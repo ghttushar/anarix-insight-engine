@@ -8,15 +8,14 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AanProvider, AanPanel } from "@/components/aan";
 import NotFound from "./pages/NotFound";
 
-// Advertising
 import CampaignManager from "./pages/advertising/CampaignManager";
 import ImpactAnalysis from "./pages/advertising/ImpactAnalysis";
 import TargetingActions from "./pages/advertising/TargetingActions";
-
-// Profitability
 import ProfitabilityDashboard from "./pages/profitability/Dashboard";
-
-// Settings
+import ProfitabilityTrends from "./pages/profitability/Trends";
+import ProfitLoss from "./pages/profitability/ProfitLoss";
+import Geographical from "./pages/profitability/Geographical";
+import CatalogProducts from "./pages/catalog/Products";
 import Appearance from "./pages/settings/Appearance";
 
 const queryClient = new QueryClient();
@@ -31,24 +30,18 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Routes>
-                {/* Default redirect to Campaign Manager */}
-                <Route path="/" element={<Navigate to="/advertising/campaigns" replace />} />
-                
-                {/* Advertising Routes */}
+                <Route path="/" element={<Navigate to="/profitability/dashboard" replace />} />
+                <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />
+                <Route path="/profitability/trends" element={<ProfitabilityTrends />} />
+                <Route path="/profitability/pnl" element={<ProfitLoss />} />
+                <Route path="/profitability/geo" element={<Geographical />} />
                 <Route path="/advertising/campaigns" element={<CampaignManager />} />
                 <Route path="/advertising/impact" element={<ImpactAnalysis />} />
                 <Route path="/advertising/targeting" element={<TargetingActions />} />
-                
-                {/* Profitability Routes */}
-                <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />
-                
-                {/* Settings Routes */}
+                <Route path="/catalog/products" element={<CatalogProducts />} />
                 <Route path="/settings/appearance" element={<Appearance />} />
-                
-                {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              {/* Aan AI Panel - renders globally */}
               <AanPanel />
             </BrowserRouter>
           </TooltipProvider>
