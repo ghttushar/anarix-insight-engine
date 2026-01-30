@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
+import { useMarketplace, Marketplace } from "@/contexts/MarketplaceContext";
 
 // Walmart logo SVG component
 const WalmartLogo = ({ className }: { className?: string }) => (
@@ -23,7 +24,7 @@ const AmazonLogo = ({ className }: { className?: string }) => (
 );
 
 interface MarketplaceOption {
-  id: string;
+  id: Marketplace;
   name: string;
   icon: React.ComponentType<{ className?: string }>;
 }
@@ -47,6 +48,10 @@ const accounts: AccountOption[] = [
 export function AppHeader() {
   const { toggleSidebar, state } = useSidebar();
   const collapsed = state === "collapsed";
+  const { marketplace, setMarketplace } = useMarketplace();
+
+  const currentMarketplace = marketplaces.find((m) => m.id === marketplace) || marketplaces[0];
+  const MarketplaceIcon = currentMarketplace.icon;
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
@@ -76,16 +81,20 @@ export function AppHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2">
-              <WalmartLogo className="h-4 w-4 text-primary" />
-              <span className="hidden sm:inline">Walmart</span>
+              <MarketplaceIcon className="h-4 w-4 text-primary" />
+              <span className="hidden sm:inline">{currentMarketplace.name}</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
-            {marketplaces.map((marketplace) => (
-              <DropdownMenuItem key={marketplace.id} className="gap-2">
-                <marketplace.icon className="h-4 w-4" />
-                {marketplace.name}
+            {marketplaces.map((mp) => (
+              <DropdownMenuItem 
+                key={mp.id} 
+                className="gap-2"
+                onClick={() => setMarketplace(mp.id)}
+              >
+                <mp.icon className="h-4 w-4" />
+                {mp.name}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
