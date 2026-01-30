@@ -1,369 +1,272 @@
 
-# Revised Anarix Implementation Plan
 
-## Critical Issues Resolution
+# Complete Advertising Section Implementation Plan
 
-### Issue 1: Navigation Hierarchy (RESOLVED)
+## Overview
 
-**Decision: Sidebar is PRIMARY navigation, Header is CONTEXTUAL controls only**
+This plan covers the complete implementation of the Advertising section with a redesigned UI layout that moves away from the heavy card-based design toward a cleaner, more professional analytical interface that matches the reference screenshots provided.
 
-```text
-+--------------------------------------------------+
-|  [☰] Anarix Logo    | Marketplace | Account     |  <-- Header (contextual)
-+--------------------------------------------------+
-| PROFITABILITY       |                            |
-|   Dashboard         |    MAIN CONTENT AREA       |
-|   Trends            |                            |
-|   Profit & Loss     |                            |
-|   Geographical      |                            |
-+---------------------+                            |
-| ADVERTISING         |                            |
-|   Campaign Manager  |                            |
-|   Impact Analysis   |                            |
-|   Targeting Actions |                            |
-+---------------------+                            |
-| CATALOG             |                            |
-|   Products          |                            |
-+---------------------+                            |
-| BUSINESS INTEL      |                            |
-|   Brand SOV         |                            |
-|   Keyword Tracker   |                            |
-|   Keyword SOV       |                            |
-|   Product SOV       |                            |
-+---------------------+                            |
-| DAY PARTING         |                            |
-|   Hourly Data       |                            |
-|   Campaigns         |                            |
-|   History           |                            |
-|   Scheduled Jobs    |                            |
-+---------------------+                            |
-| SETTINGS            |                            |
-|   Accounts          |                            |
-|   Users             |                            |
-|   History Logs      |                            |
-+--------------------------------------------------+
+---
+
+## UI Design Philosophy Changes
+
+### Current Issues
+- Heavy reliance on Card components with borders creates visual clutter
+- KPI cards feel isolated and disconnected from data
+- Chart container is overly stylized
+- Too much visual weight from borders and shadows
+
+### New Design Direction (Based on Reference Images)
+- **Minimal container styling**: Use subtle backgrounds instead of heavy borders
+- **Inline KPI metrics**: Horizontal strip with colored left borders for quick scanning
+- **Table-first layout**: Tables are the primary workspace, not cards
+- **Underlined tab navigation**: Simple horizontal tabs without pill styling
+- **Cleaner density**: More data visible, less decorative padding
+
+---
+
+## Technical Implementation
+
+### Part 1: New UI Components
+
+**1.1 InlineKPIStrip Component**
+- Horizontal row of 4 KPIs
+- Each KPI has: colored left border accent, label, value, delta with arrow
+- Background: subtle card background without heavy border
+- Delta shown as pill with up/down arrow and percentage
+
+**1.2 PerformanceChartSection Component**
+- Full-width chart area with minimal styling
+- "Show Impact" and "View Changes" toggle buttons (top-left)
+- "Hide Chart" toggle with expand/download actions (top-right)
+- Metric legend below chart (clickable to toggle)
+- Collapsible via "Hide Chart" button
+
+**1.3 DataTableToolbar Component**
+- View/Edit mode toggle (left side)
+- Search input (right side)
+- Filter button with active filter count badge
+- Columns visibility dropdown
+- Download button
+- Active filters displayed as removable chips below toolbar
+
+**1.4 UnderlineTabs Component**
+- Simple text tabs with underline active state
+- No pill/box background styling
+- Matches reference screenshots exactly
+
+---
+
+### Part 2: Campaign Manager Tabs Implementation
+
+Each tab will have its own table component with specific columns:
+
+**2.1 Campaigns Tab (Existing - Enhance)**
+Columns: Checkbox, Active, Status, Campaign (with type badges), Start Date, End Date, Budget Type, Total Budget, Daily Budget, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend, Ad Sales, ROAS, ACOS, Omnichannel Sales
+
+**2.2 Ad Groups Tab (New)**
+Columns: Checkbox, Status, Ad Group, Campaign (with type badges), Bid Automation, Min Bid, Max Bid, Target ROAS, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend, Ad Sales, ROAS, ACOS
+
+**2.3 Product Ads Tab (New)**
+Columns: Checkbox, Status, Product Ad (image + title + item ID + SKU), Ad Group, Campaign, Bid Automation, Min Bid, Max Bid, Target ROAS, Product Bid, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend
+
+**2.4 Keyword Targeting Tab (New)**
+Columns: Checkbox, Status, Keyword, Match Type, Ad Group, Campaign, Bid Automation, Min Bid, Max Bid, Target ROAS, Bid, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend
+
+**2.5 Search Terms Tab (New)**
+Columns: Checkbox, Search Term, Product Ad (image + title + details), Keyword, Match Type, Ad Group, Campaign, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend
+
+**2.6 Page Type Tab (New)**
+Columns: Checkbox, Page Type, Bid Modifier, Impressions, Clicks, CTR, CPC, Ad Spend, Ad Sales, ROAS, ACOS
+
+**2.7 Platform Tab (New)**
+Columns: Checkbox, Platform, Bid Modifier, Impressions, Clicks, CTR, CPC, Ad Spend, Ad Sales, ROAS, ACOS
+
+---
+
+### Part 3: Impact Analysis Page (New)
+
+**3.1 Page Header**
+- Time Period selector (baseline range)
+- "vs" label
+- Impact Period selector (comparison range)
+- Metrics multi-select dropdown (right side)
+- Analyze button
+
+**3.2 Impact Chart**
+- Multi-metric line chart with period comparison
+- Hide Chart toggle
+- Download and fullscreen buttons
+
+**3.3 Impact Tabs**
+- Campaigns | Ad Groups | Products | Keywords | Search Terms
+
+**3.4 Impact Table Structure**
+- Comparison table with period columns side-by-side
+- Each row shows: Entity name + Impact percentage badge
+- Grouped column headers: "Impressions" with sub-columns for each period
+- Color-coded delta values (green for positive, red for negative)
+
+---
+
+### Part 4: Targeting Actions Page (New)
+
+**4.1 Page Tabs**
+- Keyword Action | History | Archive
+
+**4.2 Action Configuration Bar**
+- Action Type dropdown (Auto to Manual, Manual to Manual, etc.)
+- Date Range dropdown
+- Priority dropdown
+- Fetch Keywords button (right side)
+
+**4.3 Table Toolbar**
+- Search input
+- Custom Bid button
+- Copy button
+- Columns dropdown
+- Download button
+- Filter button
+- Add Keywords button
+
+**4.4 Active Filters Row**
+- Removable filter chips
+- Clear button
+
+**4.5 Targeting Actions Table**
+Columns: Checkbox, Search Term (with type badge - Branded/Competitor/Generic), Normalized Term, Source Campaign, Source AdGroup, Target Campaign dropdown, Target AdGroup dropdown, Match Type to Add (BROAD/EXACT/PHRASE checkboxes with bid inputs), Archive, Impressions, Clicks, CTR, CPC, Ad Spend, Ad Sales, Ad Units, CVR, ROAS
+
+---
+
+### Part 5: Settings - Appearance Page (New)
+
+**5.1 Page Structure**
+- Clean settings layout
+- Section for Theme Mode
+- Section for other appearance preferences
+
+**5.2 Theme Switcher**
+- Light/Dark mode toggle
+- Visual preview cards showing each mode
+- Auto-detect system preference option
+- Immediate preview on selection
+
+**5.3 Implementation**
+- Use next-themes package (already installed)
+- Create ThemeProvider wrapper
+- Persist preference to localStorage
+
+---
+
+### Part 6: CSS and Style Enhancements
+
+**6.1 New CSS Classes**
+```css
+/* Inline KPI styling */
+.kpi-strip { ... }
+.kpi-item { border-left: 3px solid var(--color); }
+
+/* Underline tabs */
+.tab-underline { border-bottom: 2px solid transparent; }
+.tab-underline[data-state=active] { border-bottom-color: var(--primary); }
+
+/* Comparison delta styling */
+.delta-positive { color: var(--success); }
+.delta-negative { color: var(--destructive); }
 ```
 
-**Header contains only:**
-- Sidebar toggle (hamburger/close)
-- Anarix logo
-- Marketplace selector (Walmart/Amazon) - affects data context
-- Account selector - affects data scope
-
-**NO top navigation tabs in header. All section navigation is via sidebar.**
-
----
-
-### Issue 2: Run Button Safety Definition (RESOLVED)
-
-The "Run" button mentioned in the requirements doc is for the **Logs page filters**, not a global action.
-
-**Logs Page Run Button Specification:**
-- **Purpose**: Apply all selected filters at once
-- **Behavior**: Triggers data fetch with current filter state
-- **NOT destructive**: Does not modify any data
-- **States**:
-  - Default: Enabled
-  - Loading: Disabled + spinner + "Running..."
-  - Cooldown: 2-second debounce after execution
-- **Feedback**: Shows loading state, then success/error toast
-
-**For Campaign Manager (table inline edits):**
-- Individual Save buttons per row/field
-- Save disabled until validation passes
-- Confirmation modal for bulk actions only
-
----
-
-### Issue 3: Marketplace Selector Implications (RESOLVED)
-
-**Marketplace switching affects:**
-
-| Feature | Walmart | Amazon |
-|---------|---------|--------|
-| **Date Range Options** | No "Today"/"Yesterday" (defaults to 7 days) | All options available |
-| **Budget Fields** | Daily Budget + Total Budget | Daily Budget only |
-| **Budget Validation (3P)** | Daily >= $10, Total >= $50 | Budget >= $1 |
-| **Budget Validation (1P)** | Daily >= $50, Total >= $100 | Budget >= $1 |
-| **Min Bid (Auto)** | $0.20 | $0.02 |
-| **Min Bid (Manual)** | $0.30 | $0.02 |
-| **Min Bid (SB)** | $0.50 | $0.02 |
-| **Min Bid (SV)** | $0.80 | N/A |
-| **Bid Multiplier Max** | 1000% | 900% |
-| **Platform Bid Multiplier** | Yes (Desktop/Mobile/App) | No |
-| **Placement Bid Options** | Search Ingrid, Buy-Box, Home Page, Stock up | Top of Search, Rest of Search, Product Pages |
-| **Day Parting Graph** | Not available (show guidance message) | Hourly trends available |
-| **Total Budget Column** | Visible | Hidden |
-
-**Implementation:**
-- Create `MarketplaceContext` with current marketplace state
-- All tables, forms, and validation rules consume this context
-- Column visibility, validation rules, and available features adapt automatically
-
----
-
-### Issue 4: Bulk Actions Guardrails (RESOLVED)
-
-**Bulk Action Flow:**
-1. Select rows via checkboxes
-2. Click bulk action button
-3. **Preview Modal** appears showing:
-   - Count of items affected
-   - Summary of change to be applied
-   - List of validation errors (if any)
-4. User can Review -> Edit -> Approve or Cancel
-5. On Approve:
-   - Show progress indicator
-   - Handle partial failures gracefully
-   - Display results summary (success/failed counts)
-
-**Confirmation Requirements:**
-- Status changes (Pause/Active): Simple confirmation
-- Bid adjustments: Show before/after preview for first 5 items
-- Any action affecting >50 items: Extra confirmation step
-
-**Validation Failure Behavior:**
-- Items failing validation are excluded from action
-- User sees list of excluded items with reasons
-- Can proceed with valid items only
-
-**Partial Success Handling:**
-- Show success count and failure count
-- Failed items listed with error reasons
-- Option to retry failed items
-
----
-
-## Additional Gap Resolutions
-
-### KPI Cards Behavior
-
-**Clickability:** NO - KPI cards are display only
-**Filter tables:** NO - KPIs show aggregated data, do not filter tables
-**Delta calculations:** Static (calculated from mock data comparison)
-
-### Charts Specification
-
-**Colors per metric (locked):**
-- Ad Spend: #4A62D9 (Primary)
-- Ad Sales: #22C55E (Success green)
-- ROAS: #F59E0B (Warning amber)
-- Impressions: #9CA2C8 (Muted)
-- Clicks: #6E82F5 (Primary light)
-- CTR: #A7AEF2 (Accent)
-- CPC: #2A2D4F (Secondary)
-- ACOS: #EF4444 (Destructive red)
-
-**Max visible metrics:** 4
-
-**5th metric behavior:** Replace oldest selected metric OR show tooltip "Maximum 4 metrics. Deselect one first."
-
-### Status Badges Specification
-
-| Status | Color | Shape | Tooltip |
-|--------|-------|-------|---------|
-| Live | Green bg + text | Rounded pill | "Campaign is actively running" |
-| Paused | Gray bg + text | Rounded pill | "Campaign paused by user" |
-| Archived | Muted bg + text | Rounded pill | "Permanently stopped" |
-| Scheduled | Blue/Primary bg + text | Rounded pill | "Starts on [date]" |
-| Out of Budget | Yellow/Warning bg + text | Rounded pill | "Daily budget exhausted" |
-| Completed | Gray bg + text | Rounded pill | "Campaign ended on [date]" |
-
-**Clickability:** NO - status badges are display only
-**Placement:** Inline within table rows, left of campaign name
-
----
-
-## Aan (AI) UI Integration
-
-### Aan Entry Points
-
-1. **Header**: Small icon button (subtle, not prominent)
-2. **Contextual**: "Ask Aan" link near complex tables/charts
-3. **Empty states**: "Get help from Aan" suggestion
-
-### Aan Visual Identity
-
-- **Gradient allowed ONLY inside Aan workspace:**
-  `linear-gradient(135deg, #4A62D9, #A7AEF2)`
-- Core Anarix remains flat and neutral
-- Aan workspace has distinct visual boundary
-
-### Aan Workspace Structure
-
-```text
-+------------------------------------------+
-| Aan - AI Assistant                    [X] |
-+------------------------------------------+
-| Context: Campaign Manager > Campaigns     |
-| Date: Jan 15 - Jan 22, 2026              |
-+------------------------------------------+
-|                                          |
-|  CONVERSATION AREA                       |
-|  - User messages                         |
-|  - Aan responses                         |
-|                                          |
-+------------------------------------------+
-| DRAFT OUTPUT (when applicable)           |
-| [Preview of suggested changes]           |
-|                                          |
-| [Review] [Edit] [Approve] [Reject]       |
-+------------------------------------------+
-| Type a message...              [Send]    |
-+------------------------------------------+
-```
-
-### Aan Approval Flow
-
-1. User asks Aan a question
-2. Aan shows explanation (always)
-3. If Aan suggests changes:
-   - Show as DRAFT/PREVIEW only
-   - Never auto-apply
-   - Require explicit "Approve" click
-   - Show exactly what will change
-4. User can Edit, Approve, or Reject
-
----
-
-## Implementation Sequence
-
-### Phase 1: Foundation & Shell
-1. Update CSS with complete Periwinkle tokens
-2. Implement marketplace context provider
-3. Finalize AppHeader (contextual controls only)
-4. Finalize AppSidebar (primary navigation)
-5. Add theme toggle (light/dark)
-
-### Phase 2: Campaign Manager
-1. KPI Cards component (4 cards, static display)
-2. Performance Chart component (recharts, multi-metric)
-3. DataTable component with:
-   - Sortable columns
-   - Total row
-   - Inline editing
-   - Validation per marketplace
-   - Column visibility
-4. Filter modal component
-5. Bulk actions with confirmation flow
-6. Tab navigation (Campaigns, Ad Groups, etc.)
-
-### Phase 3: Profitability Dashboard
-1. Summary cards (Today/Yesterday/This Month/Last Month)
-2. Products/Orders table
-3. P&L catalog view
-
-### Phase 4: Shared Components
-1. DateRangePicker (with marketplace restrictions)
-2. Filter system (Where/Operator/Value pattern)
-3. Export functionality
-4. Pagination controls
-5. Status badges
-
-### Phase 5: Aan UI Shell (UI ONLY)
-1. Aan icon in header
-2. Aan slide-out panel
-3. Conversation interface
-4. Draft/Preview display area
-5. Approval controls
+**6.2 Table Enhancements**
+- Reduce row padding for density
+- Add sticky column support for wide tables
+- Horizontal scroll with shadow indicators
 
 ---
 
 ## File Structure
 
-```text
+```
 src/
-├── contexts/
-│   └── MarketplaceContext.tsx
 ├── components/
-│   ├── layout/
-│   │   ├── AppSidebar.tsx
-│   │   ├── AppHeader.tsx
-│   │   └── AppLayout.tsx
+│   ├── advertising/
+│   │   ├── InlineKPIStrip.tsx
+│   │   ├── PerformanceChartSection.tsx
+│   │   ├── DataTableToolbar.tsx
+│   │   └── UnderlineTabs.tsx
 │   ├── tables/
-│   │   ├── DataTable.tsx
-│   │   ├── TableFilters.tsx
-│   │   ├── TablePagination.tsx
-│   │   ├── TotalRow.tsx
-│   │   └── BulkActions.tsx
-│   ├── charts/
-│   │   ├── PerformanceChart.tsx
-│   │   └── MetricSelector.tsx
-│   ├── cards/
-│   │   ├── KPICard.tsx
-│   │   └── SummaryCard.tsx
-│   ├── forms/
-│   │   ├── DateRangePicker.tsx
-│   │   ├── FilterModal.tsx
-│   │   └── InlineEdit.tsx
-│   ├── status/
-│   │   └── StatusBadge.tsx
-│   └── aan/
-│       ├── AanPanel.tsx
-│       ├── AanTrigger.tsx
-│       ├── AanConversation.tsx
-│       └── AanDraftPreview.tsx
+│   │   ├── AdGroupsTable.tsx
+│   │   ├── ProductAdsTable.tsx
+│   │   ├── KeywordTargetingTable.tsx
+│   │   ├── SearchTermsTable.tsx
+│   │   ├── PageTypeTable.tsx
+│   │   ├── PlatformTable.tsx
+│   │   └── ImpactTable.tsx
+│   └── settings/
+│       └── ThemeSwitcher.tsx
 ├── pages/
 │   ├── advertising/
-│   │   └── CampaignManager.tsx
-│   ├── profitability/
-│   │   ├── Dashboard.tsx
-│   │   └── ProfitLoss.tsx
+│   │   ├── CampaignManager.tsx (enhance)
+│   │   ├── ImpactAnalysis.tsx (new)
+│   │   └── TargetingActions.tsx (new)
 │   └── settings/
-│       └── Logs.tsx
-├── hooks/
-│   └── useMarketplace.ts
-├── types/
-│   ├── campaign.ts
-│   └── validation.ts
-└── lib/
-    ├── validation/
-    │   ├── amazon.ts
-    │   └── walmart.ts
-    └── constants/
-        └── chartColors.ts
+│       └── Appearance.tsx (new)
+├── contexts/
+│   └── ThemeContext.tsx (new)
+├── data/
+│   ├── mockCampaigns.ts (enhance with more data)
+│   ├── mockAdGroups.ts (new)
+│   ├── mockProductAds.ts (new)
+│   ├── mockKeywords.ts (new)
+│   ├── mockSearchTerms.ts (new)
+│   └── mockImpactData.ts (new)
+└── types/
+    └── advertising.ts (new - extended types)
 ```
 
 ---
 
-## Validation Rules Reference
+## Route Updates
 
-### Amazon Sponsored Products
-- Campaign Budget: $1 <= budget < $100,000
-- Ad Group Default Bid: >= $0.02
-- Keyword/Target Bid: $0.02 - $49
-- Placement Bid Multiplier: 0% - 900%
-
-### Walmart Sponsored Products (3P)
-- Daily Budget: >= $10
-- Total Budget: >= $50
-- Daily Budget < Total Budget
-- Auto Campaign Bid: $0.20 - $49
-- Manual Campaign Bid: $0.30 - $49
-- Page Type/Platform Bid Multiplier: <= 1000%
-
-### Walmart Sponsored Products (1P)
-- Daily Budget: >= $50
-- Total Budget: >= $100
-- Daily Budget < Total Budget
+```tsx
+// New routes in App.tsx
+<Route path="/advertising/campaigns" element={<CampaignManager />} />
+<Route path="/advertising/impact" element={<ImpactAnalysis />} />
+<Route path="/advertising/targeting" element={<TargetingActions />} />
+<Route path="/settings/appearance" element={<Appearance />} />
+```
 
 ---
 
-## Explicit Exclusions
+## Mock Data Requirements
 
-- Real API integrations (mock data only)
-- Aan AI logic/reasoning (UI shell only)
-- Auto-applying any changes
-- Marketing pages
-- Mobile native apps
+**Ad Groups Data**: 15+ records with all columns
+**Product Ads Data**: 10+ records with product images, SKUs
+**Keywords Data**: 20+ records with match types
+**Search Terms Data**: 15+ records with product references
+**Impact Data**: Comparison data for two date periods
+**Targeting Actions Data**: 5+ records with match type options
 
 ---
 
-## Ready to Proceed
+## Implementation Order
 
-Please confirm or correct:
-1. Navigation hierarchy (Sidebar primary, Header contextual)
-2. Marketplace-aware validation rules
-3. Bulk action confirmation flow
-4. Aan UI scope (UI only, no logic)
-5. First screen to build (Campaign Manager or Profitability Dashboard)
+1. Create theme context and appearance settings page
+2. Build new UI components (InlineKPIStrip, UnderlineTabs, DataTableToolbar)
+3. Refactor Campaign Manager with new design
+4. Add all Campaign Manager tab tables with mock data
+5. Build Impact Analysis page
+6. Build Targeting Actions page
+7. Update sidebar with Appearance link
+8. Final styling polish
+
+---
+
+## Technical Notes
+
+- All tables will use the existing Table components from shadcn/ui
+- Sorting, pagination, and selection patterns remain consistent
+- Filter chips use Badge component with close button
+- Match type badges (BROAD/EXACT/PHRASE) with distinct colors
+- Campaign type badges (Manual/Auto/SP/SB) with distinct styling
+- Editable cells use Input component with inline validation
+- Total rows remain at bottom of each table
+
