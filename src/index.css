@@ -1,96 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Satoshi Variable Font */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* PERIWINKLE SYSTEM 01 - LOCKED DESIGN SYSTEM
+   DO NOT MODIFY WITHOUT EXPLICIT INSTRUCTION
+   
+   Light Mode:
+   - Background: #F5F6FA
+   - Card/Surface: #FFFFFF
+   - Text Primary: #0F1020
+   - Text Muted: #646A86
+   - Secondary (Ink Blue): #2A2D4F
+   - Brand Primary (Periwinkle): #4A62D9
+   - Brand Accent (Lilac): #A7AEF2
+   
+   Dark Mode:
+   - Background: #0E1020
+   - Card/Surface: #171A2E
+   - Text Primary: #ECEEFF
+   - Text Muted: #9CA2C8
+   - Secondary: #2F3470
+   - Brand Primary: #6E82F5
+   - Brand Accent: #B8BEFF
+   
+   Data Visualization Colors (RESERVED FOR DATA ONLY):
+   - Positive/Success: #22C55E (green)
+   - Negative/Error: #EF4444 (red)
+   - Warning: #F59E0B (yellow/amber)
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Light Mode - Periwinkle System 01 */
+    --background: 230 33% 97%; /* #F5F6FA */
+    --foreground: 240 53% 9%; /* #0F1020 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 240 53% 9%; /* #0F1020 */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 240 53% 9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 229 65% 57%; /* #4A62D9 - Brand Primary Periwinkle */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 234 30% 24%; /* #2A2D4F - Ink Blue */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 230 33% 97%;
+    --muted-foreground: 228 15% 46%; /* #646A86 */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 231 74% 81%; /* #A7AEF2 - Lilac */
+    --accent-foreground: 240 53% 9%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%; /* #EF4444 - Data viz red */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --success: 142 71% 45%; /* #22C55E - Data viz green */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%; /* #F59E0B - Data viz amber */
+    --warning-foreground: 0 0% 100%;
+
+    --border: 230 25% 90%;
+    --input: 230 25% 90%;
+    --ring: 229 65% 57%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Sidebar - Light */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 228 15% 46%;
+    --sidebar-primary: 229 65% 57%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 33% 97%;
+    --sidebar-accent-foreground: 240 53% 9%;
+    --sidebar-border: 230 25% 90%;
+    --sidebar-ring: 229 65% 57%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Typography */
+    --font-heading: 'Satoshi', system-ui, sans-serif;
+    --font-body: 'Noto Sans', system-ui, sans-serif;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark Mode - Periwinkle System 01 */
+    --background: 234 53% 9%; /* #0E1020 */
+    --foreground: 240 100% 97%; /* #ECEEFF */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 235 37% 14%; /* #171A2E */
+    --card-foreground: 240 100% 97%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 235 37% 14%;
+    --popover-foreground: 240 100% 97%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 231 88% 70%; /* #6E82F5 - Brand Primary */
+    --primary-foreground: 240 53% 9%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 234 43% 32%; /* #2F3470 */
+    --secondary-foreground: 240 100% 97%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 235 37% 14%;
+    --muted-foreground: 230 29% 69%; /* #9CA2C8 */
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 231 100% 87%; /* #B8BEFF - Lilac */
+    --accent-foreground: 240 53% 9%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 235 30% 20%;
+    --input: 235 30% 20%;
+    --ring: 231 88% 70%;
+
+    /* Sidebar - Dark */
+    --sidebar-background: 235 37% 14%;
+    --sidebar-foreground: 230 29% 69%;
+    --sidebar-primary: 231 88% 70%;
+    --sidebar-primary-foreground: 240 53% 9%;
+    --sidebar-accent: 234 53% 9%;
+    --sidebar-accent-foreground: 240 100% 97%;
+    --sidebar-border: 235 30% 20%;
+    --sidebar-ring: 231 88% 70%;
   }
 }
 
@@ -99,7 +147,44 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    font-size: 14px; /* Minimum body size as per requirements */
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+  }
+}
+
+/* Status Badge Colors - Data Visualization Reserved */
+@layer components {
+  .status-live {
+    @apply bg-success/10 text-success;
+  }
+  
+  .status-paused {
+    @apply bg-muted text-muted-foreground;
+  }
+  
+  .status-archived {
+    @apply bg-muted/50 text-muted-foreground/70;
+  }
+  
+  .status-scheduled {
+    @apply bg-primary/10 text-primary;
+  }
+  
+  .status-out-of-budget {
+    @apply bg-warning/10 text-warning;
+  }
+  
+  .status-completed {
+    @apply bg-muted text-muted-foreground;
   }
 }
