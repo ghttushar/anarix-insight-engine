@@ -1,272 +1,550 @@
 
-
-# Complete Advertising Section Implementation Plan
+# Complete Implementation Plan: Profitability, Catalog & Enhanced Navigation
 
 ## Overview
 
-This plan covers the complete implementation of the Advertising section with a redesigned UI layout that moves away from the heavy card-based design toward a cleaner, more professional analytical interface that matches the reference screenshots provided.
+This plan covers three major areas:
+1. Complete Profitability section (Dashboard, Trends, Profit & Loss, Geographical Data)
+2. Complete Catalog section (Products with grouped columns)
+3. Enhanced navigation with hover shortcuts and Aan entry point
+4. UI enhancements for better visual appeal
 
 ---
 
-## UI Design Philosophy Changes
+## Part 1: Enhanced Sidebar Navigation
 
-### Current Issues
-- Heavy reliance on Card components with borders creates visual clutter
-- KPI cards feel isolated and disconnected from data
-- Chart container is overly stylized
-- Too much visual weight from borders and shadows
+Based on the Wix reference images, I will redesign the sidebar with a modern interaction pattern that reduces clicks:
 
-### New Design Direction (Based on Reference Images)
-- **Minimal container styling**: Use subtle backgrounds instead of heavy borders
-- **Inline KPI metrics**: Horizontal strip with colored left borders for quick scanning
-- **Table-first layout**: Tables are the primary workspace, not cards
-- **Underlined tab navigation**: Simple horizontal tabs without pill styling
-- **Cleaner density**: More data visible, less decorative padding
+### 1.1 New Sidebar Design Features
 
----
+**Hover Quick-Access Flyout**
+- When hovering on a collapsed section header, show a flyout menu with all sub-items
+- No click required to see options - just hover and slide
+- Flyout appears to the right of the sidebar
+- Smooth 150ms transition
 
-## Technical Implementation
+**Always-Visible Quick Actions Row**
+- At the top of sidebar, add a "Quick Actions" dropdown (like Wix shows)
+- Contains frequently used actions across the app
+- Optional: keyboard shortcuts displayed
 
-### Part 1: New UI Components
+**Section Icons for Visual Hierarchy**
+- Each section header gets an icon alongside text
+- When collapsed, only icon visible with hover-expand behavior
 
-**1.1 InlineKPIStrip Component**
-- Horizontal row of 4 KPIs
-- Each KPI has: colored left border accent, label, value, delta with arrow
-- Background: subtle card background without heavy border
-- Delta shown as pill with up/down arrow and percentage
+**Aan Entry Point in Sidebar**
+- Dedicated "Aan AI" item at the top of sidebar (after logo area)
+- Gradient-styled to match Aan identity
+- Sparkles icon with "Aan" label
+- Clicking opens the Aan panel
 
-**1.2 PerformanceChartSection Component**
-- Full-width chart area with minimal styling
-- "Show Impact" and "View Changes" toggle buttons (top-left)
-- "Hide Chart" toggle with expand/download actions (top-right)
-- Metric legend below chart (clickable to toggle)
-- Collapsible via "Hide Chart" button
+### 1.2 Sidebar Structure
 
-**1.3 DataTableToolbar Component**
-- View/Edit mode toggle (left side)
-- Search input (right side)
-- Filter button with active filter count badge
-- Columns visibility dropdown
-- Download button
-- Active filters displayed as removable chips below toolbar
-
-**1.4 UnderlineTabs Component**
-- Simple text tabs with underline active state
-- No pill/box background styling
-- Matches reference screenshots exactly
-
----
-
-### Part 2: Campaign Manager Tabs Implementation
-
-Each tab will have its own table component with specific columns:
-
-**2.1 Campaigns Tab (Existing - Enhance)**
-Columns: Checkbox, Active, Status, Campaign (with type badges), Start Date, End Date, Budget Type, Total Budget, Daily Budget, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend, Ad Sales, ROAS, ACOS, Omnichannel Sales
-
-**2.2 Ad Groups Tab (New)**
-Columns: Checkbox, Status, Ad Group, Campaign (with type badges), Bid Automation, Min Bid, Max Bid, Target ROAS, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend, Ad Sales, ROAS, ACOS
-
-**2.3 Product Ads Tab (New)**
-Columns: Checkbox, Status, Product Ad (image + title + item ID + SKU), Ad Group, Campaign, Bid Automation, Min Bid, Max Bid, Target ROAS, Product Bid, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend
-
-**2.4 Keyword Targeting Tab (New)**
-Columns: Checkbox, Status, Keyword, Match Type, Ad Group, Campaign, Bid Automation, Min Bid, Max Bid, Target ROAS, Bid, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend
-
-**2.5 Search Terms Tab (New)**
-Columns: Checkbox, Search Term, Product Ad (image + title + details), Keyword, Match Type, Ad Group, Campaign, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend
-
-**2.6 Page Type Tab (New)**
-Columns: Checkbox, Page Type, Bid Modifier, Impressions, Clicks, CTR, CPC, Ad Spend, Ad Sales, ROAS, ACOS
-
-**2.7 Platform Tab (New)**
-Columns: Checkbox, Platform, Bid Modifier, Impressions, Clicks, CTR, CPC, Ad Spend, Ad Sales, ROAS, ACOS
+```text
++----------------------------------+
+| [Anarix Logo]              [X]   |
++----------------------------------+
+| [*] Aan AI (gradient accent)     |  <-- New entry point
++----------------------------------+
+| [>] Profitability         [icon] |  <-- Hover shows flyout
+|    Dashboard                     |
+|    Trends                        |
+|    Profit & Loss                 |
+|    Geographical                  |
++----------------------------------+
+| [>] Advertising           [icon] |
+|    Campaign Manager              |
+|    Impact Analysis               |
+|    Targeting Actions             |
++----------------------------------+
+| [>] Catalog               [icon] |
+|    Products                      |
++----------------------------------+
+| ... (remaining sections)         |
++----------------------------------+
+```
 
 ---
 
-### Part 3: Impact Analysis Page (New)
+## Part 2: Profitability Dashboard
 
-**3.1 Page Header**
-- Time Period selector (baseline range)
-- "vs" label
-- Impact Period selector (comparison range)
-- Metrics multi-select dropdown (right side)
-- Analyze button
+Based on the reference images, the dashboard has these key components:
 
-**3.2 Impact Chart**
-- Multi-metric line chart with period comparison
-- Hide Chart toggle
-- Download and fullscreen buttons
+### 2.1 Time Period Summary Cards
 
-**3.3 Impact Tabs**
-- Campaigns | Ad Groups | Products | Keywords | Search Terms
+**Structure (4 collapsible rows):**
+- Today (with current date)
+- Yesterday (with date)
+- This Month (date range)
+- Last Month (date range)
 
-**3.4 Impact Table Structure**
-- Comparison table with period columns side-by-side
-- Each row shows: Entity name + Impact percentage badge
-- Grouped column headers: "Impressions" with sub-columns for each period
-- Color-coded delta values (green for positive, red for negative)
+**Each row contains:**
+- Left accent bar (colored by period - purple gradient for hierarchy)
+- Period label + date/date range
+- Metrics inline: GMV | Auth Sales | Orders | Units | Returns | Cancelled | Ad Cost | Est. Payout | Net Profit
+- "View More" expandable link on right
+- Clicking "View More" opens a right-side panel with full breakdown
 
----
+**View More Panel (Side Panel):**
+- Sales breakdown (Organic, Sponsored Products, Sponsored Brands, Sponsored Video)
+- Orders count
+- Total Units
+- COGS
+- Total Expenses (expandable)
+- Calculated Metrics (Net Profit, TACOS, ROAS)
 
-### Part 4: Targeting Actions Page (New)
+### 2.2 Trend Chart (Right Side)
 
-**4.1 Page Tabs**
-- Keyword Action | History | Archive
+- Weekly line chart showing Orders & Units trends
+- Frequency selector (Weekly dropdown)
+- Metrics selector (Orders, Units)
+- X-axis: Week numbers
+- Y-axis: Values
 
-**4.2 Action Configuration Bar**
-- Action Type dropdown (Auto to Manual, Manual to Manual, etc.)
-- Date Range dropdown
-- Priority dropdown
-- Fetch Keywords button (right side)
+### 2.3 Products Table
 
-**4.3 Table Toolbar**
+**Toolbar:**
 - Search input
-- Custom Bid button
-- Copy button
+- Products/Orders toggle switch
+- Filters button
+- Upload COGS button
 - Columns dropdown
 - Download button
+
+**Table Columns:**
+- Product Details (image, name, ID, SKU, price, COGS link, Trends link)
+- Units
+- Refund Units
+- Cancelled Units
+- GMV
+- Auth Sales
+- Refund Sales
+- Cancelled Sales
+- Ad Spend
+- Commission on Product
+- Commission on Shipping
+- WFS Fulfillment Fee
+- Shipping Fees
+- COGS
+- Net Profit
+- Additional Fee
+- Info (More link)
+
+**Total Row at bottom**
+
+---
+
+## Part 3: Profitability Trends Page
+
+Based on reference image 3:
+
+### 3.1 Layout
+
+**Top Controls:**
+- Search by Item ID/Product Name/SKU
+- Date Range dropdown (A Quarter / 3 months by weeks)
+- Metrics dropdown (Total Sales)
+- Run button
+
+### 3.2 Scatter Plot Chart
+
+- X-axis: Profit Margin (%)
+- Y-axis: Total Sales ($)
+- Quadrant zones with color backgrounds:
+  - Top-right (green): High margin, high sales - Winners
+  - Top-left (yellow): Low margin, high sales - Optimize
+  - Bottom-right (light green): High margin, low sales - Grow
+  - Bottom-left (red/pink): Low margin, low sales - Review
+- Each product is a data point
+
+### 3.3 Products Table (Weekly Breakdown)
+
+**Columns:**
+- Product Details (image, name, ID, SKU, price, Trends link)
+- Week-05 (dynamic based on date range)
+- Week-04
+- Week-02
+- Week-01
+- Total
+
+**Total Row**
+
+---
+
+## Part 4: Profit & Loss Page
+
+Based on reference image 4:
+
+### 4.1 Controls
+
+- Product filter chip (N Product(s) Selected)
+- Date Range dropdown
+- Run button
+- Download button
+
+### 4.2 P&L Parameter Table (Expandable Rows)
+
+**Structure:**
+```text
+Parameter / Date          | Week-05 | Week-04 | Week-02 | Week-01 | Total
+---------------------------------------------------------------------------
+> Sales                   | $421.97 | $20.99  | $829.96 | $864.95 | $2,137.87
+    Order Sales           | $421.97 | $468.98 | $829.96 | $864.95 | $2,585.86
+    Refund Sales          | $0.00   | -$447.99| $0.00   | $0.00   | -$447.99
+    Cancelled Sales       | $0.00   | $0.00   | $0.00   | $0.00   | $0.00
+  COGS                    | $1.00   | $90.00  | $10.00  | $1.00   | $102.00
+> Total Expenses          | -$63.30 | $37.35  | -$124.50| -$129.75| -$280.20
+    Total Ad Spend        | -       | -       | -       | -       | -
+    Total Walmart Adj Fee | -$63.30 | $37.35  | -$124.50| -$129.75| -$280.20
+    Total Shipping Cost   | $0.00   | $0.00   | $0.00   | $0.00   | $0.00
+> Total Ad Orders         | -       | -       | -       | -       | -
+    Sponsored Products    | -       | -       | -       | -       | -
+    Sponsored Brands      | -       | -       | -       | -       | -
+    Sponsored Video       | -       | -       | -       | -       | -
+> Units                   | 3       | 1       | 4       | 5       | 13
+    Order Units           | 3       | 3       | 4       | 5       | 15
+    Refund Units          | 0       | -2      | 0       | 0       | -2
+    Cancelled Units       | 0       | 0       | 0       | 0       | 0
+```
+
+### 4.3 Products Table (Same as Dashboard)
+
+---
+
+## Part 5: Geographical Data Page
+
+Based on reference images 5-6:
+
+### 5.1 Layout
+
+**Left: Map Visualization**
+- Interactive map (US focus by default)
+- States/countries colored by data density
+- Hover reveals quick stats
+- Zoom controls (+/-)
+- Search/filter control
+
+**Right: Region Stats Panel**
+- Country flag + name + date
+- Key metrics: Sales, Units, Promo, Total Expenses
+- Calculated Metrics section: % Refunds, Sellable returns, Margin, ROI
+
+### 5.2 Region Table
+
+**Toolbar:**
+- State Level / Product Level toggle
 - Filter button
-- Add Keywords button
+- Upload COGS button
+- Columns dropdown
+- Download button
 
-**4.4 Active Filters Row**
-- Removable filter chips
+**Table Columns:**
+- Region/State (with flag + expandable arrow)
+- Stocks
+- Orders
+- Units Sold
+- Refunds
+- Sales
+- Amazon Fees
+- Sellable Returns
+- Info (More link)
+
+**Expandable Rows:** Each country expands to show states/regions
+
+---
+
+## Part 6: Catalog / Products Page
+
+Based on reference image 7:
+
+### 6.1 Controls
+
+- Search by Product Name/ID/SKU
+- Filters row with active chips (e.g., "Status is PUBLISHED")
 - Clear button
+- Upload COGS button
+- Filter button
+- Columns dropdown
+- Download button
 
-**4.5 Targeting Actions Table**
-Columns: Checkbox, Search Term (with type badge - Branded/Competitor/Generic), Normalized Term, Source Campaign, Source AdGroup, Target Campaign dropdown, Target AdGroup dropdown, Match Type to Add (BROAD/EXACT/PHRASE checkboxes with bid inputs), Archive, Impressions, Clicks, CTR, CPC, Ad Spend, Ad Sales, Ad Units, CVR, ROAS
+### 6.2 Products Table with Grouped Columns
+
+**Column Groups (with expand/collapse icons):**
+
+**Product Details Group:**
+- Image + Name + ID + SKU + Tags (3P, WFS Eligible, etc.)
+
+**Product Performance Group:**
+- Status (PUBLISHED badge)
+- Reviews & Ratings (count | star rating)
+
+**Inventory Group:**
+- Inventory Count
+- Inventory Value (COGS)
+- Inventory Value (Retail)
+
+**Revenue & Cost Group:**
+- Price
+- COGS
+- Total Sales
+- GMV
+- Total Units
+- Refund Sales
+- Cancelled Sales
+
+**Ads Group:**
+- Advertised (Yes/No)
+- Ad Spend
+
+**Total Row with aggregations**
 
 ---
 
-### Part 5: Settings - Appearance Page (New)
+## Part 7: Mock Data Files
 
-**5.1 Page Structure**
-- Clean settings layout
-- Section for Theme Mode
-- Section for other appearance preferences
+### New Data Files Required:
 
-**5.2 Theme Switcher**
-- Light/Dark mode toggle
-- Visual preview cards showing each mode
-- Auto-detect system preference option
-- Immediate preview on selection
+**src/data/mockProfitability.ts:**
+- Summary data for Today/Yesterday/This Month/Last Month
+- Products with full P&L columns
+- Weekly breakdown data
+- Regional/geographical data
 
-**5.3 Implementation**
-- Use next-themes package (already installed)
-- Create ThemeProvider wrapper
-- Persist preference to localStorage
+**src/data/mockCatalog.ts:**
+- Products with all Catalog columns
+- Status, ratings, inventory data
 
 ---
 
-### Part 6: CSS and Style Enhancements
+## Part 8: Type Definitions
 
-**6.1 New CSS Classes**
-```css
-/* Inline KPI styling */
-.kpi-strip { ... }
-.kpi-item { border-left: 3px solid var(--color); }
+### New Types in src/types/profitability.ts:
 
-/* Underline tabs */
-.tab-underline { border-bottom: 2px solid transparent; }
-.tab-underline[data-state=active] { border-bottom-color: var(--primary); }
+```typescript
+interface ProfitabilitySummary {
+  period: "today" | "yesterday" | "this_month" | "last_month";
+  dateLabel: string;
+  dateRange?: string;
+  gmv: number;
+  authSales: number;
+  orders: number;
+  units: number;
+  returns: number;
+  cancelled: number;
+  adCost: number;
+  estPayout: number;
+  netProfit: number;
+  // Breakdown for View More panel
+  breakdown: {
+    organic: number;
+    sponsoredProducts: number;
+    sponsoredBrands: number;
+    sponsoredVideo: number;
+    cogs: number;
+    totalExpenses: number;
+    tacos: number;
+    roas: number;
+  };
+}
 
-/* Comparison delta styling */
-.delta-positive { color: var(--success); }
-.delta-negative { color: var(--destructive); }
+interface ProfitabilityProduct {
+  id: string;
+  name: string;
+  image: string;
+  itemId: string;
+  sku: string;
+  price: number;
+  cogs: number;
+  units: number;
+  refundUnits: number;
+  cancelledUnits: number;
+  gmv: number;
+  authSales: number;
+  refundSales: number;
+  cancelledSales: number;
+  adSpend: number;
+  commissionProduct: number;
+  commissionShipping: number;
+  wfsFulfillmentFee: number;
+  shippingFees: number;
+  netProfit: number;
+  additionalFee: number;
+}
+
+interface GeographicalData {
+  id: string;
+  region: string;
+  countryCode: string;
+  flag: string;
+  stocks: number;
+  orders: number;
+  unitsSold: number;
+  refunds: number;
+  sales: number;
+  amazonFees: number;
+  sellableReturns: number;
+  children?: GeographicalData[];
+}
 ```
 
-**6.2 Table Enhancements**
-- Reduce row padding for density
-- Add sticky column support for wide tables
-- Horizontal scroll with shadow indicators
+### New Types in src/types/catalog.ts:
+
+```typescript
+interface CatalogProduct {
+  id: string;
+  name: string;
+  image: string;
+  itemId: string;
+  sku: string;
+  tags: string[]; // ["3P", "WFS Eligible", "Walmart Fulfilled"]
+  status: "published" | "unpublished" | "draft";
+  reviewCount: number;
+  rating: number;
+  inventoryCount: number;
+  inventoryValueCogs: number;
+  inventoryValueRetail: number;
+  price: number;
+  cogs: number;
+  totalSales: number;
+  gmv: number;
+  totalUnits: number;
+  refundSales: number;
+  cancelledSales: number;
+  advertised: boolean;
+  adSpend: number;
+}
+```
 
 ---
 
-## File Structure
+## Part 9: File Structure
 
-```
+```text
 src/
 ├── components/
-│   ├── advertising/
-│   │   ├── InlineKPIStrip.tsx
-│   │   ├── PerformanceChartSection.tsx
-│   │   ├── DataTableToolbar.tsx
-│   │   └── UnderlineTabs.tsx
-│   ├── tables/
-│   │   ├── AdGroupsTable.tsx
-│   │   ├── ProductAdsTable.tsx
-│   │   ├── KeywordTargetingTable.tsx
-│   │   ├── SearchTermsTable.tsx
-│   │   ├── PageTypeTable.tsx
-│   │   ├── PlatformTable.tsx
-│   │   └── ImpactTable.tsx
-│   └── settings/
-│       └── ThemeSwitcher.tsx
+│   ├── layout/
+│   │   ├── AppSidebar.tsx (ENHANCED with hover flyouts + Aan)
+│   │   └── SidebarFlyout.tsx (NEW)
+│   ├── profitability/
+│   │   ├── PeriodSummaryCard.tsx (NEW)
+│   │   ├── PeriodBreakdownPanel.tsx (NEW)
+│   │   ├── ProfitabilityTrendChart.tsx (NEW)
+│   │   ├── ProductsPnLTable.tsx (NEW)
+│   │   ├── PnLParameterTable.tsx (NEW)
+│   │   ├── ScatterPlotChart.tsx (NEW)
+│   │   ├── GeographyMap.tsx (NEW - placeholder/simple)
+│   │   └── RegionStatsPanel.tsx (NEW)
+│   ├── catalog/
+│   │   ├── CatalogProductsTable.tsx (NEW)
+│   │   └── ColumnGroupHeader.tsx (NEW)
+│   └── tables/
+│       └── RegionalTable.tsx (NEW)
 ├── pages/
-│   ├── advertising/
-│   │   ├── CampaignManager.tsx (enhance)
-│   │   ├── ImpactAnalysis.tsx (new)
-│   │   └── TargetingActions.tsx (new)
-│   └── settings/
-│       └── Appearance.tsx (new)
-├── contexts/
-│   └── ThemeContext.tsx (new)
+│   ├── profitability/
+│   │   ├── Dashboard.tsx (COMPLETE)
+│   │   ├── Trends.tsx (NEW)
+│   │   ├── ProfitLoss.tsx (NEW)
+│   │   └── Geographical.tsx (NEW)
+│   └── catalog/
+│       └── Products.tsx (NEW)
 ├── data/
-│   ├── mockCampaigns.ts (enhance with more data)
-│   ├── mockAdGroups.ts (new)
-│   ├── mockProductAds.ts (new)
-│   ├── mockKeywords.ts (new)
-│   ├── mockSearchTerms.ts (new)
-│   └── mockImpactData.ts (new)
+│   ├── mockProfitability.ts (NEW)
+│   └── mockCatalog.ts (NEW)
 └── types/
-    └── advertising.ts (new - extended types)
+    ├── profitability.ts (NEW)
+    └── catalog.ts (NEW)
 ```
 
 ---
 
-## Route Updates
+## Part 10: Route Updates
 
 ```tsx
-// New routes in App.tsx
-<Route path="/advertising/campaigns" element={<CampaignManager />} />
-<Route path="/advertising/impact" element={<ImpactAnalysis />} />
-<Route path="/advertising/targeting" element={<TargetingActions />} />
-<Route path="/settings/appearance" element={<Appearance />} />
+// Add to App.tsx
+// Profitability Routes
+<Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />
+<Route path="/profitability/trends" element={<ProfitabilityTrends />} />
+<Route path="/profitability/pnl" element={<ProfitLoss />} />
+<Route path="/profitability/geo" element={<GeographicalData />} />
+
+// Catalog Routes
+<Route path="/catalog/products" element={<CatalogProducts />} />
 ```
 
 ---
 
-## Mock Data Requirements
+## Part 11: Visual Enhancements
 
-**Ad Groups Data**: 15+ records with all columns
-**Product Ads Data**: 10+ records with product images, SKUs
-**Keywords Data**: 20+ records with match types
-**Search Terms Data**: 15+ records with product references
-**Impact Data**: Comparison data for two date periods
-**Targeting Actions Data**: 5+ records with match type options
+### 11.1 Sidebar Improvements
+- Add subtle hover background transitions
+- Add left accent bar for active section (not just item)
+- Slightly increased padding for better readability
+- Icon color changes on active state
+
+### 11.2 Table Enhancements
+- Grouped column headers with collapse/expand capability
+- Subtle alternating row backgrounds
+- Sticky product details column on horizontal scroll
+- Better cell padding for data density
+
+### 11.3 Color Emphasis
+- Use accent color more prominently in active states
+- Add subtle gradients to period cards (purple-to-transparent)
+- Ensure proper contrast ratios throughout
 
 ---
 
-## Implementation Order
+## Implementation Sequence
 
-1. Create theme context and appearance settings page
-2. Build new UI components (InlineKPIStrip, UnderlineTabs, DataTableToolbar)
-3. Refactor Campaign Manager with new design
-4. Add all Campaign Manager tab tables with mock data
-5. Build Impact Analysis page
-6. Build Targeting Actions page
-7. Update sidebar with Appearance link
-8. Final styling polish
+1. **Phase 1: Enhanced Sidebar + Aan Entry**
+   - Redesign AppSidebar with hover flyouts
+   - Add Aan entry point
+   - Add SidebarFlyout component
+
+2. **Phase 2: Type Definitions & Mock Data**
+   - Create profitability types
+   - Create catalog types
+   - Generate mock data files
+
+3. **Phase 3: Profitability Dashboard**
+   - PeriodSummaryCard component
+   - PeriodBreakdownPanel (side panel)
+   - TrendChart component
+   - ProductsPnLTable
+   - Complete Dashboard page
+
+4. **Phase 4: Profitability Trends**
+   - ScatterPlotChart (quadrant visualization)
+   - Weekly breakdown table
+   - Complete Trends page
+
+5. **Phase 5: Profit & Loss**
+   - PnLParameterTable (expandable rows)
+   - Complete P&L page
+
+6. **Phase 6: Geographical**
+   - GeographyMap (simple visualization)
+   - RegionStatsPanel
+   - RegionalTable (expandable)
+   - Complete Geographical page
+
+7. **Phase 7: Catalog Products**
+   - ColumnGroupHeader component
+   - CatalogProductsTable
+   - Complete Products page
+
+8. **Phase 8: Final Polish**
+   - CSS refinements
+   - Transitions and animations
+   - Responsiveness checks
 
 ---
 
 ## Technical Notes
 
-- All tables will use the existing Table components from shadcn/ui
-- Sorting, pagination, and selection patterns remain consistent
-- Filter chips use Badge component with close button
-- Match type badges (BROAD/EXACT/PHRASE) with distinct colors
-- Campaign type badges (Manual/Auto/SP/SB) with distinct styling
-- Editable cells use Input component with inline validation
-- Total rows remain at bottom of each table
-
+- Recharts will be used for all charts (already installed)
+- For the scatter plot quadrant chart, use ComposedChart with custom backgrounds
+- Map visualization will use a simplified SVG map component (no external library required)
+- Hover flyouts use Radix UI HoverCard or custom implementation with onMouseEnter/Leave
+- Expandable table rows use controlled state with chevron toggles
+- Column groups use colspan with shared header styling
