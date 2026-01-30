@@ -20,6 +20,7 @@ interface CampaignTableProps {
   campaigns: Campaign[];
   onActiveToggle?: (id: string, isActive: boolean) => void;
   showTotalBudget?: boolean; // Walmart only
+  searchQuery?: string;
 }
 
 type SortField = keyof Campaign | null;
@@ -45,7 +46,12 @@ export function CampaignTable({
   campaigns, 
   onActiveToggle,
   showTotalBudget = true,
+  searchQuery = "",
 }: CampaignTableProps) {
+  // Filter campaigns by search
+  const filteredCampaigns = campaigns.filter((c) =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
@@ -54,7 +60,7 @@ export function CampaignTable({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(new Set(campaigns.map((c) => c.id)));
+      setSelectedIds(new Set(filteredCampaigns.map((c) => c.id)));
     } else {
       setSelectedIds(new Set());
     }
@@ -80,7 +86,7 @@ export function CampaignTable({
   };
 
   // Sort campaigns
-  const sortedCampaigns = [...campaigns].sort((a, b) => {
+  const sortedCampaigns = [...filteredCampaigns].sort((a, b) => {
     if (!sortField) return 0;
     
     const aVal = a[sortField];
@@ -113,8 +119,8 @@ export function CampaignTable({
       : <ArrowDown className="h-4 w-4 text-primary" />;
   };
 
-  const allSelected = campaigns.length > 0 && selectedIds.size === campaigns.length;
-  const someSelected = selectedIds.size > 0 && selectedIds.size < campaigns.length;
+  const allSelected = filteredCampaigns.length > 0 && selectedIds.size === filteredCampaigns.length;
+  const someSelected = selectedIds.size > 0 && selectedIds.size < filteredCampaigns.length;
 
   return (
     <div className="space-y-4">

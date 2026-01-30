@@ -97,6 +97,7 @@ const navigationGroups: NavGroup[] = [
   {
     label: "Settings",
     items: [
+      { title: "Appearance", url: "/settings/appearance", icon: Settings },
       { title: "Accounts", url: "/settings/accounts", icon: Settings },
       { title: "Users", url: "/settings/users", icon: Users },
       { title: "History Logs", url: "/settings/logs", icon: FileStack },
