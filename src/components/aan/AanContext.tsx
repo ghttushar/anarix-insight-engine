@@ -26,6 +26,8 @@ interface DraftChange {
 interface AanContextType {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  openPanel: () => void;
+  closePanel: () => void;
   messages: Message[];
   addMessage: (content: string, role: "user" | "assistant", draft?: AanDraft) => void;
   currentDraft: AanDraft | null;
@@ -97,11 +99,16 @@ export function AanProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const openPanel = () => setIsOpen(true);
+  const closePanel = () => setIsOpen(false);
+
   return (
     <AanContext.Provider
       value={{
         isOpen,
         setIsOpen,
+        openPanel,
+        closePanel,
         messages,
         addMessage,
         currentDraft,
