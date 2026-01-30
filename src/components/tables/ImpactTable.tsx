@@ -1,0 +1,196 @@
+import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ImpactComparison } from "@/types/advertising";
+import { cn } from "@/lib/utils";
+import { ArrowDown, ArrowUp } from "lucide-react";
+
+interface ImpactTableProps {
+  data: ImpactComparison[];
+  searchQuery?: string;
+  showType?: boolean;
+}
+
+export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactTableProps) {
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+
+  const filteredData = data.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const toggleRow = (id: string) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedRows(newSelected);
+  };
+
+  const toggleAll = () => {
+    if (selectedRows.size === filteredData.length) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(filteredData.map((d) => d.id)));
+    }
+  };
+
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+
+  const formatNumber = (value: number) =>
+    new Intl.NumberFormat("en-US").format(value);
+
+  const formatPercent = (value: number) => `${value.toFixed(2)}%`;
+
+  const calculateDelta = (baseline: number, impact: number) => {
+    if (baseline === 0) return impact > 0 ? 100 : 0;
+    return ((impact - baseline) / baseline) * 100;
+  };
+
+  const DeltaCell = ({ baseline, impact, format = "number" }: { baseline: number; impact: number; format?: string }) => {
+    const delta = calculateDelta(baseline, impact);
+    const isPositive = delta > 0;
+    const isNeutral = delta === 0;
+
+    return (
+      <div className="flex items-center justify-end gap-2">
+        <span className="text-muted-foreground">
+          {format === "currency" ? formatCurrency(baseline) : format === "percent" ? formatPercent(baseline) : formatNumber(baseline)}
+        </span>
+        <span className="text-foreground">→</span>
+        <span className="font-medium">
+          {format === "currency" ? formatCurrency(impact) : format === "percent" ? formatPercent(impact) : formatNumber(impact)}
+        </span>
+        <span
+          className={cn(
+            "flex items-center gap-0.5 text-xs",
+            isNeutral
+              ? "text-muted-foreground"
+              : isPositive
+              ? "text-success"
+              : "text-destructive"
+          )}
+        >
+          {!isNeutral && (isPositive ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />)}
+          {Math.abs(delta).toFixed(1)}%
+        </span>
+      </div>
+    );
+  };
+
+  return (
+    <div className="rounded-lg border border-border bg-card">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/30 hover:bg-muted/30">
+              <TableHead className="w-10">
+                <Checkbox
+                  checked={selectedRows.size === filteredData.length && filteredData.length > 0}
+                  onCheckedChange={toggleAll}
+                />
+              </TableHead>
+              <TableHead className="min-w-[250px]">Name</TableHead>
+              <TableHead className="w-28 text-center">Impact</TableHead>
+              <TableHead className="min-w-[180px] text-right">Impressions</TableHead>
+              <TableHead className="min-w-[150px] text-right">Clicks</TableHead>
+              <TableHead className="min-w-[140px] text-right">CTR</TableHead>
+              <TableHead className="min-w-[180px] text-right">Ad Spend</TableHead>
+              <TableHead className="min-w-[180px] text-right">Ad Sales</TableHead>
+              <TableHead className="min-w-[140px] text-right">ROAS</TableHead>
+              <TableHead className="min-w-[140px] text-right">ACOS</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredData.map((item) => {
+              const isPositive = item.impactPercentage > 0;
+              const isNeutral = item.impactPercentage === 0;
+
+              return (
+                <TableRow
+                  key={item.id}
+                  className={cn(
+                    "transition-colors",
+                    selectedRows.has(item.id) && "bg-primary/5"
+                  )}
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedRows.has(item.id)}
+                      onCheckedChange={() => toggleRow(item.id)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {showType && item.type && (
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-xs",
+                            item.type === "auto"
+                              ? "border-primary/30 bg-primary/5 text-primary"
+                              : "border-secondary/30 bg-secondary/5 text-secondary-foreground"
+                          )}
+                        >
+                          {item.type === "auto" ? "Auto" : "Manual"}
+                        </Badge>
+                      )}
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "gap-1",
+                        isNeutral
+                          ? "border-muted bg-muted text-muted-foreground"
+                          : isPositive
+                          ? "border-success/30 bg-success/10 text-success"
+                          : "border-destructive/30 bg-destructive/10 text-destructive"
+                      )}
+                    >
+                      {isPositive ? <ArrowUp className="h-3 w-3" /> : !isNeutral ? <ArrowDown className="h-3 w-3" /> : null}
+                      {Math.abs(item.impactPercentage).toFixed(1)}%
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <DeltaCell baseline={item.baseline.impressions} impact={item.impact.impressions} />
+                  </TableCell>
+                  <TableCell>
+                    <DeltaCell baseline={item.baseline.clicks} impact={item.impact.clicks} />
+                  </TableCell>
+                  <TableCell>
+                    <DeltaCell baseline={item.baseline.ctr} impact={item.impact.ctr} format="percent" />
+                  </TableCell>
+                  <TableCell>
+                    <DeltaCell baseline={item.baseline.adSpend} impact={item.impact.adSpend} format="currency" />
+                  </TableCell>
+                  <TableCell>
+                    <DeltaCell baseline={item.baseline.adSales} impact={item.impact.adSales} format="currency" />
+                  </TableCell>
+                  <TableCell>
+                    <DeltaCell baseline={item.baseline.roas} impact={item.impact.roas} format="decimal" />
+                  </TableCell>
+                  <TableCell>
+                    <DeltaCell baseline={item.baseline.acos} impact={item.impact.acos} format="percent" />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
