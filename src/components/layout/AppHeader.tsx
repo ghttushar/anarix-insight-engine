@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useMarketplace, Marketplace } from "@/contexts/MarketplaceContext";
+import { AanTrigger } from "@/components/aan";
 
 // Walmart logo SVG component
 const WalmartLogo = ({ className }: { className?: string }) => (
@@ -77,6 +78,8 @@ export function AppHeader() {
       </div>
 
       <div className="flex items-center gap-3">
+        {/* Aan AI Trigger */}
+        <AanTrigger />
         {/* Marketplace Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

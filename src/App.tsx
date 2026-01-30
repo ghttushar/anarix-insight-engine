@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MarketplaceProvider } from "@/contexts/MarketplaceContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AanProvider, AanPanel } from "@/components/aan";
 import NotFound from "./pages/NotFound";
 
 // Advertising
@@ -24,30 +25,34 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <MarketplaceProvider defaultMarketplace="walmart">
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              {/* Default redirect to Campaign Manager */}
-              <Route path="/" element={<Navigate to="/advertising/campaigns" replace />} />
-              
-              {/* Advertising Routes */}
-              <Route path="/advertising/campaigns" element={<CampaignManager />} />
-              <Route path="/advertising/impact" element={<ImpactAnalysis />} />
-              <Route path="/advertising/targeting" element={<TargetingActions />} />
-              
-              {/* Profitability Routes */}
-              <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />
-              
-              {/* Settings Routes */}
-              <Route path="/settings/appearance" element={<Appearance />} />
-              
-              {/* Catch-all route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <AanProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                {/* Default redirect to Campaign Manager */}
+                <Route path="/" element={<Navigate to="/advertising/campaigns" replace />} />
+                
+                {/* Advertising Routes */}
+                <Route path="/advertising/campaigns" element={<CampaignManager />} />
+                <Route path="/advertising/impact" element={<ImpactAnalysis />} />
+                <Route path="/advertising/targeting" element={<TargetingActions />} />
+                
+                {/* Profitability Routes */}
+                <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />
+                
+                {/* Settings Routes */}
+                <Route path="/settings/appearance" element={<Appearance />} />
+                
+                {/* Catch-all route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              {/* Aan AI Panel - renders globally */}
+              <AanPanel />
+            </BrowserRouter>
+          </TooltipProvider>
+        </AanProvider>
       </MarketplaceProvider>
     </ThemeProvider>
   </QueryClientProvider>
