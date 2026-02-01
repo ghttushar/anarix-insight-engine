@@ -5,8 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MarketplaceProvider } from "@/contexts/MarketplaceContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AccountProvider, useAccounts } from "@/contexts/AccountContext";
 import { AanProvider, AanPanel } from "@/components/aan";
+import { CreativeFeatures } from "@/features/creative";
 import NotFound from "./pages/NotFound";
+
+// Auth & Onboarding
+import Login from "./pages/auth/Login";
+import ConnectAccounts from "./pages/onboarding/ConnectAccounts";
 
 // Advertising
 import CampaignManager from "./pages/advertising/CampaignManager";
@@ -38,60 +44,87 @@ import ScheduleEditor from "./pages/dayparting/ScheduleEditor";
 
 // Settings
 import Appearance from "./pages/settings/Appearance";
+import Accounts from "./pages/settings/Accounts";
+import ConnectAmazon from "./pages/settings/ConnectAmazon";
+import ConnectWalmart from "./pages/settings/ConnectWalmart";
 
 const queryClient = new QueryClient();
+
+function AppRoutes() {
+  const { hasAccounts, isOnboarding } = useAccounts();
+
+  return (
+    <Routes>
+      {/* Root redirect based on onboarding status */}
+      <Route path="/" element={
+        isOnboarding && !hasAccounts 
+          ? <Navigate to="/onboarding/connect" replace /> 
+          : <Navigate to="/profitability/dashboard" replace />
+      } />
+      
+      {/* Auth & Onboarding */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/onboarding/connect" element={<ConnectAccounts />} />
+      
+      {/* Profitability */}
+      <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />
+      <Route path="/profitability/trends" element={<ProfitabilityTrends />} />
+      <Route path="/profitability/pnl" element={<ProfitLoss />} />
+      <Route path="/profitability/geo" element={<Geographical />} />
+      
+      {/* Advertising */}
+      <Route path="/advertising/campaigns" element={<CampaignManager />} />
+      <Route path="/advertising/impact" element={<ImpactAnalysis />} />
+      <Route path="/advertising/targeting" element={<TargetingActions />} />
+      
+      {/* Catalog */}
+      <Route path="/catalog/products" element={<CatalogProducts />} />
+      
+      {/* Business Intelligence */}
+      <Route path="/bi/brand-sov" element={<BrandSOV />} />
+      <Route path="/bi/keyword-tracker" element={<KeywordTracker />} />
+      <Route path="/bi/keyword-sov" element={<KeywordSOV />} />
+      <Route path="/bi/product-sov" element={<ProductSOV />} />
+      
+      {/* Day Parting */}
+      <Route path="/dayparting/hourly" element={<HourlyData />} />
+      <Route path="/dayparting/campaigns" element={<DayPartingCampaigns />} />
+      <Route path="/dayparting/campaigns/:campaignId" element={<CampaignDetail />} />
+      <Route path="/dayparting/history" element={<DayPartingHistory />} />
+      <Route path="/dayparting/scheduled" element={<ScheduledJobs />} />
+      <Route path="/dayparting/scheduled/new" element={<ScheduleEditor />} />
+      <Route path="/dayparting/scheduled/:scheduleId/edit" element={<ScheduleEditor />} />
+      
+      {/* Settings */}
+      <Route path="/settings/appearance" element={<Appearance />} />
+      <Route path="/settings/accounts" element={<Accounts />} />
+      <Route path="/settings/accounts/connect/amazon" element={<ConnectAmazon />} />
+      <Route path="/settings/accounts/connect/walmart" element={<ConnectWalmart />} />
+      
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <MarketplaceProvider defaultMarketplace="walmart">
-        <AanProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Navigate to="/profitability/dashboard" replace />} />
-                
-                {/* Profitability */}
-                <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />
-                <Route path="/profitability/trends" element={<ProfitabilityTrends />} />
-                <Route path="/profitability/pnl" element={<ProfitLoss />} />
-                <Route path="/profitability/geo" element={<Geographical />} />
-                
-                {/* Advertising */}
-                <Route path="/advertising/campaigns" element={<CampaignManager />} />
-                <Route path="/advertising/impact" element={<ImpactAnalysis />} />
-                <Route path="/advertising/targeting" element={<TargetingActions />} />
-                
-                {/* Catalog */}
-                <Route path="/catalog/products" element={<CatalogProducts />} />
-                
-                {/* Business Intelligence */}
-                <Route path="/bi/brand-sov" element={<BrandSOV />} />
-                <Route path="/bi/keyword-tracker" element={<KeywordTracker />} />
-                <Route path="/bi/keyword-sov" element={<KeywordSOV />} />
-                <Route path="/bi/product-sov" element={<ProductSOV />} />
-                
-                {/* Day Parting */}
-                <Route path="/dayparting/hourly" element={<HourlyData />} />
-                <Route path="/dayparting/campaigns" element={<DayPartingCampaigns />} />
-                <Route path="/dayparting/campaigns/:campaignId" element={<CampaignDetail />} />
-                <Route path="/dayparting/history" element={<DayPartingHistory />} />
-                <Route path="/dayparting/scheduled" element={<ScheduledJobs />} />
-                <Route path="/dayparting/scheduled/new" element={<ScheduleEditor />} />
-                <Route path="/dayparting/scheduled/:scheduleId/edit" element={<ScheduleEditor />} />
-                
-                {/* Settings */}
-                <Route path="/settings/appearance" element={<Appearance />} />
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <AanPanel />
-            </BrowserRouter>
-          </TooltipProvider>
-        </AanProvider>
-      </MarketplaceProvider>
+      <AccountProvider>
+        <MarketplaceProvider defaultMarketplace="walmart">
+          <AanProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner position="bottom-center" />
+              <BrowserRouter>
+                <CreativeFeatures>
+                  <AppRoutes />
+                  <AanPanel />
+                </CreativeFeatures>
+              </BrowserRouter>
+            </TooltipProvider>
+          </AanProvider>
+        </MarketplaceProvider>
+      </AccountProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
