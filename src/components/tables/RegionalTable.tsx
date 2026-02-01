@@ -53,9 +53,9 @@ export function RegionalTable({ data }: RegionalTableProps) {
       <>
         <TableRow
           key={region.id}
-          className={cn("hover:bg-muted/30", isChild && "bg-muted/10")}
+          className={cn("hover:bg-muted/30 group", isChild && "bg-muted/10")}
         >
-          <TableCell className="sticky left-0 z-10 bg-inherit">
+          <TableCell className={cn("sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] transition-colors", isChild ? "bg-muted/10 group-hover:bg-muted/30" : "bg-card group-hover:bg-muted/30")}>
             <div className={cn("flex items-center gap-2", isChild && "pl-8")}>
               {hasChildren ? (
                 <button
@@ -151,8 +151,8 @@ export function RegionalTable({ data }: RegionalTableProps) {
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="sticky left-0 z-10 bg-muted/50 min-w-[200px]">
+            <TableRow className="bg-muted">
+              <TableHead className="sticky left-0 z-20 bg-muted min-w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                 Region
               </TableHead>
               <TableHead className="text-right">Stocks</TableHead>

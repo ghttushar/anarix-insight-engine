@@ -58,14 +58,14 @@ export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))"
         </div>
 
         {/* Metrics row */}
-        <div className="flex flex-1 items-center gap-6 overflow-x-auto">
+        <div className="flex flex-1 flex-wrap items-center gap-4 lg:gap-6">
           {metrics.map((metric) => (
-            <div key={metric.label} className="flex flex-col whitespace-nowrap">
-              <span className="text-xs text-muted-foreground">{metric.label}</span>
+            <div key={metric.label} className="flex flex-col min-w-[70px]">
+              <span className="text-xs text-muted-foreground whitespace-nowrap">{metric.label}</span>
               <span
                 className={cn(
-                  "text-sm font-medium",
-                  metric.highlight ? "text-green-600 dark:text-green-400" : "text-foreground"
+                  "text-sm font-medium whitespace-nowrap",
+                  metric.highlight ? "text-success" : "text-foreground"
                 )}
               >
                 {metric.value}
