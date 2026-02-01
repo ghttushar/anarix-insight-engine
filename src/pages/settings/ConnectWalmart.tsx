@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ShoppingCart, Megaphone, Check } from "lucide-react";
+import { ShoppingCart, Megaphone, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { useAccounts } from "@/contexts/AccountContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import logoFull from "@/assets/logo-full.png";
+import logoWhite from "@/assets/logo-white.png";
 
 // Walmart logo
 const WalmartLogo = ({ className }: { className?: string }) => (
@@ -39,10 +41,13 @@ const connectionOptions = [
 export default function ConnectWalmart() {
   const navigate = useNavigate();
   const { addAccount, isOnboarding } = useAccounts();
+  const { resolvedTheme } = useTheme();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [merchantName, setMerchantName] = useState("");
   const [merchantId, setMerchantId] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
+
+  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
 
   const handleConnect = async () => {
     if (!selectedOption || !merchantName || !merchantId) return;
@@ -74,41 +79,30 @@ export default function ConnectWalmart() {
     }
   };
 
-  const backUrl = isOnboarding ? "/onboarding/connect" : "/settings/accounts";
+  const breadcrumbItems = isOnboarding
+    ? [
+        { label: "Onboarding", href: "/onboarding/connect" },
+        { label: "Connect Walmart" },
+      ]
+    : [
+        { label: "Settings", href: "/settings/appearance" },
+        { label: "Accounts", href: "/settings/accounts" },
+        { label: "Connect Walmart" },
+      ];
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border px-6 py-4">
         <div className="flex items-center justify-between">
-          <img src={logoFull} alt="Anarix" className="h-8 w-auto" />
-          <Button variant="ghost" onClick={() => navigate(backUrl)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
+          <img src={logoSrc} alt="Anarix" className="h-8 w-auto" />
         </div>
       </header>
 
       {/* Main content */}
       <main className="max-w-4xl mx-auto p-6">
         {/* Breadcrumb */}
-        {!isOnboarding && (
-          <Breadcrumb className="mb-6">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/settings/appearance">Settings</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/settings/accounts">Accounts</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Connect Walmart</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        )}
+        <PageBreadcrumb items={breadcrumbItems} className="mb-6" />
 
         <div className="text-center mb-10">
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 mb-4">

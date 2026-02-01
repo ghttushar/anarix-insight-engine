@@ -3,34 +3,23 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProfitabilitySummary } from "@/types/profitability";
 import { PeriodBreakdownPanel } from "./PeriodBreakdownPanel";
+import { MorphingNumber } from "@/features/creative/MorphingNumber";
 
 interface PeriodSummaryCardProps {
   summary: ProfitabilitySummary;
   accentColor?: string;
 }
 
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(value);
-};
-
-const formatNumber = (value: number) => {
-  return new Intl.NumberFormat("en-US").format(value);
-};
-
 export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))" }: PeriodSummaryCardProps) {
   const [showPanel, setShowPanel] = useState(false);
 
-  // Reduced to 6 metrics for single-line display
+  // Reduced to 5 key metrics for clean single-line display
   const metrics = [
-    { label: "GMV", value: formatCurrency(summary.gmv) },
-    { label: "Auth Sales", value: formatCurrency(summary.authSales) },
-    { label: "Orders", value: formatNumber(summary.orders) },
-    { label: "Ad Cost", value: formatCurrency(summary.adCost) },
-    { label: "Net Profit", value: formatCurrency(summary.netProfit), highlight: true },
+    { label: "GMV", value: summary.gmv, format: "currency" as const },
+    { label: "Auth Sales", value: summary.authSales, format: "currency" as const },
+    { label: "Orders", value: summary.orders, format: "number" as const },
+    { label: "Ad Cost", value: summary.adCost, format: "currency" as const },
+    { label: "Net Profit", value: summary.netProfit, format: "currency" as const, highlight: true },
   ];
 
   return (
@@ -54,19 +43,20 @@ export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))"
           <div className="text-xs text-muted-foreground">{summary.dateRange}</div>
         </div>
 
-        {/* Metrics row - single line, no wrap */}
+        {/* Metrics row - single line with morphing numbers */}
         <div className="flex flex-1 items-center gap-4 lg:gap-6 overflow-hidden">
           {metrics.map((metric) => (
-            <div key={metric.label} className="flex flex-col min-w-[70px]">
+            <div key={metric.label} className="flex flex-col min-w-[80px]">
               <span className="text-xs text-muted-foreground whitespace-nowrap">{metric.label}</span>
-              <span
+              <MorphingNumber
+                value={metric.value}
+                format={metric.format}
+                decimals={metric.format === "number" ? 0 : 2}
                 className={cn(
-                  "text-sm font-medium whitespace-nowrap",
+                  "text-sm whitespace-nowrap",
                   metric.highlight ? "text-success" : "text-foreground"
                 )}
-              >
-                {metric.value}
-              </span>
+              />
             </div>
           ))}
         </div>

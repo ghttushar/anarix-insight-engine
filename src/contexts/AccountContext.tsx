@@ -17,6 +17,7 @@ interface AccountContextType {
   addAccount: (account: Omit<ConnectedAccount, "id">) => void;
   updateAccount: (id: string, updates: Partial<ConnectedAccount>) => void;
   removeAccount: (id: string) => void;
+  clearAccounts: () => void;
   hasAccounts: boolean;
   isOnboarding: boolean;
   completeOnboarding: () => void;
@@ -91,6 +92,15 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const clearAccounts = () => {
+    setAccounts([]);
+    setCurrentAccountId(null);
+    setIsOnboarding(true);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(ONBOARDING_KEY);
+    localStorage.removeItem(CURRENT_ACCOUNT_KEY);
+  };
+
   const completeOnboarding = () => {
     setIsOnboarding(false);
     localStorage.setItem(ONBOARDING_KEY, "true");
@@ -110,6 +120,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         addAccount,
         updateAccount,
         removeAccount,
+        clearAccounts,
         hasAccounts,
         isOnboarding,
         completeOnboarding,

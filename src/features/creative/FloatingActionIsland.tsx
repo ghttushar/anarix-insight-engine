@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Sparkles, RefreshCw, Download, Plus, Filter, Calendar, X } from "lucide-react";
+import { Sparkles, RefreshCw, Download, Plus, Filter, Calendar, X, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAan } from "@/components/aan";
+import { toast } from "sonner";
+import html2canvas from "html2canvas";
 
 interface ActionItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -19,23 +21,23 @@ const getContextualActions = (pathname: string, openAan: () => void): ActionItem
   if (pathname.includes("/profitability")) {
     return [
       ...commonActions,
-      { icon: RefreshCw, label: "Refresh", onClick: () => console.log("Refreshing...") },
-      { icon: Download, label: "Export", onClick: () => console.log("Exporting...") },
+      { icon: RefreshCw, label: "Refresh", onClick: () => toast.info("Refreshing data...") },
+      { icon: Download, label: "Export", onClick: () => toast.success("Export started") },
     ];
   }
 
   if (pathname.includes("/advertising")) {
     return [
       ...commonActions,
-      { icon: Plus, label: "New Campaign", onClick: () => console.log("New campaign...") },
-      { icon: Filter, label: "Filter", onClick: () => console.log("Filtering...") },
+      { icon: Plus, label: "New Campaign", onClick: () => toast.info("Opening campaign creator...") },
+      { icon: Filter, label: "Filter", onClick: () => toast.info("Opening filters...") },
     ];
   }
 
   if (pathname.includes("/dayparting")) {
     return [
       ...commonActions,
-      { icon: Calendar, label: "Schedule", onClick: () => console.log("Creating schedule...") },
+      { icon: Calendar, label: "Schedule", onClick: () => toast.info("Creating schedule...") },
     ];
   }
 
@@ -45,10 +47,41 @@ const getContextualActions = (pathname: string, openAan: () => void): ActionItem
 export function FloatingActionIsland() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [isCapturing, setIsCapturing] = useState(false);
   const location = useLocation();
   const { openPanel } = useAan();
 
   const actions = getContextualActions(location.pathname, openPanel);
+
+  const takeScreenshot = async () => {
+    setIsCapturing(true);
+    try {
+      // Hide the floating island temporarily
+      setIsVisible(false);
+      
+      // Wait a frame for the island to hide
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      
+      const canvas = await html2canvas(document.body, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+      });
+      
+      const link = document.createElement("a");
+      link.download = `anarix-screenshot-${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      
+      toast.success("Screenshot saved!");
+    } catch (error) {
+      toast.error("Failed to capture screenshot");
+      console.error("Screenshot error:", error);
+    } finally {
+      setIsVisible(true);
+      setIsCapturing(false);
+    }
+  };
 
   if (!isVisible) {
     return (
@@ -62,7 +95,7 @@ export function FloatingActionIsland() {
   }
 
   return (
-    <div 
+    <div
       className={cn(
         "fixed bottom-6 left-1/2 -translate-x-1/2 z-50",
         "bg-card/95 backdrop-blur-md border border-border rounded-full shadow-xl",
@@ -105,6 +138,25 @@ export function FloatingActionIsland() {
               )}
             </Button>
           ))}
+
+          {/* Screenshot button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={takeScreenshot}
+            disabled={isCapturing}
+            className={cn(
+              "rounded-full transition-all duration-200",
+              isExpanded ? "px-3 gap-2" : "px-2"
+            )}
+          >
+            <Camera className={cn("h-4 w-4 shrink-0", isCapturing && "animate-pulse")} />
+            {isExpanded && (
+              <span className="text-sm whitespace-nowrap animate-in fade-in duration-200">
+                {isCapturing ? "Capturing..." : "Screenshot"}
+              </span>
+            )}
+          </Button>
         </div>
 
         {/* Keyboard hint */}

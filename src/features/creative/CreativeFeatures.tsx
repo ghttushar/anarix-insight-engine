@@ -57,7 +57,7 @@ export function CreativeFeatures({
   return (
     <>
       {/* Ambient background (very subtle) */}
-      {features.ambientBackground && <AmbientBackground intensity="low" />}
+      {features.ambientBackground && <AmbientBackground intensity="medium" />}
       
       {/* Main content with all providers */}
       {content}

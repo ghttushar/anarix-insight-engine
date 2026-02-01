@@ -4,22 +4,33 @@ import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAccounts } from "@/contexts/AccountContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import logoFull from "@/assets/logo-full.png";
+import logoWhite from "@/assets/logo-white.png";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { clearAccounts } = useAccounts();
+  const { resolvedTheme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Theme-aware logo for mobile
+  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
+    // Clear any existing accounts for fresh demo experience
+    clearAccounts();
+
     // Simulate login delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
+
     // Navigate to onboarding/connect accounts
     navigate("/onboarding/connect");
     setIsLoading(false);
@@ -34,17 +45,24 @@ export default function Login() {
           <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-white/20 blur-3xl" />
           <div className="absolute bottom-40 right-20 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
         </div>
-        
+
         <div className="relative z-10 flex flex-col justify-center px-16 text-white">
-          <img src={logoFull} alt="Anarix" className="h-12 w-auto mb-12 brightness-0 invert" />
-          
+          {/* White logo for brand panel */}
+          <img
+            src={logoWhite}
+            alt="Anarix"
+            className="h-12 w-auto mb-12"
+          />
+
           <h1 className="text-4xl font-heading font-bold mb-4 leading-tight">
-            The intelligence layer<br />for your marketplace
+            The intelligence layer
+            <br />
+            for your marketplace
           </h1>
-          
+
           <p className="text-lg text-white/80 max-w-md">
-            Unify your Amazon and Walmart advertising, automate optimization, 
-            and unlock insights that drive profitable growth.
+            Unify your Amazon and Walmart advertising, automate optimization, and unlock
+            insights that drive profitable growth.
           </p>
 
           <div className="mt-12 flex items-center gap-4">
@@ -68,18 +86,16 @@ export default function Login() {
       {/* Right panel - Login form */}
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-md">
-          {/* Mobile logo */}
+          {/* Mobile logo - theme-aware */}
           <div className="lg:hidden mb-8">
-            <img src={logoFull} alt="Anarix" className="h-10 w-auto" />
+            <img src={logoSrc} alt="Anarix" className="h-10 w-auto" />
           </div>
 
           <div className="mb-8">
             <h2 className="text-2xl font-heading font-semibold text-foreground mb-2">
               Welcome back
             </h2>
-            <p className="text-muted-foreground">
-              Sign in to your Anarix account
-            </p>
+            <p className="text-muted-foreground">Sign in to your Anarix account</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
@@ -147,9 +163,13 @@ export default function Login() {
           <div className="mt-12 pt-8 border-t border-border">
             <p className="text-xs text-center text-muted-foreground">
               By signing in, you agree to our{" "}
-              <a href="#" className="text-primary hover:underline">Terms of Service</a>
-              {" "}and{" "}
-              <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+              <a href="#" className="text-primary hover:underline">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="text-primary hover:underline">
+                Privacy Policy
+              </a>
             </p>
           </div>
         </div>

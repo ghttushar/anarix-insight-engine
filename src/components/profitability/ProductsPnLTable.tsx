@@ -99,6 +99,7 @@ export function ProductsPnLTable({ products }: ProductsPnLTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted">
+              <TableHead className="sticky left-0 z-20 bg-muted min-w-[300px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.15)] dark:shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]">Product Details</TableHead>
               <TableHead className="sticky left-0 z-20 bg-muted min-w-[300px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Product Details</TableHead>
               <TableHead className="text-right">Units</TableHead>
               <TableHead className="text-right">Refund Units</TableHead>
@@ -121,7 +122,7 @@ export function ProductsPnLTable({ products }: ProductsPnLTableProps) {
           <TableBody>
             {products.map((product) => (
               <TableRow key={product.id} className="hover:bg-muted/30 group">
-                <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] transition-colors">
+                <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-muted/30 dark:bg-card dark:group-hover:bg-muted/30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.15)] dark:shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)] transition-colors">
                   <div className="flex items-center gap-3">
                     <img
                       src={product.image}
@@ -175,7 +176,7 @@ export function ProductsPnLTable({ products }: ProductsPnLTableProps) {
 
             {/* Total Row */}
             <TableRow className="bg-muted font-medium">
-              <TableCell className="sticky left-0 z-10 bg-muted shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Total</TableCell>
+              <TableCell className="sticky left-0 z-10 bg-muted dark:bg-muted shadow-[2px_0_5px_-2px_rgba(0,0,0,0.15)] dark:shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]">Total</TableCell>
               <TableCell className="text-right">{formatNumber(totals.units)}</TableCell>
               <TableCell className="text-right text-red-500">{formatNumber(totals.refundUnits)}</TableCell>
               <TableCell className="text-right text-orange-500">{formatNumber(totals.cancelledUnits)}</TableCell>
