@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -50,6 +50,8 @@ export function AppSidebar() {
   const currentPath = location.pathname;
   const { openPanel } = useAan();
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
     navigationGroups.forEach((group) => {
@@ -58,6 +60,20 @@ export function AppSidebar() {
     });
     return initial;
   });
+
+  const handleMouseEnter = useCallback((label: string) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setHoveredGroup(label);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredGroup(null);
+    }, 150);
+  }, []);
 
   const toggleGroup = (label: string) => setOpenGroups((prev) => ({ ...prev, [label]: !prev[label] }));
   const isActive = (path: string) => currentPath.startsWith(path);
@@ -74,11 +90,16 @@ export function AppSidebar() {
         </div>
 
         {navigationGroups.map((group) => (
-          <SidebarGroup key={group.label} className="relative" onMouseEnter={() => collapsed && setHoveredGroup(group.label)} onMouseLeave={() => setHoveredGroup(null)}>
+          <SidebarGroup 
+            key={group.label} 
+            className="relative"
+            onMouseEnter={() => collapsed && handleMouseEnter(group.label)}
+            onMouseLeave={handleMouseLeave}
+          >
             {!collapsed ? (
               <Collapsible open={openGroups[group.label]} onOpenChange={() => toggleGroup(group.label)}>
                 <CollapsibleTrigger asChild>
-                  <SidebarGroupLabel className="flex cursor-pointer items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground">
+                  <SidebarGroupLabel className="flex cursor-pointer items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
                     <div className="flex items-center gap-2">
                       <group.icon className="h-4 w-4" />
                       {group.label}
@@ -108,13 +129,25 @@ export function AppSidebar() {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button className="flex items-center justify-center rounded-md p-2 transition-colors text-sidebar-foreground hover:bg-sidebar-accent" title={group.label}>
+                      <button 
+                        className={cn(
+                          "flex items-center justify-center rounded-md p-2 transition-colors text-sidebar-foreground hover:bg-sidebar-accent",
+                          hoveredGroup === group.label && "bg-sidebar-accent"
+                        )} 
+                        title={group.label}
+                      >
                         <group.icon className="h-4 w-4" />
                       </button>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
-                <SidebarFlyout items={group.items} isVisible={hoveredGroup === group.label} groupLabel={group.label} />
+                <SidebarFlyout 
+                  items={group.items} 
+                  isVisible={hoveredGroup === group.label} 
+                  groupLabel={group.label}
+                  onMouseEnter={() => handleMouseEnter(group.label)}
+                  onMouseLeave={handleMouseLeave}
+                />
               </SidebarGroupContent>
             )}
           </SidebarGroup>

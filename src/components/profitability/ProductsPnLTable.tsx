@@ -98,8 +98,8 @@ export function ProductsPnLTable({ products }: ProductsPnLTableProps) {
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="sticky left-0 z-10 bg-muted/50 min-w-[300px]">Product Details</TableHead>
+            <TableRow className="bg-muted">
+              <TableHead className="sticky left-0 z-20 bg-muted min-w-[300px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Product Details</TableHead>
               <TableHead className="text-right">Units</TableHead>
               <TableHead className="text-right">Refund Units</TableHead>
               <TableHead className="text-right">Cancelled Units</TableHead>
@@ -120,15 +120,15 @@ export function ProductsPnLTable({ products }: ProductsPnLTableProps) {
           </TableHeader>
           <TableBody>
             {products.map((product) => (
-              <TableRow key={product.id} className="hover:bg-muted/30">
-                <TableCell className="sticky left-0 z-10 bg-card">
+              <TableRow key={product.id} className="hover:bg-muted/30 group">
+                <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] transition-colors">
                   <div className="flex items-center gap-3">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="h-10 w-10 rounded-md border border-border object-cover"
+                      className="h-10 w-10 rounded-md border border-border object-cover flex-shrink-0"
                     />
-                    <div className="flex flex-col">
+                    <div className="flex flex-col min-w-0">
                       <span className="font-medium text-foreground line-clamp-1">{product.name}</span>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span>{product.itemId}</span>
@@ -174,8 +174,8 @@ export function ProductsPnLTable({ products }: ProductsPnLTableProps) {
             ))}
 
             {/* Total Row */}
-            <TableRow className="bg-muted/50 font-medium">
-              <TableCell className="sticky left-0 z-10 bg-muted/50">Total</TableCell>
+            <TableRow className="bg-muted font-medium">
+              <TableCell className="sticky left-0 z-10 bg-muted shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Total</TableCell>
               <TableCell className="text-right">{formatNumber(totals.units)}</TableCell>
               <TableCell className="text-right text-red-500">{formatNumber(totals.refundUnits)}</TableCell>
               <TableCell className="text-right text-orange-500">{formatNumber(totals.cancelledUnits)}</TableCell>
