@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import Lottie from "lottie-react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface LoaderProps {
@@ -13,8 +12,28 @@ const sizeMap = {
   lg: "w-24 h-24",
 };
 
+// Simple CSS spinner fallback
+function SpinnerFallback({ size = "md", className }: LoaderProps) {
+  return (
+    <div className={cn("flex items-center justify-center", className)}>
+      <div
+        className={cn(
+          sizeMap[size],
+          "rounded-full border-2 border-primary/30 border-t-primary animate-spin"
+        )}
+      />
+    </div>
+  );
+}
+
+// Lazily load Lottie to avoid React hooks issues
+const LottiePlayer = lazy(() =>
+  import("lottie-react").then((mod) => ({ default: mod.default }))
+);
+
 export function Loader({ size = "md", className }: LoaderProps) {
   const [animationData, setAnimationData] = useState<object | null>(null);
+  const [useFallback, setUseFallback] = useState(false);
 
   useEffect(() => {
     // Load the custom loader animation from public folder
@@ -22,28 +41,20 @@ export function Loader({ size = "md", className }: LoaderProps) {
       .then((res) => res.json())
       .then((data) => setAnimationData(data))
       .catch(() => {
-        // Fallback if loader.json fails to load
         console.warn("Could not load custom loader animation");
+        setUseFallback(true);
       });
   }, []);
 
-  if (!animationData) {
-    // Fallback spinner while loading animation data
-    return (
-      <div className={cn("flex items-center justify-center", className)}>
-        <div
-          className={cn(
-            sizeMap[size],
-            "rounded-full border-2 border-primary/30 border-t-primary animate-spin"
-          )}
-        />
-      </div>
-    );
+  if (useFallback || !animationData) {
+    return <SpinnerFallback size={size} className={className} />;
   }
 
   return (
     <div className={cn("flex items-center justify-center", className)}>
-      <Lottie animationData={animationData} loop className={sizeMap[size]} />
+      <Suspense fallback={<SpinnerFallback size={size} />}>
+        <LottiePlayer animationData={animationData} loop className={sizeMap[size]} />
+      </Suspense>
     </div>
   );
 }
