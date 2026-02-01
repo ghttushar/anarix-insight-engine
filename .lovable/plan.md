@@ -1,553 +1,635 @@
 
-# Complete Implementation Plan: Business Intelligence, Day Parting & Bug Fixes
+# Comprehensive UI Enhancement, Onboarding & Bug Fix Plan
 
 ## Overview
 
-This plan covers three major areas:
-1. **Bug Fixes & UI Polish** - Fix all reported issues across the app
-2. **Business Intelligence Section** - Build Brand SOV, Keyword Tracker, Keyword SOV, Product SOV
-3. **Day Parting Section** - Fully functional end-to-end implementation with all screens
+This plan addresses multiple areas:
+1. Fix sidebar hover flyout functionality (collapsed state)
+2. Implement UX enhancement patterns (snackbars, carousels, toasts, accordions, tabs, chips, bento grid, skeleton loading, breadcrumbs)
+3. Add motion/animation/transitions system
+4. Integrate Anarix logo assets and Lottie loading animation
+5. 10 creative UI ideas to differentiate Anarix
+6. Complete onboarding flow with account connection screens
+7. Fix profitability dashboard layout (single-line metrics)
+8. Fix geography map (world map with US/Canada/Mexico)
+9. Global alignment and polish fixes
 
 ---
 
-## Part 1: Bug Fixes & UI Polish
+## Part 1: Critical Bug Fixes
 
-### 1.1 Remove Unwanted Horizontal Scroll in Profitability Dashboard
+### 1.1 Sidebar Hover Flyout (Collapsed State)
 
-**Problem**: Period Summary Cards have horizontal overflow showing ugly scrollbars (visible in user screenshot image-22.png)
-
-**Fix Location**: `src/components/profitability/PeriodSummaryCard.tsx`
+**Current Problem**: The flyout doesn't appear reliably when hovering over collapsed sidebar icons due to:
+- The flyout is rendered inside `SidebarGroupContent` which has `overflow-hidden` when collapsed
+- Mouse events don't bridge properly between icon and flyout
+- z-index conflicts with sidebar container
 
 **Solution**:
-- Remove `overflow-x-auto` from the metrics row
-- Use flex-wrap or a responsive grid instead
-- Ensure metrics fit without scrolling on desktop
+- Move flyout rendering OUTSIDE the SidebarGroup using a Portal
+- Create a flyout container with absolute positioning relative to viewport
+- Add a proper bridge element with larger hit area
+- Use a ref to track the position of each nav icon for flyout placement
+- Implement a 200ms delay before hiding to allow mouse movement
 
-### 1.2 Modern Custom Scrollbars App-Wide
+**Files to modify**:
+- `src/components/layout/AppSidebar.tsx` - Portal-based flyout positioning
+- `src/components/layout/SidebarFlyout.tsx` - Fixed positioning with viewport coords
 
-**Problem**: Default browser scrollbars look outdated
+### 1.2 Profitability Dashboard Single-Line Layout
 
-**Fix Location**: `src/index.css`
+**Current Issue**: Period summary cards wrap metrics to multiple lines
 
-**Solution**: Add custom scrollbar CSS:
-```css
-/* Modern Scrollbars */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--border)) transparent;
-}
+**Solution in `src/components/profitability/PeriodSummaryCard.tsx`**:
+- Reduce metrics displayed to fit single line: GMV, Auth Sales, Orders, Units, Ad Cost, Net Profit (6 instead of 9)
+- Move additional metrics to "View More" panel
+- Use smaller text size for values (`text-xs` instead of `text-sm`)
+- Use CSS `flex-nowrap` and `overflow-hidden` with `text-ellipsis`
 
-*::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+**Dashboard layout adjustment in `src/pages/profitability/Dashboard.tsx`**:
+- Change grid to single column layout with chart beside summaries
+- Use `grid-cols-[1fr,320px]` for chart width
 
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
+### 1.3 Geography Map Fix - World Map with NA Focus
 
-*::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
-  border-radius: 3px;
-}
+**Solution in `src/components/profitability/GeographyMap.tsx`**:
+- Replace simplified US-only SVG with proper North America SVG (US, Canada, Mexico)
+- Add world map outline in grey/muted as background
+- Only colorize US, Canada, Mexico based on demo data
+- Fix viewBox to properly frame the map
+- Ensure zoom/pan controls work correctly
+- Use proper GeoJSON-style paths for accurate state/province shapes
 
-*::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
-}
+---
 
-/* Hide scrollbar when not needed */
-.scrollbar-hide {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+## Part 2: UX Enhancement Components
+
+### 2.1 Snackbar (Quick Info Toast)
+
+**New Component**: `src/components/ui/snackbar.tsx`
+
+**Features**:
+- Appears at bottom-center of screen
+- Auto-dismisses after 3s
+- Shows icon + message + optional action
+- Slide-up animation
+
+**Usage Locations**:
+- After saving settings
+- After sync actions complete
+- When data refreshes
+
+### 2.2 Carousel Cards
+
+**Using existing**: `src/components/ui/carousel.tsx` (Embla Carousel)
+
+**Create**: `src/components/ui/info-carousel.tsx`
+
+**Usage Locations**:
+- Onboarding tips slides
+- Aan AI suggested actions
+- Profitability insight cards (rotate through insights)
+
+### 2.3 Toast Message Box (From Below)
+
+**Already exists**: `src/components/ui/sonner.tsx` (Sonner)
+
+**Enhancement**:
+- Configure to appear from bottom
+- Add slide-up animation
+- Customize styling to match Anarix brand
+
+### 2.4 Accordion Navigation (Mutex Opening)
+
+**Enhancement to**: `src/components/layout/AppSidebar.tsx`
+
+**Implementation**:
+- Track `openSectionId` as single string instead of object
+- When one section opens, others automatically close
+- Smooth height transition animation
+
+### 2.5 Tabs Component (Already exists)
+
+**File**: `src/components/ui/tabs.tsx`
+
+**Usage Locations**:
+- Already used in BI section (Active/Inactive keywords)
+- Day Parting history (All/Completed/Failed)
+- Add to Settings pages
+
+### 2.6 Chips Component
+
+**New Component**: `src/components/ui/chip.tsx`
+
+**Features**:
+- Compact pill-shaped labels
+- Removable (X button) or static
+- Color variants (default, success, warning, error, primary)
+
+**Usage Locations**:
+- Product tags (3P, WFS Eligible)
+- Filter selections
+- Status indicators
+
+### 2.7 Bento Grid Layout
+
+**New Component**: `src/components/ui/bento-grid.tsx`
+
+**Features**:
+- CSS Grid with varying cell sizes
+- Cards that span different rows/columns
+- Responsive breakpoints
+
+**Usage Locations**:
+- Profitability Dashboard (reimagine layout)
+- BI overview page
+- Aan AI insights display
+
+### 2.8 Skeleton Loading
+
+**Already exists**: `src/components/ui/skeleton.tsx`
+
+**Create wrappers**: 
+- `src/components/ui/table-skeleton.tsx` - Table row skeletons
+- `src/components/ui/card-skeleton.tsx` - Card content skeleton
+- `src/components/ui/chart-skeleton.tsx` - Chart area skeleton
+
+**Usage Locations**:
+- All data tables during load
+- Charts during data fetch
+- Period summary cards
+
+### 2.9 Breadcrumb for In-Page Navigation
+
+**Already exists**: `src/components/ui/breadcrumb.tsx`
+
+**Create wrapper**: `src/components/layout/PageBreadcrumb.tsx`
+
+**Features**:
+- Auto-generates based on route
+- Supports nested in-page sections
+- Click to navigate or scroll
+
+**Usage Locations**:
+- Day Parting flow (critical path tracking)
+- Settings > Accounts > Amazon
+- Profitability drill-downs
+
+---
+
+## Part 3: Motion & Animation System
+
+### 3.1 Tailwind Animation Extensions
+
+**File**: `tailwind.config.ts`
+
+**New animations**:
+```typescript
+keyframes: {
+  "slide-up": {
+    "0%": { transform: "translateY(20px)", opacity: "0" },
+    "100%": { transform: "translateY(0)", opacity: "1" }
+  },
+  "slide-down": {
+    "0%": { transform: "translateY(-20px)", opacity: "0" },
+    "100%": { transform: "translateY(0)", opacity: "1" }
+  },
+  "slide-in-right": {
+    "0%": { transform: "translateX(100%)" },
+    "100%": { transform: "translateX(0)" }
+  },
+  "fade-in": {
+    "0%": { opacity: "0" },
+    "100%": { opacity: "1" }
+  },
+  "scale-in": {
+    "0%": { transform: "scale(0.95)", opacity: "0" },
+    "100%": { transform: "scale(1)", opacity: "1" }
+  },
+  "shimmer": {
+    "0%": { backgroundPosition: "-200% 0" },
+    "100%": { backgroundPosition: "200% 0" }
+  },
+  "pulse-soft": {
+    "0%, 100%": { opacity: "1" },
+    "50%": { opacity: "0.7" }
+  }
 }
 ```
 
-### 1.3 Fix Table Overlapping Issues in Profitability
+### 3.2 Transition Classes
 
-**Problem**: Table headers and sticky columns overlap incorrectly (visible in image-23.png and image-24.png)
+**File**: `src/index.css`
 
-**Fix Locations**: 
-- `src/components/profitability/ProductsPnLTable.tsx`
-- `src/components/tables/RegionalTable.tsx`
+```css
+/* Page transition wrapper */
+.page-transition {
+  animation: fade-in 0.2s ease-out, slide-up 0.25s ease-out;
+}
 
-**Solution**:
-- Fix z-index hierarchy for sticky columns
-- Add proper background colors to sticky cells in both light/dark modes
-- Ensure header row has highest z-index
-- Add left shadow to indicate sticky column boundary
+/* Card hover effects */
+.card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1);
+}
 
-### 1.4 Fix Geography Map and Buttons
+/* Button press effect */
+.btn-press:active {
+  transform: scale(0.98);
+}
 
-**Problem**: Map appears to be missing or broken, zoom buttons not working (image-25.png shows the issue)
-
-**Fix Location**: 
-- `src/components/profitability/GeographyMap.tsx`
-- `src/pages/profitability/Geographical.tsx`
-
-**Solution**:
-- Fix SVG viewBox and state paths for proper rendering
-- Ensure zoom state properly updates the transform
-- Wire up region selection to update the stats panel
-- Add visual feedback for selected regions
-- Fix State/Product level toggle functionality
-
-### 1.5 Fix Alignment Issues Throughout the App
-
-**Problems Identified**:
-- Inconsistent padding in card headers
-- Misaligned toolbar buttons
-- Table column alignment issues
-
-**Solution**:
-- Audit all components for consistent padding (use `p-4` for cards, `p-6` for main content)
-- Ensure all toolbar button groups use `gap-2`
-- Fix table header alignment with body cells
-
-### 1.6 Fix Sidebar Hover Flyout Navigation
-
-**Problem**: Flyout not appearing or disappearing too quickly
-
-**Fix Locations**:
-- `src/components/layout/AppSidebar.tsx`
-- `src/components/layout/SidebarFlyout.tsx`
-
-**Solution**:
-- Add proper mouse event handling with delay
-- Keep flyout open when mouse is over it
-- Add pointer-events handling for smooth transitions
-- Use `onMouseEnter`/`onMouseLeave` on both trigger and flyout
-- Add a small overlap/padding area for easier mouse movement
+/* List item stagger */
+.stagger-item {
+  animation: slide-up 0.3s ease-out backwards;
+}
+.stagger-item:nth-child(1) { animation-delay: 0.05s; }
+.stagger-item:nth-child(2) { animation-delay: 0.1s; }
+/* ... up to nth-child(10) */
+```
 
 ---
 
-## Part 2: Business Intelligence Section
+## Part 4: Logo & Loading Assets
 
-Based on the reference screenshots (image-20.png for Brand SOV, image-21.png for Keyword Tracker):
+### 4.1 Copy Assets to Project
 
-### 2.1 Brand SOV Page
+**Actions**:
+1. Copy `user-uploads://Anarix_full_logo.png` to `src/assets/logo-full.png`
+2. Copy `user-uploads://anarix_logo_white.png` to `src/assets/logo-white.png`
+3. Copy `user-uploads://loader.json` to `public/animations/loader.json`
 
-**Route**: `/bi/brand-sov`
+### 4.2 Lottie Player Integration
 
-**Page Structure**:
+**Install**: `lottie-react` package (or use lightweight alternative)
 
-**Header Controls Row**:
-- Keyword dropdown (searchable)
-- Date Range picker
-- Position dropdown (All, 1, 2, 3...)
-- Frequency dropdown (Hourly)
-- Brand dropdown
+**New Component**: `src/components/ui/loader.tsx`
 
-**KPI Strip** (5 metrics):
-- Your Brand (Napqueen 2.5%)
-- Organic SOV (%) with delta
-- Sponsored SOV (%) with delta  
-- Total SOV (%) with delta
-- Product Count (Unique)
+```typescript
+// Uses the Anarix branded loader animation
+// Displays during page transitions, data fetching
+```
 
-**Stacked Area Chart**:
-- Shows SOV over time by brand
-- Color-coded by brand
-- Time range label ("Jan 31 (Hourly)")
-- Expandable/collapsible
-- Legend with brand names and colors
+**Usage Locations**:
+- Initial app load splash
+- Page transitions
+- Data table loading states
+- Button loading states
 
-**Brand Coverage Table**:
-- Columns: SI No, Brand, Product Count (Unique), Appearance(%), Organic SOV(%), Sponsored SOV(%), Total SOV(%), View Trend
-- Each row has View Trend button that links to trend view
-- Pagination at bottom
+### 4.3 Logo Component
 
-### 2.2 Keyword Tracker Page
+**New Component**: `src/components/brand/AnarixLogo.tsx`
 
-**Route**: `/bi/keyword-tracker`
+**Variants**:
+- `full` - Full logo with wordmark
+- `icon` - Just the A icon
+- `white` - White version for dark backgrounds
 
-**Tabs**: Active(51) | Inactive(23)
-
-**Controls**:
-- Search by keyword input
-- Add Keyword button (primary)
-
-**Table Columns**:
-- Keyword
-- Added At (timestamp with timezone)
-- Updated At (timestamp with timezone)
-- Region (flag + code)
-- Channels (icon indicators)
-- Status (toggle)
-- Action (delete button)
-
-### 2.3 Keyword SOV Page
-
-**Route**: `/bi/keyword-sov`
-
-**Structure**: Similar to Brand SOV but focused on keywords
-- Keyword filter
-- Date range
-- Position filter
-- SOV metrics for keywords
-- Trend chart
-- Keywords table with SOV data
-
-### 2.4 Product SOV Page
-
-**Route**: `/bi/product-sov`
-
-**Structure**:
-- Product filter (with image/name/SKU)
-- Date range
-- Position filter
-- Product-level SOV metrics
-- Performance chart
-- Products table with SOV rankings
+**Usage**:
+- Header (replace current placeholder)
+- Login page
+- Loading screens
 
 ---
 
-## Part 3: Day Parting Section (Fully Functional End-to-End)
+## Part 5: 10 Creative UI Ideas to Differentiate Anarix
 
-Based on the PDF flowchart (page_1.jpg), there are approximately 25+ screens for Day Parting:
+### Idea 1: Morphing Metric Cards
+- Numbers animate smoothly when values change
+- Color gradient shifts based on performance (green pulse for positive trends)
+- Micro-interactions on hover showing mini sparkline
 
-### 3.1 Navigation Structure
+### Idea 2: Ambient Data Visualization Background
+- Subtle, moving dot pattern in background that represents live data flow
+- Dots move faster when more activity happening
+- Very subtle, doesn't distract - just adds life
 
-**Sidebar Items**:
-- Hourly Data (landing)
-- Campaigns
-- History
-- Scheduled Jobs
+### Idea 3: Contextual Command Palette (Cmd+K)
+- Quick actions from anywhere in app
+- Search across campaigns, products, metrics
+- Recent actions list
+- Aan AI quick ask
 
-### 3.2 Hourly Data Page (Main Entry Point)
+### Idea 4: Floating Action Island
+- Persistent bottom-center floating element
+- Shows current context (selected campaign, date range)
+- Quick actions relevant to current page
+- Aan AI mini-chat trigger
 
-**Route**: `/dayparting/hourly`
+### Idea 5: Glassmorphism Panels for Aan AI
+- Frosted glass effect for AI workspace
+- Subtle blur and transparency
+- Distinguishes AI space from core analytics
 
-**Breadcrumb**: Day Parting > Hourly Data
+### Idea 6: Data Storytelling Mode
+- "Generate Story" button on any dashboard
+- Creates a narrative walkthrough of the data
+- Animated highlights and annotations
+- Shareable as a guided tour
 
-**Controls Row**:
-- Campaign dropdown (multi-select)
-- Date Range dropdown
-- Day of Week filter (Mon-Sun checkboxes)
-- Run button
+### Idea 7: Split-Screen Comparison View
+- Compare any two time periods side-by-side
+- Synced scrolling in tables
+- Difference highlighting (red/green overlays)
 
-**Heatmap Grid**:
-- Y-axis: Hours (0-23)
-- X-axis: Days of week or dates
-- Cell color intensity = performance metric
-- Cell shows value on hover
+### Idea 8: Metric Pulsing on Significant Changes
+- When a metric changes significantly, the card pulses once
+- Subtle ring animation expands outward
+- Draws attention without being alarming
 
-**Metrics Summary Below Grid**:
-- Spend, Revenue, ROAS, ACOS, Orders, Units
+### Idea 9: Progress Rings Instead of Progress Bars
+- Circular progress indicators for goals/targets
+- More visually distinctive
+- Animated fill with easing
 
-**Actions at Bottom**:
-- "Schedule Day Parting" button
-- "View Details" for individual hours
-
-### 3.3 Campaign Selection Flow
-
-When user clicks on a campaign from the grid:
-
-**Route**: `/dayparting/campaigns/:campaignId`
-
-**Breadcrumb**: Day Parting > Campaigns > [Campaign Name]
-
-**Page Shows**:
-- Campaign-specific heatmap
-- Performance metrics for this campaign
-- Hourly breakdown table
-- Trend chart (hourly performance over time)
-- Schedule configuration panel
-
-### 3.4 Schedule Day Parting Modal/Page
-
-**Route**: `/dayparting/schedule/new` (or modal)
-
-**Form Fields**:
-- Campaign selection (if not pre-selected)
-- Schedule Name
-- Action Type dropdown (Pause/Reduce Budget/Increase Budget)
-- Time Selection Grid (select hours to apply action)
-- Days of Week selection
-- Start Date / End Date
-- Repeat options (Daily, Weekly, Custom)
-
-**Preview Section**:
-- Shows what will happen when schedule runs
-- Estimated budget impact
-
-**Buttons**:
-- Cancel, Save as Draft, Activate Schedule
-
-### 3.5 History Page
-
-**Route**: `/dayparting/history`
-
-**Breadcrumb**: Day Parting > History
-
-**Tabs**: All | Completed | Failed | Cancelled
-
-**Table Columns**:
-- Execution Date/Time
-- Campaign
-- Action Taken
-- Status (Success/Failed/Partial)
-- Details (expandable)
-- Duration
-- Actions (View, Retry)
-
-**Filters**:
-- Date range
-- Campaign filter
-- Status filter
-
-### 3.6 Scheduled Jobs Page
-
-**Route**: `/dayparting/scheduled`
-
-**Breadcrumb**: Day Parting > Scheduled Jobs
-
-**Table Columns**:
-- Schedule Name
-- Campaign(s)
-- Action Type
-- Frequency
-- Next Run
-- Status (Active/Paused/Completed)
-- Actions (Edit, Pause/Resume, Delete)
-
-**Controls**:
-- Search
-- Create New Schedule button
-- Bulk actions (Pause/Delete selected)
-
-### 3.7 Edit Schedule Page
-
-**Route**: `/dayparting/scheduled/:scheduleId/edit`
-
-Same form as Create, but pre-populated with existing values
+### Idea 10: Keyboard-First Navigation
+- Vim-like shortcuts (j/k for up/down in tables)
+- Number keys for quick section jumping
+- Visual key hint overlay (press ? to show)
+- Makes power users incredibly fast
 
 ---
 
-## Part 4: File Structure
+## Part 6: Onboarding & Account Connection Flow
+
+### 6.1 New Pages Required
+
+**Login Page**: `src/pages/auth/Login.tsx`
+- Split layout: Left = brand panel (purple gradient with tagline), Right = login form
+- Uses reference image Channels_31.png design
+- Email/password fields
+- "Forgot Password?" link
+- "Start A Free Trial" link
+- Terms & Privacy links
+
+**Onboarding Page**: `src/pages/onboarding/ConnectAccounts.tsx`
+- Shown after first login when no accounts connected
+- "Add Account" empty card triggers marketplace selection
+- Route: `/onboarding/connect`
+
+**Settings Accounts Page**: `src/pages/settings/Accounts.tsx`
+- Shows existing connected accounts as cards
+- "Add Account" card at end
+- Matches reference image-26.png layout
+
+**Connect Amazon Page**: `src/pages/settings/ConnectAmazon.tsx`
+- "Accelerate Your Growth on Amazon" header
+- Three connection cards: Seller Central, Amazon Ads, Vendor Central
+- Route: `/settings/accounts/connect/amazon`
+
+**Connect Walmart Page**: `src/pages/settings/ConnectWalmart.tsx`
+- "Accelerate Your Growth on Walmart" header
+- Two cards: Walmart Connect, Walmart Marketplace
+- Route: `/settings/accounts/connect/walmart`
+
+### 6.2 Account Connection Context
+
+**New Context**: `src/contexts/AccountContext.tsx`
+
+**State**:
+```typescript
+interface ConnectedAccount {
+  id: string;
+  marketplace: "amazon" | "walmart";
+  accountType: "seller" | "vendor" | "ads" | "connect" | "marketplace";
+  merchantName: string;
+  merchantId: string;
+  region: string;
+  status: "connected" | "syncing" | "error";
+  lastSync?: string;
+}
+
+interface AccountContextType {
+  accounts: ConnectedAccount[];
+  addAccount: (account: ConnectedAccount) => void;
+  removeAccount: (id: string) => void;
+  hasAccounts: boolean;
+  isOnboarding: boolean;
+}
+```
+
+### 6.3 Marketplace Selection Modal
+
+**New Component**: `src/components/accounts/MarketplaceSelectionModal.tsx`
+
+- Triggered by "Add Account" card click
+- Shows Amazon and Walmart options side by side
+- Click navigates to respective connection page
+
+### 6.4 Account Card Component
+
+**New Component**: `src/components/accounts/AccountCard.tsx`
+
+**Shows**:
+- Merchant name with marketplace logo
+- Account type badge (Seller | 1P, 3P)
+- Bid Automation toggle (AI | Off | Rule)
+- Data Sync section (Advertising ID, Last Sync, Sync Now button)
+- Product Catalog section (Partner ID, Store ID)
+- Connect button for incomplete connections
+- More actions menu (⋮)
+
+### 6.5 Routing Logic
+
+**In `src/App.tsx`**:
+```tsx
+// If no accounts, redirect to onboarding
+<Route path="/" element={
+  hasAccounts ? <Navigate to="/profitability/dashboard" /> : <Navigate to="/onboarding/connect" />
+} />
+
+// Auth routes
+<Route path="/login" element={<Login />} />
+<Route path="/onboarding/connect" element={<ConnectAccounts />} />
+
+// Settings account routes
+<Route path="/settings/accounts" element={<SettingsAccounts />} />
+<Route path="/settings/accounts/connect/amazon" element={<ConnectAmazon />} />
+<Route path="/settings/accounts/connect/walmart" element={<ConnectWalmart />} />
+```
+
+### 6.6 Header Account Indicator
+
+**Update**: `src/components/layout/AppHeader.tsx`
+
+- Show connected account dropdown with account names
+- Show connection status indicator (green dot = synced)
+- If only one account, just show the name
+
+---
+
+## Part 7: Implementation File Structure
 
 ```text
 src/
+├── assets/
+│   ├── logo-full.png (NEW - copy from uploads)
+│   ├── logo-white.png (NEW - copy from uploads)
 ├── components/
-│   ├── bi/
-│   │   ├── SOVChart.tsx (reusable stacked area chart)
-│   │   ├── SOVKPIStrip.tsx (SOV-specific metrics)
-│   │   ├── BrandCoverageTable.tsx
-│   │   ├── KeywordTrackerTable.tsx
-│   │   ├── AddKeywordModal.tsx
-│   │   └── TrendViewModal.tsx
-│   ├── dayparting/
-│   │   ├── HourlyHeatmap.tsx (main grid)
-│   │   ├── HeatmapCell.tsx (individual cell)
-│   │   ├── TimeSelector.tsx (hour selection grid)
-│   │   ├── DaySelector.tsx (day of week selection)
-│   │   ├── ScheduleForm.tsx (create/edit form)
-│   │   ├── SchedulePreview.tsx
-│   │   ├── HistoryTable.tsx
-│   │   ├── ScheduledJobsTable.tsx
-│   │   ├── CampaignHourlyChart.tsx
-│   │   └── DayPartingBreadcrumb.tsx
-│   └── ui/
-│       └── breadcrumb.tsx (already exists)
+│   ├── accounts/
+│   │   ├── AccountCard.tsx (NEW)
+│   │   ├── AddAccountCard.tsx (NEW)
+│   │   └── MarketplaceSelectionModal.tsx (NEW)
+│   ├── brand/
+│   │   └── AnarixLogo.tsx (NEW)
+│   ├── layout/
+│   │   ├── AppSidebar.tsx (MODIFY - accordion mutex, flyout portal)
+│   │   ├── SidebarFlyout.tsx (MODIFY - viewport positioning)
+│   │   ├── PageBreadcrumb.tsx (NEW)
+│   │   └── FloatingActionIsland.tsx (NEW - creative idea)
+│   ├── ui/
+│   │   ├── chip.tsx (NEW)
+│   │   ├── snackbar.tsx (NEW)
+│   │   ├── bento-grid.tsx (NEW)
+│   │   ├── loader.tsx (NEW - Lottie integration)
+│   │   ├── table-skeleton.tsx (NEW)
+│   │   ├── card-skeleton.tsx (NEW)
+│   │   └── command-palette.tsx (NEW - Cmd+K feature)
+│   ├── profitability/
+│   │   ├── PeriodSummaryCard.tsx (MODIFY - single line)
+│   │   └── GeographyMap.tsx (MODIFY - world map)
+├── contexts/
+│   └── AccountContext.tsx (NEW)
 ├── pages/
-│   ├── bi/
-│   │   ├── BrandSOV.tsx
-│   │   ├── KeywordTracker.tsx
-│   │   ├── KeywordSOV.tsx
-│   │   └── ProductSOV.tsx
-│   └── dayparting/
-│       ├── HourlyData.tsx
-│       ├── Campaigns.tsx
-│       ├── CampaignDetail.tsx
-│       ├── History.tsx
-│       ├── ScheduledJobs.tsx
-│       └── ScheduleEditor.tsx
-├── data/
-│   ├── mockBrandSOV.ts
-│   ├── mockKeywordTracker.ts
-│   └── mockDayParting.ts
-└── types/
-    ├── bi.ts
-    └── dayparting.ts
+│   ├── auth/
+│   │   └── Login.tsx (NEW)
+│   ├── onboarding/
+│   │   └── ConnectAccounts.tsx (NEW)
+│   ├── settings/
+│   │   ├── Accounts.tsx (NEW)
+│   │   ├── ConnectAmazon.tsx (NEW)
+│   │   └── ConnectWalmart.tsx (NEW)
+└── public/
+    └── animations/
+        └── loader.json (NEW - copy from uploads)
 ```
 
 ---
 
-## Part 5: Type Definitions
+## Part 8: Implementation Sequence
 
-### Business Intelligence Types (`src/types/bi.ts`)
+### Phase 1: Critical Fixes (Priority)
+1. Fix sidebar flyout with portal-based rendering
+2. Fix profitability dashboard single-line layout
+3. Fix geography map with proper world map SVG
 
-```typescript
-interface Brand {
-  id: string;
-  name: string;
-  productCount: number;
-  appearance: number;
-  organicSOV: number;
-  sponsoredSOV: number;
-  totalSOV: number;
-}
+### Phase 2: Asset Integration
+1. Copy logo files to src/assets
+2. Copy loader.json to public/animations
+3. Create AnarixLogo component
+4. Create Loader component with Lottie
 
-interface TrackedKeyword {
-  id: string;
-  keyword: string;
-  addedAt: string;
-  updatedAt: string;
-  region: string;
-  channels: ("organic" | "sponsored")[];
-  status: "active" | "inactive";
-}
+### Phase 3: UX Components
+1. Create Chip component
+2. Create Snackbar component
+3. Create Bento Grid component
+4. Create skeleton loading wrappers
+5. Update accordion in sidebar to mutex behavior
 
-interface SOVDataPoint {
-  timestamp: string;
-  brands: Record<string, number>;
-}
-```
+### Phase 4: Onboarding Flow
+1. Create AccountContext
+2. Create Login page
+3. Create ConnectAccounts (onboarding) page
+4. Create Accounts settings page
+5. Create ConnectAmazon page
+6. Create ConnectWalmart page
+7. Create MarketplaceSelectionModal
+8. Create AccountCard component
+9. Update routing in App.tsx
+10. Update header account indicator
 
-### Day Parting Types (`src/types/dayparting.ts`)
+### Phase 5: Animation System
+1. Add keyframes to tailwind.config.ts
+2. Add transition utilities to index.css
+3. Apply page-transition class to all pages
+4. Add card-hover to interactive cards
+5. Add stagger animation to lists
 
-```typescript
-interface HourlyData {
-  hour: number; // 0-23
-  dayOfWeek: number; // 0-6
-  date: string;
-  spend: number;
-  revenue: number;
-  orders: number;
-  roas: number;
-  acos: number;
-}
-
-interface DayPartingSchedule {
-  id: string;
-  name: string;
-  campaignIds: string[];
-  actionType: "pause" | "reduce_budget" | "increase_budget";
-  budgetModifier?: number;
-  hours: number[];
-  daysOfWeek: number[];
-  startDate: string;
-  endDate?: string;
-  repeatType: "daily" | "weekly" | "custom";
-  status: "active" | "paused" | "completed";
-  createdAt: string;
-  nextRun?: string;
-}
-
-interface ExecutionHistory {
-  id: string;
-  scheduleId: string;
-  scheduleName: string;
-  campaignName: string;
-  executedAt: string;
-  action: string;
-  status: "success" | "failed" | "partial";
-  details?: string;
-  duration: number;
-}
-```
-
----
-
-## Part 6: Route Updates
-
-```tsx
-// Add to App.tsx Routes
-// Business Intelligence
-<Route path="/bi/brand-sov" element={<BrandSOV />} />
-<Route path="/bi/keyword-tracker" element={<KeywordTracker />} />
-<Route path="/bi/keyword-sov" element={<KeywordSOV />} />
-<Route path="/bi/product-sov" element={<ProductSOV />} />
-
-// Day Parting
-<Route path="/dayparting/hourly" element={<HourlyData />} />
-<Route path="/dayparting/campaigns" element={<DayPartingCampaigns />} />
-<Route path="/dayparting/campaigns/:campaignId" element={<CampaignDetail />} />
-<Route path="/dayparting/history" element={<DayPartingHistory />} />
-<Route path="/dayparting/scheduled" element={<ScheduledJobs />} />
-<Route path="/dayparting/scheduled/new" element={<ScheduleEditor />} />
-<Route path="/dayparting/scheduled/:scheduleId/edit" element={<ScheduleEditor />} />
-```
-
----
-
-## Part 7: Implementation Sequence
-
-### Phase 1: Bug Fixes (Priority)
-1. Fix custom scrollbars in index.css
-2. Fix PeriodSummaryCard overflow
-3. Fix table sticky column z-index issues
-4. Fix GeographyMap rendering and buttons
-5. Fix sidebar hover flyout behavior
-
-### Phase 2: Business Intelligence
-1. Create BI type definitions
-2. Create mock data files
-3. Build shared components (SOVChart, SOVKPIStrip)
-4. Implement Brand SOV page with all features
-5. Implement Keyword Tracker page with add/delete functionality
-6. Implement Keyword SOV page
-7. Implement Product SOV page
-
-### Phase 3: Day Parting Core
-1. Create dayparting type definitions
-2. Create mock data for hourly metrics
-3. Build HourlyHeatmap component (the core visualization)
-4. Build TimeSelector and DaySelector components
-5. Implement Hourly Data page
-
-### Phase 4: Day Parting Scheduling
-1. Build ScheduleForm component
-2. Build SchedulePreview component
-3. Implement ScheduleEditor page (create/edit)
-4. Implement Scheduled Jobs page with table
-
-### Phase 5: Day Parting History & Details
-1. Build HistoryTable component
-2. Implement History page
-3. Implement Campaign Detail page
-4. Add breadcrumb navigation throughout
-
-### Phase 6: Final Polish
-1. Verify all navigation works
-2. Test all interactive elements
-3. Ensure consistent styling
-4. Verify dark mode works correctly
+### Phase 6: Creative Enhancements
+1. Implement Command Palette (Cmd+K)
+2. Create Floating Action Island
+3. Add metric pulsing animations
+4. Implement progress rings
 
 ---
 
 ## Technical Notes
 
-### Heatmap Implementation
-- Use CSS Grid for the hour/day matrix
-- Cell colors based on performance quintiles
-- Use Tailwind color opacity for intensity (bg-primary/20 to bg-primary/100)
-- Tooltip on hover shows exact values
+### Sidebar Flyout Portal Solution
+The flyout needs to escape the sidebar's overflow constraints. Use React Portal to render at document body level, then position absolutely using the trigger element's bounding rect.
 
-### Schedule Time Selector
-- Grid of 24 cells (one per hour)
-- Click/drag to select multiple hours
-- Visual feedback for selected hours
-- Days of week as toggleable chips
+```typescript
+// Get trigger position
+const rect = triggerRef.current?.getBoundingClientRect();
+// Portal to body, position at rect.right, rect.top
+```
 
-### Flyout Fix Details
-The current flyout disappears because there's no connection between the trigger and the flyout. Solution:
-1. Wrap trigger and flyout in a single container with pointer-events
-2. Add a small invisible bridge element between trigger and flyout
-3. Use a delay before hiding (150ms debounce)
-4. Keep flyout open while any related element is hovered
+### World Map SVG
+Use a simplified world map SVG with country paths. Only US, Canada, Mexico will have data-driven fills. Other countries render in muted gray. The SVG should be viewBox optimized for North America prominence.
 
-### Table Sticky Column Fix
-The overlapping occurs because:
-1. Background colors use transparent fallbacks
-2. z-index isn't properly stacked
+### Lottie Integration
+Use `@lottiefiles/react-lottie-player` for lightweight Lottie support. The loader.json is already a proper Lottie animation file (120 frames at 60fps = 2 second loop).
 
-Solution:
-- Sticky header: z-20
-- Sticky column header: z-30
-- Sticky body cells: z-10
-- Use explicit background colors, not inherit
+### Account Persistence
+For demo purposes, accounts will be stored in localStorage via the AccountContext. In production, this would sync with backend.
 
-## reply in chat what font are you using across the software 
+
+for Part 5: 10 Creative UI Ideas to Differentiate Anarix
+
+### Idea 1: Morphing Metric Cards
+- Numbers animate smoothly when values change
+- Color gradient shifts based on performance (green pulse for positive trends)
+- Micro-interactions on hover showing mini sparkline
+
+### Idea 2: Ambient Data Visualization Background
+- Subtle, moving dot pattern in background that represents live data flow
+- Dots move faster when more activity happening
+- Very subtle, doesn't distract - just adds life
+
+### Idea 3: Contextual Command Palette (Cmd+K)
+- Quick actions from anywhere in app
+- Search across campaigns, products, metrics
+- Recent actions list
+- Aan AI quick ask
+
+### Idea 4: Floating Action Island
+- Persistent bottom-center floating element
+- Shows current context (selected campaign, date range)
+- Quick actions relevant to current page
+- Aan AI mini-chat trigger
+
+### Idea 5: Glassmorphism Panels for Aan AI
+- Frosted glass effect for AI workspace
+- Subtle blur and transparency
+- Distinguishes AI space from core analytics
+
+### Idea 6: Data Storytelling Mode
+- "Generate Story" button on any dashboard
+- Creates a narrative walkthrough of the data
+- Animated highlights and annotations
+- Shareable as a guided tour
+
+### Idea 7: Split-Screen Comparison View
+- Compare any two time periods side-by-side
+- Synced scrolling in tables
+- Difference highlighting (red/green overlays)
+
+### Idea 8: Metric Pulsing on Significant Changes
+- When a metric changes significantly, the card pulses once
+- Subtle ring animation expands outward
+- Draws attention without being alarming
+
+### Idea 9: Progress Rings Instead of Progress Bars
+- Circular progress indicators for goals/targets
+- More visually distinctive
+- Animated fill with easing
+
+### Idea 10: Keyboard-First Navigation
+- Vim-like shortcuts (j/k for up/down in tables)
+- Number keys for quick section jumping
+- Visual key hint overlay (press ? to show)
+- Makes power users incredibly fast
+
+implement all this but give me an entire documentation in chat how is everything mapped what are entry exit points how to use every feature and for keyboard shortcuts tell me all the shortcuts you putting and how all of this will help and everything about all the 10 ideas, also create a different file for this so if i dont like it i can use ask you to remove it without interfering with the overall build.
