@@ -1,46 +1,90 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link } from "lucide-react";
+import {
+  LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target,
+  MousePointerClick, Package, Brain, Search, BarChart3, Clock,
+  CalendarClock, History, ListTodo, Settings, Users, FileStack,
+  ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
+import {
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
+  SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar
+} from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { SidebarFlyout } from "./SidebarFlyout";
+import { SidebarHoverPopup } from "./SidebarHoverPopup";
 import { useAan } from "@/components/aan";
 
-interface NavItem { title: string; url: string; icon: React.ComponentType<{ className?: string }>; }
-interface NavGroup { label: string; icon: React.ComponentType<{ className?: string }>; items: NavItem[]; defaultOpen?: boolean; }
+interface NavItem {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+interface NavGroup {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  items: NavItem[];
+  defaultOpen?: boolean;
+}
 
 const navigationGroups: NavGroup[] = [
-  { label: "Profitability", icon: DollarSign, defaultOpen: true, items: [
-    { title: "Dashboard", url: "/profitability/dashboard", icon: LayoutDashboard },
-    { title: "Trends", url: "/profitability/trends", icon: TrendingUp },
-    { title: "Profit & Loss", url: "/profitability/pnl", icon: FileText },
-    { title: "Geographical Data", url: "/profitability/geo", icon: MapPin },
-  ]},
-  { label: "Advertising", icon: Megaphone, defaultOpen: true, items: [
-    { title: "Campaign Manager", url: "/advertising/campaigns", icon: Megaphone },
-    { title: "Impact Analysis", url: "/advertising/impact", icon: Target },
-    { title: "Targeting Actions", url: "/advertising/targeting", icon: MousePointerClick },
-  ]},
-  { label: "Catalog", icon: ShoppingBag, items: [{ title: "Products", url: "/catalog/products", icon: Package }]},
-  { label: "Business Intelligence", icon: Brain, items: [
-    { title: "Brand SOV", url: "/bi/brand-sov", icon: Brain },
-    { title: "Keyword Tracker", url: "/bi/keyword-tracker", icon: Search },
-    { title: "Keyword SOV", url: "/bi/keyword-sov", icon: BarChart3 },
-    { title: "Product SOV", url: "/bi/product-sov", icon: Package },
-  ]},
-  { label: "Day Parting", icon: Clock, items: [
-    { title: "Hourly Data", url: "/dayparting/hourly", icon: Clock },
-    { title: "Campaigns", url: "/dayparting/campaigns", icon: CalendarClock },
-    { title: "History", url: "/dayparting/history", icon: History },
-    { title: "Scheduled Jobs", url: "/dayparting/scheduled", icon: ListTodo },
-  ]},
-  { label: "Settings", icon: Settings, items: [
-    { title: "Appearance", url: "/settings/appearance", icon: Settings },
-    { title: "Accounts", url: "/settings/accounts", icon: Link },
-    { title: "Users", url: "/settings/users", icon: Users },
-    { title: "History Logs", url: "/settings/logs", icon: FileStack },
-  ]},
+  {
+    label: "Profitability",
+    icon: DollarSign,
+    defaultOpen: true,
+    items: [
+      { title: "Dashboard", url: "/profitability/dashboard", icon: LayoutDashboard },
+      { title: "Trends", url: "/profitability/trends", icon: TrendingUp },
+      { title: "Profit & Loss", url: "/profitability/pnl", icon: FileText },
+      { title: "Geographical Data", url: "/profitability/geo", icon: MapPin },
+    ],
+  },
+  {
+    label: "Advertising",
+    icon: Megaphone,
+    defaultOpen: true,
+    items: [
+      { title: "Campaign Manager", url: "/advertising/campaigns", icon: Megaphone },
+      { title: "Impact Analysis", url: "/advertising/impact", icon: Target },
+      { title: "Targeting Actions", url: "/advertising/targeting", icon: MousePointerClick },
+    ],
+  },
+  {
+    label: "Catalog",
+    icon: ShoppingBag,
+    items: [{ title: "Products", url: "/catalog/products", icon: Package }],
+  },
+  {
+    label: "Business Intelligence",
+    icon: Brain,
+    items: [
+      { title: "Brand SOV", url: "/bi/brand-sov", icon: Brain },
+      { title: "Keyword Tracker", url: "/bi/keyword-tracker", icon: Search },
+      { title: "Keyword SOV", url: "/bi/keyword-sov", icon: BarChart3 },
+      { title: "Product SOV", url: "/bi/product-sov", icon: Package },
+    ],
+  },
+  {
+    label: "Day Parting",
+    icon: Clock,
+    items: [
+      { title: "Hourly Data", url: "/dayparting/hourly", icon: Clock },
+      { title: "Campaigns", url: "/dayparting/campaigns", icon: CalendarClock },
+      { title: "History", url: "/dayparting/history", icon: History },
+      { title: "Scheduled Jobs", url: "/dayparting/scheduled", icon: ListTodo },
+    ],
+  },
+  {
+    label: "Settings",
+    icon: Settings,
+    items: [
+      { title: "Preferences", url: "/settings/appearance", icon: Settings },
+      { title: "Accounts", url: "/settings/accounts", icon: Link },
+      { title: "Users", url: "/settings/users", icon: Users },
+      { title: "History Logs", url: "/settings/logs", icon: FileStack },
+    ],
+  },
 ];
 
 export function AppSidebar() {
@@ -53,7 +97,7 @@ export function AppSidebar() {
   const [triggerRects, setTriggerRects] = useState<Record<string, DOMRect | null>>({});
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  
+
   // Mutex accordion - only one section open at a time
   const [openSection, setOpenSection] = useState<string | null>(() => {
     for (const group of navigationGroups) {
@@ -68,14 +112,14 @@ export function AppSidebar() {
       clearTimeout(hoverTimeoutRef.current);
       hoverTimeoutRef.current = null;
     }
-    
+
     // Get fresh rect on hover
     const trigger = triggerRefs.current[label];
     if (trigger) {
       const rect = trigger.getBoundingClientRect();
-      setTriggerRects(prev => ({ ...prev, [label]: rect }));
+      setTriggerRects((prev) => ({ ...prev, [label]: rect }));
     }
-    
+
     setHoveredGroup(label);
   }, []);
 
@@ -95,17 +139,26 @@ export function AppSidebar() {
   }, []);
 
   const toggleSection = (label: string) => {
-    setOpenSection(prev => prev === label ? null : label);
+    setOpenSection((prev) => (prev === label ? null : label));
   };
 
   const isActive = (path: string) => currentPath.startsWith(path);
 
   return (
-    <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-300", collapsed ? "w-14" : "w-60")} collapsible="icon">
+    <Sidebar
+      className={cn(
+        "border-r border-sidebar-border bg-sidebar transition-all duration-300",
+        collapsed ? "w-14" : "w-60"
+      )}
+      collapsible="icon"
+    >
       <SidebarContent className="py-4">
         {/* Aan AI Entry Point */}
         <div className="px-3 mb-4">
-          <button onClick={openPanel} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 border border-primary/20 text-primary">
+          <button
+            onClick={openPanel}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 border border-primary/20 text-primary"
+          >
             <Sparkles className="h-4 w-4 shrink-0" />
             {!collapsed && <span>Aan AI</span>}
           </button>
@@ -114,26 +167,38 @@ export function AppSidebar() {
         {navigationGroups.map((group) => (
           <SidebarGroup key={group.label} className="relative">
             {!collapsed ? (
-              <Collapsible 
-                open={openSection === group.label} 
+              <Collapsible
+                open={openSection === group.label}
                 onOpenChange={() => toggleSection(group.label)}
               >
                 <CollapsibleTrigger asChild>
-                  <SidebarGroupLabel className="flex cursor-pointer items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
-                    <div className="flex items-center gap-2">
+                  <SidebarGroupLabel className="flex cursor-pointer items-center justify-between px-3 py-2.5 text-sm font-semibold uppercase tracking-wide text-foreground hover:bg-sidebar-accent transition-colors rounded-md mx-2">
+                    <div className="flex items-center gap-2.5">
                       <group.icon className="h-4 w-4" />
-                      {group.label}
+                      <span>{group.label}</span>
                     </div>
-                    {openSection === group.label ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                    {openSection === group.label ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
                   </SidebarGroupLabel>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="overflow-hidden transition-all duration-200 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                   <SidebarGroupContent>
-                    <SidebarMenu>
+                    <SidebarMenu className="pl-4 border-l-2 border-border ml-5 mt-1">
                       {group.items.map((item) => (
                         <SidebarMenuItem key={item.title}>
                           <SidebarMenuButton asChild>
-                            <NavLink to={item.url} className={cn("flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors", isActive(item.url) ? "bg-primary/10 text-primary" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground")}>
+                            <NavLink
+                              to={item.url}
+                              className={cn(
+                                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                                isActive(item.url)
+                                  ? "bg-primary/10 text-primary border-l-2 border-primary -ml-[2px] pl-[14px]"
+                                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                              )}
+                            >
                               <item.icon className="h-4 w-4 shrink-0" />
                               <span>{item.title}</span>
                             </NavLink>
@@ -149,17 +214,19 @@ export function AppSidebar() {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button 
-                        ref={(el) => { triggerRefs.current[group.label] = el; }}
+                      <button
+                        ref={(el) => {
+                          triggerRefs.current[group.label] = el;
+                        }}
                         className={cn(
                           "flex items-center justify-center rounded-md p-2 transition-colors text-sidebar-foreground hover:bg-sidebar-accent",
                           hoveredGroup === group.label && "bg-sidebar-accent"
-                        )} 
+                        )}
                         title={group.label}
                         onMouseEnter={() => handleMouseEnter(group.label)}
                         onMouseLeave={handleMouseLeave}
                       >
-                        <group.icon className="h-4 w-4" />
+                        <group.icon className="h-5 w-5" />
                       </button>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -168,19 +235,21 @@ export function AppSidebar() {
             )}
           </SidebarGroup>
         ))}
-        
-        {/* Render all flyouts via portal */}
-        {collapsed && navigationGroups.map((group) => (
-          <SidebarFlyout 
-            key={group.label}
-            items={group.items} 
-            isVisible={hoveredGroup === group.label} 
-            groupLabel={group.label}
-            triggerRect={triggerRects[group.label] || null}
-            onMouseEnter={() => handleMouseEnter(group.label)}
-            onMouseLeave={handleMouseLeave}
-          />
-        ))}
+
+        {/* Render all hover popups via portal when collapsed */}
+        {collapsed &&
+          navigationGroups.map((group) => (
+            <SidebarHoverPopup
+              key={group.label}
+              items={group.items}
+              isVisible={hoveredGroup === group.label}
+              groupLabel={group.label}
+              triggerRect={triggerRects[group.label] || null}
+              currentPath={currentPath}
+              onMouseEnter={() => handleMouseEnter(group.label)}
+              onMouseLeave={handleMouseLeave}
+            />
+          ))}
       </SidebarContent>
     </Sidebar>
   );

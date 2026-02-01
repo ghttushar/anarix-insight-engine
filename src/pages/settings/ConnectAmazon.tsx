@@ -1,20 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Store, ShoppingCart, Tag, Check } from "lucide-react";
+import { Store, ShoppingCart, Tag, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { useAccounts } from "@/contexts/AccountContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import logoFull from "@/assets/logo-full.png";
+import logoWhite from "@/assets/logo-white.png";
 
 const connectionOptions = [
   {
     id: "seller",
     title: "Seller Central",
-    description: "Connect your Amazon Seller Central account to sync orders, inventory, and advertising data.",
+    description:
+      "Connect your Amazon Seller Central account to sync orders, inventory, and advertising data.",
     icon: Store,
     color: "bg-orange-100 text-orange-600",
     accountType: "seller" as const,
@@ -22,7 +25,8 @@ const connectionOptions = [
   {
     id: "ads",
     title: "Amazon Ads",
-    description: "Connect your Amazon Advertising account to manage Sponsored Products, Brands, and Display campaigns.",
+    description:
+      "Connect your Amazon Advertising account to manage Sponsored Products, Brands, and Display campaigns.",
     icon: Tag,
     color: "bg-blue-100 text-blue-600",
     accountType: "ads" as const,
@@ -30,7 +34,8 @@ const connectionOptions = [
   {
     id: "vendor",
     title: "Vendor Central",
-    description: "Connect your Amazon Vendor Central account for 1P sellers to sync purchase orders and analytics.",
+    description:
+      "Connect your Amazon Vendor Central account for 1P sellers to sync purchase orders and analytics.",
     icon: ShoppingCart,
     color: "bg-purple-100 text-purple-600",
     accountType: "vendor" as const,
@@ -40,21 +45,24 @@ const connectionOptions = [
 export default function ConnectAmazon() {
   const navigate = useNavigate();
   const { addAccount, isOnboarding } = useAccounts();
+  const { resolvedTheme } = useTheme();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [merchantName, setMerchantName] = useState("");
   const [merchantId, setMerchantId] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
 
+  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
+
   const handleConnect = async () => {
     if (!selectedOption || !merchantName || !merchantId) return;
 
     setIsConnecting(true);
-    
+
     // Simulate connection
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const option = connectionOptions.find((o) => o.id === selectedOption);
-    
+
     addAccount({
       marketplace: "amazon",
       accountType: option?.accountType || "seller",
@@ -67,7 +75,7 @@ export default function ConnectAmazon() {
     });
 
     toast.success("Amazon account connected successfully!");
-    
+
     if (isOnboarding) {
       navigate("/onboarding/connect");
     } else {
@@ -77,39 +85,30 @@ export default function ConnectAmazon() {
 
   const backUrl = isOnboarding ? "/onboarding/connect" : "/settings/accounts";
 
+  const breadcrumbItems = isOnboarding
+    ? [
+        { label: "Onboarding", href: "/onboarding/connect" },
+        { label: "Connect Amazon" },
+      ]
+    : [
+        { label: "Settings", href: "/settings/appearance" },
+        { label: "Accounts", href: "/settings/accounts" },
+        { label: "Connect Amazon" },
+      ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border px-6 py-4">
         <div className="flex items-center justify-between">
-          <img src={logoFull} alt="Anarix" className="h-8 w-auto" />
-          <Button variant="ghost" onClick={() => navigate(backUrl)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
+          <img src={logoSrc} alt="Anarix" className="h-8 w-auto" />
         </div>
       </header>
 
       {/* Main content */}
       <main className="max-w-4xl mx-auto p-6">
         {/* Breadcrumb */}
-        {!isOnboarding && (
-          <Breadcrumb className="mb-6">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/settings/appearance">Settings</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/settings/accounts">Accounts</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Connect Amazon</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        )}
+        <PageBreadcrumb items={breadcrumbItems} className="mb-6" />
 
         <div className="text-center mb-10">
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-100 mb-4">
@@ -141,7 +140,12 @@ export default function ConnectAmazon() {
                   <Check className="h-4 w-4 text-primary-foreground" />
                 </div>
               )}
-              <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center mb-4", option.color)}>
+              <div
+                className={cn(
+                  "h-12 w-12 rounded-xl flex items-center justify-center mb-4",
+                  option.color
+                )}
+              >
                 <option.icon className="h-6 w-6" />
               </div>
               <h3 className="font-medium text-foreground mb-1">{option.title}</h3>
@@ -176,8 +180,8 @@ export default function ConnectAmazon() {
               </p>
             </div>
 
-            <Button 
-              className="w-full" 
+            <Button
+              className="w-full"
               size="lg"
               onClick={handleConnect}
               disabled={!merchantName || !merchantId || isConnecting}

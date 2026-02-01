@@ -1,4 +1,4 @@
-import { PanelLeft, ChevronDown } from "lucide-react";
+import { PanelLeft, ChevronDown, Keyboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,7 +8,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useMarketplace, Marketplace } from "@/contexts/MarketplaceContext";
+import { useAccounts } from "@/contexts/AccountContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { AanTrigger } from "@/components/aan";
+import logoFull from "@/assets/logo-full.png";
+import logoWhite from "@/assets/logo-white.png";
 
 // Walmart logo SVG component
 const WalmartLogo = ({ className }: { className?: string }) => (
@@ -35,24 +39,22 @@ const marketplaces: MarketplaceOption[] = [
   { id: "amazon", name: "Amazon", icon: AmazonLogo },
 ];
 
-interface AccountOption {
-  id: string;
-  name: string;
-}
-
-const accounts: AccountOption[] = [
-  { id: "1", name: "Nadia's Organics" },
-  { id: "2", name: "TechGear Pro" },
-  { id: "3", name: "HomeStyle Essentials" },
-];
-
 export function AppHeader() {
   const { toggleSidebar, state } = useSidebar();
   const collapsed = state === "collapsed";
   const { marketplace, setMarketplace } = useMarketplace();
+  const { accounts } = useAccounts();
+  const { resolvedTheme } = useTheme();
+
+  // Theme-aware logo
+  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
 
   const currentMarketplace = marketplaces.find((m) => m.id === marketplace) || marketplaces[0];
   const MarketplaceIcon = currentMarketplace.icon;
+
+  // Get first account name for display
+  const primaryAccount = accounts[0];
+  const accountDisplayName = primaryAccount?.merchantName || "Select Account";
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
@@ -68,18 +70,24 @@ export function AppHeader() {
           <PanelLeft className="h-5 w-5" />
         </Button>
 
-        {/* Logo */}
+        {/* Logo - Theme-aware */}
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="font-heading text-lg font-bold text-primary-foreground">A</span>
-          </div>
-          <span className="font-heading text-xl font-bold text-foreground">Anarix</span>
+          <img src={logoSrc} alt="Anarix" className="h-8 w-auto" />
         </div>
       </div>
 
       <div className="flex items-center gap-3">
+        {/* Keyboard shortcut hint */}
+        <div className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Keyboard className="h-3.5 w-3.5" />
+          <span>Press</span>
+          <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono">?</kbd>
+          <span>for shortcuts</span>
+        </div>
+
         {/* Aan AI Trigger */}
         <AanTrigger />
+
         {/* Marketplace Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -91,8 +99,8 @@ export function AppHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
             {marketplaces.map((mp) => (
-              <DropdownMenuItem 
-                key={mp.id} 
+              <DropdownMenuItem
+                key={mp.id}
                 className="gap-2"
                 onClick={() => setMarketplace(mp.id)}
               >
@@ -107,14 +115,27 @@ export function AppHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2">
-              <span className="max-w-[150px] truncate">Nadia's Organics</span>
+              <div className="h-2 w-2 rounded-full bg-success" />
+              <span className="max-w-[150px] truncate">{accountDisplayName}</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {accounts.map((account) => (
-              <DropdownMenuItem key={account.id}>{account.name}</DropdownMenuItem>
-            ))}
+          <DropdownMenuContent align="end" className="w-56">
+            {accounts.length > 0 ? (
+              accounts.map((account) => (
+                <DropdownMenuItem key={account.id} className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-success" />
+                  <div className="flex flex-col">
+                    <span className="font-medium">{account.merchantName}</span>
+                    <span className="text-xs text-muted-foreground capitalize">
+                      {account.marketplace} • {account.accountType}
+                    </span>
+                  </div>
+                </DropdownMenuItem>
+              ))
+            ) : (
+              <DropdownMenuItem disabled>No accounts connected</DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
