@@ -14,6 +14,10 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
+    // Critical: ensure a single React instance across all deps.
+    // Without this, some libraries can end up calling hooks on a different
+    // React copy, which manifests as: "Cannot read properties of null (reading 'useEffect')".
+    dedupe: ["react", "react-dom", "react/jsx-runtime"],
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
