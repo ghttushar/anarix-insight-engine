@@ -24,15 +24,12 @@ const formatNumber = (value: number) => {
 export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))" }: PeriodSummaryCardProps) {
   const [showPanel, setShowPanel] = useState(false);
 
+  // Reduced to 6 metrics for single-line display
   const metrics = [
     { label: "GMV", value: formatCurrency(summary.gmv) },
     { label: "Auth Sales", value: formatCurrency(summary.authSales) },
     { label: "Orders", value: formatNumber(summary.orders) },
-    { label: "Units", value: formatNumber(summary.units) },
-    { label: "Returns", value: formatNumber(summary.returns) },
-    { label: "Cancelled", value: formatNumber(summary.cancelled) },
     { label: "Ad Cost", value: formatCurrency(summary.adCost) },
-    { label: "Est. Payout", value: formatCurrency(summary.estPayout) },
     { label: "Net Profit", value: formatCurrency(summary.netProfit), highlight: true },
   ];
 
@@ -57,8 +54,8 @@ export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))"
           <div className="text-xs text-muted-foreground">{summary.dateRange}</div>
         </div>
 
-        {/* Metrics row */}
-        <div className="flex flex-1 flex-wrap items-center gap-4 lg:gap-6">
+        {/* Metrics row - single line, no wrap */}
+        <div className="flex flex-1 items-center gap-4 lg:gap-6 overflow-hidden">
           {metrics.map((metric) => (
             <div key={metric.label} className="flex flex-col min-w-[70px]">
               <span className="text-xs text-muted-foreground whitespace-nowrap">{metric.label}</span>
