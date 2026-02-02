@@ -1,442 +1,433 @@
 
-# Comprehensive Aan Architecture, Insights Panel & UI Enhancement Plan
+# Complete Aan Architecture & Navigation Enhancement Plan
 
 ## Overview
 
-This plan implements the complete Aan AI layer architecture along with multiple UI refinements:
-1. Add Insights icon to Floating Island with categorized insights panel (Critical, Attention, Positive)
-2. Update "View More" on Profitability Dashboard to open Aan-style right panel
-3. Fix Anarix logo positioning (top of sidebar, not header)
-4. Show Floating Island only in app (not login/settings)
-5. Collapsed sidebar shows Anarix logo icon instead of generic sparkle
-6. Implement complete Aan 3-mode architecture (Floating Copilot, Split Task View, Full Workspace)
-7. Create unique Aan gradient
-8. Add Allura font for "Aan" branding
-9. Dynamic logo switching in Aan mode ("Aan by Anarix")
+This plan implements the complete Aan functionality as a unified AI reasoning layer, along with critical navigation and UI improvements:
+
+1. **Fix Floating Island vs Navbar Aan Behavior** - Island opens Copilot panel, Navbar opens Workspace
+2. **Rebuild Aan Workspace Sidebar** - Match the reference design with logo, sections, and chat history
+3. **Add Breadcrumbs for Both Anarix and Aan** - Navigation context in all screens
+4. **Apply Correct Aan Gradient** - Use the reference purple-indigo gradient
+5. **Remove Right-Side Shadow** - Clean up copilot panel styling
+6. **Move Marketplace/Account Dropdowns to Navbar** - With popup modal for account selection
+7. **Fix Navbar Alignment** - Proper spacing between logo and items
+8. **Implement Complete Aan Functionality** - Single chat system with filtered views
 
 ---
 
-## Part 1: Aan Gradient & Typography System
+## Part 1: Aan Entry Point Behavior (Critical Fix)
 
-### 1.1 Add Allura Font
-**File**: `src/index.css`
+### Current Issue
+- Both the sidebar Aan button and floating island trigger the same `openPanel()` which opens Copilot
+- The navbar "Aan" should open the dedicated Workspace mode
 
-Add Google Fonts import for Allura (script/decorative font for Aan branding):
-```css
-@import url('https://fonts.googleapis.com/css2?family=Allura&display=swap');
-```
+### Files to Modify
 
-### 1.2 Aan-Specific Gradient
-**CSS Variables** in `src/index.css`:
-```css
-:root {
-  --aan-gradient-start: #6366F1; /* Indigo-500 */
-  --aan-gradient-mid: #8B5CF6; /* Violet-500 */
-  --aan-gradient-end: #A78BFA; /* Violet-400 */
-}
-```
+**`src/components/layout/AppSidebar.tsx`**
+- Change sidebar Aan button to open Copilot mode (keep as-is)
 
-Utility class for Aan gradient:
-```css
-.aan-gradient {
-  background: linear-gradient(135deg, var(--aan-gradient-start), var(--aan-gradient-mid), var(--aan-gradient-end));
-}
-```
+**`src/features/creative/FloatingActionIsland.tsx`**
+- Keep "Ask Aan" triggering `openPanel()` → Copilot mode (keep as-is)
 
-### 1.3 Typography Variables
-```css
-:root {
-  --font-aan: 'Allura', cursive;
-}
-```
+**`src/components/layout/AppHeader.tsx`**
+- Add "Aan" button in the header that triggers `openWorkspace()` → Workspace mode
+- This will be styled with the Aan gradient
 
 ---
 
-## Part 2: Insights Panel System
+## Part 2: Rebuild Aan Workspace Sidebar (Match Reference)
 
-### 2.1 New Component: InsightsPanel
-**File**: `src/components/insights/InsightsPanel.tsx`
-
-A right-side panel (same pattern as AanPanel) showing categorized insights:
-
-**Three Categories**:
-1. **Critical Alerts** (Red) - Immediate action required
-   - Icon: AlertTriangle
-   - Examples: "High-spend zero-conversion keywords", "Budget depleted campaigns"
-
-2. **Worth a Look** (Yellow/Amber) - Review when possible
-   - Icon: AlertCircle
-   - Examples: "Missing backend search terms", "Price competitiveness opportunity"
-
-3. **Wins & Highlights** (Green) - Positive insights
-   - Icon: CheckCircle2
-   - Examples: "Strong inventory health", "ROAS improvement detected"
-
-**Mock Insights Data**:
-```typescript
-const mockInsights = [
-  {
-    id: "1",
-    category: "critical",
-    title: "High-spend, zero-conversion keywords detected",
-    description: "15 keywords have spent over $500 with 0 conversions in the last 30 days.",
-    action: "Pause or negatively target these keywords immediately.",
-  },
-  {
-    id: "2",
-    category: "attention",
-    title: "Missing backend search terms",
-    description: "23 products are missing optimized backend search terms.",
-    action: "Add relevant backend keywords to improve discoverability.",
-  },
-  {
-    id: "3",
-    category: "positive",
-    title: "Strong inventory health",
-    description: "All products have sufficient stock levels for the next 45 days.",
-    action: null,
-  },
-  // ... more insights
-];
+### Reference Design Elements (from uploaded image-41.png)
+```text
+┌─────────────────────────┐
+│  ✧ Aan                  │  ← Logo with "by Anarix"
+│     by Anarix           │
+├─────────────────────────┤
+│  ▢ New Chat             │  ← Action button
+│  📄 Reports             │  ← Filter section
+│  ◯ Audit                │
+│  ✦ Creative             │
+│  🤖 Agent               │
+├─────────────────────────┤
+│  Chat History           │  ← Section label
+│  ⌕ Search history...    │  ← Search input
+├─────────────────────────┤
+│  ▼ New Conversation     │  ← Chat history items
+│    Today                │
+│                         │
+│  Campaign Performance   │
+│    1/8/2026             │
+└─────────────────────────┘
 ```
 
-### 2.2 InsightsContext
-**File**: `src/components/insights/InsightsContext.tsx`
+### New File: `src/components/aan/AanWorkspaceSidebar.tsx` (Complete Rewrite)
 
-Manages insights panel state:
 ```typescript
-interface InsightsContextType {
-  isOpen: boolean;
-  openPanel: () => void;
-  closePanel: () => void;
-  insights: Insight[];
-  criticalCount: number;
-  attentionCount: number;
-  positiveCount: number;
+interface ChatHistoryItem {
+  id: string;
+  title: string;
+  date: Date;
+  type: "chat" | "report" | "audit" | "creative" | "agent";
 }
+
+// Sidebar structure:
+// 1. Aan Logo with "by Anarix" branding (using Allura font)
+// 2. "New Chat" button
+// 3. Filter sections: Reports, Audit, Creative, Agent
+// 4. "Chat History" label
+// 5. Search input
+// 6. Scrollable list of conversations grouped by date
 ```
 
-### 2.3 Add to Floating Island
-**Update**: `src/features/creative/FloatingActionIsland.tsx`
-
-Add Lightbulb icon for insights:
-```typescript
-import { Lightbulb } from "lucide-react";
-
-// In actions array:
-{ icon: Lightbulb, label: "Insights", onClick: openInsights }
-```
-
----
-
-## Part 3: Floating Island Visibility Logic
-
-### 3.1 Route-Based Visibility
-**Update**: `src/features/creative/FloatingActionIsland.tsx`
-
-Hide on login, onboarding, and settings routes:
-```typescript
-const hiddenRoutes = ["/login", "/onboarding", "/settings"];
-const shouldHide = hiddenRoutes.some(route => pathname.startsWith(route));
-
-if (shouldHide) return null;
-```
-
-### 3.2 Collapsed State with Anarix Logo
-When user minimizes the island, show a circular button with the Anarix logo icon:
-```tsx
-if (!isVisible) {
-  return (
-    <button
-      onClick={() => setIsVisible(true)}
-      className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full shadow-lg flex items-center justify-center overflow-hidden border border-border bg-card hover:shadow-xl transition-shadow"
-    >
-      <img 
-        src={resolvedTheme === "dark" ? logoWhite : logoFull} 
-        alt="Anarix" 
-        className="h-8 w-8 object-contain"
-      />
-    </button>
-  );
-}
-```
-
----
-
-## Part 4: Sidebar Logo Placement
-
-### 4.1 Move Logo to Top of Sidebar
-**Update**: `src/components/layout/AppSidebar.tsx`
-
-Add logo at the very top of sidebar content (before Aan AI button):
-```tsx
-<SidebarContent className="py-4">
-  {/* Logo at top */}
-  <div className="px-3 mb-4 flex items-center justify-center">
-    {!collapsed ? (
-      <img src={logoSrc} alt="Anarix" className="h-8 w-auto" />
-    ) : (
-      <img src={logoIcon} alt="Anarix" className="h-8 w-8 object-contain" />
-    )}
-  </div>
-  
-  {/* Aan AI Entry Point */}
-  ...
-</SidebarContent>
-```
-
-### 4.2 Remove Logo from Header
-**Update**: `src/components/layout/AppHeader.tsx`
-
-Remove the logo from the header (keep only sidebar toggle and other controls).
-
----
-
-## Part 5: Aan Three-Mode Architecture
-
-### 5.1 Mode Definitions
-
-```typescript
-type AanMode = "closed" | "copilot" | "split" | "workspace";
-```
-
-**Mode A: Floating Copilot (copilot)**
-- Triggered by: Floating Island click, sidebar Aan button, keyboard shortcut
-- Right panel ~420px wide
-- Background dimmed 4%
-- Lightweight chat interface
-- No full navigation
-- Can start tasks but hands off to split/workspace for completion
-
-**Mode B: Split Task View (split)**
-- Triggered by: Clicking artifact card in copilot
-- Right panel expands to ~50% width
-- Main Anarix UI visible on left
-- Shows artifact (report, audit, etc.)
-- Version history and edit mode
-- Mini chat input at bottom for artifact edits
-
-**Mode C: Full Workspace (workspace)**
-- Triggered by: "Aan" in top nav, "Open in full workspace" CTA
-- Replaces entire Anarix shell
-- Has its own sidebar (Chat, Reports, Audit, Creative, Rules, Agents)
-- Separate history
-- Back button returns to last Anarix screen
-
-### 5.2 Update AanContext
-**File**: `src/components/aan/AanContext.tsx`
-
-Add mode tracking:
+### AanContext Updates
+Add chat history management:
 ```typescript
 interface AanContextType {
-  mode: AanMode;
-  setMode: (mode: AanMode) => void;
-  openCopilot: () => void;
-  openSplit: (artifact: AanArtifact) => void;
-  openWorkspace: () => void;
-  closeAan: () => void;
-  currentArtifact: AanArtifact | null;
-  // ... existing props
+  // ... existing
+  conversations: Conversation[];
+  currentConversation: Conversation | null;
+  activeFilter: "all" | "reports" | "audit" | "creative" | "agent";
+  setActiveFilter: (filter: string) => void;
+  startNewConversation: () => void;
+  selectConversation: (id: string) => void;
+  searchHistory: (query: string) => Conversation[];
 }
 ```
 
-### 5.3 AanCopilotPanel (Mode A)
-**File**: `src/components/aan/AanCopilotPanel.tsx`
+---
 
-Slim right panel (420px) with:
-- Aan gradient header with "Aan" in Allura font
-- Context bar showing current page
-- Chat messages
-- Input area
-- No full navigation
-- "Open in workspace" link
+## Part 3: Breadcrumb Navigation for Both Systems
 
-### 5.4 AanSplitView (Mode B)
-**File**: `src/components/aan/AanSplitView.tsx`
+### Anarix Breadcrumbs
+Already implemented in `PageBreadcrumb.tsx` - ensure all pages use it
 
-Expanded view (50% width) showing:
-- Artifact header (title, date, download, version selector)
-- Artifact content (charts, tables)
-- Mini edit chat at bottom
-- Close button returns to copilot
+### Aan Breadcrumbs (New Component)
+**New File: `src/components/aan/AanBreadcrumb.tsx`**
 
-### 5.5 AanWorkspace (Mode C)
-**File**: `src/components/aan/AanWorkspace.tsx`
+```typescript
+// Shows context within Aan workspace
+// Example: Aan > Reports > Campaign Performance Analysis
+// Example: Aan > Audit > Q4 2025 Audit
 
-Full-screen replacement with:
-- Own sidebar (Chat, Reports, Audit, Creative, Rules, Agents)
-- Logo changes to "Aan by Anarix" (Aan in Allura, Anarix logo)
-- Glassmorphism panel styling
-- Back to Anarix button
+interface AanBreadcrumbProps {
+  section?: string; // "reports" | "audit" | "creative" | etc.
+  conversationTitle?: string;
+}
+```
+
+### Update `AanWorkspace.tsx`
+- Add breadcrumb below the header
+- Shows: "Aan" > [Section] > [Conversation Title]
 
 ---
 
-## Part 6: Dynamic Logo in Aan Mode
+## Part 4: Apply Correct Aan Gradient
 
-### 6.1 AanLogo Component
-**File**: `src/components/aan/AanLogo.tsx`
+### Reference Gradient (from sidebar screenshot)
+The gradient in image-41 shows a purple-to-indigo gradient going from left to right.
 
-```tsx
-export function AanLogo({ className }: { className?: string }) {
-  const { resolvedTheme } = useTheme();
-  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
-  
-  return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <span 
-        className="text-2xl font-bold"
-        style={{ fontFamily: 'Allura, cursive' }}
-      >
-        Aan
-      </span>
-      <span className="text-xs text-muted-foreground">by</span>
-      <img src={logoSrc} alt="Anarix" className="h-5 w-auto" />
-    </div>
+### Update `src/index.css`
+```css
+:root {
+  /* Updated Aan Gradient - matches reference */
+  --aan-gradient-start: 258 90% 66%; /* #8B5CF6 Violet-500 */
+  --aan-gradient-mid: 239 84% 67%;   /* #6366F1 Indigo-500 */
+  --aan-gradient-end: 217 91% 60%;   /* #3B82F6 Blue-500 */
+}
+
+.aan-gradient {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--aan-gradient-start)) 0%,
+    hsl(var(--aan-gradient-mid)) 50%,
+    hsl(var(--aan-gradient-end)) 100%
   );
 }
 ```
 
 ---
 
-## Part 7: View More Panel Enhancement
+## Part 5: Remove Right-Side Shadow
 
-### 7.1 Update PeriodBreakdownPanel
-**File**: `src/components/profitability/PeriodBreakdownPanel.tsx`
+### Current Issue
+The copilot panel has `shadow-2xl` which creates a heavy shadow on the left edge
 
-Style it like the Aan panel with:
-- Same slide-in animation
-- Backdrop dimming
-- Gradient header accent
-- Close button styling
-
+### Fix in `src/components/aan/AanCopilotPanel.tsx`
 ```tsx
-<div className="relative overflow-hidden border-b border-border">
-  <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5" />
-  <div className="relative flex items-center justify-between px-4 py-4">
-    ...
+// Change from:
+"border-l border-border bg-background shadow-2xl"
+// To:
+"border-l border-border bg-background shadow-lg"
+```
+
+Also update `AanSplitView.tsx` with the same fix.
+
+---
+
+## Part 6: Move Marketplace/Account to Navbar
+
+### Reference Design (from image-42, image-43)
+```text
+┌────────────────────────────────────────────────────┐
+│  ☰  [Anarix Logo]  ... gap ...  [★ Walmart ▼] [● tushar ▼] │
+└────────────────────────────────────────────────────┘
+```
+
+### Update `src/components/layout/AppHeader.tsx`
+
+1. **Marketplace Selector (Star Icon Badge)**
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline" className="gap-2">
+      <Star className="h-4 w-4 text-warning fill-warning" />
+      <span>Walmart</span>
+      <ChevronDown className="h-4 w-4" />
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    {/* Marketplace options */}
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+2. **Account Selector (Status Dot)**
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline" className="gap-2">
+      <div className="h-2 w-2 rounded-full bg-success" />
+      <span>tushar</span>
+      <ChevronDown className="h-4 w-4" />
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent className="w-80">
+    {/* Large scrollable account list */}
+    <ScrollArea className="max-h-[300px]">
+      {accounts.map(account => (
+        <DropdownMenuItem key={account.id}>
+          {account.merchantName}
+        </DropdownMenuItem>
+      ))}
+    </ScrollArea>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+### Key Behavior
+- Dropdown appears above/below trigger (not pushing nav items)
+- Large account list is scrollable
+- Selected account shows status indicator
+
+---
+
+## Part 7: Fix Navbar Alignment
+
+### Current Issue
+Items are too close to the logo, cramped layout
+
+### Update `src/components/layout/AppHeader.tsx`
+```tsx
+<header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
+  <div className="flex items-center gap-6"> {/* Increased gap */}
+    <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+      <PanelLeft className="h-5 w-5" />
+    </Button>
+    
+    {/* Aan button in nav with gradient */}
+    <Button 
+      onClick={openWorkspace}
+      className="aan-gradient text-white gap-2"
+    >
+      <Sparkles className="h-4 w-4" />
+      <span style={{ fontFamily: "var(--font-aan)" }}>Aan</span>
+    </Button>
   </div>
-</div>
+
+  <div className="flex items-center gap-3">
+    {/* Marketplace & Account selectors */}
+  </div>
+</header>
+```
+
+### Remove Logo from Header
+Logo is in the sidebar - header should not duplicate it
+
+---
+
+## Part 8: Complete Aan Functionality
+
+### 8.1 Single Chat System Architecture
+
+**Key Principle**: One chat engine, multiple views
+
+```typescript
+interface Conversation {
+  id: string;
+  title: string;
+  createdAt: Date;
+  updatedAt: Date;
+  type: "general" | "report" | "audit" | "creative" | "rule" | "agent";
+  messages: Message[];
+  artifacts: Artifact[];
+}
+
+interface Artifact {
+  id: string;
+  type: "report" | "audit" | "rule" | "creative";
+  title: string;
+  version: number;
+  versions: ArtifactVersion[];
+  status: "draft" | "applied" | "archived";
+  data: any; // Charts, tables, etc.
+}
+```
+
+### 8.2 Sidebar Tab Filtering
+
+Tabs filter the conversation list, NOT create new chat systems:
+
+```typescript
+const filteredConversations = useMemo(() => {
+  if (activeFilter === "all") return conversations;
+  return conversations.filter(c => c.type === activeFilter);
+}, [conversations, activeFilter]);
+```
+
+### 8.3 Artifact Cards in Chat
+
+When Aan generates a report/audit:
+```tsx
+// In AanConversation.tsx
+if (message.artifact) {
+  return (
+    <ArtifactCard
+      artifact={message.artifact}
+      onClick={() => openSplit(message.artifact)}
+    />
+  );
+}
+```
+
+### 8.4 Chat to Summary to Artifact Flow
+
+1. **User Request**: "Generate last 7 day campaign report"
+2. **Immediate Response**: Aan shows partial insights, bullets, KPIs inline
+3. **Artifact Creation**: Aan creates clickable artifact card
+4. **Artifact Interaction**: Click opens Split Task View
+5. **Iteration**: Edit button opens mini-chat for refinements
+
+### 8.5 Version Management in Split View
+
+```typescript
+interface ArtifactVersion {
+  version: number;
+  createdAt: Date;
+  changes: string; // "Removed ROAS column, grouped by campaign type"
+  data: any;
+}
+
+// Version selector UI
+<DropdownMenu>
+  <DropdownMenuTrigger>v{currentVersion}</DropdownMenuTrigger>
+  <DropdownMenuContent>
+    {artifact.versions.map(v => (
+      <DropdownMenuItem onClick={() => setCurrentVersion(v.version)}>
+        v{v.version} - {format(v.createdAt, "MMM d, h:mm a")}
+      </DropdownMenuItem>
+    ))}
+  </DropdownMenuContent>
+</DropdownMenu>
 ```
 
 ---
 
-## Part 8: File Structure
+## Part 9: File Structure Changes
 
 ```text
 src/
 ├── components/
 │   ├── aan/
-│   │   ├── AanContext.tsx (MODIFY - add mode management)
-│   │   ├── AanCopilotPanel.tsx (NEW - Mode A)
-│   │   ├── AanSplitView.tsx (NEW - Mode B)
-│   │   ├── AanWorkspace.tsx (NEW - Mode C)
-│   │   ├── AanWorkspaceSidebar.tsx (NEW - workspace sidebar)
-│   │   ├── AanLogo.tsx (NEW - "Aan by Anarix" logo)
-│   │   ├── AanPanel.tsx (MODIFY - becomes router between modes)
-│   │   └── index.ts (MODIFY - export new components)
-│   ├── insights/
-│   │   ├── InsightsContext.tsx (NEW)
-│   │   ├── InsightsPanel.tsx (NEW)
-│   │   ├── InsightCard.tsx (NEW)
-│   │   └── index.ts (NEW)
+│   │   ├── AanContext.tsx (MAJOR UPDATE - add conversations, filtering)
+│   │   ├── AanWorkspaceSidebar.tsx (COMPLETE REWRITE - match reference)
+│   │   ├── AanWorkspace.tsx (UPDATE - add breadcrumb, improve layout)
+│   │   ├── AanBreadcrumb.tsx (NEW)
+│   │   ├── AanCopilotPanel.tsx (UPDATE - remove shadow)
+│   │   ├── AanSplitView.tsx (UPDATE - remove shadow, enhance versioning)
+│   │   ├── ArtifactCard.tsx (NEW - clickable artifact in chat)
+│   │   ├── AanConversation.tsx (UPDATE - support artifacts)
+│   │   └── index.ts (UPDATE exports)
 │   ├── layout/
-│   │   ├── AppSidebar.tsx (MODIFY - add logo at top)
-│   │   └── AppHeader.tsx (MODIFY - remove logo)
-│   └── profitability/
-│       └── PeriodBreakdownPanel.tsx (MODIFY - Aan-style styling)
-├── features/creative/
-│   └── FloatingActionIsland.tsx (MODIFY - add insights, hide on certain routes, collapsed logo)
-└── index.css (MODIFY - add Allura font, Aan gradient)
+│   │   ├── AppHeader.tsx (MAJOR UPDATE - Aan button, dropdowns)
+│   │   └── AppSidebar.tsx (MINOR - keep copilot trigger)
+└── index.css (UPDATE - correct Aan gradient)
 ```
 
 ---
 
-## Part 9: Implementation Sequence
+## Part 10: Implementation Sequence
 
-### Phase 1: Typography & Gradient Foundation
-1. Add Allura font import to index.css
-2. Add Aan gradient CSS variables
-3. Add font-aan CSS variable
+### Phase 1: Navigation & Layout Fixes
+1. Update AppHeader - add Aan button (workspace trigger), move dropdowns
+2. Fix navbar alignment and spacing
+3. Remove duplicate logo from header
+4. Fix copilot/split view shadows
 
-### Phase 2: Logo Positioning
-1. Move logo from header to sidebar top
-2. Create icon-only version for collapsed sidebar
-3. Update header to remove logo
+### Phase 2: Aan Workspace Sidebar Rebuild
+1. Rewrite AanWorkspaceSidebar to match reference
+2. Add New Chat, filter sections, chat history
+3. Add search functionality
+4. Implement date grouping for history
 
-### Phase 3: Floating Island Updates
-1. Add route-based visibility logic
-2. Add collapsed state with Anarix logo
-3. Add Insights icon trigger
+### Phase 3: Context & State Management
+1. Extend AanContext with conversations, filtering
+2. Add artifact management
+3. Implement single chat system with filters
 
-### Phase 4: Insights System
-1. Create InsightsContext
-2. Create InsightCard component
-3. Create InsightsPanel component
-4. Wire to FloatingIsland
+### Phase 4: Breadcrumbs
+1. Create AanBreadcrumb component
+2. Integrate into AanWorkspace
+3. Ensure all Anarix pages have breadcrumbs
 
-### Phase 5: Aan Mode Architecture
-1. Update AanContext with mode management
-2. Create AanCopilotPanel (refactor from current AanPanel)
-3. Create AanSplitView for artifacts
-4. Create AanWorkspace for full mode
-5. Create AanWorkspaceSidebar
-6. Create AanLogo component
+### Phase 5: Artifact System
+1. Create ArtifactCard component
+2. Update AanConversation to render artifacts
+3. Enhance AanSplitView with versioning
 
-### Phase 6: View More Enhancement
-1. Update PeriodBreakdownPanel styling to match Aan
-
-### Phase 7: App Integration
-1. Add InsightsProvider to App.tsx
-2. Update route structure for Aan workspace if needed
+### Phase 6: Gradient & Polish
+1. Update Aan gradient to match reference
+2. Final styling pass on all Aan components
 
 ---
 
 ## Technical Details
 
-### Aan Gradient Specification
+### Aan Entry Points Behavior Matrix
+| Entry Point | Action | Mode Opened |
+|-------------|--------|-------------|
+| Floating Island "Ask Aan" | openCopilot() | Copilot (side panel) |
+| Sidebar Aan Button | openCopilot() | Copilot (side panel) |
+| Header Aan Button | openWorkspace() | Full Workspace |
+| "Open in workspace" link | openWorkspace() | Full Workspace |
+
+### Correct Aan Gradient (from reference)
 ```css
-.aan-gradient {
-  background: linear-gradient(
-    135deg,
-    #6366F1 0%,    /* Indigo-500 */
-    #8B5CF6 50%,   /* Violet-500 */
-    #A78BFA 100%   /* Violet-400 */
-  );
-}
+/* Purple → Indigo → Blue gradient (left to right) */
+background: linear-gradient(90deg, #8B5CF6 0%, #6366F1 50%, #3B82F6 100%);
 ```
 
-### Insight Categories
-| Category | Name | Color | Icon |
-|----------|------|-------|------|
-| critical | Critical Alerts | destructive (red) | AlertTriangle |
-| attention | Worth a Look | warning (amber) | AlertCircle |
-| positive | Wins & Highlights | success (green) | CheckCircle2 |
-
-### Mode Switching Logic
-```typescript
-// From Floating Island → Copilot
-openCopilot()
-
-// From Copilot → Split (when artifact clicked)
-openSplit(artifact)
-
-// From Copilot/Split → Workspace
-openWorkspace()
-
-// Any mode → Closed
-closeAan()
+### Navbar Layout Specification
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│ [☰] ←8px→ [✧ Aan] ←flex grow→ [★ Walmart ▼] ←12px→ [● tushar ▼]│
+└─────────────────────────────────────────────────────────────────┘
+         ^                                ^
+         gap-6                           gap-3
 ```
 
-### Panel Width Specifications
-- Copilot Panel: 420px (fixed)
-- Split View: 50vw (flexible)
-- Workspace: 100vw (replaces shell)
-
-### Z-Index Layers
-- Background: z-[-10]
-- Main content: z-[1]
-- Floating Island: z-[50]
-- Aan Backdrop: z-[40]
-- Aan Panel: z-[50]
-- Insights Panel: z-[50]
-- Modals/Dialogs: z-[60]
+### Account Dropdown Popup
+- Width: 320px
+- Max Height: 300px with ScrollArea
+- Shows: Account name, marketplace, status
+- Search field at top for large lists
