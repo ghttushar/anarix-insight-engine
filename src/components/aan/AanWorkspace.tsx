@@ -1,8 +1,7 @@
-import { X } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAan } from "./AanContext";
 import { AanWorkspaceSidebar } from "./AanWorkspaceSidebar";
-import { AanBreadcrumb } from "./AanBreadcrumb";
 import { AanConversation } from "./AanConversation";
 import { AanInput } from "./AanInput";
 
@@ -15,14 +14,18 @@ export function AanWorkspace() {
 
   return (
     <div className="fixed inset-0 z-[60] flex flex-col bg-background">
-      {/* Header */}
-      <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
-        <AanBreadcrumb />
+      {/* Header - Aan by Anarix branding */}
+      <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 aan-gradient-text" />
+          <span className="font-aan text-aan aan-gradient-text">Aan</span>
+          <span className="text-sm text-muted-foreground">by Anarix</span>
+        </div>
         <Button
           variant="ghost"
           size="icon"
           onClick={closeAan}
-          className="h-8 w-8"
+          className="h-8 w-8 hover:bg-muted"
         >
           <X className="h-4 w-4" />
         </Button>
