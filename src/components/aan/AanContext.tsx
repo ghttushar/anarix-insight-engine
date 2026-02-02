@@ -67,6 +67,17 @@ interface AanContextType {
   approveDraft: (draftId: string) => void;
   rejectDraft: (draftId: string) => void;
 
+  // Internal artifact viewing (for workspace mode)
+  viewingArtifact: AanDraft | null;
+  viewArtifact: (artifact: AanDraft) => void;
+  closeArtifactView: () => void;
+
+  // Generation state
+  isGenerating: boolean;
+  generationType: "report" | "audit" | null;
+  generationProgress: number;
+  setGenerationState: (isGenerating: boolean, type: "report" | "audit" | null, progress: number) => void;
+
   // Conversations management
   conversations: Conversation[];
   currentConversation: Conversation | null;
@@ -199,6 +210,14 @@ export function AanProvider({ children }: { children: ReactNode }) {
   const [currentArtifact, setCurrentArtifact] = useState<AanDraft | null>(null);
   const [context, setContext] = useState<AanContextInfo>({ page: "Campaign Manager" });
 
+  // Internal artifact viewing state (for workspace mode)
+  const [viewingArtifact, setViewingArtifact] = useState<AanDraft | null>(null);
+
+  // Generation state
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationType, setGenerationType] = useState<"report" | "audit" | null>(null);
+  const [generationProgress, setGenerationProgress] = useState(0);
+
   // Current conversation
   const currentConversation = useMemo(() => {
     return conversations.find((c) => c.id === currentConversationId) || null;
@@ -209,18 +228,36 @@ export function AanProvider({ children }: { children: ReactNode }) {
 
   // Mode helpers
   const openCopilot = () => setMode("copilot");
+  
   const openSplit = (artifact: AanDraft) => {
-    setCurrentArtifact(artifact);
-    setMode("split");
+    // If in workspace mode, view internally instead of exiting
+    if (mode === "workspace") {
+      setViewingArtifact(artifact);
+    } else {
+      setCurrentArtifact(artifact);
+      setMode("split");
+    }
   };
+
+  const viewArtifact = (artifact: AanDraft) => {
+    setViewingArtifact(artifact);
+  };
+
+  const closeArtifactView = () => {
+    setViewingArtifact(null);
+  };
+
   const openWorkspace = () => {
     console.log("[Aan] Opening workspace mode");
     setCurrentArtifact(null);
+    setViewingArtifact(null);
     setMode("workspace");
   };
+
   const closeAan = () => {
     setMode("closed");
     setCurrentArtifact(null);
+    setViewingArtifact(null);
   };
 
   // Legacy compatibility
@@ -228,6 +265,13 @@ export function AanProvider({ children }: { children: ReactNode }) {
   const setIsOpen = (open: boolean) => setMode(open ? "copilot" : "closed");
   const openPanel = () => openCopilot();
   const closePanel = () => closeAan();
+
+  // Generation state setter
+  const setGenerationState = (generating: boolean, type: "report" | "audit" | null, progress: number) => {
+    setIsGenerating(generating);
+    setGenerationType(type);
+    setGenerationProgress(progress);
+  };
 
   const addMessage = (content: string, role: "user" | "assistant", draft?: AanDraft) => {
     if (!currentConversationId) return;
@@ -247,7 +291,6 @@ export function AanProvider({ children }: { children: ReactNode }) {
               ...conv,
               messages: [...conv.messages, newMessage],
               updatedAt: new Date(),
-              // Update conversation type if artifact is generated
               type: draft?.type === "report" ? "report" : draft?.type === "audit" ? "audit" : conv.type,
             }
           : conv
@@ -328,6 +371,13 @@ export function AanProvider({ children }: { children: ReactNode }) {
         setCurrentDraft,
         approveDraft,
         rejectDraft,
+        viewingArtifact,
+        viewArtifact,
+        closeArtifactView,
+        isGenerating,
+        generationType,
+        generationProgress,
+        setGenerationState,
         conversations,
         currentConversation,
         activeFilter,

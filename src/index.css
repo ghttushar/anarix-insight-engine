@@ -270,3 +270,42 @@
     line-height: 1.2;
   }
 }
+
+/* Density Mode Styles */
+@layer components {
+  /* Comfortable mode (default) */
+  .density-comfortable {
+    --spacing-base: 4px;
+    --row-height: 44px;
+    --card-padding: 16px;
+  }
+
+  .density-comfortable table tbody tr td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .density-comfortable .card {
+    padding: 16px;
+  }
+
+  /* Compact mode */
+  .density-compact {
+    --spacing-base: 2px;
+    --row-height: 32px;
+    --card-padding: 12px;
+  }
+
+  .density-compact table tbody tr td {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .density-compact .card {
+    padding: 12px;
+  }
+
+  .density-compact table tbody tr {
+    height: 32px;
+  }
+}

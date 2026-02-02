@@ -9,3 +9,4 @@ export { AanWorkspaceSidebar } from "./AanWorkspaceSidebar";
 export { AanLogo } from "./AanLogo";
 export { AanBreadcrumb } from "./AanBreadcrumb";
 export { ArtifactCard } from "./ArtifactCard";
+export { AanArtifactViewer } from "./AanArtifactViewer";

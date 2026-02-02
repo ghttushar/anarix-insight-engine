@@ -61,7 +61,14 @@ const getContextualActions = (
 };
 
 // Routes where floating island should be hidden
-const hiddenRoutes = ["/login", "/onboarding", "/settings"];
+const hiddenRoutes = [
+  "/login",
+  "/onboarding",
+  "/settings",
+  "/settings/preferences",
+  "/settings/accounts",
+  "/settings/accounts/connect",
+];
 
 export function FloatingActionIsland() {
   const [isExpanded, setIsExpanded] = useState(false);
