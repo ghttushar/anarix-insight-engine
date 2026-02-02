@@ -1,433 +1,240 @@
 
-# Complete Aan Architecture & Navigation Enhancement Plan
-
-## Overview
-
-This plan implements the complete Aan functionality as a unified AI reasoning layer, along with critical navigation and UI improvements:
-
-1. **Fix Floating Island vs Navbar Aan Behavior** - Island opens Copilot panel, Navbar opens Workspace
-2. **Rebuild Aan Workspace Sidebar** - Match the reference design with logo, sections, and chat history
-3. **Add Breadcrumbs for Both Anarix and Aan** - Navigation context in all screens
-4. **Apply Correct Aan Gradient** - Use the reference purple-indigo gradient
-5. **Remove Right-Side Shadow** - Clean up copilot panel styling
-6. **Move Marketplace/Account Dropdowns to Navbar** - With popup modal for account selection
-7. **Fix Navbar Alignment** - Proper spacing between logo and items
-8. **Implement Complete Aan Functionality** - Single chat system with filtered views
-
----
-
-## Part 1: Aan Entry Point Behavior (Critical Fix)
-
-### Current Issue
-- Both the sidebar Aan button and floating island trigger the same `openPanel()` which opens Copilot
-- The navbar "Aan" should open the dedicated Workspace mode
-
-### Files to Modify
-
-**`src/components/layout/AppSidebar.tsx`**
-- Change sidebar Aan button to open Copilot mode (keep as-is)
-
-**`src/features/creative/FloatingActionIsland.tsx`**
-- Keep "Ask Aan" triggering `openPanel()` → Copilot mode (keep as-is)
-
-**`src/components/layout/AppHeader.tsx`**
-- Add "Aan" button in the header that triggers `openWorkspace()` → Workspace mode
-- This will be styled with the Aan gradient
-
----
-
-## Part 2: Rebuild Aan Workspace Sidebar (Match Reference)
-
-### Reference Design Elements (from uploaded image-41.png)
-```text
-┌─────────────────────────┐
-│  ✧ Aan                  │  ← Logo with "by Anarix"
-│     by Anarix           │
-├─────────────────────────┤
-│  ▢ New Chat             │  ← Action button
-│  📄 Reports             │  ← Filter section
-│  ◯ Audit                │
-│  ✦ Creative             │
-│  🤖 Agent               │
-├─────────────────────────┤
-│  Chat History           │  ← Section label
-│  ⌕ Search history...    │  ← Search input
-├─────────────────────────┤
-│  ▼ New Conversation     │  ← Chat history items
-│    Today                │
-│                         │
-│  Campaign Performance   │
-│    1/8/2026             │
-└─────────────────────────┘
-```
-
-### New File: `src/components/aan/AanWorkspaceSidebar.tsx` (Complete Rewrite)
-
-```typescript
-interface ChatHistoryItem {
-  id: string;
-  title: string;
-  date: Date;
-  type: "chat" | "report" | "audit" | "creative" | "agent";
-}
-
-// Sidebar structure:
-// 1. Aan Logo with "by Anarix" branding (using Allura font)
-// 2. "New Chat" button
-// 3. Filter sections: Reports, Audit, Creative, Agent
-// 4. "Chat History" label
-// 5. Search input
-// 6. Scrollable list of conversations grouped by date
-```
-
-### AanContext Updates
-Add chat history management:
-```typescript
-interface AanContextType {
-  // ... existing
-  conversations: Conversation[];
-  currentConversation: Conversation | null;
-  activeFilter: "all" | "reports" | "audit" | "creative" | "agent";
-  setActiveFilter: (filter: string) => void;
-  startNewConversation: () => void;
-  selectConversation: (id: string) => void;
-  searchHistory: (query: string) => Conversation[];
-}
-```
-
----
-
-## Part 3: Breadcrumb Navigation for Both Systems
-
-### Anarix Breadcrumbs
-Already implemented in `PageBreadcrumb.tsx` - ensure all pages use it
-
-### Aan Breadcrumbs (New Component)
-**New File: `src/components/aan/AanBreadcrumb.tsx`**
-
-```typescript
-// Shows context within Aan workspace
-// Example: Aan > Reports > Campaign Performance Analysis
-// Example: Aan > Audit > Q4 2025 Audit
-
-interface AanBreadcrumbProps {
-  section?: string; // "reports" | "audit" | "creative" | etc.
-  conversationTitle?: string;
-}
-```
-
-### Update `AanWorkspace.tsx`
-- Add breadcrumb below the header
-- Shows: "Aan" > [Section] > [Conversation Title]
-
----
-
-## Part 4: Apply Correct Aan Gradient
-
-### Reference Gradient (from sidebar screenshot)
-The gradient in image-41 shows a purple-to-indigo gradient going from left to right.
-
-### Update `src/index.css`
-```css
-:root {
-  /* Updated Aan Gradient - matches reference */
-  --aan-gradient-start: 258 90% 66%; /* #8B5CF6 Violet-500 */
-  --aan-gradient-mid: 239 84% 67%;   /* #6366F1 Indigo-500 */
-  --aan-gradient-end: 217 91% 60%;   /* #3B82F6 Blue-500 */
-}
-
-.aan-gradient {
-  background: linear-gradient(
-    90deg,
-    hsl(var(--aan-gradient-start)) 0%,
-    hsl(var(--aan-gradient-mid)) 50%,
-    hsl(var(--aan-gradient-end)) 100%
-  );
-}
-```
-
----
-
-## Part 5: Remove Right-Side Shadow
-
-### Current Issue
-The copilot panel has `shadow-2xl` which creates a heavy shadow on the left edge
-
-### Fix in `src/components/aan/AanCopilotPanel.tsx`
-```tsx
-// Change from:
-"border-l border-border bg-background shadow-2xl"
-// To:
-"border-l border-border bg-background shadow-lg"
-```
-
-Also update `AanSplitView.tsx` with the same fix.
-
----
-
-## Part 6: Move Marketplace/Account to Navbar
-
-### Reference Design (from image-42, image-43)
-```text
-┌────────────────────────────────────────────────────┐
-│  ☰  [Anarix Logo]  ... gap ...  [★ Walmart ▼] [● tushar ▼] │
-└────────────────────────────────────────────────────┘
-```
-
-### Update `src/components/layout/AppHeader.tsx`
-
-1. **Marketplace Selector (Star Icon Badge)**
-```tsx
-<DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="outline" className="gap-2">
-      <Star className="h-4 w-4 text-warning fill-warning" />
-      <span>Walmart</span>
-      <ChevronDown className="h-4 w-4" />
-    </Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent>
-    {/* Marketplace options */}
-  </DropdownMenuContent>
-</DropdownMenu>
-```
-
-2. **Account Selector (Status Dot)**
-```tsx
-<DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="outline" className="gap-2">
-      <div className="h-2 w-2 rounded-full bg-success" />
-      <span>tushar</span>
-      <ChevronDown className="h-4 w-4" />
-    </Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent className="w-80">
-    {/* Large scrollable account list */}
-    <ScrollArea className="max-h-[300px]">
-      {accounts.map(account => (
-        <DropdownMenuItem key={account.id}>
-          {account.merchantName}
-        </DropdownMenuItem>
-      ))}
-    </ScrollArea>
-  </DropdownMenuContent>
-</DropdownMenu>
-```
-
-### Key Behavior
-- Dropdown appears above/below trigger (not pushing nav items)
-- Large account list is scrollable
-- Selected account shows status indicator
-
----
-
-## Part 7: Fix Navbar Alignment
-
-### Current Issue
-Items are too close to the logo, cramped layout
-
-### Update `src/components/layout/AppHeader.tsx`
-```tsx
-<header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
-  <div className="flex items-center gap-6"> {/* Increased gap */}
-    <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-      <PanelLeft className="h-5 w-5" />
-    </Button>
-    
-    {/* Aan button in nav with gradient */}
-    <Button 
-      onClick={openWorkspace}
-      className="aan-gradient text-white gap-2"
-    >
-      <Sparkles className="h-4 w-4" />
-      <span style={{ fontFamily: "var(--font-aan)" }}>Aan</span>
-    </Button>
-  </div>
-
-  <div className="flex items-center gap-3">
-    {/* Marketplace & Account selectors */}
-  </div>
-</header>
-```
-
-### Remove Logo from Header
-Logo is in the sidebar - header should not duplicate it
-
----
-
-## Part 8: Complete Aan Functionality
-
-### 8.1 Single Chat System Architecture
-
-**Key Principle**: One chat engine, multiple views
-
-```typescript
-interface Conversation {
-  id: string;
-  title: string;
-  createdAt: Date;
-  updatedAt: Date;
-  type: "general" | "report" | "audit" | "creative" | "rule" | "agent";
-  messages: Message[];
-  artifacts: Artifact[];
-}
-
-interface Artifact {
-  id: string;
-  type: "report" | "audit" | "rule" | "creative";
-  title: string;
-  version: number;
-  versions: ArtifactVersion[];
-  status: "draft" | "applied" | "archived";
-  data: any; // Charts, tables, etc.
-}
-```
-
-### 8.2 Sidebar Tab Filtering
-
-Tabs filter the conversation list, NOT create new chat systems:
-
-```typescript
-const filteredConversations = useMemo(() => {
-  if (activeFilter === "all") return conversations;
-  return conversations.filter(c => c.type === activeFilter);
-}, [conversations, activeFilter]);
-```
-
-### 8.3 Artifact Cards in Chat
-
-When Aan generates a report/audit:
-```tsx
-// In AanConversation.tsx
-if (message.artifact) {
-  return (
-    <ArtifactCard
-      artifact={message.artifact}
-      onClick={() => openSplit(message.artifact)}
-    />
-  );
-}
-```
-
-### 8.4 Chat to Summary to Artifact Flow
-
-1. **User Request**: "Generate last 7 day campaign report"
-2. **Immediate Response**: Aan shows partial insights, bullets, KPIs inline
-3. **Artifact Creation**: Aan creates clickable artifact card
-4. **Artifact Interaction**: Click opens Split Task View
-5. **Iteration**: Edit button opens mini-chat for refinements
-
-### 8.5 Version Management in Split View
-
-```typescript
-interface ArtifactVersion {
-  version: number;
-  createdAt: Date;
-  changes: string; // "Removed ROAS column, grouped by campaign type"
-  data: any;
-}
-
-// Version selector UI
-<DropdownMenu>
-  <DropdownMenuTrigger>v{currentVersion}</DropdownMenuTrigger>
-  <DropdownMenuContent>
-    {artifact.versions.map(v => (
-      <DropdownMenuItem onClick={() => setCurrentVersion(v.version)}>
-        v{v.version} - {format(v.createdAt, "MMM d, h:mm a")}
-      </DropdownMenuItem>
-    ))}
-  </DropdownMenuContent>
-</DropdownMenu>
-```
-
----
-
-## Part 9: File Structure Changes
-
-```text
-src/
-├── components/
-│   ├── aan/
-│   │   ├── AanContext.tsx (MAJOR UPDATE - add conversations, filtering)
-│   │   ├── AanWorkspaceSidebar.tsx (COMPLETE REWRITE - match reference)
-│   │   ├── AanWorkspace.tsx (UPDATE - add breadcrumb, improve layout)
-│   │   ├── AanBreadcrumb.tsx (NEW)
-│   │   ├── AanCopilotPanel.tsx (UPDATE - remove shadow)
-│   │   ├── AanSplitView.tsx (UPDATE - remove shadow, enhance versioning)
-│   │   ├── ArtifactCard.tsx (NEW - clickable artifact in chat)
-│   │   ├── AanConversation.tsx (UPDATE - support artifacts)
-│   │   └── index.ts (UPDATE exports)
-│   ├── layout/
-│   │   ├── AppHeader.tsx (MAJOR UPDATE - Aan button, dropdowns)
-│   │   └── AppSidebar.tsx (MINOR - keep copilot trigger)
-└── index.css (UPDATE - correct Aan gradient)
-```
-
----
-
-## Part 10: Implementation Sequence
-
-### Phase 1: Navigation & Layout Fixes
-1. Update AppHeader - add Aan button (workspace trigger), move dropdowns
-2. Fix navbar alignment and spacing
-3. Remove duplicate logo from header
-4. Fix copilot/split view shadows
-
-### Phase 2: Aan Workspace Sidebar Rebuild
-1. Rewrite AanWorkspaceSidebar to match reference
-2. Add New Chat, filter sections, chat history
-3. Add search functionality
-4. Implement date grouping for history
-
-### Phase 3: Context & State Management
-1. Extend AanContext with conversations, filtering
-2. Add artifact management
-3. Implement single chat system with filters
-
-### Phase 4: Breadcrumbs
-1. Create AanBreadcrumb component
-2. Integrate into AanWorkspace
-3. Ensure all Anarix pages have breadcrumbs
-
-### Phase 5: Artifact System
-1. Create ArtifactCard component
-2. Update AanConversation to render artifacts
-3. Enhance AanSplitView with versioning
-
-### Phase 6: Gradient & Polish
-1. Update Aan gradient to match reference
-2. Final styling pass on all Aan components
-
----
-
-## Technical Details
-
-### Aan Entry Points Behavior Matrix
-| Entry Point | Action | Mode Opened |
-|-------------|--------|-------------|
-| Floating Island "Ask Aan" | openCopilot() | Copilot (side panel) |
-| Sidebar Aan Button | openCopilot() | Copilot (side panel) |
-| Header Aan Button | openWorkspace() | Full Workspace |
-| "Open in workspace" link | openWorkspace() | Full Workspace |
-
-### Correct Aan Gradient (from reference)
-```css
-/* Purple → Indigo → Blue gradient (left to right) */
-background: linear-gradient(90deg, #8B5CF6 0%, #6366F1 50%, #3B82F6 100%);
-```
-
-### Navbar Layout Specification
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│ [☰] ←8px→ [✧ Aan] ←flex grow→ [★ Walmart ▼] ←12px→ [● tushar ▼]│
-└─────────────────────────────────────────────────────────────────┘
-         ^                                ^
-         gap-6                           gap-3
-```
-
-### Account Dropdown Popup
-- Width: 320px
-- Max Height: 300px with ScrollArea
-- Shows: Account name, marketplace, status
-- Search field at top for large lists
+<context>
+Why it stopped: my last attempt to address your issues was interrupted/canceled mid-response (system cancellation). You’re currently in READ-ONLY mode, so I cannot apply fixes right now; I can only produce an exact implementation plan. If you want me to proceed with the fixes, please send a new request after reviewing this plan, and I’ll implement in default mode.
+</context>
+
+<goals>
+You reported these concrete failures that must be fixed, without changing layout beyond what you asked:
+1) Right-side “weird shadow” still present.
+2) Aan breadcrumbs should show only “Aan” (no tabs/sections/conversation), and the Back button becomes redundant.
+3) Toast position must move from bottom-right to bottom-left.
+4) Allura font is unreadable: increase its size everywhere it is used.
+5) No mock reports: need a testable “Generate report” flow:
+   - show report summary in chat immediately
+   - simulate 30s generation delay
+   - when ready, add clickable report artifact card in chat
+   - clicking artifact opens it in the right split panel and it is visible.
+6) Clicking “Aan” in top nav still opens Copilot instead of full Workspace.
+</goals>
+
+<findings-from-code>
+A) Shadows
+- Copilot panel uses: `shadow-lg` (src/components/aan/AanCopilotPanel.tsx)
+- Split panel uses: `shadow-lg` (src/components/aan/AanSplitView.tsx)
+- Profitability “View More” panel uses: `shadow-2xl` (src/components/profitability/PeriodBreakdownPanel.tsx)
+So even if we reduce Aan panel shadows, you may still see a strong right-side shadow from PeriodBreakdownPanel and/or the panels.
+
+B) Breadcrumb + back button
+- Aan breadcrumb currently renders “Aan > [Filter] > [Conversation title]” (src/components/aan/AanBreadcrumb.tsx)
+- Workspace header includes “Back to Anarix” button next to breadcrumb (src/components/aan/AanWorkspace.tsx)
+This matches your complaint.
+
+C) Toasts
+- Sonner is mounted with: `<Sonner position="bottom-right" />` (src/App.tsx)
+- There is also Radix/shadcn ToastViewport with default `sm:right-0` behavior (src/components/ui/toast.tsx), but your current visible toasts are likely Sonner because `WelcomeToasts` uses `toast` from sonner.
+
+D) Nav Aan opens Copilot (still)
+- AppHeader’s Aan button calls `openWorkspace` (src/components/layout/AppHeader.tsx)
+- Sidebar Aan button calls `openPanel` (copilot) (src/components/layout/AppSidebar.tsx)
+Given your report, we should harden the workspace entry so it cannot accidentally route to copilot (e.g., by legacy “openPanel/isOpen” compatibility or overlapping handlers).
+</findings-from-code>
+
+<implementation-plan>
+<phase-1-remove-shadows>
+Objective: remove the right-edge shadow exactly where it exists, without introducing new layout.
+
+1) Aan Copilot panel shadow removal
+- File: src/components/aan/AanCopilotPanel.tsx
+- Change panel container class from:
+  `... border-l ... shadow-lg ...`
+  to:
+  `... border-l ... shadow-none ...`
+  (keep border-l for separation; no shadow at all)
+
+2) Aan Split panel shadow removal
+- File: src/components/aan/AanSplitView.tsx
+- Change panel container class from:
+  `... border-l ... shadow-lg ...`
+  to:
+  `... border-l ... shadow-none ...`
+
+3) Profitability right panel shadow removal (this is likely the “still there” one)
+- File: src/components/profitability/PeriodBreakdownPanel.tsx
+- Change panel container class from:
+  `... border-l ... shadow-2xl ...`
+  to:
+  `... border-l ... shadow-none ...`
+This keeps the right panel separation purely via the 1px border, matching the “safety-first / no expressive UI” rules.
+
+Verification:
+- Open Profitability Dashboard → click “View More” (wherever it is) → ensure no shadow.
+- Open Aan copilot/split → ensure no shadow.
+</phase-1-remove-shadows>
+
+<phase-2-aan-breadcrumb-and-back>
+Objective: Aan workspace header must not show redundant navigation and must match your “breadcrumb should just show Aan” requirement.
+
+1) Simplify Aan breadcrumb to ONLY render “Aan”
+- File: src/components/aan/AanBreadcrumb.tsx
+- Replace current logic that renders chevrons + filter + conversation title with a single element:
+  - Text: “Aan”
+  - Font: Allura via a shared class (see Phase 4)
+  - No click behavior (or keep click as no-op). Since you want no tabs shown, clicking shouldn’t change filters.
+
+2) Remove redundant “Back to Anarix” button
+- File: src/components/aan/AanWorkspace.tsx
+- Remove the left-side back button block entirely.
+- Replace it with a single close control (X icon button) aligned to the right side of the workspace header.
+  - This preserves a clear exit action without duplicating breadcrumb/back concepts.
+
+Verification:
+- Open full Aan workspace from top nav.
+- Header shows breadcrumb “Aan” only.
+- No “Aan > Reports …” style breadcrumbs.
+- No “Back to Anarix” text button.
+</phase-2-aan-breadcrumb-and-back>
+
+<phase-3-toast-bottom-left>
+Objective: all app toast notifications appear bottom-left (not bottom-right).
+
+1) Sonner position
+- File: src/App.tsx
+- Change:
+  `<Sonner position="bottom-right" />`
+  to:
+  `<Sonner position="bottom-left" />`
+
+2) Radix/shadcn ToastViewport position (defensive)
+- File: src/components/ui/toast.tsx
+- Change ToastViewport className from right anchored:
+  `sm:bottom-0 sm:right-0 ...`
+  to left anchored:
+  `sm:bottom-0 sm:left-0 sm:right-auto ...`
+This ensures any shadcn `useToast()` toasts also appear bottom-left.
+
+Verification:
+- Trigger `WelcomeToasts` (sonner) and any shadcn toast (if used elsewhere).
+- Confirm they render bottom-left.
+</phase-3-toast-bottom-left>
+
+<phase-4-allura-font-readability>
+Objective: increase Allura size everywhere it is used, and remove inline `style={{ fontFamily: ... }}` usage to comply with “no inline styles”.
+
+1) Add a dedicated utility class for Aan script typography
+- File: src/index.css
+- Add in @layer components (or utilities):
+  - `.font-aan { font-family: var(--font-aan); }`
+  - `.text-aan { font-size: 24px; line-height: 1; }` (or 22px if you prefer; but you asked “not readable” so plan uses 24px)
+This avoids guessing in multiple components and ensures consistent readability.
+
+2) Replace inline Allura font usage with the class + new readable size:
+- Files:
+  - src/components/layout/AppHeader.tsx (Aan button label)
+  - src/components/layout/AppSidebar.tsx (Aan label)
+  - src/components/aan/AanLogo.tsx (“Aan” wordmark)
+  - src/components/aan/AanBreadcrumb.tsx (“Aan” only)
+- Replace:
+  `style={{ fontFamily: "var(--font-aan)" }} className="text-lg"`
+  with:
+  `className="font-aan text-aan"`
+(Exact sizes remain centralized in CSS.)
+
+Verification:
+- Confirm Allura is legible in header button, sidebar button, workspace logo, breadcrumb.
+</phase-4-allura-font-readability>
+
+<phase-5-mock-reports-with-30s-delay-and-right-panel>
+Objective: you can test the report lifecycle end-to-end:
+User request → immediate summary in chat → 30s “generation” → clickable report artifact card → click opens split view with content.
+
+1) Add deterministic “report request” handling in AanInput
+- File: src/components/aan/AanInput.tsx
+- Current behavior: random response after 1.5s; often not a report.
+- Change behavior:
+  a) Detect “report intent” by simple string match (no new UI):
+     - if message includes words like: “report”, “generate report”, “create report”, “last 7 days report”
+  b) Immediately add assistant message with a report summary (no artifact yet). Example content (exact, concise, enterprise tone):
+     - “Report draft started.”
+     - “Summary (last 7 days):”
+     - “• Spend: …”
+     - “• Sales: …”
+     - “• ROAS: …”
+     - “Generating full report. ETA ~30 seconds.”
+  c) Start a 30s timer.
+  d) After 30s, add a second assistant message: “Report ready.” with an attached `draft` of type `report`.
+     - This must include title/description and mock sections for the split panel.
+
+2) Ensure the report is clickable and opens split view
+- Already wired:
+  - AanConversation renders ArtifactCard when `message.draft` exists.
+  - Clicking ArtifactCard calls `openSplit(draft)`.
+  - AanSplitView reads `currentArtifact` and renders content.
+- We will ensure the report draft has enough fields so split view doesn’t render empty:
+  - `draft.type = "report"`
+  - `draft.title = "Last 7 Days Campaign Performance"`
+  - `draft.description = "Performance overview with KPIs, trend, and top movers."`
+  - `draft.changes = [...]` (can be treated as “sections” until we build real report layout)
+
+3) Make report actually visible in right panel
+- File: src/components/aan/AanSplitView.tsx
+- Add conditional rendering for `currentArtifact.type === "report"`:
+  - If `changes` is empty or not the right shape, show a simple placeholder “Report sections” list instead of the “changes” diff UI.
+This avoids the “I clicked it but nothing meaningful shows” problem.
+
+4) Optional but important: mark conversations as “report” type when a report artifact is created
+- File: src/components/aan/AanContext.tsx
+- When adding a message with `draft.type === "report"`, update the current conversation’s `type` to `"report"` so it appears under “Reports” filter in workspace sidebar.
+This aligns with your “one chat engine, filters are organizational” requirement.
+
+Verification:
+- In Copilot:
+  - Ask: “Generate last 7 day report”
+  - See summary immediately
+  - Wait ~30s
+  - See “Report ready” + artifact card
+  - Click artifact card → Split panel opens and shows report content.
+</phase-5-mock-reports-with-30s-delay-and-right-panel>
+
+<phase-6-nav-aan-must-open-workspace-not-copilot>
+Objective: top nav Aan always opens full workspace. Floating island Aan always opens copilot.
+
+1) Harden openWorkspace behavior
+- File: src/components/aan/AanContext.tsx
+- Update `openWorkspace` to:
+  - setMode("workspace")
+  - clear `currentArtifact`
+  - optionally close any copilot state (mode swap is enough)
+This guarantees workspace mode is visually dominant.
+
+2) Ensure AppHeader uses openWorkspace (already does), but eliminate any accidental openPanel calls
+- File: src/components/layout/AppHeader.tsx
+- Confirm the Aan button’s onClick is ONLY `openWorkspace`.
+- Ensure no surrounding element has click handlers triggering `openPanel`.
+
+3) Ensure floating island “Ask Aan” uses openPanel (copilot) only
+- File: src/features/creative/FloatingActionIsland.tsx
+- Confirm it passes `openPanel` to “Ask Aan”.
+
+4) Fix Command Palette “Aan” action (optional)
+- File: src/features/creative/CommandPalette.tsx
+- Today it calls `openPanel()` (copilot). If you want Cmd+K “Aan” to open workspace instead, you must explicitly confirm. Otherwise keep it as copilot.
+
+Verification:
+- Click header nav Aan → full workspace opens (no copilot).
+- Click floating island Ask Aan → copilot opens (not workspace).
+</phase-6-nav-aan-must-open-workspace-not-copilot>
+</implementation-plan>
+
+<blocked-clarifications-needed>
+You also asked for “breadcrumbs for Anarix navigation”. The codebase currently has sidebar-based navigation and does not have a top “Dashboard / Reports / Aan” primary nav system as described in your spec. “Breadcrumbs” could be rendered in multiple places, which would change layout.
+To avoid inventing layout, I need you to specify ONE of these exact placements:
+A) In AppHeader, between sidebar toggle and the Aan button
+B) At top of each page content area, above the page title
+C) Inside AppLayout main content wrapper, always at top (global)
+Once you choose A/B/C, I’ll implement it exactly.
+</blocked-clarifications-needed>
+
+<execution-notes>
+Because the system instructed “TIME CRITICAL: stop now”, I did not continue exploring further files or running more checks. If you want me to proceed implementing these fixes, please send a new message like:
+“Continue and implement the plan above (choose breadcrumb option A/B/C).”
+</execution-notes>
