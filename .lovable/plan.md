@@ -1,240 +1,329 @@
 
-<context>
-Why it stopped: my last attempt to address your issues was interrupted/canceled mid-response (system cancellation). You’re currently in READ-ONLY mode, so I cannot apply fixes right now; I can only produce an exact implementation plan. If you want me to proceed with the fixes, please send a new request after reviewing this plan, and I’ll implement in default mode.
-</context>
 
-<goals>
-You reported these concrete failures that must be fixed, without changing layout beyond what you asked:
-1) Right-side “weird shadow” still present.
-2) Aan breadcrumbs should show only “Aan” (no tabs/sections/conversation), and the Back button becomes redundant.
-3) Toast position must move from bottom-right to bottom-left.
-4) Allura font is unreadable: increase its size everywhere it is used.
-5) No mock reports: need a testable “Generate report” flow:
-   - show report summary in chat immediately
-   - simulate 30s generation delay
-   - when ready, add clickable report artifact card in chat
-   - clicking artifact opens it in the right split panel and it is visible.
-6) Clicking “Aan” in top nav still opens Copilot instead of full Workspace.
-</goals>
+# Complete Aan Fixes & UI Enhancement Plan
 
-<findings-from-code>
-A) Shadows
-- Copilot panel uses: `shadow-lg` (src/components/aan/AanCopilotPanel.tsx)
-- Split panel uses: `shadow-lg` (src/components/aan/AanSplitView.tsx)
-- Profitability “View More” panel uses: `shadow-2xl` (src/components/profitability/PeriodBreakdownPanel.tsx)
-So even if we reduce Aan panel shadows, you may still see a strong right-side shadow from PeriodBreakdownPanel and/or the panels.
+## Summary of Issues to Fix
 
-B) Breadcrumb + back button
-- Aan breadcrumb currently renders “Aan > [Filter] > [Conversation title]” (src/components/aan/AanBreadcrumb.tsx)
-- Workspace header includes “Back to Anarix” button next to breadcrumb (src/components/aan/AanWorkspace.tsx)
-This matches your complaint.
+Based on code exploration and your feedback:
 
-C) Toasts
-- Sonner is mounted with: `<Sonner position="bottom-right" />` (src/App.tsx)
-- There is also Radix/shadcn ToastViewport with default `sm:right-0` behavior (src/components/ui/toast.tsx), but your current visible toasts are likely Sonner because `WelcomeToasts` uses `toast` from sonner.
+| Issue | Current State | Required Fix |
+|-------|---------------|--------------|
+| Shadow on right panels | Panels have no shadow classes | Fix floating island shadow-xl, verify all slide-in panels |
+| Breadcrumbs showing tabs | Shows "Aan" only, but "Back to Anarix" still visible in header | Remove Back button entirely, keep only "Aan" + X close |
+| Toast position | Sonner set to bottom-left but may conflict with floating island | Verify positioning, fix any conflicts |
+| Allura font unreadable | 24px (1.5rem) | Increase to 32px (2rem) |
+| No mock reports to test | Report generation on 30s delay exists | Preload demo conversations with artifacts |
+| Nav Aan opens copilot | `openWorkspace()` called but user reports copilot | Debug and harden the mode switching logic |
+| Marketplace/Account in wrong place | Right side of header | Move to left side near Aan button |
 
-D) Nav Aan opens Copilot (still)
-- AppHeader’s Aan button calls `openWorkspace` (src/components/layout/AppHeader.tsx)
-- Sidebar Aan button calls `openPanel` (copilot) (src/components/layout/AppSidebar.tsx)
-Given your report, we should harden the workspace entry so it cannot accidentally route to copilot (e.g., by legacy “openPanel/isOpen” compatibility or overlapping handlers).
-</findings-from-code>
+---
 
-<implementation-plan>
-<phase-1-remove-shadows>
-Objective: remove the right-edge shadow exactly where it exists, without introducing new layout.
+## Phase 1: Fix Panel Shadows (All Right-Side Panels)
 
-1) Aan Copilot panel shadow removal
-- File: src/components/aan/AanCopilotPanel.tsx
-- Change panel container class from:
-  `... border-l ... shadow-lg ...`
-  to:
-  `... border-l ... shadow-none ...`
-  (keep border-l for separation; no shadow at all)
+### Files to Modify
 
-2) Aan Split panel shadow removal
-- File: src/components/aan/AanSplitView.tsx
-- Change panel container class from:
-  `... border-l ... shadow-lg ...`
-  to:
-  `... border-l ... shadow-none ...`
+1. **Floating Action Island** - Remove shadow-xl
+   - File: `src/features/creative/FloatingActionIsland.tsx`
+   - Line 125: Change `shadow-xl` to `shadow-md` (or `shadow-none`)
+   - Line 114 (collapsed orb): Change `shadow-lg` to `shadow-sm`
 
-3) Profitability right panel shadow removal (this is likely the “still there” one)
-- File: src/components/profitability/PeriodBreakdownPanel.tsx
-- Change panel container class from:
-  `... border-l ... shadow-2xl ...`
-  to:
-  `... border-l ... shadow-none ...`
-This keeps the right panel separation purely via the 1px border, matching the “safety-first / no expressive UI” rules.
+2. **Sonner Toasts** - Remove heavy shadow
+   - File: `src/components/ui/sonner.tsx`
+   - Line 16: Change `shadow-lg` to `shadow-sm`
 
-Verification:
-- Open Profitability Dashboard → click “View More” (wherever it is) → ensure no shadow.
-- Open Aan copilot/split → ensure no shadow.
-</phase-1-remove-shadows>
+3. **Artifact Card hover shadow**
+   - File: `src/components/aan/ArtifactCard.tsx`
+   - Line 31: Change `hover:shadow-md` to `hover:shadow-sm`
 
-<phase-2-aan-breadcrumb-and-back>
-Objective: Aan workspace header must not show redundant navigation and must match your “breadcrumb should just show Aan” requirement.
+4. **Chart Tooltip**
+   - File: `src/components/ui/chart.tsx`
+   - Line 157: Change `shadow-xl` to `shadow-md`
 
-1) Simplify Aan breadcrumb to ONLY render “Aan”
-- File: src/components/aan/AanBreadcrumb.tsx
-- Replace current logic that renders chevrons + filter + conversation title with a single element:
-  - Text: “Aan”
-  - Font: Allura via a shared class (see Phase 4)
-  - No click behavior (or keep click as no-op). Since you want no tabs shown, clicking shouldn’t change filters.
+---
 
-2) Remove redundant “Back to Anarix” button
-- File: src/components/aan/AanWorkspace.tsx
-- Remove the left-side back button block entirely.
-- Replace it with a single close control (X icon button) aligned to the right side of the workspace header.
-  - This preserves a clear exit action without duplicating breadcrumb/back concepts.
+## Phase 2: Simplify Aan Workspace Header
 
-Verification:
-- Open full Aan workspace from top nav.
-- Header shows breadcrumb “Aan” only.
-- No “Aan > Reports …” style breadcrumbs.
-- No “Back to Anarix” text button.
-</phase-2-aan-breadcrumb-and-back>
+### Current State
+- `AanWorkspace.tsx` has header with breadcrumb + X button
+- Breadcrumb shows only "Aan"
 
-<phase-3-toast-bottom-left>
-Objective: all app toast notifications appear bottom-left (not bottom-right).
+### Required Changes
 
-1) Sonner position
-- File: src/App.tsx
-- Change:
-  `<Sonner position="bottom-right" />`
-  to:
-  `<Sonner position="bottom-left" />`
+**File: `src/components/aan/AanWorkspace.tsx`**
 
-2) Radix/shadcn ToastViewport position (defensive)
-- File: src/components/ui/toast.tsx
-- Change ToastViewport className from right anchored:
-  `sm:bottom-0 sm:right-0 ...`
-  to left anchored:
-  `sm:bottom-0 sm:left-0 sm:right-auto ...`
-This ensures any shadcn `useToast()` toasts also appear bottom-left.
+Update header structure:
+```text
+BEFORE:
+┌────────────────────────────────────────────────┐
+│  [Aan gradient text]                      [X]  │
+└────────────────────────────────────────────────┘
 
-Verification:
-- Trigger `WelcomeToasts` (sonner) and any shadcn toast (if used elsewhere).
-- Confirm they render bottom-left.
-</phase-3-toast-bottom-left>
+AFTER: (exactly as reference image-44)
+┌────────────────────────────────────────────────┐
+│  [Aan gradient text]          (no back btn) [X]│
+└────────────────────────────────────────────────┘
+```
 
-<phase-4-allura-font-readability>
-Objective: increase Allura size everywhere it is used, and remove inline `style={{ fontFamily: ... }}` usage to comply with “no inline styles”.
+- Remove any "Back to Anarix" text or button (already removed based on current code)
+- Keep only:
+  - "Aan" in Allura font with gradient (left)
+  - X close button (right)
 
-1) Add a dedicated utility class for Aan script typography
-- File: src/index.css
-- Add in @layer components (or utilities):
-  - `.font-aan { font-family: var(--font-aan); }`
-  - `.text-aan { font-size: 24px; line-height: 1; }` (or 22px if you prefer; but you asked “not readable” so plan uses 24px)
-This avoids guessing in multiple components and ensures consistent readability.
+---
 
-2) Replace inline Allura font usage with the class + new readable size:
-- Files:
-  - src/components/layout/AppHeader.tsx (Aan button label)
-  - src/components/layout/AppSidebar.tsx (Aan label)
-  - src/components/aan/AanLogo.tsx (“Aan” wordmark)
-  - src/components/aan/AanBreadcrumb.tsx (“Aan” only)
-- Replace:
-  `style={{ fontFamily: "var(--font-aan)" }} className="text-lg"`
-  with:
-  `className="font-aan text-aan"`
-(Exact sizes remain centralized in CSS.)
+## Phase 3: Increase Allura Font Size
 
-Verification:
-- Confirm Allura is legible in header button, sidebar button, workspace logo, breadcrumb.
-</phase-4-allura-font-readability>
+**File: `src/index.css`**
 
-<phase-5-mock-reports-with-30s-delay-and-right-panel>
-Objective: you can test the report lifecycle end-to-end:
-User request → immediate summary in chat → 30s “generation” → clickable report artifact card → click opens split view with content.
+Change from:
+```css
+.text-aan {
+  font-size: 1.5rem; /* 24px */
+  line-height: 1.2;
+}
 
-1) Add deterministic “report request” handling in AanInput
-- File: src/components/aan/AanInput.tsx
-- Current behavior: random response after 1.5s; often not a report.
-- Change behavior:
-  a) Detect “report intent” by simple string match (no new UI):
-     - if message includes words like: “report”, “generate report”, “create report”, “last 7 days report”
-  b) Immediately add assistant message with a report summary (no artifact yet). Example content (exact, concise, enterprise tone):
-     - “Report draft started.”
-     - “Summary (last 7 days):”
-     - “• Spend: …”
-     - “• Sales: …”
-     - “• ROAS: …”
-     - “Generating full report. ETA ~30 seconds.”
-  c) Start a 30s timer.
-  d) After 30s, add a second assistant message: “Report ready.” with an attached `draft` of type `report`.
-     - This must include title/description and mock sections for the split panel.
+.text-aan-lg {
+  font-size: 1.75rem; /* 28px */
+  line-height: 1.2;
+}
+```
 
-2) Ensure the report is clickable and opens split view
-- Already wired:
-  - AanConversation renders ArtifactCard when `message.draft` exists.
-  - Clicking ArtifactCard calls `openSplit(draft)`.
-  - AanSplitView reads `currentArtifact` and renders content.
-- We will ensure the report draft has enough fields so split view doesn’t render empty:
-  - `draft.type = "report"`
-  - `draft.title = "Last 7 Days Campaign Performance"`
-  - `draft.description = "Performance overview with KPIs, trend, and top movers."`
-  - `draft.changes = [...]` (can be treated as “sections” until we build real report layout)
+To:
+```css
+.text-aan {
+  font-size: 2rem; /* 32px - readable */
+  line-height: 1.2;
+}
 
-3) Make report actually visible in right panel
-- File: src/components/aan/AanSplitView.tsx
-- Add conditional rendering for `currentArtifact.type === "report"`:
-  - If `changes` is empty or not the right shape, show a simple placeholder “Report sections” list instead of the “changes” diff UI.
-This avoids the “I clicked it but nothing meaningful shows” problem.
+.text-aan-lg {
+  font-size: 2.5rem; /* 40px - for larger contexts */
+  line-height: 1.2;
+}
+```
 
-4) Optional but important: mark conversations as “report” type when a report artifact is created
-- File: src/components/aan/AanContext.tsx
-- When adding a message with `draft.type === "report"`, update the current conversation’s `type` to `"report"` so it appears under “Reports” filter in workspace sidebar.
-This aligns with your “one chat engine, filters are organizational” requirement.
+---
 
-Verification:
-- In Copilot:
-  - Ask: “Generate last 7 day report”
-  - See summary immediately
-  - Wait ~30s
-  - See “Report ready” + artifact card
-  - Click artifact card → Split panel opens and shows report content.
-</phase-5-mock-reports-with-30s-delay-and-right-panel>
+## Phase 4: Move Marketplace/Account to Left Side of Header
 
-<phase-6-nav-aan-must-open-workspace-not-copilot>
-Objective: top nav Aan always opens full workspace. Floating island Aan always opens copilot.
+### Current Layout (Right Side)
+```text
+[☰] [Aan] ─────────────────────── [★ Walmart ▼] [● Demo Store ▼]
+```
 
-1) Harden openWorkspace behavior
-- File: src/components/aan/AanContext.tsx
-- Update `openWorkspace` to:
-  - setMode("workspace")
-  - clear `currentArtifact`
-  - optionally close any copilot state (mode swap is enough)
-This guarantees workspace mode is visually dominant.
+### New Layout (Left Side, per user request)
+```text
+[☰] [★ Walmart ▼] [● Demo Store ▼] ─── [Aan gradient button]
+```
 
-2) Ensure AppHeader uses openWorkspace (already does), but eliminate any accidental openPanel calls
-- File: src/components/layout/AppHeader.tsx
-- Confirm the Aan button’s onClick is ONLY `openWorkspace`.
-- Ensure no surrounding element has click handlers triggering `openPanel`.
+**File: `src/components/layout/AppHeader.tsx`**
 
-3) Ensure floating island “Ask Aan” uses openPanel (copilot) only
-- File: src/features/creative/FloatingActionIsland.tsx
-- Confirm it passes `openPanel` to “Ask Aan”.
+Restructure the header:
+1. Move marketplace + account dropdowns to left div (after sidebar toggle)
+2. Move Aan button to right side OR keep in left but after dropdowns
+3. Add proper spacing between elements
 
-4) Fix Command Palette “Aan” action (optional)
-- File: src/features/creative/CommandPalette.tsx
-- Today it calls `openPanel()` (copilot). If you want Cmd+K “Aan” to open workspace instead, you must explicitly confirm. Otherwise keep it as copilot.
+Based on your image-47 reference showing `[★ Walmart ▼] [● tushar ▼]` as pills, I'll style them accordingly.
 
-Verification:
-- Click header nav Aan → full workspace opens (no copilot).
-- Click floating island Ask Aan → copilot opens (not workspace).
-</phase-6-nav-aan-must-open-workspace-not-copilot>
-</implementation-plan>
+---
 
-<blocked-clarifications-needed>
-You also asked for “breadcrumbs for Anarix navigation”. The codebase currently has sidebar-based navigation and does not have a top “Dashboard / Reports / Aan” primary nav system as described in your spec. “Breadcrumbs” could be rendered in multiple places, which would change layout.
-To avoid inventing layout, I need you to specify ONE of these exact placements:
-A) In AppHeader, between sidebar toggle and the Aan button
-B) At top of each page content area, above the page title
-C) Inside AppLayout main content wrapper, always at top (global)
-Once you choose A/B/C, I’ll implement it exactly.
-</blocked-clarifications-needed>
+## Phase 5: Preload Mock Conversations with Artifacts
 
-<execution-notes>
-Because the system instructed “TIME CRITICAL: stop now”, I did not continue exploring further files or running more checks. If you want me to proceed implementing these fixes, please send a new message like:
-“Continue and implement the plan above (choose breadcrumb option A/B/C).”
-</execution-notes>
+### Current State
+- `AanContext.tsx` has 3 mock conversations but NO artifacts
+- User must type "generate report" to get artifact (30s delay)
+
+### Required Changes
+
+**File: `src/components/aan/AanContext.tsx`**
+
+Add preloaded artifacts to initial conversations:
+
+```typescript
+const initialConversations: Conversation[] = [
+  {
+    id: "conv-1",
+    title: "Campaign Performance Analysis",
+    type: "report",
+    messages: [
+      // User request
+      { role: "user", content: "Generate a report..." },
+      // AI response with summary
+      { role: "assistant", content: "I've analyzed your campaign..." },
+      // AI message with artifact
+      { 
+        role: "assistant", 
+        content: "Report ready! Click below to view.",
+        draft: {
+          id: "report-demo-1",
+          type: "report",
+          title: "Last 7 Day Campaign Performance Dashboard",
+          description: "Amazon • Jan 1 - Jan 7, 2026",
+          changes: [
+            { field: "Total Ad Spend", before: "$10,973.60", after: "$10,973.60" },
+            { field: "Total Ad Sales", before: "$36,955.24", after: "$36,955.24" },
+            { field: "Overall ROAS", before: "3.37x", after: "3.37x" },
+          ],
+          status: "pending",
+        },
+      },
+    ],
+    artifacts: [],
+  },
+  {
+    id: "conv-2",
+    title: "Q4 2025 Audit Review",
+    type: "audit",
+    messages: [
+      { role: "user", content: "Create an account health summary" },
+      { 
+        role: "assistant", 
+        content: "Overall Health Score: 78/100\n\nYour account shows strong fundamentals...",
+        draft: {
+          id: "audit-demo-1",
+          type: "audit",
+          title: "Account Health Audit",
+          description: "Health Score: 78/100 • Risk Level: Low",
+          changes: [
+            { field: "Health Score", before: "N/A", after: "78/100" },
+            { field: "Wasted Spend", before: "N/A", after: "$2,341 (-15%)" },
+            { field: "Optimization Score", before: "N/A", after: "B+" },
+          ],
+          status: "pending",
+        },
+      },
+    ],
+    artifacts: [],
+  },
+];
+```
+
+This matches your reference images (image-50, image-49) showing the report summaries and audit cards.
+
+---
+
+## Phase 6: Fix Nav Aan Opening Workspace (Not Copilot)
+
+### Debugging
+
+Current code in `AppHeader.tsx`:
+```typescript
+const { openWorkspace } = useAan();
+// ...
+<Button onClick={openWorkspace} ...>
+```
+
+Current code in `AanContext.tsx`:
+```typescript
+const openWorkspace = () => setMode("workspace");
+```
+
+This SHOULD work. Possible issues:
+1. Event propagation conflict
+2. Another handler intercepting the click
+3. Legacy `isOpen` state interfering
+
+### Fix
+
+**File: `src/components/aan/AanContext.tsx`**
+
+Harden `openWorkspace`:
+```typescript
+const openWorkspace = () => {
+  console.log("[Aan] Opening workspace mode");
+  setCurrentArtifact(null);
+  setMode("workspace");
+};
+```
+
+**File: `src/components/layout/AppHeader.tsx`**
+
+Add explicit event handling:
+```typescript
+<Button
+  onClick={(e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    openWorkspace();
+  }}
+  ...
+>
+```
+
+---
+
+## Phase 7: Toast Position Verification
+
+### Current State
+- `App.tsx` line 152: `<Sonner position="bottom-left" />`
+- This should work, but floating island may visually conflict
+
+### Verify
+- Floating island is at `bottom-6 left-1/2 -translate-x-1/2` (center bottom)
+- Toast viewport in `toast.tsx` line 17: `sm:bottom-0 sm:left-0 sm:right-auto`
+
+Both are correctly configured. If toasts still appear elsewhere, check browser dev tools.
+
+---
+
+## Phase 8: Rebuild Split View for Reports (Match Reference)
+
+Based on image-51, the report split view should show:
+
+```text
+┌─────────────────────────────────────────────────┐
+│ Last 7 Day Campaign Performance Dashboard      │
+│ Amazon • Jan 1 - Jan 7, 2026                    │
+│                                        [↓ Download] [v1/3 ▼]
+├─────────────────────────────────────────────────┤
+│ ┌───────────┐ ┌───────────┐ ┌───────────┐      │
+│ │Total Spend│ │Total Sales│ │Overall    │      │
+│ │$10,973.60 │ │$36,955.24 │ │ROAS 3.37x │      │
+│ └───────────┘ └───────────┘ └───────────┘      │
+├─────────────────────────────────────────────────┤
+│ Campaign      │Impr│Clicks│Spend│Sales│ROAS   │
+│───────────────│────│──────│─────│─────│───────│
+│SP | Catch All │433k│3,595 │$3k  │$10k │3.33   │
+│SP | New Vic...│53k │1,087 │$1.9k│$8k  │4.20   │
+│...            │    │      │     │     │       │
+└─────────────────────────────────────────────────┘
+│ Generated: Jan 8, 2026 at 10:39 AM              │
+├─────────────────────────────────────────────────┤
+│ [Editing: Last 7 Day... (v1)]              [X] │
+│ [Message Aan...]                          [→] │
+└─────────────────────────────────────────────────┘
+```
+
+**File: `src/components/aan/AanSplitView.tsx`**
+
+Update to include:
+1. Full KPI cards (3 columns: Spend, Sales, ROAS)
+2. Campaign table with columns: Campaign, Impressions, Clicks, Spend, Sales, ROAS
+3. Generated timestamp at bottom
+4. Mini edit chat bar with artifact title
+
+---
+
+## Implementation Order
+
+1. Phase 1: Shadow fixes (quick wins)
+2. Phase 3: Font size increase (quick win)
+3. Phase 4: Header restructure (marketplace/account to left)
+4. Phase 5: Preload mock data (enables testing)
+5. Phase 6: Debug nav Aan click
+6. Phase 2: Workspace header cleanup
+7. Phase 8: Report split view enhancement
+
+---
+
+## Files to Modify
+
+| File | Changes |
+|------|---------|
+| `src/index.css` | Increase Allura font to 2rem |
+| `src/features/creative/FloatingActionIsland.tsx` | Reduce/remove shadow |
+| `src/components/ui/sonner.tsx` | Reduce shadow |
+| `src/components/layout/AppHeader.tsx` | Move dropdowns to left, harden Aan click |
+| `src/components/aan/AanContext.tsx` | Preload artifacts, harden openWorkspace |
+| `src/components/aan/AanSplitView.tsx` | Add campaign table for reports |
+| `src/components/aan/ArtifactCard.tsx` | Reduce hover shadow |
+
