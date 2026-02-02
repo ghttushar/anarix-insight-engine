@@ -14,10 +14,7 @@ export function AanLogo({ className, showByAnarix = true }: AanLogoProps) {
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span
-        className="text-2xl aan-gradient-text font-bold"
-        style={{ fontFamily: "var(--font-aan)" }}
-      >
+      <span className="font-aan text-aan-lg aan-gradient-text font-bold">
         Aan
       </span>
       {showByAnarix && (

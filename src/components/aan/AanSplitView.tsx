@@ -39,10 +39,10 @@ export function AanSplitView() {
         />
       )}
 
-      {/* Split Panel - 50% width */}
+      {/* Split Panel - 50% width, NO shadow */}
       <div
         className={cn(
-          "fixed right-0 top-0 z-50 flex h-full w-[50vw] flex-col border-l border-border bg-background shadow-lg transition-transform duration-300 ease-out",
+          "fixed right-0 top-0 z-50 flex h-full w-[50vw] min-w-[600px] flex-col border-l border-border bg-background transition-transform duration-300 ease-out",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -112,25 +112,73 @@ export function AanSplitView() {
               {currentArtifact.description}
             </p>
 
-            {/* Mock artifact content */}
-            <div className="space-y-4">
-              {currentArtifact.changes.map((change, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between rounded-md bg-muted/50 px-4 py-3"
-                >
-                  <span className="text-sm font-medium">{change.field}</span>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-muted-foreground line-through">
-                      {change.before}
-                    </span>
-                    <span className="text-primary font-medium">
-                      → {change.after}
-                    </span>
-                  </div>
+            {/* Report-specific content */}
+            {currentArtifact.type === "report" && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  {currentArtifact.changes.slice(0, 4).map((change, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-lg border border-border bg-muted/30 p-4"
+                    >
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                        {change.field}
+                      </p>
+                      <p className="text-lg font-semibold text-foreground">
+                        {change.after}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        was {change.before}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+
+                {/* Additional report sections */}
+                {currentArtifact.changes.length > 4 && (
+                  <div className="border-t border-border pt-6">
+                    <h4 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+                      Key Insights
+                    </h4>
+                    <div className="space-y-3">
+                      {currentArtifact.changes.slice(4).map((change, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between rounded-md bg-muted/50 px-4 py-3"
+                        >
+                          <span className="text-sm font-medium">{change.field}</span>
+                          <span className="text-sm text-primary font-medium">
+                            {change.after}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Non-report artifact content (bid changes, etc.) */}
+            {currentArtifact.type !== "report" && (
+              <div className="space-y-4">
+                {currentArtifact.changes.map((change, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between rounded-md bg-muted/50 px-4 py-3"
+                  >
+                    <span className="text-sm font-medium">{change.field}</span>
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-muted-foreground line-through">
+                        {change.before}
+                      </span>
+                      <span className="text-primary font-medium">
+                        → {change.after}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
