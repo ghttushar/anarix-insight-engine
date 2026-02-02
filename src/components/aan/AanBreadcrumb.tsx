@@ -7,7 +7,7 @@ interface AanBreadcrumbProps {
 export function AanBreadcrumb({ className }: AanBreadcrumbProps) {
   return (
     <nav className={cn("flex items-center", className)}>
-      <span className="font-aan text-aan aan-gradient-text font-bold">
+      <span className="font-aan text-aan aan-gradient-text">
         Aan
       </span>
     </nav>

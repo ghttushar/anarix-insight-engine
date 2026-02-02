@@ -111,7 +111,7 @@ export function FloatingActionIsland() {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full shadow-lg flex items-center justify-center overflow-hidden border border-border bg-card hover:shadow-xl transition-all hover:scale-105"
+        className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full shadow-sm flex items-center justify-center overflow-hidden border border-border bg-card hover:shadow-md transition-all hover:scale-105"
       >
         <img src={logoSrc} alt="Anarix" className="h-7 w-7 object-contain" />
       </button>
@@ -122,7 +122,7 @@ export function FloatingActionIsland() {
     <div
       className={cn(
         "fixed bottom-6 left-1/2 -translate-x-1/2 z-50",
-        "bg-card/95 backdrop-blur-md border border-border rounded-full shadow-xl",
+        "bg-card/95 backdrop-blur-md border border-border rounded-full shadow-sm",
         "transition-all duration-300 ease-out",
         isExpanded ? "px-2 py-2" : "px-4 py-2"
       )}

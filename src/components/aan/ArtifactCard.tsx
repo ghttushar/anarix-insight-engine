@@ -28,7 +28,7 @@ export function ArtifactCard({ artifact, onClick, className }: ArtifactCardProps
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left rounded-lg border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-md group",
+        "w-full text-left rounded-lg border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-sm group",
         className
       )}
     >
