@@ -71,9 +71,7 @@ export function AppHeader() {
           className="aan-gradient text-white gap-2 hover:opacity-90"
         >
           <Sparkles className="h-4 w-4" />
-          <span style={{ fontFamily: "var(--font-aan)" }} className="text-lg">
-            Aan
-          </span>
+          <span className="font-aan text-aan">Aan</span>
         </Button>
       </div>
 

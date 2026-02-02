@@ -254,4 +254,19 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+
+  /* Aan Typography - Allura at readable size */
+  .font-aan {
+    font-family: var(--font-aan);
+  }
+
+  .text-aan {
+    font-size: 1.5rem; /* 24px - readable */
+    line-height: 1.2;
+  }
+
+  .text-aan-lg {
+    font-size: 1.75rem; /* 28px - larger contexts */
+    line-height: 1.2;
+  }
 }

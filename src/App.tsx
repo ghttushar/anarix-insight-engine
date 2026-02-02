@@ -149,7 +149,7 @@ const App = () => (
               <InsightsProvider>
                 <TooltipProvider>
                   <Toaster />
-                  <Sonner position="bottom-right" />
+                  <Sonner position="bottom-left" />
                   <BrowserRouter>
                     <CreativeFeatures>
                       <WelcomeToasts />

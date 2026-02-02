@@ -26,7 +26,7 @@ export function AanCopilotPanel() {
       {/* Panel - 420px width */}
       <div
         className={cn(
-          "fixed right-0 top-0 z-50 flex h-full w-[420px] flex-col border-l border-border bg-background shadow-lg transition-transform duration-300 ease-out",
+          "fixed right-0 top-0 z-50 flex h-full w-[420px] flex-col border-l border-border bg-background transition-transform duration-300 ease-out",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
