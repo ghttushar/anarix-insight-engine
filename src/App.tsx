@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { DensityProvider } from "@/contexts/DensityContext";
 import { AccountProvider, useAccounts } from "@/contexts/AccountContext";
 import { AanProvider, AanPanel } from "@/components/aan";
+import { InsightsProvider, InsightsPanel } from "@/components/insights";
 import { CreativeFeatures } from "@/features/creative";
 import { toast } from "sonner";
 import NotFound from "./pages/NotFound";
@@ -58,12 +59,10 @@ function WelcomeToasts() {
 
   useEffect(() => {
     if (hasAccounts) {
-      // Welcome toast after entering dashboard
       const timer1 = setTimeout(() => {
         toast.success("Welcome to Anarix! Your data is syncing...");
       }, 2000);
 
-      // Tip toast
       const timer2 = setTimeout(() => {
         toast.info("💡 Tip: Press ⌘K to open the command palette", {
           duration: 5000,
@@ -85,7 +84,6 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {/* Root redirect - always start from login for fresh experience */}
       <Route
         path="/"
         element={
@@ -148,17 +146,20 @@ const App = () => (
         <AccountProvider>
           <MarketplaceProvider defaultMarketplace="walmart">
             <AanProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner position="bottom-right" />
-                <BrowserRouter>
-                  <CreativeFeatures>
-                    <WelcomeToasts />
-                    <AppRoutes />
-                    <AanPanel />
-                  </CreativeFeatures>
-                </BrowserRouter>
-              </TooltipProvider>
+              <InsightsProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner position="bottom-right" />
+                  <BrowserRouter>
+                    <CreativeFeatures>
+                      <WelcomeToasts />
+                      <AppRoutes />
+                      <AanPanel />
+                      <InsightsPanel />
+                    </CreativeFeatures>
+                  </BrowserRouter>
+                </TooltipProvider>
+              </InsightsProvider>
             </AanProvider>
           </MarketplaceProvider>
         </AccountProvider>

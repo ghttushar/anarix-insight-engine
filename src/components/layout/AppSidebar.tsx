@@ -14,6 +14,9 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { SidebarHoverPopup } from "./SidebarHoverPopup";
 import { useAan } from "@/components/aan";
+import { useTheme } from "@/contexts/ThemeContext";
+import logoFull from "@/assets/logo-full.png";
+import logoWhite from "@/assets/logo-white.png";
 
 interface NavItem {
   title: string;
@@ -93,10 +96,14 @@ export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   const { openPanel } = useAan();
+  const { resolvedTheme } = useTheme();
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [triggerRects, setTriggerRects] = useState<Record<string, DOMRect | null>>({});
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  // Theme-aware logo
+  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
 
   // Mutex accordion - only one section open at a time
   const [openSection, setOpenSection] = useState<string | null>(() => {
@@ -113,7 +120,6 @@ export function AppSidebar() {
       hoverTimeoutRef.current = null;
     }
 
-    // Get fresh rect on hover
     const trigger = triggerRefs.current[label];
     if (trigger) {
       const rect = trigger.getBoundingClientRect();
@@ -129,7 +135,6 @@ export function AppSidebar() {
     }, 200);
   }, []);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (hoverTimeoutRef.current) {
@@ -153,14 +158,33 @@ export function AppSidebar() {
       collapsible="icon"
     >
       <SidebarContent className="py-4">
+        {/* Logo at top */}
+        <div className={cn(
+          "mb-4 flex items-center",
+          collapsed ? "justify-center px-2" : "px-4"
+        )}>
+          {!collapsed ? (
+            <img src={logoSrc} alt="Anarix" className="h-8 w-auto" />
+          ) : (
+            <img src={logoSrc} alt="Anarix" className="h-7 w-7 object-contain" />
+          )}
+        </div>
+
         {/* Aan AI Entry Point */}
         <div className="px-3 mb-4">
           <button
             onClick={openPanel}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 border border-primary/20 text-primary"
+            className={cn(
+              "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all aan-gradient text-white hover:opacity-90",
+              collapsed && "justify-center px-2"
+            )}
           >
             <Sparkles className="h-4 w-4 shrink-0" />
-            {!collapsed && <span>Aan AI</span>}
+            {!collapsed && (
+              <span style={{ fontFamily: "var(--font-aan)" }} className="text-lg">
+                Aan
+              </span>
+            )}
           </button>
         </div>
 

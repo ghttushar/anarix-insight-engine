@@ -1,7 +1,8 @@
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProfitabilitySummary } from "@/types/profitability";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface PeriodBreakdownPanelProps {
   summary: ProfitabilitySummary;
@@ -60,43 +61,69 @@ export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdo
   ];
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="w-[400px] sm:max-w-[400px]">
-        <SheetHeader className="border-b border-border pb-4">
-          <SheetTitle className="flex items-center justify-between">
-            <span>{summary.dateLabel} Breakdown</span>
-          </SheetTitle>
-          <p className="text-sm text-muted-foreground">{summary.dateRange}</p>
-        </SheetHeader>
+    <>
+      {/* Backdrop - same as Aan panel */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/4 backdrop-blur-[1px] transition-opacity"
+          onClick={onClose}
+        />
+      )}
 
-        <div className="mt-6 space-y-6 overflow-y-auto">
-          {sections.map((section) => (
-            <div key={section.title}>
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                {section.title}
-              </h3>
-              <div className="space-y-2">
-                {section.items.map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2"
-                  >
-                    <span className="text-sm text-muted-foreground">{item.label}</span>
-                    <span
-                      className={cn(
-                        "font-medium",
-                        item.highlight ? "text-green-600 dark:text-green-400" : "text-foreground"
-                      )}
-                    >
-                      {item.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
+      {/* Panel - Aan-style slide-in */}
+      <div
+        className={cn(
+          "fixed right-0 top-0 z-50 flex h-full w-[400px] flex-col border-l border-border bg-background shadow-2xl transition-transform duration-300 ease-out",
+          isOpen ? "translate-x-0" : "translate-x-full"
+        )}
+      >
+        {/* Header with gradient accent */}
+        <div className="relative overflow-hidden border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5" />
+          <div className="relative flex items-center justify-between px-4 py-4">
+            <div>
+              <h2 className="font-heading text-base font-semibold text-foreground">
+                {summary.dateLabel} Breakdown
+              </h2>
+              <p className="text-xs text-muted-foreground">{summary.dateRange}</p>
             </div>
-          ))}
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-      </SheetContent>
-    </Sheet>
+
+        {/* Content */}
+        <ScrollArea className="flex-1">
+          <div className="space-y-6 p-4">
+            {sections.map((section) => (
+              <div key={section.title}>
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                  {section.title}
+                </h3>
+                <div className="space-y-2">
+                  {section.items.map((item) => (
+                    <div
+                      key={item.label}
+                      className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2"
+                    >
+                      <span className="text-sm text-muted-foreground">{item.label}</span>
+                      <span
+                        className={cn(
+                          "font-medium",
+                          item.highlight ? "text-success" : "text-foreground"
+                        )}
+                      >
+                        {item.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+    </>
   );
 }
