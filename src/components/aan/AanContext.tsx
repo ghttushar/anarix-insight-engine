@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
+export type AanMode = "closed" | "copilot" | "split" | "workspace";
+
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -8,9 +10,9 @@ interface Message {
   draft?: AanDraft;
 }
 
-interface AanDraft {
+export interface AanDraft {
   id: string;
-  type: "rule" | "audit" | "bid_change" | "campaign_edit";
+  type: "rule" | "audit" | "bid_change" | "campaign_edit" | "report";
   title: string;
   description: string;
   changes: DraftChange[];
@@ -23,25 +25,39 @@ interface DraftChange {
   after: string | number;
 }
 
-interface AanContextType {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-  openPanel: () => void;
-  closePanel: () => void;
-  messages: Message[];
-  addMessage: (content: string, role: "user" | "assistant", draft?: AanDraft) => void;
-  currentDraft: AanDraft | null;
-  setCurrentDraft: (draft: AanDraft | null) => void;
-  approveDraft: (draftId: string) => void;
-  rejectDraft: (draftId: string) => void;
-  context: AanContextInfo;
-  setContext: (context: AanContextInfo) => void;
-}
-
 interface AanContextInfo {
   page: string;
   dateRange?: string;
   selectedItems?: string[];
+}
+
+interface AanContextType {
+  // Mode management
+  mode: AanMode;
+  setMode: (mode: AanMode) => void;
+  openCopilot: () => void;
+  openSplit: (artifact: AanDraft) => void;
+  openWorkspace: () => void;
+  closeAan: () => void;
+
+  // Legacy compatibility
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  openPanel: () => void;
+  closePanel: () => void;
+
+  // Messages and drafts
+  messages: Message[];
+  addMessage: (content: string, role: "user" | "assistant", draft?: AanDraft) => void;
+  currentDraft: AanDraft | null;
+  currentArtifact: AanDraft | null;
+  setCurrentDraft: (draft: AanDraft | null) => void;
+  approveDraft: (draftId: string) => void;
+  rejectDraft: (draftId: string) => void;
+
+  // Context
+  context: AanContextInfo;
+  setContext: (context: AanContextInfo) => void;
 }
 
 const AanContext = createContext<AanContextType | undefined>(undefined);
@@ -57,10 +73,29 @@ const initialMessages: Message[] = [
 ];
 
 export function AanProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [mode, setMode] = useState<AanMode>("closed");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [currentDraft, setCurrentDraft] = useState<AanDraft | null>(null);
+  const [currentArtifact, setCurrentArtifact] = useState<AanDraft | null>(null);
   const [context, setContext] = useState<AanContextInfo>({ page: "Campaign Manager" });
+
+  // Mode helpers
+  const openCopilot = () => setMode("copilot");
+  const openSplit = (artifact: AanDraft) => {
+    setCurrentArtifact(artifact);
+    setMode("split");
+  };
+  const openWorkspace = () => setMode("workspace");
+  const closeAan = () => {
+    setMode("closed");
+    setCurrentArtifact(null);
+  };
+
+  // Legacy compatibility
+  const isOpen = mode !== "closed";
+  const setIsOpen = (open: boolean) => setMode(open ? "copilot" : "closed");
+  const openPanel = () => openCopilot();
+  const closePanel = () => closeAan();
 
   const addMessage = (content: string, role: "user" | "assistant", draft?: AanDraft) => {
     const newMessage: Message = {
@@ -71,7 +106,7 @@ export function AanProvider({ children }: { children: ReactNode }) {
       draft,
     };
     setMessages((prev) => [...prev, newMessage]);
-    
+
     if (draft) {
       setCurrentDraft(draft);
     }
@@ -99,12 +134,15 @@ export function AanProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const openPanel = () => setIsOpen(true);
-  const closePanel = () => setIsOpen(false);
-
   return (
     <AanContext.Provider
       value={{
+        mode,
+        setMode,
+        openCopilot,
+        openSplit,
+        openWorkspace,
+        closeAan,
         isOpen,
         setIsOpen,
         openPanel,
@@ -112,6 +150,7 @@ export function AanProvider({ children }: { children: ReactNode }) {
         messages,
         addMessage,
         currentDraft,
+        currentArtifact,
         setCurrentDraft,
         approveDraft,
         rejectDraft,

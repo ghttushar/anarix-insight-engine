@@ -1,92 +1,63 @@
-import { PanelLeft, ChevronDown, Keyboard } from "lucide-react";
+import { PanelLeft, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useMarketplace, Marketplace } from "@/contexts/MarketplaceContext";
 import { useAccounts } from "@/contexts/AccountContext";
-import { useTheme } from "@/contexts/ThemeContext";
-import { AanTrigger } from "@/components/aan";
-import logoFull from "@/assets/logo-full.png";
-import logoWhite from "@/assets/logo-white.png";
 
 // Walmart logo SVG component
-const WalmartLogo = ({
-  className
-}: {
-  className?: string;
-}) => <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+const WalmartLogo = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 2L14.5 8.5L21 9.5L16 14L17.5 21L12 17.5L6.5 21L8 14L3 9.5L9.5 8.5L12 2Z" />
-  </svg>;
+  </svg>
+);
 
 // Amazon logo SVG component
-const AmazonLogo = ({
-  className
-}: {
-  className?: string;
-}) => <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+const AmazonLogo = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2v-2zm0-10h2v8h-2V7z" />
-  </svg>;
+  </svg>
+);
+
 interface MarketplaceOption {
   id: Marketplace;
   name: string;
-  icon: React.ComponentType<{
-    className?: string;
-  }>;
+  icon: React.ComponentType<{ className?: string }>;
 }
-const marketplaces: MarketplaceOption[] = [{
-  id: "walmart",
-  name: "Walmart",
-  icon: WalmartLogo
-}, {
-  id: "amazon",
-  name: "Amazon",
-  icon: AmazonLogo
-}];
-export function AppHeader() {
-  const {
-    toggleSidebar,
-    state
-  } = useSidebar();
-  const collapsed = state === "collapsed";
-  const {
-    marketplace,
-    setMarketplace
-  } = useMarketplace();
-  const {
-    accounts
-  } = useAccounts();
-  const {
-    resolvedTheme
-  } = useTheme();
 
-  // Theme-aware logo
-  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
-  const currentMarketplace = marketplaces.find(m => m.id === marketplace) || marketplaces[0];
+const marketplaces: MarketplaceOption[] = [
+  { id: "walmart", name: "Walmart", icon: WalmartLogo },
+  { id: "amazon", name: "Amazon", icon: AmazonLogo },
+];
+
+export function AppHeader() {
+  const { toggleSidebar, state } = useSidebar();
+  const collapsed = state === "collapsed";
+  const { marketplace, setMarketplace } = useMarketplace();
+  const { accounts } = useAccounts();
+
+  const currentMarketplace = marketplaces.find((m) => m.id === marketplace) || marketplaces[0];
   const MarketplaceIcon = currentMarketplace.icon;
 
-  // Get first account name for display
   const primaryAccount = accounts[0];
   const accountDisplayName = primaryAccount?.merchantName || "Select Account";
-  return <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
+
+  return (
+    <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
       <div className="flex items-center gap-4">
         {/* Sidebar Toggle */}
-        <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-8 w-8" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="h-8 w-8"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
           <PanelLeft className="h-5 w-5" />
         </Button>
-
-        {/* Logo - Theme-aware */}
-        <div className="flex items-center gap-2">
-          <img src={logoSrc} alt="Anarix" className="h-8 w-auto" />
-        </div>
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Keyboard shortcut hint */}
-        
-
-        {/* Aan AI Trigger */}
-        <AanTrigger />
-
         {/* Marketplace Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -97,10 +68,12 @@ export function AppHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
-            {marketplaces.map(mp => <DropdownMenuItem key={mp.id} className="gap-2" onClick={() => setMarketplace(mp.id)}>
+            {marketplaces.map((mp) => (
+              <DropdownMenuItem key={mp.id} className="gap-2" onClick={() => setMarketplace(mp.id)}>
                 <mp.icon className="h-4 w-4" />
                 {mp.name}
-              </DropdownMenuItem>)}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -114,7 +87,9 @@ export function AppHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            {accounts.length > 0 ? accounts.map(account => <DropdownMenuItem key={account.id} className="flex items-center gap-2">
+            {accounts.length > 0 ? (
+              accounts.map((account) => (
+                <DropdownMenuItem key={account.id} className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-success" />
                   <div className="flex flex-col">
                     <span className="font-medium">{account.merchantName}</span>
@@ -122,9 +97,14 @@ export function AppHeader() {
                       {account.marketplace} • {account.accountType}
                     </span>
                   </div>
-                </DropdownMenuItem>) : <DropdownMenuItem disabled>No accounts connected</DropdownMenuItem>}
+                </DropdownMenuItem>
+              ))
+            ) : (
+              <DropdownMenuItem disabled>No accounts connected</DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </header>;
+    </header>
+  );
 }
