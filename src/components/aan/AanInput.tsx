@@ -1,4 +1,4 @@
-import { useState, useRef, KeyboardEvent } from "react";
+import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { useAan } from "./AanContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +13,8 @@ const isReportRequest = (message: string): boolean => {
     lower.includes("create report") ||
     lower.includes("performance report") ||
     lower.includes("last 7 days") ||
-    lower.includes("weekly report")
+    lower.includes("weekly report") ||
+    lower.includes("data visualization")
   );
 };
 
@@ -25,34 +26,40 @@ const isAuditRequest = (message: string): boolean => {
     lower.includes("health") ||
     lower.includes("account health") ||
     lower.includes("review") ||
-    lower.includes("analyze account")
+    lower.includes("analyze account") ||
+    lower.includes("paragraph") ||
+    lower.includes("summary")
   );
 };
 
-// Mock report summary shown immediately
-const getReportSummary = () => `**Report Draft Started**
+// Enhanced report summary with data visualization style
+const getReportSummary = () => `I've analyzed your Amazon advertising data for the last 7 days. Here's what I found:
 
-Summary (Last 7 Days):
-• **Total Spend:** $12,450.32
-• **Total Sales:** $48,920.15
-• **ROAS:** 3.93x
-• **TACoS:** 25.4%
-• **Impressions:** 1.2M
-• **Clicks:** 45,200 (CTR: 3.8%)
+**Performance Summary:**
+• Total Ad Spend: $10,973.60
+• Total Ad Sales: $36,955.24
+• Overall ROAS: 3.37x
 
-Generating full report. ETA ~30 seconds...`;
+**Top Performers:**
+Your best performing campaign is "SP | Bamboo | 8 inch | Queen" with a 6.01x ROAS, followed by "SB | Bed in a Box Mattress" at 6.19x ROAS. These campaigns are efficiently converting ad spend into sales.
 
-// Mock audit summary shown immediately
-const getAuditSummary = () => `**Audit Started**
+**Opportunities:**
+Consider optimizing "SP | Bamboo | Queen" (1.88x ROAS) and "SP | Bamboo | 8 inch | Twin" (2.04x ROAS) which are underperforming relative to your account average.
 
-Preliminary Findings:
-• **Health Score:** 78/100
-• **Campaigns Analyzed:** 47
-• **Issues Found:** 23
-• **Critical Issues:** 3 requiring immediate action
-• **Wasted Spend:** $2,341 (down 15% from last month)
+Generating full report with data visualizations...`;
 
-Running full audit. ETA ~30 seconds...`;
+// Audit summary in paragraph format
+const getAuditSummary = () => `I've completed a comprehensive audit of your Amazon account. Here's what I found:
+
+**Overall Health Score: 78/100**
+
+Your account shows strong fundamentals with a few areas requiring attention. The most critical issue is your advertising efficiency, where I've identified significant wasted spend on non-converting keywords.
+
+Key findings include 15 high-spend, zero-conversion keywords that should be paused immediately, 23 products missing optimized backend search terms, and 8 products priced 5-10% higher than top competitors.
+
+On the positive side, all products have sufficient inventory health for the next 45 days.
+
+Running full audit analysis...`;
 
 // Mock non-report responses
 const mockResponses = [
@@ -82,12 +89,19 @@ const mockResponses = [
 ];
 
 export function AanInput() {
-  const { addMessage } = useAan();
+  const { addMessage, setGenerationState } = useAan();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationType, setGenerationType] = useState<"report" | "audit" | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    };
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -103,30 +117,43 @@ export function AanInput() {
       await new Promise((resolve) => setTimeout(resolve, 500));
       addMessage(getReportSummary(), "assistant");
       setIsLoading(false);
-      setIsGenerating(true);
-      setGenerationType("report");
+
+      // Start generation progress
+      setGenerationState(true, "report", 0);
+      
+      // Progress animation over 30 seconds
+      let progress = 0;
+      progressIntervalRef.current = setInterval(() => {
+        progress += 100 / 30; // Increment every second
+        if (progress >= 100) {
+          if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+          progress = 100;
+        }
+        setGenerationState(true, "report", progress);
+      }, 1000);
 
       // After 30 seconds, add the report artifact
       timerRef.current = setTimeout(() => {
-        addMessage("**Report Ready!** Click below to view the full report.", "assistant", {
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+        setGenerationState(false, null, 0);
+        
+        addMessage("**Report Ready!** Click below to view the full report with data visualizations.", "assistant", {
           id: "report-" + Date.now(),
           type: "report" as const,
           title: "Last 7 Days Campaign Performance",
-          description: "Amazon • Performance overview for the past week",
+          description: "Amazon • Performance overview with data visualizations",
           changes: [
-            { field: "Total Spend", before: "N/A", after: "$12,450.32" },
-            { field: "Total Sales", before: "N/A", after: "$48,920.15" },
-            { field: "ROAS", before: "N/A", after: "3.93x" },
-            { field: "Impressions", before: "N/A", after: "1,200,000" },
-            { field: "Top Campaign", before: "N/A", after: "SP | Electronics ($18,420 sales)" },
-            { field: "Best Performer", before: "N/A", after: "Wireless Earbuds (+42% CTR)" },
+            { field: "Total Ad Spend", before: "N/A", after: "$10,973.60" },
+            { field: "Total Ad Sales", before: "N/A", after: "$36,955.24" },
+            { field: "Overall ROAS", before: "N/A", after: "3.37x" },
+            { field: "Impressions", before: "N/A", after: "1,234,567" },
+            { field: "Top Campaign", before: "N/A", after: "SP | Bamboo | 8 inch | Queen (6.01x ROAS)" },
+            { field: "Best Performer", before: "N/A", after: "SB | Bed in a Box Mattress (+42% CTR)" },
             { field: "Recommendation", before: "N/A", after: "Increase budget on top 3 campaigns" },
           ],
           status: "pending" as const,
         });
-        setIsGenerating(false);
-        setGenerationType(null);
-      }, 30000); // 30 second delay
+      }, 30000);
 
       return;
     }
@@ -138,12 +165,27 @@ export function AanInput() {
       await new Promise((resolve) => setTimeout(resolve, 500));
       addMessage(getAuditSummary(), "assistant");
       setIsLoading(false);
-      setIsGenerating(true);
-      setGenerationType("audit");
+
+      // Start generation progress
+      setGenerationState(true, "audit", 0);
+      
+      // Progress animation over 30 seconds
+      let progress = 0;
+      progressIntervalRef.current = setInterval(() => {
+        progress += 100 / 30;
+        if (progress >= 100) {
+          if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+          progress = 100;
+        }
+        setGenerationState(true, "audit", progress);
+      }, 1000);
 
       // After 30 seconds, add the audit artifact
       timerRef.current = setTimeout(() => {
-        addMessage("**Audit Complete!** Click below to view the full health report.", "assistant", {
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+        setGenerationState(false, null, 0);
+        
+        addMessage("**Audit Complete!** Click below to view the full health report with actionable recommendations.", "assistant", {
           id: "audit-" + Date.now(),
           type: "audit" as const,
           title: "Account Health Audit",
@@ -159,9 +201,7 @@ export function AanInput() {
           ],
           status: "pending" as const,
         });
-        setIsGenerating(false);
-        setGenerationType(null);
-      }, 30000); // 30 second delay
+      }, 30000);
 
       return;
     }
@@ -180,16 +220,6 @@ export function AanInput() {
       e.preventDefault();
       handleSend();
     }
-  };
-
-  const getStatusMessage = () => {
-    if (isGenerating && generationType === "report") {
-      return "Generating full report... This will take about 30 seconds.";
-    }
-    if (isGenerating && generationType === "audit") {
-      return "Running full audit... This will take about 30 seconds.";
-    }
-    return "Aan will explain reasoning and create drafts for your approval";
   };
 
   return (
@@ -218,7 +248,7 @@ export function AanInput() {
         </Button>
       </div>
       <p className="mt-2 text-xs text-muted-foreground text-center">
-        {getStatusMessage()}
+        Aan will explain reasoning and create drafts for your approval
       </p>
     </div>
   );

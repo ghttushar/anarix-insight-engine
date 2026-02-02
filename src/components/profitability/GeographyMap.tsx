@@ -89,7 +89,7 @@ export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapPro
               fill="hsl(var(--muted))"
               stroke="hsl(var(--border))"
               strokeWidth={0.5}
-              className="opacity-40"
+              className="opacity-40 cursor-default"
             />
           ))}
 
@@ -102,9 +102,10 @@ export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapPro
               stroke={selectedRegion === code ? "hsl(var(--primary))" : "hsl(var(--border))"}
               strokeWidth={selectedRegion === code ? 2.5 : 1}
               className={cn(
-                "cursor-pointer transition-all duration-200",
+                "cursor-pointer transition-all duration-200 hover:brightness-110",
                 hoveredCountry === code && "brightness-110"
               )}
+              style={{ cursor: "pointer" }}
               onMouseEnter={() => setHoveredCountry(code)}
               onMouseLeave={() => setHoveredCountry(null)}
               onClick={() => onRegionSelect?.(code)}

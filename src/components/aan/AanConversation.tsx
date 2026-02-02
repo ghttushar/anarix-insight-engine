@@ -4,16 +4,17 @@ import { cn } from "@/lib/utils";
 import { Sparkles, User } from "lucide-react";
 import { format } from "date-fns";
 import { ArtifactCard } from "./ArtifactCard";
+import { CircularProgress } from "@/components/ui/circular-progress";
 
 export function AanConversation() {
-  const { messages, openSplit } = useAan();
+  const { messages, openSplit, isGenerating, generationType, generationProgress } = useAan();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isGenerating, generationProgress]);
 
   return (
     <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -50,7 +51,7 @@ export function AanConversation() {
           >
             <div
               className={cn(
-                "rounded-2xl px-4 py-2.5 text-sm",
+                "rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap",
                 message.role === "assistant"
                   ? "bg-card text-foreground border border-border"
                   : "bg-primary text-primary-foreground"
@@ -74,6 +75,29 @@ export function AanConversation() {
           </div>
         </div>
       ))}
+
+      {/* Generation Progress Indicator */}
+      {isGenerating && (
+        <div className="flex gap-3">
+          {/* Avatar */}
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full aan-gradient text-white">
+            <Sparkles className="h-4 w-4" />
+          </div>
+
+          {/* Progress Card */}
+          <div className="flex items-center gap-4 p-4 rounded-2xl border border-border bg-card">
+            <CircularProgress progress={generationProgress} size={56} />
+            <div>
+              <p className="font-medium text-foreground">
+                {generationType === "report" ? "Generating Report" : "Running Audit"}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {Math.ceil((100 - generationProgress) * 0.3)}s remaining
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

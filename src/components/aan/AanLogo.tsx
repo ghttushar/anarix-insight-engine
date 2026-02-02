@@ -1,18 +1,19 @@
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/contexts/ThemeContext";
-import logoFull from "@/assets/logo-full.png";
-import logoWhite from "@/assets/logo-white.png";
+import { Sparkles } from "lucide-react";
+
 interface AanLogoProps {
   className?: string;
   showByAnarix?: boolean;
 }
-export function AanLogo({
-  className,
-  showByAnarix = true
-}: AanLogoProps) {
-  const {
-    resolvedTheme
-  } = useTheme();
-  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
-  return;
+
+export function AanLogo({ className, showByAnarix = true }: AanLogoProps) {
+  return (
+    <div className={cn("flex items-center gap-2", className)}>
+      <Sparkles className="h-5 w-5 aan-gradient-text" />
+      <span className="font-aan text-aan aan-gradient-text font-bold">Aan</span>
+      {showByAnarix && (
+        <span className="text-sm text-muted-foreground">by Anarix</span>
+      )}
+    </div>
+  );
 }
