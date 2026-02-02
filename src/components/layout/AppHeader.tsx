@@ -53,7 +53,8 @@ export function AppHeader() {
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
-      <div className="flex items-center gap-6">
+      {/* Left Side: Toggle + Marketplace + Account */}
+      <div className="flex items-center gap-3">
         {/* Sidebar Toggle */}
         <Button
           variant="ghost"
@@ -65,27 +66,16 @@ export function AppHeader() {
           <PanelLeft className="h-5 w-5" />
         </Button>
 
-        {/* Aan button in navbar - opens full workspace */}
-        <Button
-          onClick={openWorkspace}
-          className="aan-gradient text-white gap-2 hover:opacity-90"
-        >
-          <Sparkles className="h-4 w-4" />
-          <span className="font-aan text-aan">Aan</span>
-        </Button>
-      </div>
-
-      <div className="flex items-center gap-3">
         {/* Marketplace Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2">
               <MarketplaceIcon className="h-4 w-4 text-warning fill-warning" />
               <span className="hidden sm:inline">{currentMarketplace.name}</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
+          <DropdownMenuContent align="start" className="w-40">
             {marketplaces.map((mp) => (
               <DropdownMenuItem
                 key={mp.id}
@@ -102,13 +92,13 @@ export function AppHeader() {
         {/* Account Selector with scrollable popup */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2">
               <div className="h-2 w-2 rounded-full bg-success" />
               <span className="max-w-[150px] truncate">{accountDisplayName}</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 p-0">
+          <DropdownMenuContent align="start" className="w-80 p-0">
             <ScrollArea className="max-h-[300px]">
               <div className="p-1">
                 {accounts.length > 0 ? (
@@ -135,6 +125,22 @@ export function AppHeader() {
             </ScrollArea>
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+
+      {/* Right Side: Aan button */}
+      <div className="flex items-center gap-3">
+        {/* Aan button in navbar - opens full workspace */}
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            openWorkspace();
+          }}
+          className="aan-gradient text-white gap-2 hover:opacity-90"
+        >
+          <Sparkles className="h-4 w-4" />
+          <span className="font-aan text-aan">Aan</span>
+        </Button>
       </div>
     </header>
   );

@@ -261,12 +261,12 @@
   }
 
   .text-aan {
-    font-size: 1.5rem; /* 24px - readable */
+    font-size: 2rem; /* 32px - readable */
     line-height: 1.2;
   }
 
   .text-aan-lg {
-    font-size: 1.75rem; /* 28px - larger contexts */
+    font-size: 2.5rem; /* 40px - larger contexts */
     line-height: 1.2;
   }
 }
