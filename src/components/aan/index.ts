@@ -1,5 +1,5 @@
 export { AanProvider, useAan } from "./AanContext";
-export type { AanMode, AanDraft } from "./AanContext";
+export type { AanMode, AanDraft, Conversation, FilterType } from "./AanContext";
 export { AanTrigger } from "./AanTrigger";
 export { AanPanel } from "./AanPanel";
 export { AanCopilotPanel } from "./AanCopilotPanel";
@@ -7,3 +7,5 @@ export { AanSplitView } from "./AanSplitView";
 export { AanWorkspace } from "./AanWorkspace";
 export { AanWorkspaceSidebar } from "./AanWorkspaceSidebar";
 export { AanLogo } from "./AanLogo";
+export { AanBreadcrumb } from "./AanBreadcrumb";
+export { ArtifactCard } from "./ArtifactCard";

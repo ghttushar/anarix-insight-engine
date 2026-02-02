@@ -1,9 +1,16 @@
-import { PanelLeft, ChevronDown } from "lucide-react";
+import { PanelLeft, ChevronDown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useMarketplace, Marketplace } from "@/contexts/MarketplaceContext";
 import { useAccounts } from "@/contexts/AccountContext";
+import { useAan } from "@/components/aan";
 
 // Walmart logo SVG component
 const WalmartLogo = ({ className }: { className?: string }) => (
@@ -35,8 +42,10 @@ export function AppHeader() {
   const collapsed = state === "collapsed";
   const { marketplace, setMarketplace } = useMarketplace();
   const { accounts } = useAccounts();
+  const { openWorkspace } = useAan();
 
-  const currentMarketplace = marketplaces.find((m) => m.id === marketplace) || marketplaces[0];
+  const currentMarketplace =
+    marketplaces.find((m) => m.id === marketplace) || marketplaces[0];
   const MarketplaceIcon = currentMarketplace.icon;
 
   const primaryAccount = accounts[0];
@@ -44,7 +53,7 @@ export function AppHeader() {
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
         {/* Sidebar Toggle */}
         <Button
           variant="ghost"
@@ -55,6 +64,17 @@ export function AppHeader() {
         >
           <PanelLeft className="h-5 w-5" />
         </Button>
+
+        {/* Aan button in navbar - opens full workspace */}
+        <Button
+          onClick={openWorkspace}
+          className="aan-gradient text-white gap-2 hover:opacity-90"
+        >
+          <Sparkles className="h-4 w-4" />
+          <span style={{ fontFamily: "var(--font-aan)" }} className="text-lg">
+            Aan
+          </span>
+        </Button>
       </div>
 
       <div className="flex items-center gap-3">
@@ -62,14 +82,18 @@ export function AppHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2">
-              <MarketplaceIcon className="h-4 w-4 text-primary" />
+              <MarketplaceIcon className="h-4 w-4 text-warning fill-warning" />
               <span className="hidden sm:inline">{currentMarketplace.name}</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
             {marketplaces.map((mp) => (
-              <DropdownMenuItem key={mp.id} className="gap-2" onClick={() => setMarketplace(mp.id)}>
+              <DropdownMenuItem
+                key={mp.id}
+                className="gap-2"
+                onClick={() => setMarketplace(mp.id)}
+              >
                 <mp.icon className="h-4 w-4" />
                 {mp.name}
               </DropdownMenuItem>
@@ -77,7 +101,7 @@ export function AppHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Account Selector */}
+        {/* Account Selector with scrollable popup */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2">
@@ -86,22 +110,31 @@ export function AppHeader() {
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            {accounts.length > 0 ? (
-              accounts.map((account) => (
-                <DropdownMenuItem key={account.id} className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-success" />
-                  <div className="flex flex-col">
-                    <span className="font-medium">{account.merchantName}</span>
-                    <span className="text-xs text-muted-foreground capitalize">
-                      {account.marketplace} • {account.accountType}
-                    </span>
-                  </div>
-                </DropdownMenuItem>
-              ))
-            ) : (
-              <DropdownMenuItem disabled>No accounts connected</DropdownMenuItem>
-            )}
+          <DropdownMenuContent align="end" className="w-80 p-0">
+            <ScrollArea className="max-h-[300px]">
+              <div className="p-1">
+                {accounts.length > 0 ? (
+                  accounts.map((account) => (
+                    <DropdownMenuItem
+                      key={account.id}
+                      className="flex items-center gap-3 px-3 py-2.5"
+                    >
+                      <div className="h-2 w-2 rounded-full bg-success shrink-0" />
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-medium truncate">
+                          {account.merchantName}
+                        </span>
+                        <span className="text-xs text-muted-foreground capitalize">
+                          {account.marketplace} • {account.accountType}
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))
+                ) : (
+                  <DropdownMenuItem disabled>No accounts connected</DropdownMenuItem>
+                )}
+              </div>
+            </ScrollArea>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

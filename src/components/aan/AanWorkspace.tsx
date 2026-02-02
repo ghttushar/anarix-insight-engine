@@ -1,16 +1,13 @@
-import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAan } from "./AanContext";
-import { AanLogo } from "./AanLogo";
 import { AanWorkspaceSidebar } from "./AanWorkspaceSidebar";
+import { AanBreadcrumb } from "./AanBreadcrumb";
 import { AanConversation } from "./AanConversation";
 import { AanInput } from "./AanInput";
 
 export function AanWorkspace() {
   const { mode, closeAan } = useAan();
-  const [activeSection, setActiveSection] = useState("chat");
 
   const isOpen = mode === "workspace";
 
@@ -31,37 +28,19 @@ export function AanWorkspace() {
             Back to Anarix
           </Button>
           <div className="h-6 w-px bg-border" />
-          <AanLogo />
+          <AanBreadcrumb />
         </div>
       </header>
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Aan Sidebar */}
-        <AanWorkspaceSidebar
-          activeSection={activeSection}
-          onSectionChange={setActiveSection}
-        />
+        <AanWorkspaceSidebar />
 
         {/* Workspace Content */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          {activeSection === "chat" ? (
-            <>
-              <AanConversation />
-              <AanInput />
-            </>
-          ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold text-foreground mb-2 capitalize">
-                  {activeSection}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  This section is coming soon. Use the Chat to interact with Aan.
-                </p>
-              </div>
-            </div>
-          )}
+          <AanConversation />
+          <AanInput />
         </main>
       </div>
     </div>

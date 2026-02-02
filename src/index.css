@@ -95,10 +95,10 @@
     --font-body: 'Noto Sans', system-ui, sans-serif;
     --font-aan: 'Allura', cursive;
 
-    /* Aan AI Gradient (unique to Aan) */
-    --aan-gradient-start: 239 84% 67%; /* Indigo-500 HSL */
-    --aan-gradient-mid: 258 90% 66%; /* Violet-500 HSL */
-    --aan-gradient-end: 263 70% 76%; /* Violet-400 HSL */
+    /* Aan AI Gradient - Purple to Indigo to Blue (left to right) */
+    --aan-gradient-start: 258 90% 66%; /* #8B5CF6 Violet-500 */
+    --aan-gradient-mid: 239 84% 67%;   /* #6366F1 Indigo-500 */
+    --aan-gradient-end: 217 91% 60%;   /* #3B82F6 Blue-500 */
   }
 
   .dark {
@@ -236,7 +236,7 @@
   /* Aan AI Gradient - Only for Aan workspace/copilot */
   .aan-gradient {
     background: linear-gradient(
-      135deg,
+      90deg,
       hsl(var(--aan-gradient-start)) 0%,
       hsl(var(--aan-gradient-mid)) 50%,
       hsl(var(--aan-gradient-end)) 100%

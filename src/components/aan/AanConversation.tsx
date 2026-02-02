@@ -3,9 +3,10 @@ import { useAan } from "./AanContext";
 import { cn } from "@/lib/utils";
 import { Sparkles, User } from "lucide-react";
 import { format } from "date-fns";
+import { ArtifactCard } from "./ArtifactCard";
 
 export function AanConversation() {
-  const { messages } = useAan();
+  const { messages, openSplit } = useAan();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function AanConversation() {
             className={cn(
               "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
               message.role === "assistant"
-                ? "bg-gradient-to-br from-primary to-accent text-white"
+                ? "aan-gradient text-white"
                 : "bg-muted text-muted-foreground"
             )}
           >
@@ -43,7 +44,7 @@ export function AanConversation() {
           {/* Message Bubble */}
           <div
             className={cn(
-              "flex max-w-[80%] flex-col gap-1",
+              "flex max-w-[80%] flex-col gap-2",
               message.role === "user" ? "items-end" : "items-start"
             )}
           >
@@ -57,6 +58,16 @@ export function AanConversation() {
             >
               {message.content}
             </div>
+
+            {/* Artifact Card (if present) */}
+            {message.draft && (
+              <ArtifactCard
+                artifact={message.draft}
+                onClick={() => openSplit(message.draft!)}
+                className="max-w-sm"
+              />
+            )}
+
             <span className="text-xs text-muted-foreground px-2">
               {format(message.timestamp, "h:mm a")}
             </span>
