@@ -1,5 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Campaign } from "@/types/campaign";
+import { DeltaBadge } from "@/components/ui/delta-badge";
+import { getDelta } from "@/lib/utils/deltaGenerator";
 
 interface CampaignTableTotalRowProps {
   campaigns: Campaign[];
@@ -7,11 +9,7 @@ interface CampaignTableTotalRowProps {
 }
 
 function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(value);
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
 }
 
 function formatNumber(value: number): string {
@@ -22,10 +20,7 @@ function formatPercent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
-export function CampaignTableTotalRow({ 
-  campaigns,
-  showTotalBudget = true,
-}: CampaignTableTotalRowProps) {
+export function CampaignTableTotalRow({ campaigns, showTotalBudget = true }: CampaignTableTotalRowProps) {
   const totals = {
     dailyBudget: campaigns.reduce((sum, c) => sum + c.dailyBudget, 0),
     totalBudget: campaigns.reduce((sum, c) => sum + (c.totalBudget || 0), 0),
@@ -41,22 +36,27 @@ export function CampaignTableTotalRow({
     acos: totals.sales > 0 ? (totals.spend / totals.sales) * 100 : 0,
   };
 
+  const TotalCell = ({ value, metric }: { value: string; metric: string }) => (
+    <div className="flex flex-col items-end">
+      <span className="text-foreground">{value}</span>
+      <DeltaBadge value={getDelta("total", metric)} />
+    </div>
+  );
+
   return (
     <TableRow className="bg-muted/30 font-medium">
-      <TableCell colSpan={4} className="text-foreground">
-        Total ({campaigns.length} campaigns)
-      </TableCell>
-      <TableCell className="text-right">{formatCurrency(totals.dailyBudget)}</TableCell>
+      <TableCell colSpan={4} className="text-foreground">Total ({campaigns.length} campaigns)</TableCell>
+      <TableCell className="text-right"><TotalCell value={formatCurrency(totals.dailyBudget)} metric="dailyBudget" /></TableCell>
       {showTotalBudget && (
-        <TableCell className="text-right">{formatCurrency(totals.totalBudget)}</TableCell>
+        <TableCell className="text-right"><TotalCell value={formatCurrency(totals.totalBudget)} metric="totalBudget" /></TableCell>
       )}
-      <TableCell className="text-right">{formatCurrency(totals.spend)}</TableCell>
-      <TableCell className="text-right">{formatCurrency(totals.sales)}</TableCell>
-      <TableCell className="text-right">{derivedTotals.roas.toFixed(2)}</TableCell>
-      <TableCell className="text-right">{formatNumber(totals.impressions)}</TableCell>
-      <TableCell className="text-right">{formatNumber(totals.clicks)}</TableCell>
-      <TableCell className="text-right">{formatPercent(derivedTotals.ctr)}</TableCell>
-      <TableCell className="text-right">{formatPercent(derivedTotals.acos)}</TableCell>
+      <TableCell className="text-right"><TotalCell value={formatCurrency(totals.spend)} metric="spend" /></TableCell>
+      <TableCell className="text-right"><TotalCell value={formatCurrency(totals.sales)} metric="sales" /></TableCell>
+      <TableCell className="text-right"><TotalCell value={derivedTotals.roas.toFixed(2)} metric="roas" /></TableCell>
+      <TableCell className="text-right"><TotalCell value={formatNumber(totals.impressions)} metric="impressions" /></TableCell>
+      <TableCell className="text-right"><TotalCell value={formatNumber(totals.clicks)} metric="clicks" /></TableCell>
+      <TableCell className="text-right"><TotalCell value={formatPercent(derivedTotals.ctr)} metric="ctr" /></TableCell>
+      <TableCell className="text-right"><TotalCell value={formatPercent(derivedTotals.acos)} metric="acos" /></TableCell>
     </TableRow>
   );
 }
