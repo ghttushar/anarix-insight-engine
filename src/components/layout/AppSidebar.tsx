@@ -219,7 +219,7 @@ export function AppSidebar() {
           )}
         </div>
 
-        {/* Aan AI Button - Sleek Pill */}
+        {/* Aan AI Button - Clean Pill */}
         <div className="px-3 mb-4">
           {!collapsed ? (
             <button
@@ -228,10 +228,11 @@ export function AppSidebar() {
                 e.preventDefault();
                 openWorkspace();
               }}
-              className="group relative w-full rounded-full text-sm font-medium transition-all overflow-hidden py-2 flex items-center justify-start px-4 gap-3 aan-pill-button"
+              className="group relative w-full rounded-full text-sm font-medium transition-all overflow-hidden py-2 flex items-center justify-start px-4 gap-3 border border-primary/30 bg-transparent hover:bg-primary/5"
             >
-              <Sparkles className="h-4 w-4 shrink-0 aan-gradient-text" />
-              <span className="font-aan aan-gradient-text" style={{ fontSize: "1.5rem", lineHeight: 1 }}>
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Sparkles className="h-4 w-4 shrink-0 aan-gradient-text relative z-[1]" />
+              <span className="font-aan aan-gradient-text relative z-[1]" style={{ fontSize: "1.5rem", lineHeight: 1 }}>
                 Aan
               </span>
             </button>
@@ -246,8 +247,8 @@ export function AppSidebar() {
                   }}
                   className="group relative flex w-full items-center justify-center rounded-full p-2.5 transition-all border border-primary/30 bg-transparent hover:bg-primary/5"
                 >
-                  <div className="absolute inset-0 rounded-full aan-gradient opacity-0 group-hover:opacity-[0.08] transition-opacity" />
-                  <Sparkles className="h-4 w-4 aan-gradient-text" />
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Sparkles className="h-4 w-4 aan-gradient-text relative z-[1]" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right">Open Aan Workspace</TooltipContent>
