@@ -273,7 +273,6 @@
 
 /* Density Mode Styles */
 @layer components {
-  /* Comfortable mode (default) */
   .density-comfortable {
     --spacing-base: 4px;
     --row-height: 44px;
@@ -285,11 +284,6 @@
     padding-bottom: 10px;
   }
 
-  .density-comfortable .card {
-    padding: 16px;
-  }
-
-  /* Compact mode */
   .density-compact {
     --spacing-base: 2px;
     --row-height: 32px;
@@ -297,15 +291,30 @@
   }
 
   .density-compact table tbody tr td {
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
-
-  .density-compact .card {
-    padding: 12px;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
   }
 
   .density-compact table tbody tr {
-    height: 32px;
+    height: 32px !important;
   }
+
+  .density-compact .card,
+  .density-compact [class*="rounded-lg border"] {
+    padding: 12px;
+  }
+}
+
+/* Table hover fix - prevent overlap */
+table tbody tr {
+  position: relative;
+}
+
+table tbody tr:hover {
+  z-index: 1;
+}
+
+table th,
+table td {
+  vertical-align: middle;
 }

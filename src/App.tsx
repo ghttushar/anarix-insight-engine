@@ -45,7 +45,7 @@ import CampaignDetail from "./pages/dayparting/CampaignDetail";
 import DayPartingHistory from "./pages/dayparting/History";
 import ScheduledJobs from "./pages/dayparting/ScheduledJobs";
 import ScheduleEditor from "./pages/dayparting/ScheduleEditor";
-
+import WorkspaceDashboard from "./pages/workspace/Dashboard";
 // Settings
 import Preferences from "./pages/settings/Preferences";
 import Accounts from "./pages/settings/Accounts";
@@ -98,6 +98,9 @@ function AppRoutes() {
       {/* Auth & Onboarding */}
       <Route path="/login" element={<Login />} />
       <Route path="/onboarding/connect" element={<ConnectAccounts />} />
+
+      {/* Workspace */}
+      <Route path="/workspace" element={<WorkspaceDashboard />} />
 
       {/* Profitability */}
       <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />

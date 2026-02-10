@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Sparkles, RefreshCw, Download, Plus, Filter, Calendar, X, Camera, Lightbulb } from "lucide-react";
+import { Sparkles, RefreshCw, Download, X, Camera, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAan } from "@/components/aan";
 import { useInsights } from "@/components/insights";
-import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
-import logoFull from "@/assets/logo-full.png";
-import logoWhite from "@/assets/logo-white.png";
 
 interface ActionItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -18,56 +15,11 @@ interface ActionItem {
   highlight?: boolean;
 }
 
-const getContextualActions = (
-  pathname: string,
-  openAan: () => void,
-  openInsights: () => void,
-  criticalCount: number
-): ActionItem[] => {
-  const commonActions: ActionItem[] = [
-    { icon: Sparkles, label: "Ask Aan", onClick: openAan },
-    {
-      icon: Lightbulb,
-      label: criticalCount > 0 ? `Insights (${criticalCount})` : "Insights",
-      onClick: openInsights,
-      highlight: criticalCount > 0,
-    },
-  ];
-
-  if (pathname.includes("/profitability")) {
-    return [
-      ...commonActions,
-      { icon: RefreshCw, label: "Refresh", onClick: () => toast.info("Refreshing data...") },
-      { icon: Download, label: "Export", onClick: () => toast.success("Export started") },
-    ];
-  }
-
-  if (pathname.includes("/advertising")) {
-    return [
-      ...commonActions,
-      { icon: Plus, label: "New Campaign", onClick: () => toast.info("Opening campaign creator...") },
-      { icon: Filter, label: "Filter", onClick: () => toast.info("Opening filters...") },
-    ];
-  }
-
-  if (pathname.includes("/dayparting")) {
-    return [
-      ...commonActions,
-      { icon: Calendar, label: "Schedule", onClick: () => toast.info("Creating schedule...") },
-    ];
-  }
-
-  return commonActions;
-};
-
 // Routes where floating island should be hidden
 const hiddenRoutes = [
   "/login",
   "/onboarding",
   "/settings",
-  "/settings/preferences",
-  "/settings/accounts",
-  "/settings/accounts/connect",
 ];
 
 export function FloatingActionIsland() {
@@ -77,32 +29,38 @@ export function FloatingActionIsland() {
   const location = useLocation();
   const { openPanel } = useAan();
   const { openPanel: openInsights, criticalCount } = useInsights();
-  const { resolvedTheme } = useTheme();
 
   // Hide on specific routes
   const shouldHide = hiddenRoutes.some((route) => location.pathname.startsWith(route));
   if (shouldHide) return null;
 
-  const actions = getContextualActions(location.pathname, openPanel, openInsights, criticalCount);
-  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
+  // Universal fixed actions
+  const actions: ActionItem[] = [
+    { icon: Sparkles, label: "Ask Aan", onClick: openPanel },
+    {
+      icon: Lightbulb,
+      label: criticalCount > 0 ? `Insights (${criticalCount})` : "Insights",
+      onClick: openInsights,
+      highlight: criticalCount > 0,
+    },
+    { icon: RefreshCw, label: "Refresh", onClick: () => toast.info("Refreshing data...") },
+    { icon: Download, label: "Export", onClick: () => toast.success("Export started") },
+  ];
 
   const takeScreenshot = async () => {
     setIsCapturing(true);
     try {
       setIsVisible(false);
       await new Promise((resolve) => setTimeout(resolve, 100));
-
       const canvas = await html2canvas(document.body, {
         useCORS: true,
         allowTaint: true,
         backgroundColor: null,
       });
-
       const link = document.createElement("a");
       link.download = `anarix-screenshot-${Date.now()}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
-
       toast.success("Screenshot saved!");
     } catch (error) {
       toast.error("Failed to capture screenshot");
@@ -113,14 +71,21 @@ export function FloatingActionIsland() {
     }
   };
 
-  // Collapsed state - show Anarix logo orb
+  // Prominent reopen button when closed
   if (!isVisible) {
     return (
       <button
         onClick={() => setIsVisible(true)}
-        className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full shadow-sm flex items-center justify-center overflow-hidden border border-border bg-card hover:shadow-md transition-all hover:scale-105"
+        className={cn(
+          "fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full px-4 py-2.5",
+          "border border-primary/30 bg-card shadow-md",
+          "hover:border-primary/60 hover:shadow-lg transition-all duration-200",
+          "group"
+        )}
       >
-        <img src={logoSrc} alt="Anarix" className="h-7 w-7 object-contain" />
+        <div className="absolute inset-0 rounded-full aan-gradient opacity-0 group-hover:opacity-10 transition-opacity" />
+        <Sparkles className="h-4 w-4 aan-gradient-text" />
+        <span className="text-sm font-medium text-foreground">Actions</span>
       </button>
     );
   }
@@ -129,7 +94,7 @@ export function FloatingActionIsland() {
     <div
       className={cn(
         "fixed bottom-6 left-1/2 -translate-x-1/2 z-50",
-        "bg-card/95 backdrop-blur-md border border-border rounded-full shadow-sm",
+        "bg-card/95 backdrop-blur-md border border-border rounded-full",
         "transition-all duration-300 ease-out",
         isExpanded ? "px-2 py-2" : "px-4 py-2"
       )}
@@ -145,7 +110,6 @@ export function FloatingActionIsland() {
           <X className="h-4 w-4" />
         </button>
 
-        {/* Divider */}
         <div className="h-6 w-px bg-border" />
 
         {/* Actions */}
@@ -171,7 +135,7 @@ export function FloatingActionIsland() {
             </Button>
           ))}
 
-          {/* Screenshot button */}
+          {/* Screenshot */}
           <Button
             variant="ghost"
             size="sm"
@@ -191,7 +155,6 @@ export function FloatingActionIsland() {
           </Button>
         </div>
 
-        {/* Keyboard hint */}
         {isExpanded && (
           <div className="pl-2 border-l border-border">
             <span className="text-xs text-muted-foreground">
