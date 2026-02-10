@@ -78,7 +78,7 @@ export function RegionalTable({ data }: RegionalTableProps) {
           <TableCell className="text-right">{formatNumber(region.stocks)}</TableCell>
           <TableCell className="text-right">{formatNumber(region.orders)}</TableCell>
           <TableCell className="text-right">{formatNumber(region.unitsSold)}</TableCell>
-          <TableCell className="text-right text-red-500">{formatNumber(region.refunds)}</TableCell>
+          <TableCell className="text-right text-foreground">{formatNumber(region.refunds)}</TableCell>
           <TableCell className="text-right">{formatCurrency(region.sales)}</TableCell>
           <TableCell className="text-right">{formatCurrency(region.amazonFees)}</TableCell>
           <TableCell className="text-right">{formatNumber(region.sellableReturns)}</TableCell>

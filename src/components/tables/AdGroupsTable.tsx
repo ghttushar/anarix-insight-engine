@@ -116,7 +116,7 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
                     >
                       {group.campaignType === "auto" ? "Auto" : "Manual"}
                     </Badge>
-                    <span className="text-muted-foreground">{group.campaignName}</span>
+                    <span className="text-foreground">{group.campaignName}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">

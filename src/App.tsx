@@ -99,8 +99,9 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/onboarding/connect" element={<ConnectAccounts />} />
 
-      {/* Workspace */}
+      {/* Sandbox */}
       <Route path="/workspace" element={<WorkspaceDashboard />} />
+      <Route path="/workspace/:dashboardId" element={<WorkspaceDashboard />} />
 
       {/* Profitability */}
       <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />

@@ -113,7 +113,7 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{term.keyword}</TableCell>
+                <TableCell className="text-foreground">{term.keyword}</TableCell>
                 <TableCell>
                   <Badge
                     variant="outline"
@@ -122,8 +122,8 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
                     {term.matchType}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{term.adGroupName}</TableCell>
-                <TableCell className="text-muted-foreground">{term.campaignName}</TableCell>
+                <TableCell className="text-foreground">{term.adGroupName}</TableCell>
+                <TableCell className="text-foreground">{term.campaignName}</TableCell>
                 <TableCell className="text-right">{formatNumber(term.impressions)}</TableCell>
                 <TableCell className="text-right">{formatNumber(term.clicks)}</TableCell>
                 <TableCell className="text-right">{formatPercent(term.ctr)}</TableCell>

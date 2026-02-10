@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import { X, Pencil, GripVertical } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { WidgetType } from "@/pages/workspace/Dashboard";
 
 const typeLabels: Record<WidgetType, string> = {
@@ -16,15 +15,16 @@ interface WidgetHeaderProps {
   type: WidgetType;
   onRemove: () => void;
   onTitleChange: (title: string) => void;
+  dragHandle?: ReactNode;
 }
 
-export function WidgetHeader({ title, type, onRemove, onTitleChange }: WidgetHeaderProps) {
+export function WidgetHeader({ title, type, onRemove, onTitleChange, dragHandle }: WidgetHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
     <div className="flex items-center justify-between border-b border-border bg-muted/30 px-3 py-2 shrink-0">
       <div className="flex items-center gap-2 min-w-0">
-        <GripVertical className="h-3.5 w-3.5 text-muted-foreground cursor-grab shrink-0" />
+        {dragHandle || <GripVertical className="h-3.5 w-3.5 text-muted-foreground cursor-grab shrink-0" />}
         <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground shrink-0">
           {typeLabels[type]}
         </span>
