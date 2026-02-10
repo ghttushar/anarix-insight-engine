@@ -1,531 +1,311 @@
 
 
-# Complete Aan Workspace & UI Fixes Implementation Plan
+# Comprehensive UI Overhaul Plan
 
-## Summary of Requirements
-
-| # | Issue | Solution |
-|---|-------|----------|
-| 1 | Report viewer opens outside Aan | Create embedded split view INSIDE Aan workspace |
-| 2 | Sidebar/Panel toggle behavior | Creative expand/collapse button; mutual exclusivity |
-| 3 | 30s circular progress during generation | Add animated circular progress indicator |
-| 4 | Report = data visualization in chat | Rich markdown summary with inline data |
-| 5 | Audit = paragraph summary in chat | Simple paragraph format |
-| 6 | Report viewer stays in Aan | Modify openSplit to NOT exit workspace |
-| 7 | Geography map broken | Replace with static world map SVG, cursor pointer for active regions |
-| 8 | Floating island on login/settings | Add more routes to hidden list |
-| 9 | Compact/Comfortable not working | Add CSS density classes to table rows and cards |
-| 10 | App starts in light mode | Change default theme from "system" to "light" |
+This is a large, multi-phase implementation covering a new Workspace screen, universal top taskbar, floating island fixes, copilot panel redesign, sidebar collapse, table fixes, map fix, and alignment cleanup.
 
 ---
 
-## Phase 1: Theme & Density Fixes
+## What Changes
 
-### 1.1 Default to Light Mode
+| # | Feature | Summary |
+|---|---------|---------|
+| 1 | **Universal Top Taskbar** | New fixed top bar with marketplace/store selector (searchable), dark/light toggle, profile switcher -- visible everywhere except Aan workspace |
+| 2 | **Master Dashboard (Workspace)** | New canvas-based analytics sandbox with draggable/resizable widgets (Metric, Chart, Table, Annotation, Task) |
+| 3 | **Floating Island Cleanup** | Universal with fixed actions: Ask Aan, Insights, Refresh, Export, Screenshot. Hidden on login/onboarding/settings. Prominent reopen button |
+| 4 | **Copilot Panel Redesign** | Opens sideways on the same layer (not overlay/blur), pushes content left |
+| 5 | **Left Sidebar Collapsible** | Add collapse/expand button; auto-collapse when copilot opens |
+| 6 | **Aan Button Redesign** | Replace current gradient sticker look with a sleek, highlighted but creative design |
+| 7 | **Marketplace Selector** | Use real Amazon/Walmart logos; dropdown doubles as searchbar for store names |
+| 8 | **Table Fixes** | Fix hover overlap, alignment, and consistency across all tables |
+| 9 | **Geography Map Fix** | Proper world map SVG with US/Canada/Mexico active, hand cursor, click/scroll support |
+| 10 | **Density (Compact/Comfortable)** | Ensure CSS classes actually affect table rows and card padding |
+| 11 | **Move selectors to top taskbar** | Remove marketplace/account from sidebar, put in universal taskbar |
 
-**File: `src/contexts/ThemeContext.tsx`**
+---
 
-Change default theme from "system" to "light":
+## Phase 1: Universal Top Taskbar
 
-```typescript
-// Line 14-17: Change from
-const [theme, setThemeState] = useState<Theme>(() => {
-  if (typeof window !== "undefined") {
-    return (localStorage.getItem("anarix-theme") as Theme) || "system";
-  }
-  return "system";
-});
+### New Component: `src/components/layout/AppTaskbar.tsx`
 
-// To:
-const [theme, setThemeState] = useState<Theme>(() => {
-  if (typeof window !== "undefined") {
-    return (localStorage.getItem("anarix-theme") as Theme) || "light";
-  }
-  return "light";
-});
+A fixed 48px top bar present on all app pages (not login, not Aan workspace).
+
+```text
+[Amazon Logo v] [Demo Store (searchable) v] ──────── [Sun/Moon toggle] [Profile Avatar v]
 ```
 
-### 1.2 Fix Density Styles
+**Structure:**
+- **Left**: Marketplace dropdown (with real Amazon/Walmart logos as images), Account/Store dropdown with built-in search input
+- **Right**: Light/Dark mode toggle button, Profile avatar dropdown (Profile, Settings, Logout)
+- Height: 48px, sticky top, border-bottom, bg-card
+- The marketplace dropdown items show the real Amazon/Walmart logo images
+- The store dropdown has an input field at top for filtering store names
 
-**File: `src/index.css`**
+### Integration
+- Added to `AppLayout.tsx` above the sidebar+content flex
+- Marketplace and account selectors REMOVED from `AppSidebar.tsx`
+- Dark/Light toggle also remains in Preferences page
 
-Add density-aware CSS classes that tables and cards can use:
+### Assets needed
+- Amazon logo SVG/PNG saved to `src/assets/amazon-logo.png`
+- Walmart logo SVG/PNG saved to `src/assets/walmart-logo.png`
+
+---
+
+## Phase 2: Sidebar Updates
+
+### File: `src/components/layout/AppSidebar.tsx`
+
+**Remove:**
+- Marketplace selector section
+- Account selector section
+
+**Add:**
+- Collapse/expand toggle button at bottom of sidebar
+- When copilot panel opens, sidebar auto-collapses
+
+**Aan Button Redesign:**
+Replace the current gradient block with a sleek design:
+- Outlined button with subtle gradient border
+- Sparkles icon with gradient text
+- "Aan" in Allura font
+- On hover: gradient fills in softly
+- Not a solid gradient block (current "sticker" look)
+
+---
+
+## Phase 3: Copilot Panel Redesign
+
+### File: `src/components/aan/AanCopilotPanel.tsx`
+
+**Current:** Fixed right panel with backdrop blur overlay
+**New:** Inline side panel on the same layer
+
+Changes:
+- Remove the backdrop overlay (`bg-black/4 backdrop-blur`)
+- Panel renders as part of the layout flow, not fixed overlay
+- Content area shrinks to accommodate the panel
+- Sidebar auto-collapses when panel opens
+
+### File: `src/components/layout/AppLayout.tsx`
+
+Update layout to accommodate inline copilot:
+
+```text
+[Taskbar]
+[Sidebar | Main Content | Copilot Panel (when open)]
+```
+
+The copilot panel width (420px) is subtracted from main content area rather than overlaying.
+
+---
+
+## Phase 4: Floating Island Cleanup
+
+### File: `src/features/creative/FloatingActionIsland.tsx`
+
+**Fixed actions (same on all pages):**
+- Ask Aan (opens copilot)
+- Insights
+- Refresh
+- Export
+- Screenshot
+
+Remove all contextual/page-specific actions (New Campaign, Filter, Schedule).
+
+**Hidden routes:** `/login`, `/onboarding`, all `/settings` paths
+
+**Prominent reopen button:**
+- When closed, show a larger, more visible button (not tiny logo orb)
+- Use a pill shape with gradient border: `[Sparkles icon] Anarix` or just a larger rounded button with clear icon
+
+---
+
+## Phase 5: Master Dashboard / Workspace Screen
+
+### New Files:
+- `src/pages/workspace/Dashboard.tsx` -- Main workspace canvas
+- `src/components/workspace/WidgetCanvas.tsx` -- Grid-based canvas
+- `src/components/workspace/MetricWidget.tsx` -- Single KPI display
+- `src/components/workspace/ChartWidget.tsx` -- Chart with type switching
+- `src/components/workspace/TableWidget.tsx` -- Lightweight data table
+- `src/components/workspace/AnnotationWidget.tsx` -- Post-it note
+- `src/components/workspace/TaskWidget.tsx` -- Checkbox to-do list
+- `src/components/workspace/WidgetHeader.tsx` -- Shared widget header
+- `src/components/workspace/AddWidgetModal.tsx` -- Widget picker dialog
+
+### Navigation
+- Add "Workspace" as a new top-level nav item in sidebar (above Profitability)
+- Route: `/workspace`
+
+### Canvas Behavior
+- CSS Grid-based layout (not drag library initially -- use `react-resizable-panels` or CSS grid with manual sizing)
+- Widgets snap to grid cells
+- Each widget has: header (title + controls), body (content), resize handle
+- Global filters at top: Date range, Marketplace, Account
+- Widgets inherit global filters by default, can override locally (shown with indicator)
+
+### Widget Details
+
+**Metric Widget:**
+- Dropdown to select metric (ROAS, Spend, Sales, etc.)
+- Large number display
+- Optional delta percentage
+- Optional mini sparkline
+
+**Chart Widget:**
+- Platform selector (Amazon/Walmart)
+- Entity selector (Account/Campaign/Ad Group/Keyword/Product)
+- Primary metric (required) + up to 2 secondary
+- Chart type switcher: Line, Bar, Stacked Bar, Area, Pie, Table
+- Toggle controls: Legend, Axis labels, Grid
+- Uses existing Recharts library
+
+**Table Widget:**
+- Max 10-15 visible rows
+- Sort, filter, column visibility
+- "Open Full View" button routes to relevant Anarix screen
+
+**Annotation Widget:**
+- Textarea, max 10 lines, plain text
+- Optional link chip to a widget or dashboard
+
+**Task Widget:**
+- Checkbox list, max 10 items
+- Optional due date per item
+
+### State Persistence
+- Dashboard state saved to localStorage
+- Support: Duplicate, Rename, Reset
+
+---
+
+## Phase 6: Table Fixes
+
+### Issue: Hover rows overlap/misalign
+
+**Root cause:** Table rows may have content that overflows or inconsistent padding.
+
+### File: `src/components/ui/table.tsx`
+
+Fix TableRow hover:
+- Add `relative` to prevent z-index overlap issues
+- Ensure consistent row height
+
+### Global table CSS in `src/index.css`:
 
 ```css
-/* Density Modes */
-.density-comfortable {
-  --spacing-base: 4px;
-  --row-height: 44px;
-  --card-padding: 16px;
+/* Fix table hover overlap */
+table tbody tr {
+  position: relative;
 }
 
-.density-compact {
-  --spacing-base: 2px;
-  --row-height: 32px;
-  --card-padding: 12px;
+table tbody tr:hover {
+  z-index: 1;
 }
 
-/* Apply to table rows */
+/* Ensure consistent cell alignment */
+table th, table td {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+```
+
+### Per-table fixes:
+- `CatalogProductsTable.tsx`: Fix column alignment, ensure consistent widths
+- `CampaignTable.tsx`: Already looks correct, verify hover
+- All other tables: Audit for consistent header/cell alignment
+
+---
+
+## Phase 7: Geography Map Fix
+
+### File: `src/components/profitability/GeographyMap.tsx`
+
+Replace current simplified SVG paths with a proper world map vector. Use Natural Earth simplified world GeoJSON converted to SVG paths for accurate country boundaries.
+
+Key changes:
+- Accurate SVG paths for all continents
+- US, Canada, Mexico: colored by data intensity, `cursor: pointer` on hover
+- All other countries: muted fill, `cursor: default`
+- Hand cursor (pointer) on active regions
+- Map is scrollable/pannable within its container
+- Tooltip on hover showing country name + sales data
+
+---
+
+## Phase 8: Density Fix Verification
+
+### Current state:
+- `DensityContext.tsx` applies CSS classes correctly
+- `index.css` has `.density-compact` and `.density-comfortable` rules
+- Rules target `table tbody tr td` padding
+
+### Issue:
+Tables may use custom padding that overrides density. Need to ensure density CSS has higher specificity or uses `!important` for table cells.
+
+### Fix in `src/index.css`:
+```css
 .density-compact table tbody tr td {
-  padding-top: 4px;
-  padding-bottom: 4px;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
 }
 
-.density-compact .card {
-  padding: 12px;
-}
-```
-
----
-
-## Phase 2: Floating Island Route Hiding
-
-**File: `src/features/creative/FloatingActionIsland.tsx`**
-
-Update hidden routes array to include all settings pages:
-
-```typescript
-// Line 64: Change from
-const hiddenRoutes = ["/login", "/onboarding", "/settings"];
-
-// To:
-const hiddenRoutes = [
-  "/login",
-  "/onboarding",
-  "/settings/appearance",
-  "/settings/accounts",
-  "/settings/accounts/connect",
-];
-```
-
-Use startsWith matching which is already in place (line 76).
-
----
-
-## Phase 3: Aan Workspace Internal Split View
-
-### Current Flow (BROKEN)
-```text
-Aan Workspace -> Click Report -> Exits workspace -> Opens standalone split panel
-```
-
-### New Flow (CORRECT)
-```text
-Aan Workspace -> Click Report -> Sidebar hides -> Right panel shows INSIDE workspace
-```
-
-### 3.1 Add State to Aan Context
-
-**File: `src/components/aan/AanContext.tsx`**
-
-Add state for internal artifact viewing:
-
-```typescript
-// Add new state
-const [viewingArtifact, setViewingArtifact] = useState<AanDraft | null>(null);
-
-// Add new method
-const viewArtifact = (artifact: AanDraft) => {
-  setViewingArtifact(artifact);
-};
-
-const closeArtifactView = () => {
-  setViewingArtifact(null);
-};
-
-// Update openSplit to work within workspace
-const openSplit = (artifact: AanDraft) => {
-  // If in workspace mode, view internally
-  if (mode === "workspace") {
-    setViewingArtifact(artifact);
-  } else {
-    // Otherwise use standalone split view
-    setCurrentArtifact(artifact);
-    setMode("split");
-  }
-};
-```
-
-### 3.2 Update Aan Workspace Layout
-
-**File: `src/components/aan/AanWorkspace.tsx`**
-
-Add internal split view panel with sidebar toggle:
-
-```typescript
-import { useState } from "react";
-import { X, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useAan } from "./AanContext";
-import { AanWorkspaceSidebar } from "./AanWorkspaceSidebar";
-import { AanConversation } from "./AanConversation";
-import { AanInput } from "./AanInput";
-import { AanArtifactViewer } from "./AanArtifactViewer"; // NEW
-
-export function AanWorkspace() {
-  const { mode, closeAan, viewingArtifact, closeArtifactView } = useAan();
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  
-  const isOpen = mode === "workspace";
-  if (!isOpen) return null;
-
-  // When artifact is being viewed, hide sidebar
-  const showSidebar = sidebarExpanded && !viewingArtifact;
-  const showArtifactPanel = !!viewingArtifact;
-
-  return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-background">
-      {/* Header */}
-      <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 aan-gradient-text" />
-          <span className="font-aan text-aan aan-gradient-text font-bold">Aan</span>
-          <span className="text-sm text-muted-foreground">by Anarix</span>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          {/* Creative Sidebar Toggle Button */}
-          <button
-            onClick={() => setSidebarExpanded(!sidebarExpanded)}
-            className="relative h-8 w-8 rounded-full border border-border bg-card hover:bg-muted transition-all overflow-hidden group"
-            title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
-          >
-            <div className="absolute inset-0 aan-gradient opacity-0 group-hover:opacity-20 transition-opacity" />
-            {sidebarExpanded ? (
-              <ChevronLeft className="h-4 w-4 mx-auto" />
-            ) : (
-              <ChevronRight className="h-4 w-4 mx-auto" />
-            )}
-          </button>
-          
-          <Button variant="ghost" size="icon" onClick={closeAan} className="h-8 w-8 hover:bg-muted">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </header>
-
-      {/* Main Content with conditional layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - hidden when viewing artifact */}
-        {showSidebar && <AanWorkspaceSidebar />}
-
-        {/* Conversation Area */}
-        <main className="flex-1 flex flex-col overflow-hidden">
-          <AanConversation />
-          <AanInput />
-        </main>
-
-        {/* Artifact Viewer Panel - shown when artifact selected */}
-        {showArtifactPanel && (
-          <AanArtifactViewer
-            artifact={viewingArtifact}
-            onClose={closeArtifactView}
-          />
-        )}
-      </div>
-    </div>
-  );
+.density-compact table tbody tr {
+  height: 32px !important;
 }
 ```
 
-### 3.3 Create Aan Artifact Viewer Component
-
-**New File: `src/components/aan/AanArtifactViewer.tsx`**
-
-This is the RIGHT PANEL that shows report/audit content INSIDE the Aan workspace:
-
-```typescript
-// Contains the same content as AanSplitView but styled for embedded use
-// - No fixed positioning
-// - Uses flex layout within workspace
-// - Width: 50% of workspace
-// - Has own close button that calls closeArtifactView
-```
-
 ---
 
-## Phase 4: Circular Progress During Generation
+## Files Summary
 
-### 4.1 Create Circular Progress Component
-
-**New File: `src/components/ui/circular-progress.tsx`**
-
-```typescript
-interface CircularProgressProps {
-  progress: number; // 0-100
-  size?: number;
-  strokeWidth?: number;
-  label?: string;
-}
-
-export function CircularProgress({ 
-  progress, 
-  size = 64, 
-  strokeWidth = 4,
-  label 
-}: CircularProgressProps) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (progress / 100) * circumference;
-
-  return (
-    <div className="relative inline-flex items-center justify-center">
-      <svg width={size} height={size} className="transform -rotate-90">
-        {/* Background circle */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="hsl(var(--border))"
-          strokeWidth={strokeWidth}
-          fill="none"
-        />
-        {/* Progress circle with gradient */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="url(#progress-gradient)"
-          strokeWidth={strokeWidth}
-          fill="none"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          className="transition-all duration-300"
-        />
-        <defs>
-          <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(var(--aan-gradient-start))" />
-            <stop offset="50%" stopColor="hsl(var(--aan-gradient-mid))" />
-            <stop offset="100%" stopColor="hsl(var(--aan-gradient-end))" />
-          </linearGradient>
-        </defs>
-      </svg>
-      {/* Center text */}
-      <div className="absolute flex flex-col items-center">
-        <span className="text-lg font-bold text-foreground">{Math.round(progress)}%</span>
-        {label && <span className="text-xs text-muted-foreground">{label}</span>}
-      </div>
-    </div>
-  );
-}
-```
-
-### 4.2 Update Aan Input with Progress
-
-**File: `src/components/aan/AanInput.tsx`**
-
-Add progress state and timer:
-
-```typescript
-const [generationProgress, setGenerationProgress] = useState(0);
-
-// During 30 second generation
-if (isReportRequest(userMessage)) {
-  setIsGenerating(true);
-  setGenerationType("report");
-  
-  // Progress animation over 30 seconds
-  const progressInterval = setInterval(() => {
-    setGenerationProgress((p) => {
-      if (p >= 100) {
-        clearInterval(progressInterval);
-        return 100;
-      }
-      return p + (100 / 30); // Increment every second
-    });
-  }, 1000);
-
-  timerRef.current = setTimeout(() => {
-    clearInterval(progressInterval);
-    setGenerationProgress(0);
-    // ... add artifact message
-  }, 30000);
-}
-```
-
-### 4.3 Show Progress in Chat
-
-**File: `src/components/aan/AanConversation.tsx`**
-
-Add progress indicator that appears during generation:
-
-```typescript
-// At the end of messages list, show generation progress if active
-{isGenerating && (
-  <div className="flex items-center gap-4 p-4 rounded-lg border border-border bg-card/50">
-    <CircularProgress progress={generationProgress} size={56} />
-    <div>
-      <p className="font-medium text-foreground">
-        {generationType === "report" ? "Generating Report" : "Running Audit"}
-      </p>
-      <p className="text-sm text-muted-foreground">
-        {Math.ceil((100 - generationProgress) * 0.3)}s remaining
-      </p>
-    </div>
-  </div>
-)}
-```
-
----
-
-## Phase 5: Report & Audit Chat Summaries
-
-### 5.1 Enhanced Report Summary (Data Visualization Style)
-
-**File: `src/components/aan/AanInput.tsx`**
-
-Update `getReportSummary()` to return rich formatted content:
-
-```typescript
-const getReportSummary = () => `I've analyzed your Amazon advertising data for the last 7 days. Here's what I found:
-
-**Performance Summary:**
-• Total Ad Spend: $10,973.60
-• Total Ad Sales: $36,955.24
-• Overall ROAS: 3.37x
-
-**Top Performers:**
-Your best performing campaign is "SP | Bamboo | 8 inch | Queen" with a 6.01x ROAS, followed by "SB | Bed in a Box Mattress" at 6.19x ROAS. These campaigns are efficiently converting ad spend into sales.
-
-**Opportunities:**
-Consider optimizing "SP | Bamboo | Queen" (1.88x ROAS) and "SP | Bamboo | 8 inch | Twin" (2.04x ROAS) which are underperforming relative to your account average.
-
-Click the report below to view the full dashboard with detailed metrics.`;
-```
-
-### 5.2 Audit Summary (Paragraph Format)
-
-```typescript
-const getAuditSummary = () => `I've completed a comprehensive audit of your Amazon account. Here's what I found:
-
-**Overall Health Score: 78/100**
-
-Your account shows strong fundamentals with a few areas requiring attention. The most critical issue is your advertising efficiency, where I've identified significant wasted spend on non-converting keywords.
-
-Key findings include 15 high-spend, zero-conversion keywords that should be paused immediately, 23 products missing optimized backend search terms, and 8 products priced 5-10% higher than top competitors.
-
-On the positive side, all products have sufficient inventory health for the next 45 days.
-
-Click below to view the full audit report with actionable recommendations.`;
-```
-
----
-
-## Phase 6: Geography Map Fix
-
-**File: `src/components/profitability/GeographyMap.tsx`**
-
-Replace the current broken SVG with a proper world map:
-
-1. Add cursor: pointer to active countries
-2. Improve SVG paths for accurate country shapes
-3. Add hand cursor on hover for active regions
-
-```typescript
-// Update the path elements for active countries:
-<path
-  key={code}
-  d={country.path}
-  fill={getIntensityColor(country.sales)}
-  stroke={selectedRegion === code ? "hsl(var(--primary))" : "hsl(var(--border))"}
-  strokeWidth={selectedRegion === code ? 2.5 : 1}
-  className={cn(
-    "cursor-pointer transition-all duration-200",  // <- cursor-pointer added
-    hoveredCountry === code && "brightness-110"
-  )}
-  style={{ cursor: "pointer" }}  // <- explicit cursor style
-  onMouseEnter={() => setHoveredCountry(code)}
-  onMouseLeave={() => setHoveredCountry(null)}
-  onClick={() => onRegionSelect?.(code)}
-/>
-
-// For inactive world regions, keep cursor default:
-<path
-  key={code}
-  d={region.path}
-  fill="hsl(var(--muted))"
-  stroke="hsl(var(--border))"
-  strokeWidth={0.5}
-  className="opacity-40 cursor-default"  // <- cursor-default for inactive
-/>
-```
-
-Also improve the SVG viewport and paths for better visual representation.
-
----
-
-## Phase 7: Creative Sidebar Toggle Button Design
-
-The toggle button in the Aan workspace header should be sleek and unique:
-
-```typescript
-{/* Creative Sidebar Toggle - Sleek pill design */}
-<button
-  onClick={() => setSidebarExpanded(!sidebarExpanded)}
-  className="group relative flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-3 hover:border-primary/50 transition-all overflow-hidden"
-  title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
->
-  {/* Gradient hover effect */}
-  <div className="absolute inset-0 aan-gradient opacity-0 group-hover:opacity-10 transition-opacity" />
-  
-  {/* Animated chevrons */}
-  <div className="relative flex items-center">
-    {sidebarExpanded ? (
-      <>
-        <ChevronLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
-        <ChevronLeft className="h-3.5 w-3.5 -ml-2 opacity-50 transition-transform group-hover:-translate-x-0.5" />
-      </>
-    ) : (
-      <>
-        <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        <ChevronRight className="h-3.5 w-3.5 -ml-2 opacity-50 transition-transform group-hover:translate-x-0.5" />
-      </>
-    )}
-  </div>
-  
-  {/* Label - only when expanded */}
-  {sidebarExpanded && (
-    <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-      Hide
-    </span>
-  )}
-</button>
-```
-
----
-
-## Files to Create
-
+### New Files (10)
 | File | Purpose |
 |------|---------|
-| `src/components/ui/circular-progress.tsx` | Animated circular progress indicator |
-| `src/components/aan/AanArtifactViewer.tsx` | Embedded artifact viewer for workspace |
+| `src/components/layout/AppTaskbar.tsx` | Universal top taskbar |
+| `src/pages/workspace/Dashboard.tsx` | Workspace canvas page |
+| `src/components/workspace/WidgetCanvas.tsx` | Grid-based widget canvas |
+| `src/components/workspace/MetricWidget.tsx` | Single KPI widget |
+| `src/components/workspace/ChartWidget.tsx` | Chart exploration widget |
+| `src/components/workspace/TableWidget.tsx` | Lightweight table widget |
+| `src/components/workspace/AnnotationWidget.tsx` | Post-it note widget |
+| `src/components/workspace/TaskWidget.tsx` | To-do list widget |
+| `src/components/workspace/WidgetHeader.tsx` | Shared widget header |
+| `src/components/workspace/AddWidgetModal.tsx` | Widget type picker |
 
-## Files to Modify
-
+### Modified Files (10)
 | File | Changes |
 |------|---------|
-| `src/contexts/ThemeContext.tsx` | Default to "light" instead of "system" |
-| `src/index.css` | Add density CSS classes |
-| `src/features/creative/FloatingActionIsland.tsx` | Expand hidden routes list |
-| `src/components/aan/AanContext.tsx` | Add viewingArtifact state and methods |
-| `src/components/aan/AanWorkspace.tsx` | Add sidebar toggle and embedded viewer |
-| `src/components/aan/AanInput.tsx` | Add circular progress during generation |
-| `src/components/aan/AanConversation.tsx` | Show progress indicator and pass generation state |
-| `src/components/profitability/GeographyMap.tsx` | Add cursor pointer styles |
+| `src/components/layout/AppLayout.tsx` | Add taskbar, inline copilot support, sidebar collapse |
+| `src/components/layout/AppSidebar.tsx` | Remove selectors, add collapse button, redesign Aan button, add Workspace nav |
+| `src/components/aan/AanCopilotPanel.tsx` | Remove overlay/blur, make inline side panel |
+| `src/features/creative/FloatingActionIsland.tsx` | Universal fixed actions, prominent reopen, hide on login/settings |
+| `src/components/profitability/GeographyMap.tsx` | Proper world map SVG, cursor pointer |
+| `src/components/ui/table.tsx` | Fix hover overlap with relative positioning |
+| `src/index.css` | Density fixes, table alignment CSS |
+| `src/App.tsx` | Add workspace route |
+| `src/contexts/ThemeContext.tsx` | Verify light default |
+| `src/components/aan/AanContext.tsx` | Add sidebar collapse communication |
+
+### Asset Files (2)
+| File | Purpose |
+|------|---------|
+| `src/assets/amazon-logo.png` | Amazon marketplace logo |
+| `src/assets/walmart-logo.png` | Walmart marketplace logo |
 
 ---
 
 ## Implementation Order
 
-1. Theme default to light + density CSS
-2. Floating island route hiding
-3. Circular progress component
-4. Aan context updates for internal viewing
-5. Aan workspace layout with sidebar toggle
-6. Artifact viewer component
-7. Update report/audit summaries
-8. Geography map cursor fix
-9. Test end-to-end report generation flow
+1. Universal top taskbar + remove selectors from sidebar
+2. Sidebar collapse button + Aan button redesign
+3. Copilot panel inline (remove overlay/blur)
+4. Floating island cleanup + prominent reopen
+5. Table hover/alignment fixes
+6. Geography map SVG replacement
+7. Density CSS specificity fix
+8. Workspace page + widget system (largest piece)
+9. Route registration + navigation update
+10. End-to-end testing
 
