@@ -2,14 +2,11 @@ import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/status/StatusBadge";
+import { DeltaBadge } from "@/components/ui/delta-badge";
+import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockProductAds, productAdsTotals } from "@/data/mockProductAds";
 import { cn } from "@/lib/utils";
 
@@ -28,29 +25,27 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
 
   const toggleRow = (id: string) => {
     const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
+    if (newSelected.has(id)) newSelected.delete(id);
+    else newSelected.add(id);
     setSelectedRows(newSelected);
   };
 
   const toggleAll = () => {
-    if (selectedRows.size === filteredAds.length) {
-      setSelectedRows(new Set());
-    } else {
-      setSelectedRows(new Set(filteredAds.map((a) => a.id)));
-    }
+    if (selectedRows.size === filteredAds.length) setSelectedRows(new Set());
+    else setSelectedRows(new Set(filteredAds.map((a) => a.id)));
   };
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
-
-  const formatNumber = (value: number) =>
-    new Intl.NumberFormat("en-US").format(value);
-
+  const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
+
+  const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
+    <div className="flex flex-col items-end">
+      <span className="text-foreground">{formatted}</span>
+      <DeltaBadge value={getDelta(id, metric)} />
+    </div>
+  );
 
   return (
     <div className="rounded-lg border border-border bg-card">
@@ -58,12 +53,7 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-10">
-                <Checkbox
-                  checked={selectedRows.size === filteredAds.length && filteredAds.length > 0}
-                  onCheckedChange={toggleAll}
-                />
-              </TableHead>
+              <TableHead className="w-10"><Checkbox checked={selectedRows.size === filteredAds.length && filteredAds.length > 0} onCheckedChange={toggleAll} /></TableHead>
               <TableHead className="w-24">Status</TableHead>
               <TableHead className="min-w-[300px]">Product Ad</TableHead>
               <TableHead className="min-w-[150px]">Ad Group</TableHead>
@@ -83,67 +73,43 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredAds.map((ad) => (
-              <TableRow
-                key={ad.id}
-                className={cn(
-                  "transition-colors",
-                  selectedRows.has(ad.id) && "bg-primary/5"
-                )}
-              >
-                <TableCell>
-                  <Checkbox
-                    checked={selectedRows.has(ad.id)}
-                    onCheckedChange={() => toggleRow(ad.id)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={ad.status} />
-                </TableCell>
+              <TableRow key={ad.id} className={cn("transition-colors", selectedRows.has(ad.id) && "bg-primary/5")}>
+                <TableCell><Checkbox checked={selectedRows.has(ad.id)} onCheckedChange={() => toggleRow(ad.id)} /></TableCell>
+                <TableCell><StatusBadge status={ad.status} /></TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <img
-                      src={ad.productImage}
-                      alt={ad.productName}
-                      className="h-10 w-10 rounded-md object-cover"
-                    />
+                    <img src={ad.productImage} alt={ad.productName} className="h-10 w-10 rounded-md object-cover" />
                     <div className="flex flex-col">
                       <span className="font-medium text-foreground">{ad.productName}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {ad.itemId} · {ad.sku}
-                      </span>
+                      <span className="text-xs text-muted-foreground">{ad.itemId} · {ad.sku}</span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="text-foreground">{ad.adGroupName}</TableCell>
                 <TableCell className="text-foreground">{ad.campaignName}</TableCell>
-                <TableCell className="text-center">
-                  <Switch checked={ad.bidAutomation} disabled />
-                </TableCell>
-                <TableCell className="text-right">{formatCurrency(ad.minBid)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(ad.maxBid)}</TableCell>
-                <TableCell className="text-right font-medium">{formatCurrency(ad.productBid)}</TableCell>
-                <TableCell className="text-right">{formatNumber(ad.impressions)}</TableCell>
-                <TableCell className="text-right">{formatNumber(ad.clicks)}</TableCell>
-                <TableCell className="text-right">{formatPercent(ad.ctr)}</TableCell>
-                <TableCell className="text-right">{formatNumber(ad.adUnits)}</TableCell>
-                <TableCell className="text-right">{formatPercent(ad.cvr)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(ad.cpc)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(ad.adSpend)}</TableCell>
+                <TableCell className="text-center"><Switch checked={ad.bidAutomation} disabled /></TableCell>
+                <TableCell className="text-right text-foreground">{formatCurrency(ad.minBid)}</TableCell>
+                <TableCell className="text-right text-foreground">{formatCurrency(ad.maxBid)}</TableCell>
+                <TableCell className="text-right font-medium text-foreground">{formatCurrency(ad.productBid)}</TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(ad.impressions)} id={ad.id} metric="impressions" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(ad.clicks)} id={ad.id} metric="clicks" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatPercent(ad.ctr)} id={ad.id} metric="ctr" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(ad.adUnits)} id={ad.id} metric="adUnits" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatPercent(ad.cvr)} id={ad.id} metric="cvr" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatCurrency(ad.cpc)} id={ad.id} metric="cpc" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatCurrency(ad.adSpend)} id={ad.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
-            {/* Total Row */}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={5} className="font-semibold">
-                Total ({filteredAds.length} product ads)
-              </TableCell>
+              <TableCell colSpan={5} className="font-semibold">Total ({filteredAds.length} product ads)</TableCell>
               <TableCell colSpan={4}></TableCell>
-              <TableCell className="text-right">{formatNumber(productAdsTotals.impressions)}</TableCell>
-              <TableCell className="text-right">{formatNumber(productAdsTotals.clicks)}</TableCell>
-              <TableCell className="text-right">{formatPercent(productAdsTotals.ctr)}</TableCell>
-              <TableCell className="text-right">{formatNumber(productAdsTotals.adUnits)}</TableCell>
-              <TableCell className="text-right">{formatPercent(productAdsTotals.cvr)}</TableCell>
-              <TableCell className="text-right">{formatCurrency(productAdsTotals.cpc)}</TableCell>
-              <TableCell className="text-right">{formatCurrency(productAdsTotals.adSpend)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.impressions)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.clicks)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatPercent(productAdsTotals.ctr)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.adUnits)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatPercent(productAdsTotals.cvr)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatCurrency(productAdsTotals.cpc)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatCurrency(productAdsTotals.adSpend)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

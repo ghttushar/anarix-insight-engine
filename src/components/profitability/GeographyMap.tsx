@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { useState, useMemo } from "react";
+import { ZoomIn, ZoomOut, RotateCcw, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface GeographyMapProps {
@@ -7,56 +7,157 @@ interface GeographyMapProps {
   onRegionSelect?: (regionId: string) => void;
 }
 
-// Simplified but recognizable country/region paths for a world map
-// Active regions: USA, Canada, Mexico
-const activeCountries: Record<string, { path: string; name: string; sales: number; labelX: number; labelY: number }> = {
-  USA: {
-    path: "M50,95 L55,90 L65,88 L80,87 L95,88 L105,90 L120,92 L130,95 L128,100 L132,108 L125,115 L118,118 L108,120 L100,125 L108,130 L106,138 L98,135 L88,140 L80,138 L72,142 L65,140 L60,148 L52,145 L48,135 L42,128 L35,120 L28,112 L25,100 L30,92 L40,90 Z",
-    name: "United States",
-    sales: 156789,
-    labelX: 78,
-    labelY: 115,
-  },
-  CAN: {
-    path: "M25,30 L40,25 L60,22 L80,20 L100,22 L120,25 L135,30 L142,40 L140,52 L135,62 L130,72 L128,80 L120,85 L105,87 L95,86 L80,85 L65,86 L55,88 L45,88 L35,85 L25,80 L20,70 L18,55 L20,40 Z",
-    name: "Canada",
-    sales: 45678,
-    labelX: 80,
-    labelY: 55,
-  },
-  MEX: {
-    path: "M28,118 L35,125 L42,132 L48,140 L52,148 L60,155 L68,162 L75,168 L80,172 L78,178 L70,182 L60,180 L50,175 L42,168 L35,158 L28,148 L24,138 L22,128 Z",
-    name: "Mexico",
-    sales: 23456,
-    labelX: 50,
-    labelY: 158,
-  },
-};
+// Hexagonal dot-grid world map
+// Each point represents a geographic area using an offset hex grid
+// Coordinates are col, row in a hex grid mapped to approximate lat/lng
 
-// Decorative continent outlines (not interactive)
-const decorativePaths: { path: string; name: string }[] = [
+interface HexPoint {
+  col: number;
+  row: number;
+  country: string;
+}
+
+// Generate hex grid points that form continent shapes
+// Grid: cols 0-60, rows 0-30
+const hexPoints: HexPoint[] = [
+  // North America - Canada
+  ...[
+    [12,3],[13,3],[14,3],[15,3],[16,3],[17,3],[18,3],
+    [11,4],[12,4],[13,4],[14,4],[15,4],[16,4],[17,4],[18,4],[19,4],
+    [10,5],[11,5],[12,5],[13,5],[14,5],[15,5],[16,5],[17,5],[18,5],[19,5],
+    [10,6],[11,6],[12,6],[13,6],[14,6],[15,6],[16,6],[17,6],[18,6],
+  ].map(([c,r]) => ({ col: c, row: r, country: "CAN" })),
+  
+  // North America - USA
+  ...[
+    [10,7],[11,7],[12,7],[13,7],[14,7],[15,7],[16,7],[17,7],
+    [10,8],[11,8],[12,8],[13,8],[14,8],[15,8],[16,8],[17,8],
+    [11,9],[12,9],[13,9],[14,9],[15,9],[16,9],[17,9],
+    [12,10],[13,10],[14,10],[15,10],[16,10],
+  ].map(([c,r]) => ({ col: c, row: r, country: "USA" })),
+  
+  // North America - Mexico
+  ...[
+    [10,10],[11,10],[12,11],[13,11],
+    [10,11],[11,11],
+    [10,12],[11,12],[12,12],
+  ].map(([c,r]) => ({ col: c, row: r, country: "MEX" })),
+  
+  // Central America & Caribbean
+  ...[
+    [13,12],[14,12],[15,12],
+    [14,13],[15,13],
+  ].map(([c,r]) => ({ col: c, row: r, country: "OTHER" })),
+  
   // South America
-  { path: "M80,190 L95,185 L108,195 L115,215 L112,240 L105,260 L92,270 L78,262 L72,245 L70,225 L72,205 Z", name: "South America" },
+  ...[
+    [16,14],[17,14],[18,14],[19,14],
+    [16,15],[17,15],[18,15],[19,15],[20,15],
+    [16,16],[17,16],[18,16],[19,16],[20,16],[21,16],
+    [17,17],[18,17],[19,17],[20,17],[21,17],
+    [17,18],[18,18],[19,18],[20,18],[21,18],
+    [18,19],[19,19],[20,19],[21,19],
+    [18,20],[19,20],[20,20],
+    [19,21],[20,21],
+    [19,22],[20,22],
+    [19,23],[20,23],
+    [19,24],
+  ].map(([c,r]) => ({ col: c, row: r, country: "OTHER" })),
+  
   // Europe
-  { path: "M230,55 L240,50 L255,48 L268,52 L275,60 L272,72 L265,80 L255,82 L245,78 L235,72 L228,62 Z", name: "Europe" },
+  ...[
+    [28,3],[29,3],[30,3],[31,3],[32,3],
+    [27,4],[28,4],[29,4],[30,4],[31,4],[32,4],[33,4],
+    [27,5],[28,5],[29,5],[30,5],[31,5],[32,5],[33,5],[34,5],
+    [28,6],[29,6],[30,6],[31,6],[32,6],[33,6],[34,6],
+    [29,7],[30,7],[31,7],[32,7],[33,7],
+    [29,8],[30,8],[31,8],[32,8],
+  ].map(([c,r]) => ({ col: c, row: r, country: "OTHER" })),
+  
   // Africa
-  { path: "M235,95 L250,90 L268,92 L278,100 L280,118 L275,140 L265,155 L250,162 L238,158 L228,145 L225,125 L228,108 Z", name: "Africa" },
-  // Asia
-  { path: "M280,35 L300,30 L325,28 L350,32 L365,42 L370,58 L365,75 L355,88 L340,92 L320,90 L300,85 L285,75 L278,60 L275,45 Z", name: "Asia" },
+  ...[
+    [29,9],[30,9],[31,9],[32,9],
+    [28,10],[29,10],[30,10],[31,10],[32,10],[33,10],
+    [28,11],[29,11],[30,11],[31,11],[32,11],[33,11],
+    [29,12],[30,12],[31,12],[32,12],[33,12],
+    [29,13],[30,13],[31,13],[32,13],[33,13],
+    [30,14],[31,14],[32,14],[33,14],
+    [30,15],[31,15],[32,15],
+    [31,16],[32,16],
+    [31,17],[32,17],
+    [32,18],
+  ].map(([c,r]) => ({ col: c, row: r, country: "OTHER" })),
+  
   // Middle East
-  { path: "M272,72 L285,68 L295,72 L298,82 L292,90 L282,92 L275,85 Z", name: "Middle East" },
-  // Oceania / Australia
-  { path: "M340,165 L360,158 L378,162 L385,175 L380,190 L365,198 L348,195 L338,182 Z", name: "Australia" },
-  // Southeast Asia islands
-  { path: "M345,100 L358,95 L368,100 L372,110 L365,118 L352,120 L342,112 Z", name: "SE Asia" },
+  ...[
+    [34,7],[35,7],[36,7],
+    [34,8],[35,8],[36,8],[37,8],
+    [35,9],[36,9],[37,9],
+    [35,10],[36,10],
+  ].map(([c,r]) => ({ col: c, row: r, country: "OTHER" })),
+  
+  // Asia (Russia + Central + East)
+  ...[
+    [34,2],[35,2],[36,2],[37,2],[38,2],[39,2],[40,2],[41,2],[42,2],[43,2],[44,2],[45,2],[46,2],
+    [34,3],[35,3],[36,3],[37,3],[38,3],[39,3],[40,3],[41,3],[42,3],[43,3],[44,3],[45,3],[46,3],[47,3],
+    [35,4],[36,4],[37,4],[38,4],[39,4],[40,4],[41,4],[42,4],[43,4],[44,4],[45,4],[46,4],[47,4],
+    [36,5],[37,5],[38,5],[39,5],[40,5],[41,5],[42,5],[43,5],[44,5],[45,5],[46,5],
+    [37,6],[38,6],[39,6],[40,6],[41,6],[42,6],[43,6],[44,6],[45,6],
+    [38,7],[39,7],[40,7],[41,7],[42,7],[43,7],[44,7],
+    [38,8],[39,8],[40,8],[41,8],[42,8],[43,8],
+  ].map(([c,r]) => ({ col: c, row: r, country: "OTHER" })),
+  
+  // India / SE Asia
+  ...[
+    [39,9],[40,9],[41,9],[42,9],
+    [39,10],[40,10],[41,10],[42,10],[43,10],
+    [40,11],[41,11],[42,11],[43,11],
+    [41,12],[42,12],[43,12],[44,12],
+    [42,13],[43,13],[44,13],
+  ].map(([c,r]) => ({ col: c, row: r, country: "OTHER" })),
+  
+  // Australia
+  ...[
+    [44,16],[45,16],[46,16],[47,16],
+    [43,17],[44,17],[45,17],[46,17],[47,17],[48,17],
+    [43,18],[44,18],[45,18],[46,18],[47,18],[48,18],
+    [44,19],[45,19],[46,19],[47,19],[48,19],
+    [45,20],[46,20],[47,20],
+  ].map(([c,r]) => ({ col: c, row: r, country: "OTHER" })),
+  
+  // Japan / Korea
+  ...[
+    [46,7],[47,7],
+    [46,8],[47,8],
+    [47,9],
+  ].map(([c,r]) => ({ col: c, row: r, country: "OTHER" })),
 ];
 
-const getIntensityColor = (sales: number): string => {
-  if (sales >= 100000) return "hsl(var(--primary) / 0.8)";
-  if (sales >= 50000) return "hsl(var(--primary) / 0.5)";
-  if (sales >= 25000) return "hsl(var(--primary) / 0.35)";
-  return "hsl(var(--primary) / 0.2)";
+const activeCountryData: Record<string, { name: string; sales: number; orders: number; color: string }> = {
+  USA: { name: "United States", sales: 156789, orders: 12450, color: "0.7" },
+  CAN: { name: "Canada", sales: 45678, orders: 3210, color: "0.45" },
+  MEX: { name: "Mexico", sales: 23456, orders: 1890, color: "0.3" },
 };
+
+const HEX_SIZE = 7;
+const HEX_GAP = 1.5;
+
+function hexToPixel(col: number, row: number): { x: number; y: number } {
+  const w = (HEX_SIZE * 2 + HEX_GAP);
+  const h = (HEX_SIZE * Math.sqrt(3) + HEX_GAP);
+  const x = col * w + (row % 2 === 1 ? w / 2 : 0);
+  const y = row * h * 0.85;
+  return { x: x + 20, y: y + 20 };
+}
+
+function hexPath(cx: number, cy: number, size: number): string {
+  const points: string[] = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI / 180) * (60 * i - 30);
+    points.push(`${cx + size * Math.cos(angle)},${cy + size * Math.sin(angle)}`);
+  }
+  return `M${points.join("L")}Z`;
+}
 
 export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapProps) {
   const [zoom, setZoom] = useState(1);
@@ -74,15 +175,24 @@ export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapPro
     setIsPanning(true);
     setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
   };
-
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isPanning) return;
     setPan({ x: e.clientX - panStart.x, y: e.clientY - panStart.y });
   };
-
   const handleMouseUp = () => setIsPanning(false);
 
-  const hoveredData = hoveredCountry ? activeCountries[hoveredCountry] : null;
+  const hoveredData = hoveredCountry ? activeCountryData[hoveredCountry] : null;
+
+  // Compute SVG viewBox based on hex positions
+  const viewBox = useMemo(() => {
+    let maxX = 0, maxY = 0;
+    hexPoints.forEach(({ col, row }) => {
+      const { x, y } = hexToPixel(col, row);
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+    });
+    return `0 0 ${maxX + 40} ${maxY + 40}`;
+  }, []);
 
   return (
     <div className="rounded-lg border border-border bg-card p-4">
@@ -102,7 +212,7 @@ export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapPro
       </div>
 
       <div
-        className="relative h-[400px] overflow-hidden rounded-lg bg-muted/10 border border-border select-none"
+        className="relative h-[400px] overflow-hidden rounded-lg bg-muted/5 border border-border select-none"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -110,7 +220,7 @@ export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapPro
         style={{ cursor: isPanning ? "grabbing" : "grab" }}
       >
         <svg
-          viewBox="0 0 420 280"
+          viewBox={viewBox}
           className="h-full w-full"
           style={{
             transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
@@ -119,57 +229,77 @@ export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapPro
           }}
           preserveAspectRatio="xMidYMid meet"
         >
-          {/* Decorative continents */}
-          {decorativePaths.map((region) => (
-            <path
-              key={region.name}
-              d={region.path}
-              fill="hsl(var(--muted))"
-              stroke="hsl(var(--border))"
-              strokeWidth={0.5}
-              className="opacity-50"
-              style={{ cursor: "default" }}
-            />
-          ))}
-
-          {/* Active countries */}
-          {Object.entries(activeCountries).map(([code, country]) => (
-            <g key={code}>
+          {hexPoints.map(({ col, row, country }, i) => {
+            const { x, y } = hexToPixel(col, row);
+            const isActive = country in activeCountryData;
+            const isSelected = selectedRegion === country;
+            const isHovered = hoveredCountry === country;
+            
+            let fill: string;
+            if (isActive) {
+              const opacity = activeCountryData[country].color;
+              fill = `hsl(var(--primary) / ${isHovered ? parseFloat(opacity) + 0.15 : opacity})`;
+            } else {
+              fill = "hsl(var(--muted-foreground) / 0.08)";
+            }
+            
+            return (
               <path
-                d={country.path}
-                fill={getIntensityColor(country.sales)}
-                stroke={selectedRegion === code ? "hsl(var(--primary))" : "hsl(var(--border))"}
-                strokeWidth={selectedRegion === code ? 2 : 0.8}
-                style={{ cursor: "pointer" }}
-                className="transition-all duration-150 hover:brightness-110"
-                onMouseEnter={() => setHoveredCountry(code)}
+                key={`${col}-${row}-${i}`}
+                d={hexPath(x, y, HEX_SIZE)}
+                fill={fill}
+                stroke={isSelected ? "hsl(var(--primary))" : isActive ? "hsl(var(--primary) / 0.2)" : "transparent"}
+                strokeWidth={isSelected ? 1.5 : 0.5}
+                style={{ cursor: isActive ? "pointer" : "default" }}
+                className="transition-all duration-150"
+                onMouseEnter={() => isActive && setHoveredCountry(country)}
                 onMouseLeave={() => setHoveredCountry(null)}
                 onClick={(e) => {
+                  if (!isActive) return;
                   e.stopPropagation();
-                  onRegionSelect?.(code);
+                  onRegionSelect?.(country);
                 }}
               />
-              <text
-                x={country.labelX}
-                y={country.labelY}
-                className="fill-foreground pointer-events-none"
-                textAnchor="middle"
-                fontSize={6}
-                fontWeight={500}
-              >
-                {code}
-              </text>
-            </g>
-          ))}
+            );
+          })}
         </svg>
 
-        {/* Tooltip */}
+        {/* Floating metric cards for active regions */}
+        {Object.entries(activeCountryData).map(([code, data]) => {
+          // Position cards near each country
+          const positions: Record<string, { left: string; top: string }> = {
+            USA: { left: "22%", top: "42%" },
+            CAN: { left: "25%", top: "15%" },
+            MEX: { left: "12%", top: "58%" },
+          };
+          const pos = positions[code];
+          if (!pos) return null;
+          
+          return (
+            <div
+              key={code}
+              className={`absolute rounded-md border bg-popover/95 backdrop-blur-sm px-2.5 py-1.5 shadow-sm transition-all duration-150 ${
+                selectedRegion === code ? "border-primary ring-1 ring-primary/20" : "border-border"
+              } ${hoveredCountry === code ? "scale-105" : ""}`}
+              style={{ left: pos.left, top: pos.top, pointerEvents: "none" }}
+            >
+              <div className="flex items-center gap-1.5">
+                <MapPin className="h-3 w-3 text-primary" />
+                <span className="text-xs font-medium text-foreground">{data.name}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                ${data.sales.toLocaleString()}
+              </p>
+            </div>
+          );
+        })}
+
+        {/* Tooltip on hover */}
         {hoveredData && (
           <div className="absolute bottom-3 left-3 rounded-lg border border-border bg-popover px-3 py-2 shadow-lg z-10">
             <p className="font-medium text-foreground text-sm">{hoveredData.name}</p>
-            <p className="text-xs text-muted-foreground">
-              Sales: ${hoveredData.sales.toLocaleString()}
-            </p>
+            <p className="text-xs text-muted-foreground">Sales: ${hoveredData.sales.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Orders: {hoveredData.orders.toLocaleString()}</p>
           </div>
         )}
 
@@ -192,7 +322,7 @@ export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapPro
           <span className="text-[10px] text-muted-foreground">High</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="h-2.5 w-2.5 rounded-full bg-muted opacity-50" />
+          <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "hsl(var(--muted-foreground) / 0.08)" }} />
           <span className="text-[10px] text-muted-foreground">No data</span>
         </div>
       </div>

@@ -2,13 +2,10 @@ import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import { DeltaBadge } from "@/components/ui/delta-badge";
+import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockSearchTerms, searchTermsTotals } from "@/data/mockSearchTerms";
 import { cn } from "@/lib/utils";
 
@@ -33,29 +30,27 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
 
   const toggleRow = (id: string) => {
     const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
+    if (newSelected.has(id)) newSelected.delete(id);
+    else newSelected.add(id);
     setSelectedRows(newSelected);
   };
 
   const toggleAll = () => {
-    if (selectedRows.size === filteredTerms.length) {
-      setSelectedRows(new Set());
-    } else {
-      setSelectedRows(new Set(filteredTerms.map((t) => t.id)));
-    }
+    if (selectedRows.size === filteredTerms.length) setSelectedRows(new Set());
+    else setSelectedRows(new Set(filteredTerms.map((t) => t.id)));
   };
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
-
-  const formatNumber = (value: number) =>
-    new Intl.NumberFormat("en-US").format(value);
-
+  const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
+
+  const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
+    <div className="flex flex-col items-end">
+      <span className="text-foreground">{formatted}</span>
+      <DeltaBadge value={getDelta(id, metric)} />
+    </div>
+  );
 
   return (
     <div className="rounded-lg border border-border bg-card">
@@ -63,12 +58,7 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-10">
-                <Checkbox
-                  checked={selectedRows.size === filteredTerms.length && filteredTerms.length > 0}
-                  onCheckedChange={toggleAll}
-                />
-              </TableHead>
+              <TableHead className="w-10"><Checkbox checked={selectedRows.size === filteredTerms.length && filteredTerms.length > 0} onCheckedChange={toggleAll} /></TableHead>
               <TableHead className="min-w-[200px]">Search Term</TableHead>
               <TableHead className="min-w-[250px]">Product Ad</TableHead>
               <TableHead className="min-w-[150px]">Keyword</TableHead>
@@ -86,27 +76,12 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredTerms.map((term) => (
-              <TableRow
-                key={term.id}
-                className={cn(
-                  "transition-colors",
-                  selectedRows.has(term.id) && "bg-primary/5"
-                )}
-              >
-                <TableCell>
-                  <Checkbox
-                    checked={selectedRows.has(term.id)}
-                    onCheckedChange={() => toggleRow(term.id)}
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{term.searchTerm}</TableCell>
+              <TableRow key={term.id} className={cn("transition-colors", selectedRows.has(term.id) && "bg-primary/5")}>
+                <TableCell><Checkbox checked={selectedRows.has(term.id)} onCheckedChange={() => toggleRow(term.id)} /></TableCell>
+                <TableCell className="font-medium text-foreground">{term.searchTerm}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <img
-                      src={term.productImage}
-                      alt={term.productName}
-                      className="h-8 w-8 rounded object-cover"
-                    />
+                    <img src={term.productImage} alt={term.productName} className="h-8 w-8 rounded object-cover" />
                     <div className="flex flex-col">
                       <span className="text-sm text-foreground">{term.productName}</span>
                       <span className="text-xs text-muted-foreground">{term.itemId}</span>
@@ -114,37 +89,27 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
                   </div>
                 </TableCell>
                 <TableCell className="text-foreground">{term.keyword}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={cn("text-xs uppercase", matchTypeColors[term.matchType])}
-                  >
-                    {term.matchType}
-                  </Badge>
-                </TableCell>
+                <TableCell><Badge variant="outline" className={cn("text-xs uppercase", matchTypeColors[term.matchType])}>{term.matchType}</Badge></TableCell>
                 <TableCell className="text-foreground">{term.adGroupName}</TableCell>
                 <TableCell className="text-foreground">{term.campaignName}</TableCell>
-                <TableCell className="text-right">{formatNumber(term.impressions)}</TableCell>
-                <TableCell className="text-right">{formatNumber(term.clicks)}</TableCell>
-                <TableCell className="text-right">{formatPercent(term.ctr)}</TableCell>
-                <TableCell className="text-right">{formatNumber(term.adUnits)}</TableCell>
-                <TableCell className="text-right">{formatPercent(term.cvr)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(term.cpc)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(term.adSpend)}</TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(term.impressions)} id={term.id} metric="impressions" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(term.clicks)} id={term.id} metric="clicks" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatPercent(term.ctr)} id={term.id} metric="ctr" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(term.adUnits)} id={term.id} metric="adUnits" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatPercent(term.cvr)} id={term.id} metric="cvr" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatCurrency(term.cpc)} id={term.id} metric="cpc" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatCurrency(term.adSpend)} id={term.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
-            {/* Total Row */}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={7} className="font-semibold">
-                Total ({filteredTerms.length} search terms)
-              </TableCell>
-              <TableCell className="text-right">{formatNumber(searchTermsTotals.impressions)}</TableCell>
-              <TableCell className="text-right">{formatNumber(searchTermsTotals.clicks)}</TableCell>
-              <TableCell className="text-right">{formatPercent(searchTermsTotals.ctr)}</TableCell>
-              <TableCell className="text-right">{formatNumber(searchTermsTotals.adUnits)}</TableCell>
-              <TableCell className="text-right">{formatPercent(searchTermsTotals.cvr)}</TableCell>
-              <TableCell className="text-right">{formatCurrency(searchTermsTotals.cpc)}</TableCell>
-              <TableCell className="text-right">{formatCurrency(searchTermsTotals.adSpend)}</TableCell>
+              <TableCell colSpan={7} className="font-semibold">Total ({filteredTerms.length} search terms)</TableCell>
+              <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.impressions)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.clicks)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatPercent(searchTermsTotals.ctr)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.adUnits)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatPercent(searchTermsTotals.cvr)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatCurrency(searchTermsTotals.cpc)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatCurrency(searchTermsTotals.adSpend)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

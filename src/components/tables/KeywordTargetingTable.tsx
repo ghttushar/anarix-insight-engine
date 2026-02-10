@@ -3,14 +3,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/status/StatusBadge";
+import { DeltaBadge } from "@/components/ui/delta-badge";
+import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockKeywords, keywordsTotals } from "@/data/mockKeywords";
 import { cn } from "@/lib/utils";
 
@@ -35,29 +32,27 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
 
   const toggleRow = (id: string) => {
     const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
+    if (newSelected.has(id)) newSelected.delete(id);
+    else newSelected.add(id);
     setSelectedRows(newSelected);
   };
 
   const toggleAll = () => {
-    if (selectedRows.size === filteredKeywords.length) {
-      setSelectedRows(new Set());
-    } else {
-      setSelectedRows(new Set(filteredKeywords.map((k) => k.id)));
-    }
+    if (selectedRows.size === filteredKeywords.length) setSelectedRows(new Set());
+    else setSelectedRows(new Set(filteredKeywords.map((k) => k.id)));
   };
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
-
-  const formatNumber = (value: number) =>
-    new Intl.NumberFormat("en-US").format(value);
-
+  const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
+
+  const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
+    <div className="flex flex-col items-end">
+      <span className="text-foreground">{formatted}</span>
+      <DeltaBadge value={getDelta(id, metric)} />
+    </div>
+  );
 
   return (
     <div className="rounded-lg border border-border bg-card">
@@ -65,12 +60,7 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-10">
-                <Checkbox
-                  checked={selectedRows.size === filteredKeywords.length && filteredKeywords.length > 0}
-                  onCheckedChange={toggleAll}
-                />
-              </TableHead>
+              <TableHead className="w-10"><Checkbox checked={selectedRows.size === filteredKeywords.length && filteredKeywords.length > 0} onCheckedChange={toggleAll} /></TableHead>
               <TableHead className="w-24">Status</TableHead>
               <TableHead className="min-w-[200px]">Keyword</TableHead>
               <TableHead className="w-24">Match Type</TableHead>
@@ -91,76 +81,43 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
           </TableHeader>
           <TableBody>
             {filteredKeywords.map((keyword) => (
-              <TableRow
-                key={keyword.id}
-                className={cn(
-                  "transition-colors",
-                  selectedRows.has(keyword.id) && "bg-primary/5"
-                )}
-              >
-                <TableCell>
-                  <Checkbox
-                    checked={selectedRows.has(keyword.id)}
-                    onCheckedChange={() => toggleRow(keyword.id)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={keyword.status} />
-                </TableCell>
-                <TableCell className="font-medium">{keyword.keyword}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={cn("text-xs uppercase", matchTypeColors[keyword.matchType])}
-                  >
-                    {keyword.matchType}
-                  </Badge>
-                </TableCell>
+              <TableRow key={keyword.id} className={cn("transition-colors", selectedRows.has(keyword.id) && "bg-primary/5")}>
+                <TableCell><Checkbox checked={selectedRows.has(keyword.id)} onCheckedChange={() => toggleRow(keyword.id)} /></TableCell>
+                <TableCell><StatusBadge status={keyword.status} /></TableCell>
+                <TableCell className="font-medium text-foreground">{keyword.keyword}</TableCell>
+                <TableCell><Badge variant="outline" className={cn("text-xs uppercase", matchTypeColors[keyword.matchType])}>{keyword.matchType}</Badge></TableCell>
                 <TableCell className="text-foreground">{keyword.adGroupName}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "text-xs",
-                        keyword.campaignType === "auto"
-                          ? "border-primary/30 bg-primary/5 text-primary"
-                          : "border-secondary/30 bg-secondary/5 text-secondary-foreground"
-                      )}
-                    >
+                    <Badge variant="outline" className={cn("text-xs", keyword.campaignType === "auto" ? "border-primary/30 bg-primary/5 text-primary" : "border-secondary/30 bg-secondary/5 text-secondary-foreground")}>
                       {keyword.campaignType === "auto" ? "Auto" : "Manual"}
                     </Badge>
                     <span className="text-foreground">{keyword.campaignName}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-center">
-                  <Switch checked={keyword.bidAutomation} disabled />
-                </TableCell>
-                <TableCell className="text-right">{formatCurrency(keyword.minBid)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(keyword.maxBid)}</TableCell>
-                <TableCell className="text-right font-medium">{formatCurrency(keyword.bid)}</TableCell>
-                <TableCell className="text-right">{formatNumber(keyword.impressions)}</TableCell>
-                <TableCell className="text-right">{formatNumber(keyword.clicks)}</TableCell>
-                <TableCell className="text-right">{formatPercent(keyword.ctr)}</TableCell>
-                <TableCell className="text-right">{formatNumber(keyword.adUnits)}</TableCell>
-                <TableCell className="text-right">{formatPercent(keyword.cvr)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(keyword.cpc)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(keyword.adSpend)}</TableCell>
+                <TableCell className="text-center"><Switch checked={keyword.bidAutomation} disabled /></TableCell>
+                <TableCell className="text-right text-foreground">{formatCurrency(keyword.minBid)}</TableCell>
+                <TableCell className="text-right text-foreground">{formatCurrency(keyword.maxBid)}</TableCell>
+                <TableCell className="text-right font-medium text-foreground">{formatCurrency(keyword.bid)}</TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(keyword.impressions)} id={keyword.id} metric="impressions" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(keyword.clicks)} id={keyword.id} metric="clicks" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatPercent(keyword.ctr)} id={keyword.id} metric="ctr" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(keyword.adUnits)} id={keyword.id} metric="adUnits" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatPercent(keyword.cvr)} id={keyword.id} metric="cvr" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatCurrency(keyword.cpc)} id={keyword.id} metric="cpc" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatCurrency(keyword.adSpend)} id={keyword.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
-            {/* Total Row */}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={6} className="font-semibold">
-                Total ({filteredKeywords.length} keywords)
-              </TableCell>
+              <TableCell colSpan={6} className="font-semibold">Total ({filteredKeywords.length} keywords)</TableCell>
               <TableCell colSpan={4}></TableCell>
-              <TableCell className="text-right">{formatNumber(keywordsTotals.impressions)}</TableCell>
-              <TableCell className="text-right">{formatNumber(keywordsTotals.clicks)}</TableCell>
-              <TableCell className="text-right">{formatPercent(keywordsTotals.ctr)}</TableCell>
-              <TableCell className="text-right">{formatNumber(keywordsTotals.adUnits)}</TableCell>
-              <TableCell className="text-right">{formatPercent(keywordsTotals.cvr)}</TableCell>
-              <TableCell className="text-right">{formatCurrency(keywordsTotals.cpc)}</TableCell>
-              <TableCell className="text-right">{formatCurrency(keywordsTotals.adSpend)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.impressions)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.clicks)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatPercent(keywordsTotals.ctr)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.adUnits)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatPercent(keywordsTotals.cvr)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatCurrency(keywordsTotals.cpc)}</TableCell>
+              <TableCell className="text-right text-foreground">{formatCurrency(keywordsTotals.adSpend)}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

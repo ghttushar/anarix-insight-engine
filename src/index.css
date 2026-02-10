@@ -336,15 +336,6 @@
   }
 }
 
-/* Table hover fix - prevent overlap */
-table tbody tr {
-  position: relative;
-}
-
-table tbody tr:hover {
-  z-index: 1;
-}
-
 table th,
 table td {
   vertical-align: middle;
