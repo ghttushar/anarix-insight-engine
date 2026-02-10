@@ -23,7 +23,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
       <AppTaskbar />
 
       {/* Main area: Sidebar + Content + Copilot (inline, same layer) */}
-      <div className="flex flex-1 overflow-hidden relative z-0">
+      <div className="flex flex-1 overflow-hidden">
         <AppSidebar />
         <main className="flex-1 overflow-auto bg-background p-6">
           {children}
