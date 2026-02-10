@@ -1,167 +1,145 @@
 
-# Comprehensive Sandbox, Map, Tables, and UI Fix Plan
 
-## Summary of All Changes
+# Comprehensive UI Overhaul: Layout, Map, Tables, and Orion-Inspired Design
 
-| # | Issue | Solution |
-|---|-------|----------|
-| 1 | Geo map is broken/ugly | Delete current SVG map, replace with a proper world map using accurate Natural Earth simplified map image |
-| 2 | Aan button looks bad | Redesign to a minimal, sleek outlined pill with subtle sparkle animation on hover |
-| 3 | Sandbox: Duplicate should be "Create New" and add to nav | Multi-dashboard system with localStorage persistence, dynamic nav items under "Sandbox" |
-| 4 | Rename "Workspace" to "Sandbox" | Update all references in sidebar nav, breadcrumbs, routes |
-| 5 | Widgets not freely movable | Implement drag-and-drop reordering of widgets on the canvas |
-| 6 | Collapse button badly placed | Replace bottom toggle with a small arrow nook on the right edge, vertically centered |
-| 7 | All tables need redesign | Rebuild table styling: black text for all values, green/red micro-delta badges for up/down metrics (per reference image) |
-| 8 | Left nav on wrong layer | Fix z-index so sidebar is same layer as app content, not elevated above |
-| 9 | Annotation widget boring | Redesign as FigJam-style post-it notes with colored backgrounds, slight rotation, pin icon |
-| 10 | Sandbox needs more features | Add widget resize controls, drag handle, better empty states |
+## Issues Identified
+
+| # | Problem | Root Cause |
+|---|---------|------------|
+| 1 | Sidebar pushed below taskbar | Sidebar uses `fixed inset-y-0` which starts from viewport top, but taskbar takes 48px. Sidebar needs `top: 48px` offset |
+| 2 | Geography map still crude blobs | SVG paths are hand-drawn approximations, not real geography |
+| 3 | Tables missing delta badges | DeltaBadge component exists but is not imported/used in any table |
+| 4 | Table hover overlapping | `relative` + `z-index` on hover causes stacking issues with sticky columns |
+| 5 | Design lacks Orion-level polish | Tables, cards, and charts need cleaner spacing, subtle shadows, and refined typography |
 
 ---
 
-## Phase 1: Rename Workspace to Sandbox
+## Phase 1: Fix Sidebar Alignment with Taskbar
 
-### Files affected:
-- `src/components/layout/AppSidebar.tsx` - Change "Workspace" label to "Sandbox", "Dashboard Builder" to "My Sandbox"
-- `src/pages/workspace/Dashboard.tsx` - Update breadcrumb text
-- Route stays `/workspace` (no URL change needed)
+### File: `src/components/ui/sidebar.tsx` (line 195)
 
----
+The sidebar inner container uses `fixed inset-y-0` which means it starts from the very top of the viewport. Since the taskbar is 48px tall, the sidebar renders behind it.
 
-## Phase 2: Multi-Dashboard System
-
-### File: `src/pages/workspace/Dashboard.tsx`
-
-Replace single dashboard with multi-dashboard system:
-
-- State: `dashboards` array stored in localStorage (each has id, name, widgets)
-- "Create New" button creates a fresh empty dashboard, adds it to the list
-- Each dashboard name is editable inline
-- Current dashboard selectable
-
-### File: `src/components/layout/AppSidebar.tsx`
-
-Under "Sandbox" nav group, dynamically render dashboard names from localStorage:
-- Default: "My Sandbox"
-- Each new dashboard appears as a sub-item under Sandbox
-- Route: `/workspace/:dashboardId` or use query params
-
----
-
-## Phase 3: Geography Map - Complete Replacement
-
-### File: `src/components/profitability/GeographyMap.tsx`
-
-Delete ALL current SVG paths. Replace with proper simplified world map SVG paths sourced from Natural Earth / world-atlas data. The key differences:
-
-- Accurate continent and country outlines (not blobs)
-- All countries rendered with muted fill
-- USA, Canada, Mexico: filled with data-intensity colors, `cursor: pointer`
-- All other countries: muted, `cursor: default`
-- Hover tooltip with country name + sales
-- Zoom controls preserved
-- Pan support via mouse drag (translateX/Y state)
-
-The SVG paths will be hardcoded (not fetched) using simplified world map coordinates for approximately 180 countries. Active countries (US/CA/MX) get interactive behavior, rest are decorative.
-
----
-
-## Phase 4: Aan Button Redesign
-
-### File: `src/components/layout/AppSidebar.tsx`
-
-Replace current bordered box with a sleek pill-shaped button:
-- Transparent background with a thin gradient border (1px)
-- Sparkles icon with gradient text
-- "Aan" in Allura font with gradient text
-- On hover: background fills with 8% opacity gradient, border brightens
-- Compact: just the sparkle icon with same thin gradient border
-- No solid gradient fill ever (that was the "sticker" look)
-
----
-
-## Phase 5: Sidebar Collapse - Edge Nook
-
-### File: `src/components/layout/AppSidebar.tsx`
-
-Remove the bottom "Collapse" button entirely. Replace with:
-- A small 24x48px notch/arrow on the right edge of the sidebar, vertically centered
-- When expanded: shows a left-pointing chevron
-- When collapsed: shows a right-pointing chevron
-- Positioned with `position: absolute; right: -12px; top: 50%; transform: translateY(-50%)`
-- Styled as a small rounded pill with border, bg-card
-- Z-index above content but not overlay
+**Fix**: Change the fixed sidebar to account for the taskbar height:
+- Replace `inset-y-0` with `top-12 bottom-0` (48px = 3rem = Tailwind `top-12`)
+- Change `h-svh` to `h-[calc(100svh-48px)]` on both the spacer div and the fixed container
 
 ### File: `src/components/layout/AppLayout.tsx`
 
-Ensure sidebar has `position: relative` and correct z-index (same layer as main content, not elevated).
+No changes needed here -- the flex layout is correct.
 
 ---
 
-## Phase 6: Table Redesign
+## Phase 2: Replace Geography Map with Orion-Inspired Hexagonal Map
 
-### Approach:
-All table text should be black (`text-foreground`). No colored text for values. Instead, under numeric cells that have changed, show a micro-delta badge:
+Inspired by Orion's hexagonal world map design (light purple hexagons forming continent shapes with data-intensity coloring), the new map will use:
 
-```text
-$10,973.60
-  ^^ +12.4%     (green, small, with up arrow icon)
+### File: `src/components/profitability/GeographyMap.tsx` -- Complete Rewrite
+
+**Design approach** (inspired by Orion's hexagonal world map):
+- Use a dot-grid or hexagonal-point based world map representation
+- Each "dot" or hexagon represents a geographic area
+- Active regions (US, Canada, Mexico) shown with filled purple/periwinkle hexagons at varying intensity
+- Inactive regions shown with light gray/muted dots
+- City/region callout cards floating on the map (like Orion's "Chicago 98,320,300" cards)
+- Clean, modern aesthetic with soft purple color palette
+- Summary KPI cards on the left side (Total Sales, Orders, Units)
+- Circular progress indicators for key percentages
+
+**Implementation**:
+- Replace SVG path-based map with a grid of small circles/hexagons positioned to form continent shapes
+- Each point has coordinates mapped to approximate geographic positions
+- Active country points get `cursor: pointer`, data-intensity fill colors
+- Hover reveals tooltip card with region name + key metrics
+- Selected region highlighted with primary color border
+
+**Key visual elements from Orion**:
+- Floating metric cards with icon + label + value
+- Subtle gradient background on the map container
+- Clean sans-serif typography for labels
+- Purple-to-blue color scale for data intensity
+
+---
+
+## Phase 3: Table Redesign with Delta Badges
+
+### Approach
+
+Every numeric cell that represents a metric (Spend, Sales, ROAS, Impressions, etc.) will show the value in black text (`text-foreground`) with a micro delta badge underneath when there is a change to display.
+
+The `DeltaBadge` component already exists at `src/components/ui/delta-badge.tsx`. It needs to be imported and used in every table.
+
+### Mock Data Enhancement
+
+Since current mock data does not include `previousValue` or `delta` fields, we will add random delta percentages to each table row for demonstration. This will be done via a helper function that generates consistent deltas based on the row ID (seeded).
+
+### Files to modify (all tables):
+
+**`src/components/tables/CampaignTable.tsx`**:
+- Import `DeltaBadge`
+- Wrap each numeric cell in a vertical flex container:
+  ```
+  <div className="flex flex-col items-end">
+    <span className="text-foreground">{formatCurrency(campaign.spend)}</span>
+    <DeltaBadge value={getDelta(campaign.id, 'spend')} />
+  </div>
+  ```
+
+**Apply same pattern to**:
+- `CampaignTableTotalRow.tsx`
+- `AdGroupsTable.tsx`
+- `KeywordTargetingTable.tsx`
+- `SearchTermsTable.tsx`
+- `ProductAdsTable.tsx`
+- `RegionalTable.tsx`
+- `ImpactTable.tsx` (already has its own delta system, clean it up)
+- `PageTypeTable.tsx`
+- `PlatformTable.tsx`
+
+### Table Hover Fix
+
+**File: `src/index.css`** -- Remove the z-index hover hack:
+```css
+/* REMOVE these rules */
+table tbody tr { position: relative; }
+table tbody tr:hover { z-index: 1; }
 ```
 
-or
+**File: `src/components/ui/table.tsx`**:
+- Remove `relative` from TableRow className
+- Use simple `hover:bg-muted/50` without z-index manipulation
+- Ensure sticky columns use proper `bg-inherit` to prevent hover bleed
 
-```text
-$5,234.87
-  vv -3.2%      (red, small, with down arrow icon)
-```
+### Table Design Polish (Orion-inspired):
 
-### Files to modify:
-- `src/components/ui/table.tsx` - Ensure clean base styling, remove hover overlap issues
-- `src/components/tables/CampaignTable.tsx` - Apply black text, add delta badges
-- `src/components/tables/CampaignTableTotalRow.tsx` - Same treatment
-- All other table components (KeywordTargetingTable, SearchTermsTable, ProductAdsTable, AdGroupsTable, etc.) - Apply same pattern
-
-### New utility component: `src/components/ui/delta-badge.tsx`
-
-```typescript
-interface DeltaBadgeProps {
-  value: number; // percentage change
-}
-// Renders a small inline badge: green up arrow + percentage or red down arrow
-```
+- Header row: subtle `bg-muted/40` with `text-xs uppercase tracking-wider text-muted-foreground`
+- Body rows: `h-11` (44px) fixed height, clean borders
+- Cell text: all `text-foreground` (black in light mode)
+- Hover: simple `bg-muted/30` background change, no position/z-index tricks
+- Total row: `bg-muted/20` with `font-semibold`
+- Numbers right-aligned with consistent padding
+- Delta badges: 11px font, green/red with tiny arrow icon, directly under the value
 
 ---
 
-## Phase 7: Annotation Widget - FigJam Style
+## Phase 4: Orion-Inspired Design Polish
 
-### File: `src/components/workspace/AnnotationWidget.tsx`
+### KPI Cards (`src/components/cards/KPICard.tsx`)
+- Clean card with subtle border
+- Large number in bold
+- Delta percentage in green/red next to the value (like Orion's "$12,875 +10%")
+- Small label text above
+- Optional mini sparkline chart
 
-Replace plain textarea with a post-it note style:
-- Background colors: rotate through soft yellow (#FEF9C3), soft pink (#FCE7F3), soft blue (#DBEAFE), soft green (#DCFCE7)
-- Slight random rotation (-2deg to +2deg) per note
-- Pin/thumbtack icon in top-right corner
-- Handwriting-like font hint (slightly rounded, casual)
-- Shadow to give lifted appearance
-- Textarea still functional inside
+### Color System Refinements in `src/index.css`:
+- Add subtle card shadow: `shadow-[0_1px_3px_rgba(0,0,0,0.04)]`
+- Refine border colors for softer appearance
+- Add smooth transitions for all interactive elements
 
----
-
-## Phase 8: Widget Drag and Drop
-
-### File: `src/components/workspace/WidgetCanvas.tsx`
-
-Implement drag-and-drop reordering using native HTML5 drag API:
-- Each widget gets `draggable="true"`
-- `onDragStart`, `onDragOver`, `onDrop` handlers
-- Visual feedback: dragged widget gets opacity reduction, drop target gets highlighted border
-- On drop: reorder the widgets array and persist
-
----
-
-## Phase 9: Sidebar Z-Index Fix
-
-### File: `src/components/layout/AppLayout.tsx` and `src/index.css`
-
-Ensure the sidebar does not have an elevated z-index. It should sit on the same layer as the main content. Remove any `z-50` or similar from the sidebar component. The sidebar is part of the flex layout, not overlaid.
+### Typography Improvements:
+- Ensure Satoshi font loads correctly (current CORS error with fontshare API)
+- Fallback to system fonts gracefully
+- Consistent heading sizes across pages
 
 ---
 
@@ -169,40 +147,34 @@ Ensure the sidebar does not have an elevated z-index. It should sit on the same 
 
 | File | Purpose |
 |------|---------|
-| `src/components/ui/delta-badge.tsx` | Micro delta indicator for table cells |
+| `src/lib/utils/deltaGenerator.ts` | Helper to generate consistent delta percentages for mock data |
 
 ## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/components/profitability/GeographyMap.tsx` | Complete rewrite with proper world map SVG |
-| `src/components/layout/AppSidebar.tsx` | Rename to Sandbox, multi-dashboard nav, Aan button redesign, edge nook collapse |
-| `src/components/layout/AppLayout.tsx` | Z-index fix, sidebar relative positioning |
-| `src/pages/workspace/Dashboard.tsx` | Multi-dashboard system, "Create New" instead of "Duplicate" |
-| `src/components/workspace/AnnotationWidget.tsx` | FigJam-style post-it notes |
-| `src/components/workspace/WidgetCanvas.tsx` | Drag-and-drop reordering |
-| `src/components/ui/table.tsx` | Clean base styling |
-| `src/components/tables/CampaignTable.tsx` | Black text, delta badges |
-| `src/components/tables/CampaignTableTotalRow.tsx` | Same |
-| `src/components/tables/KeywordTargetingTable.tsx` | Same |
-| `src/components/tables/SearchTermsTable.tsx` | Same |
-| `src/components/tables/ProductAdsTable.tsx` | Same |
-| `src/components/tables/AdGroupsTable.tsx` | Same |
-| `src/components/tables/ImpactTable.tsx` | Same |
-| `src/components/tables/RegionalTable.tsx` | Same |
-| `src/components/tables/PageTypeTable.tsx` | Same |
-| `src/components/tables/PlatformTable.tsx` | Same |
-| `src/components/workspace/TableWidget.tsx` | Same pattern |
-| `src/index.css` | Remove table hover overlap hacks, clean density styles |
+| `src/components/ui/sidebar.tsx` | Fix sidebar top offset for taskbar (top-12 instead of inset-y-0) |
+| `src/components/profitability/GeographyMap.tsx` | Complete rewrite with Orion-inspired hexagonal dot map |
+| `src/components/ui/table.tsx` | Remove `relative` from TableRow, clean hover styles |
+| `src/index.css` | Remove z-index table hack, add Orion-inspired polish, fix font loading |
+| `src/components/tables/CampaignTable.tsx` | Add DeltaBadge to all numeric cells |
+| `src/components/tables/CampaignTableTotalRow.tsx` | Add DeltaBadge |
+| `src/components/tables/AdGroupsTable.tsx` | Add DeltaBadge |
+| `src/components/tables/KeywordTargetingTable.tsx` | Add DeltaBadge |
+| `src/components/tables/SearchTermsTable.tsx` | Add DeltaBadge |
+| `src/components/tables/ProductAdsTable.tsx` | Add DeltaBadge |
+| `src/components/tables/RegionalTable.tsx` | Add DeltaBadge |
+| `src/components/tables/ImpactTable.tsx` | Clean up existing delta display |
+| `src/components/tables/PageTypeTable.tsx` | Add DeltaBadge |
+| `src/components/tables/PlatformTable.tsx` | Add DeltaBadge |
 
 ## Implementation Order
 
-1. Rename Workspace to Sandbox + multi-dashboard system
-2. Sidebar edge nook collapse button + z-index fix
-3. Aan button redesign (sleek pill)
-4. Geography map complete replacement
-5. Delta badge component
-6. Table redesign across all tables
-7. Annotation widget FigJam style
-8. Widget drag-and-drop
-9. End-to-end testing
+1. Fix sidebar alignment (sidebar.tsx -- top offset)
+2. Fix table hover (remove z-index hack from index.css and table.tsx)
+3. Create delta generator utility
+4. Add DeltaBadge to all tables
+5. Replace geography map with hexagonal dot map
+6. Apply Orion-inspired design polish (shadows, typography, spacing)
+7. Fix font loading (Satoshi CORS issue)
+
