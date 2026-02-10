@@ -116,7 +116,7 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
                     {keyword.matchType}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{keyword.adGroupName}</TableCell>
+                <TableCell className="text-foreground">{keyword.adGroupName}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Badge
@@ -130,7 +130,7 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
                     >
                       {keyword.campaignType === "auto" ? "Auto" : "Manual"}
                     </Badge>
-                    <span className="text-muted-foreground">{keyword.campaignName}</span>
+                    <span className="text-foreground">{keyword.campaignName}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center">

@@ -271,6 +271,37 @@
   }
 }
 
+/* Aan Pill Button - gradient border with border-radius */
+.aan-pill-button {
+  position: relative;
+  background: transparent;
+  z-index: 0;
+}
+
+.aan-pill-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    hsl(258 90% 66%),
+    hsl(239 84% 67%),
+    hsl(217 91% 60%)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.aan-pill-button:hover {
+  background: hsl(var(--primary) / 0.05);
+}
+
 /* Density Mode Styles */
 @layer components {
   .density-comfortable {

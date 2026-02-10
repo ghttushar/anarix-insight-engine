@@ -31,7 +31,7 @@ export function TableWidget() {
                 <TableCell className="text-xs font-medium truncate max-w-[200px]">{row.name}</TableCell>
                 <TableCell className="text-right text-xs">{row.spend}</TableCell>
                 <TableCell className="text-right text-xs">{row.sales}</TableCell>
-                <TableCell className="text-right text-xs font-semibold text-primary">{row.roas}</TableCell>
+                <TableCell className="text-right text-xs font-semibold text-foreground">{row.roas}</TableCell>
               </TableRow>
             ))}
           </TableBody>

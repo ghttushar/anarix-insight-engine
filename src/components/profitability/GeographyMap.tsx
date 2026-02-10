@@ -1,154 +1,199 @@
 import { useState } from "react";
 import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 interface GeographyMapProps {
   selectedRegion?: string;
   onRegionSelect?: (regionId: string) => void;
 }
 
-// North America country paths - accurate SVG paths
-const northAmericaCountries = {
+// Simplified but recognizable country/region paths for a world map
+// Active regions: USA, Canada, Mexico
+const activeCountries: Record<string, { path: string; name: string; sales: number; labelX: number; labelY: number }> = {
   USA: {
-    path: "M 158,120 L 162,115 L 180,118 L 220,115 L 260,118 L 280,130 L 285,145 L 270,155 L 275,175 L 265,185 L 250,190 L 240,210 L 255,225 L 252,240 L 240,235 L 220,245 L 200,240 L 185,250 L 170,245 L 155,255 L 145,250 L 140,235 L 130,220 L 115,210 L 100,190 L 95,170 L 100,150 L 115,135 L 135,125 Z",
+    path: "M50,95 L55,90 L65,88 L80,87 L95,88 L105,90 L120,92 L130,95 L128,100 L132,108 L125,115 L118,118 L108,120 L100,125 L108,130 L106,138 L98,135 L88,140 L80,138 L72,142 L65,140 L60,148 L52,145 L48,135 L42,128 L35,120 L28,112 L25,100 L30,92 L40,90 Z",
     name: "United States",
     sales: 156789,
+    labelX: 78,
+    labelY: 115,
   },
   CAN: {
-    path: "M 100,20 L 130,15 L 170,18 L 210,12 L 250,15 L 290,20 L 310,35 L 305,55 L 290,70 L 280,90 L 285,105 L 260,110 L 220,108 L 180,112 L 160,108 L 130,115 L 100,110 L 80,95 L 75,70 L 80,45 L 90,30 Z",
+    path: "M25,30 L40,25 L60,22 L80,20 L100,22 L120,25 L135,30 L142,40 L140,52 L135,62 L130,72 L128,80 L120,85 L105,87 L95,86 L80,85 L65,86 L55,88 L45,88 L35,85 L25,80 L20,70 L18,55 L20,40 Z",
     name: "Canada",
     sales: 45678,
+    labelX: 80,
+    labelY: 55,
   },
   MEX: {
-    path: "M 100,195 L 120,210 L 130,235 L 145,255 L 160,270 L 175,280 L 190,275 L 200,285 L 195,300 L 175,310 L 155,305 L 135,295 L 120,280 L 105,265 L 95,245 L 90,225 L 95,210 Z",
+    path: "M28,118 L35,125 L42,132 L48,140 L52,148 L60,155 L68,162 L75,168 L80,172 L78,178 L70,182 L60,180 L50,175 L42,168 L35,158 L28,148 L24,138 L22,128 Z",
     name: "Mexico",
     sales: 23456,
+    labelX: 50,
+    labelY: 158,
   },
 };
 
-// Other world regions (greyed out)
-const worldRegions = {
-  SA: { path: "M 180,320 L 220,310 L 250,340 L 260,400 L 240,450 L 200,470 L 170,440 L 160,380 L 165,340 Z", name: "South America" },
-  EU: { path: "M 420,80 L 480,70 L 510,90 L 520,120 L 500,145 L 460,150 L 430,135 L 410,110 Z", name: "Europe" },
-  AF: { path: "M 440,170 L 510,160 L 540,200 L 530,280 L 480,320 L 420,300 L 400,240 L 420,190 Z", name: "Africa" },
-  AS: { path: "M 540,60 L 650,50 L 720,80 L 750,140 L 720,200 L 640,220 L 560,200 L 520,150 L 530,100 Z", name: "Asia" },
-  OC: { path: "M 660,280 L 750,270 L 780,310 L 760,360 L 700,380 L 640,350 L 640,310 Z", name: "Oceania" },
-};
+// Decorative continent outlines (not interactive)
+const decorativePaths: { path: string; name: string }[] = [
+  // South America
+  { path: "M80,190 L95,185 L108,195 L115,215 L112,240 L105,260 L92,270 L78,262 L72,245 L70,225 L72,205 Z", name: "South America" },
+  // Europe
+  { path: "M230,55 L240,50 L255,48 L268,52 L275,60 L272,72 L265,80 L255,82 L245,78 L235,72 L228,62 Z", name: "Europe" },
+  // Africa
+  { path: "M235,95 L250,90 L268,92 L278,100 L280,118 L275,140 L265,155 L250,162 L238,158 L228,145 L225,125 L228,108 Z", name: "Africa" },
+  // Asia
+  { path: "M280,35 L300,30 L325,28 L350,32 L365,42 L370,58 L365,75 L355,88 L340,92 L320,90 L300,85 L285,75 L278,60 L275,45 Z", name: "Asia" },
+  // Middle East
+  { path: "M272,72 L285,68 L295,72 L298,82 L292,90 L282,92 L275,85 Z", name: "Middle East" },
+  // Oceania / Australia
+  { path: "M340,165 L360,158 L378,162 L385,175 L380,190 L365,198 L348,195 L338,182 Z", name: "Australia" },
+  // Southeast Asia islands
+  { path: "M345,100 L358,95 L368,100 L372,110 L365,118 L352,120 L342,112 Z", name: "SE Asia" },
+];
 
 const getIntensityColor = (sales: number): string => {
-  if (sales >= 100000) return "hsl(var(--primary) / 0.85)";
-  if (sales >= 50000) return "hsl(var(--primary) / 0.55)";
+  if (sales >= 100000) return "hsl(var(--primary) / 0.8)";
+  if (sales >= 50000) return "hsl(var(--primary) / 0.5)";
   if (sales >= 25000) return "hsl(var(--primary) / 0.35)";
   return "hsl(var(--primary) / 0.2)";
 };
 
 export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapProps) {
   const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
 
-  const handleZoomIn = () => setZoom((z) => Math.min(z + 0.25, 2));
+  const handleZoomIn = () => setZoom((z) => Math.min(z + 0.25, 3));
   const handleZoomOut = () => setZoom((z) => Math.max(z - 0.25, 0.5));
-  const handleReset = () => setZoom(1);
+  const handleReset = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
 
-  const hoveredData = hoveredCountry
-    ? northAmericaCountries[hoveredCountry as keyof typeof northAmericaCountries]
-    : null;
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    setIsPanning(true);
+    setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isPanning) return;
+    setPan({ x: e.clientX - panStart.x, y: e.clientY - panStart.y });
+  };
+
+  const handleMouseUp = () => setIsPanning(false);
+
+  const hoveredData = hoveredCountry ? activeCountries[hoveredCountry] : null;
 
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      {/* Controls */}
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-medium text-foreground">Sales by Region</h3>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={handleZoomIn} title="Zoom In" className="h-8 w-8">
-            <ZoomIn className="h-4 w-4" />
+        <div className="flex items-center gap-1">
+          <Button variant="outline" size="icon" onClick={handleZoomIn} className="h-7 w-7">
+            <ZoomIn className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="outline" size="icon" onClick={handleZoomOut} title="Zoom Out" className="h-8 w-8">
-            <ZoomOut className="h-4 w-4" />
+          <Button variant="outline" size="icon" onClick={handleZoomOut} className="h-7 w-7">
+            <ZoomOut className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="outline" size="icon" onClick={handleReset} title="Reset" className="h-8 w-8">
-            <RotateCcw className="h-4 w-4" />
+          <Button variant="outline" size="icon" onClick={handleReset} className="h-7 w-7">
+            <RotateCcw className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
-      {/* Map */}
-      <div className="relative h-[400px] overflow-hidden rounded-lg bg-muted/10 border border-border">
+      <div
+        className="relative h-[400px] overflow-hidden rounded-lg bg-muted/10 border border-border select-none"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ cursor: isPanning ? "grabbing" : "grab" }}
+      >
         <svg
-          viewBox="0 0 800 500"
-          className="h-full w-full transition-transform duration-300"
-          style={{ transform: `scale(${zoom})`, transformOrigin: "center center" }}
+          viewBox="0 0 420 280"
+          className="h-full w-full"
+          style={{
+            transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+            transformOrigin: "center center",
+            transition: isPanning ? "none" : "transform 0.2s ease",
+          }}
           preserveAspectRatio="xMidYMid meet"
         >
-          {/* World regions (greyed out) */}
-          {Object.entries(worldRegions).map(([code, region]) => (
+          {/* Decorative continents */}
+          {decorativePaths.map((region) => (
             <path
-              key={code}
+              key={region.name}
               d={region.path}
               fill="hsl(var(--muted))"
               stroke="hsl(var(--border))"
               strokeWidth={0.5}
-              className="opacity-40 cursor-default"
+              className="opacity-50"
+              style={{ cursor: "default" }}
             />
           ))}
 
-          {/* North America countries (active with data) */}
-          {Object.entries(northAmericaCountries).map(([code, country]) => (
-            <path
-              key={code}
-              d={country.path}
-              fill={getIntensityColor(country.sales)}
-              stroke={selectedRegion === code ? "hsl(var(--primary))" : "hsl(var(--border))"}
-              strokeWidth={selectedRegion === code ? 2.5 : 1}
-              className={cn(
-                "cursor-pointer transition-all duration-200 hover:brightness-110",
-                hoveredCountry === code && "brightness-110"
-              )}
-              style={{ cursor: "pointer" }}
-              onMouseEnter={() => setHoveredCountry(code)}
-              onMouseLeave={() => setHoveredCountry(null)}
-              onClick={() => onRegionSelect?.(code)}
-            />
+          {/* Active countries */}
+          {Object.entries(activeCountries).map(([code, country]) => (
+            <g key={code}>
+              <path
+                d={country.path}
+                fill={getIntensityColor(country.sales)}
+                stroke={selectedRegion === code ? "hsl(var(--primary))" : "hsl(var(--border))"}
+                strokeWidth={selectedRegion === code ? 2 : 0.8}
+                style={{ cursor: "pointer" }}
+                className="transition-all duration-150 hover:brightness-110"
+                onMouseEnter={() => setHoveredCountry(code)}
+                onMouseLeave={() => setHoveredCountry(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRegionSelect?.(code);
+                }}
+              />
+              <text
+                x={country.labelX}
+                y={country.labelY}
+                className="fill-foreground pointer-events-none"
+                textAnchor="middle"
+                fontSize={6}
+                fontWeight={500}
+              >
+                {code}
+              </text>
+            </g>
           ))}
-
-          {/* Country labels */}
-          <text x="190" y="180" className="fill-foreground text-xs font-medium pointer-events-none" textAnchor="middle">USA</text>
-          <text x="180" y="65" className="fill-foreground text-xs font-medium pointer-events-none" textAnchor="middle">CAN</text>
-          <text x="145" y="275" className="fill-foreground text-xs font-medium pointer-events-none" textAnchor="middle">MEX</text>
         </svg>
 
         {/* Tooltip */}
         {hoveredData && (
-          <div className="absolute bottom-4 left-4 rounded-lg border border-border bg-popover p-3 shadow-lg z-10">
-            <p className="font-medium text-foreground">{hoveredData.name}</p>
-            <p className="text-sm text-muted-foreground">
+          <div className="absolute bottom-3 left-3 rounded-lg border border-border bg-popover px-3 py-2 shadow-lg z-10">
+            <p className="font-medium text-foreground text-sm">{hoveredData.name}</p>
+            <p className="text-xs text-muted-foreground">
               Sales: ${hoveredData.sales.toLocaleString()}
             </p>
           </div>
         )}
 
         {/* Zoom indicator */}
-        <div className="absolute top-3 right-3 px-2 py-1 rounded bg-popover/80 text-xs text-muted-foreground">
+        <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-popover/80 text-[10px] text-muted-foreground">
           {Math.round(zoom * 100)}%
         </div>
       </div>
 
       {/* Legend */}
-      <div className="mt-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-muted-foreground">Low Sales</span>
+      <div className="mt-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-[10px] text-muted-foreground">Low</span>
           <div className="flex rounded overflow-hidden">
-            <div className="h-4 w-8" style={{ backgroundColor: "hsl(var(--primary) / 0.2)" }} />
-            <div className="h-4 w-8" style={{ backgroundColor: "hsl(var(--primary) / 0.35)" }} />
-            <div className="h-4 w-8" style={{ backgroundColor: "hsl(var(--primary) / 0.55)" }} />
-            <div className="h-4 w-8" style={{ backgroundColor: "hsl(var(--primary) / 0.85)" }} />
+            <div className="h-3 w-6" style={{ backgroundColor: "hsl(var(--primary) / 0.2)" }} />
+            <div className="h-3 w-6" style={{ backgroundColor: "hsl(var(--primary) / 0.35)" }} />
+            <div className="h-3 w-6" style={{ backgroundColor: "hsl(var(--primary) / 0.5)" }} />
+            <div className="h-3 w-6" style={{ backgroundColor: "hsl(var(--primary) / 0.8)" }} />
           </div>
-          <span className="text-xs text-muted-foreground">High Sales</span>
+          <span className="text-[10px] text-muted-foreground">High</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-muted opacity-40" />
-          <span className="text-xs text-muted-foreground">No data available</span>
+        <div className="flex items-center gap-1.5">
+          <div className="h-2.5 w-2.5 rounded-full bg-muted opacity-50" />
+          <span className="text-[10px] text-muted-foreground">No data</span>
         </div>
       </div>
     </div>

@@ -114,8 +114,8 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{ad.adGroupName}</TableCell>
-                <TableCell className="text-muted-foreground">{ad.campaignName}</TableCell>
+                <TableCell className="text-foreground">{ad.adGroupName}</TableCell>
+                <TableCell className="text-foreground">{ad.campaignName}</TableCell>
                 <TableCell className="text-center">
                   <Switch checked={ad.bidAutomation} disabled />
                 </TableCell>
