@@ -191,7 +191,7 @@ export function AppSidebar() {
   return (
     <Sidebar
       className={cn(
-        "border-r border-sidebar-border bg-sidebar transition-all duration-300 relative z-0",
+        "border-r border-sidebar-border bg-sidebar transition-all duration-300",
         collapsed ? "w-14" : "w-60"
       )}
       collapsible="icon"
