@@ -18,19 +18,15 @@ function LayoutInner({ children }: { children: ReactNode }) {
   }, [copilotOpen, setOpen]);
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
-      {/* Universal Top Taskbar */}
-      <AppTaskbar />
-
-      {/* Main area: Sidebar + Content + Copilot (inline, same layer) */}
-      <div className="flex flex-1 overflow-hidden">
-        <AppSidebar />
+    <div className="flex min-h-screen w-full">
+      <AppSidebar />
+      <div className="flex flex-1 flex-col min-h-screen overflow-hidden">
+        <AppTaskbar />
         <main className="flex-1 overflow-auto bg-background p-6">
           {children}
         </main>
-        {/* Copilot Panel - inline, no overlay */}
-        <AanCopilotPanel />
       </div>
+      <AanCopilotPanel />
     </div>
   );
 }
