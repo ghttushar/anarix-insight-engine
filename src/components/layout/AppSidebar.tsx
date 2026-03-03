@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, PanelLeftClose, PanelLeftOpen, Blocks } from "lucide-react";
+import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, PanelLeftClose, PanelLeftOpen, Blocks, Database, Mail, Wrench } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -81,6 +81,34 @@ const navigationGroups: NavGroup[] = [{
     icon: Package
   }]
 }, {
+  label: "AMC",
+  icon: Database,
+  items: [{
+    title: "Queries",
+    url: "/amc/queries",
+    icon: Database
+  }, {
+    title: "Executed Queries",
+    url: "/amc/executed",
+    icon: FileText
+  }, {
+    title: "Schedules",
+    url: "/amc/schedules",
+    icon: CalendarClock
+  }, {
+    title: "Audiences",
+    url: "/amc/audiences",
+    icon: Users
+  }, {
+    title: "Created Audiences",
+    url: "/amc/created-audiences",
+    icon: Users
+  }, {
+    title: "Instances",
+    url: "/amc/instances",
+    icon: Blocks
+  }]
+}, {
   label: "Business Intelligence",
   icon: Brain,
   items: [{
@@ -136,9 +164,17 @@ const navigationGroups: NavGroup[] = [{
     url: "/settings/users",
     icon: Users
   }, {
-    title: "History Logs",
+    title: "Invitations",
+    url: "/settings/invites",
+    icon: Mail
+  }, {
+    title: "Activity Logs",
     url: "/settings/logs",
     icon: FileStack
+  }, {
+    title: "Configuration",
+    url: "/settings/configuration",
+    icon: Wrench
   }]
 }];
 export function AppSidebar() {

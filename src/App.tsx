@@ -8,6 +8,7 @@ import { MarketplaceProvider } from "@/contexts/MarketplaceContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { DensityProvider } from "@/contexts/DensityContext";
 import { AccountProvider, useAccounts } from "@/contexts/AccountContext";
+import { VisualEffectsProvider } from "@/contexts/VisualEffectsContext";
 import { AanProvider, AanPanel } from "@/components/aan";
 import { InsightsProvider, InsightsPanel } from "@/components/insights";
 import { CreativeFeatures } from "@/features/creative";
@@ -38,6 +39,14 @@ import KeywordTracker from "./pages/bi/KeywordTracker";
 import KeywordSOV from "./pages/bi/KeywordSOV";
 import ProductSOV from "./pages/bi/ProductSOV";
 
+// AMC
+import AMCQueries from "./pages/amc/Queries";
+import AMCExecutedQueries from "./pages/amc/ExecutedQueries";
+import AMCSchedules from "./pages/amc/Schedules";
+import AMCAudiences from "./pages/amc/Audiences";
+import AMCCreatedAudiences from "./pages/amc/CreatedAudiences";
+import AMCInstances from "./pages/amc/Instances";
+
 // Day Parting
 import HourlyData from "./pages/dayparting/HourlyData";
 import DayPartingCampaigns from "./pages/dayparting/Campaigns";
@@ -46,11 +55,16 @@ import DayPartingHistory from "./pages/dayparting/History";
 import ScheduledJobs from "./pages/dayparting/ScheduledJobs";
 import ScheduleEditor from "./pages/dayparting/ScheduleEditor";
 import WorkspaceDashboard from "./pages/workspace/Dashboard";
+
 // Settings
 import Preferences from "./pages/settings/Preferences";
 import Accounts from "./pages/settings/Accounts";
 import ConnectAmazon from "./pages/settings/ConnectAmazon";
 import ConnectWalmart from "./pages/settings/ConnectWalmart";
+import SettingsUsers from "./pages/settings/Users";
+import SettingsInvites from "./pages/settings/Invites";
+import SettingsLogs from "./pages/settings/Logs";
+import SettingsConfiguration from "./pages/settings/Configuration";
 
 const queryClient = new QueryClient();
 
@@ -123,6 +137,14 @@ function AppRoutes() {
       <Route path="/bi/keyword-sov" element={<KeywordSOV />} />
       <Route path="/bi/product-sov" element={<ProductSOV />} />
 
+      {/* AMC */}
+      <Route path="/amc/queries" element={<AMCQueries />} />
+      <Route path="/amc/executed" element={<AMCExecutedQueries />} />
+      <Route path="/amc/schedules" element={<AMCSchedules />} />
+      <Route path="/amc/audiences" element={<AMCAudiences />} />
+      <Route path="/amc/created-audiences" element={<AMCCreatedAudiences />} />
+      <Route path="/amc/instances" element={<AMCInstances />} />
+
       {/* Day Parting */}
       <Route path="/dayparting/hourly" element={<HourlyData />} />
       <Route path="/dayparting/campaigns" element={<DayPartingCampaigns />} />
@@ -137,6 +159,10 @@ function AppRoutes() {
       <Route path="/settings/accounts" element={<Accounts />} />
       <Route path="/settings/accounts/connect/amazon" element={<ConnectAmazon />} />
       <Route path="/settings/accounts/connect/walmart" element={<ConnectWalmart />} />
+      <Route path="/settings/users" element={<SettingsUsers />} />
+      <Route path="/settings/invites" element={<SettingsInvites />} />
+      <Route path="/settings/logs" element={<SettingsLogs />} />
+      <Route path="/settings/configuration" element={<SettingsConfiguration />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -151,18 +177,20 @@ const App = () => (
           <MarketplaceProvider defaultMarketplace="walmart">
             <AanProvider>
               <InsightsProvider>
-                <TooltipProvider>
-                  <Toaster />
-                  <Sonner position="bottom-left" />
-                  <BrowserRouter>
-                    <CreativeFeatures>
-                      <WelcomeToasts />
-                      <AppRoutes />
-                      <AanPanel />
-                      <InsightsPanel />
-                    </CreativeFeatures>
-                  </BrowserRouter>
-                </TooltipProvider>
+                <VisualEffectsProvider>
+                  <TooltipProvider>
+                    <Toaster />
+                    <Sonner position="bottom-left" />
+                    <BrowserRouter>
+                      <CreativeFeatures>
+                        <WelcomeToasts />
+                        <AppRoutes />
+                        <AanPanel />
+                        <InsightsPanel />
+                      </CreativeFeatures>
+                    </BrowserRouter>
+                  </TooltipProvider>
+                </VisualEffectsProvider>
               </InsightsProvider>
             </AanProvider>
           </MarketplaceProvider>
