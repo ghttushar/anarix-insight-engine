@@ -1,136 +1,93 @@
 
 
-# AMC Module, Missing Settings Pages, and Functional Preferences
+# Fix Tables, Add Universal Taskbar Features, Fix Filter/Column Controls
 
-## Audit: What exists vs. what's needed
+## Three Issues Identified
 
-### From the repo sidebar, AMC has 6 sub-pages:
-1. **Queries** — `/amc/queries`
-2. **Executed Queries** — `/amc/executed`
-3. **Schedules** — `/amc/schedules`
-4. **Audiences** — `/amc/audiences`
-5. **Created Audiences** — `/amc/created-audiences`
-6. **Instances** — `/amc/instances`
+### Issue 1: No universal features in the top taskbar
+From the reference images (image-64), the taskbar should include **Ad Type** dropdown (`All`, `SP`, `SB`, `SD`, `SV`), **Frequency** dropdown (`Daily`, `Weekly`, `Monthly`), and **Date Range** selector — positioned in the taskbar alongside the existing Marketplace/Store selector. These are universal controls that persist across modules.
 
-### Settings pages in repo vs. current app:
+### Issue 2: Filter and Column dropdowns on tables are not functional
+The `DataTableToolbar` has the UI but `CampaignManager` passes `onFilter={() => {}}` (empty handler) and does not pass `columns` prop at all. The Filter button opens nothing. The Columns button doesn't render because no columns are provided.
 
-| Page | Repo | Current App |
-|------|------|-------------|
-| Accounts | Yes | Yes |
-| Preferences | N/A (new) | Yes |
-| Users | Yes | **Missing** |
-| Invites | Yes | **Missing** |
-| Logs | Yes | **Missing** (sidebar link exists but no page) |
-| Configuration | Yes | **Missing** |
-
-### Also from approved plan:
-- Conditional taskbar (hide on `/settings`, `/login`, `/onboarding`)
-- Visual Effects context (functional toggles)
-- Editable keyboard shortcuts
-- Enhanced density CSS
+### Issue 3: Tables are visually broken — overlapping/crooked
+The root cause is the `Table` component's wrapper uses `overflow-auto` without constraining the table layout. Combined with `min-w-[200px]`+ many columns, the HTML table overflows its container. The `ProductsPnLTable` has a duplicate sticky column header (line 102-103 both say "Product Details"). Several total rows have incorrect `colSpan` counts that don't match the actual number of header columns.
 
 ---
 
-## Implementation
+## Plan
 
-### 1. New files to create
+### Phase 1: Fix the base Table component
+**File: `src/components/ui/table.tsx`**
+- Add `table-fixed` option or ensure the overflow wrapper constrains properly
+- Reduce default cell padding from `p-4` to `px-3 py-2` for data-dense tables (row height 44px per spec)
+- Add `whitespace-nowrap` to `TableHead` and `TableCell` defaults to prevent line-wrapping that causes layout shifts
 
-**AMC pages** (6 placeholder pages with AppLayout, tables, and mock data):
+### Phase 2: Add universal controls to AppTaskbar
+**File: `src/components/layout/AppTaskbar.tsx`**
+Add three new dropdowns between the left area and the right marketplace section:
+1. **Ad Type** — Select with options: `All`, `SP`, `SB`, `SD`, `SV`
+2. **Frequency** — Select with options: `Daily`, `Weekly`, `Monthly`
+3. **Date Range** — Display current range (e.g., "Feb 24, 2026 - Mar 02, 2026") with preset options
 
-| File | Content |
-|------|---------|
-| `src/pages/amc/Queries.tsx` | Table: query name, status, last run, actions. Mock 5 rows. |
-| `src/pages/amc/ExecutedQueries.tsx` | Table: query name, execution time, status, results count. |
-| `src/pages/amc/Schedules.tsx` | Table: schedule name, frequency, next run, status. |
-| `src/pages/amc/Audiences.tsx` | Table: audience name, size, created date, status. |
-| `src/pages/amc/CreatedAudiences.tsx` | Table: audience name, type, size, last updated. |
-| `src/pages/amc/Instances.tsx` | Table: instance ID, region, status, created. |
-| `src/data/mockAMC.ts` | Mock data for all 6 AMC tables. |
+**New context file: `src/contexts/FilterContext.tsx`**
+- Store `adType`, `frequency`, `dateRange` globally
+- Expose setters
+- Persist to localStorage
 
-**Missing Settings pages** (4):
+**File: `src/App.tsx`** — Wrap with `FilterProvider`
 
-| File | Content |
-|------|---------|
-| `src/pages/settings/Users.tsx` | Table: name, email, role, status, last login. Invite button. |
-| `src/pages/settings/Invites.tsx` | Table: email, role, status (pending/accepted), sent date. Send invite form. |
-| `src/pages/settings/Logs.tsx` | Table: timestamp, user, action, module, details. Filterable. |
-| `src/pages/settings/Configuration.tsx` | Form sections: default marketplace, default date range, notification preferences, API keys display. |
+### Phase 3: Make Filter and Columns functional in CampaignManager
+**File: `src/pages/advertising/CampaignManager.tsx`**
+- Add `columns` state array with all column definitions and `visible` boolean
+- Add `filters` state array for active filters
+- Add `filterPanelOpen` state that toggles a filter row (matching image-62: "Where [Campaign Status] [is] [Live]")
+- Pass these to `DataTableToolbar` with proper handlers
+- Pass `visibleColumns` to each table component
 
-**Visual Effects Context:**
+**File: `src/components/advertising/DataTableToolbar.tsx`**
+- Add inline filter builder row: field dropdown + operator dropdown + value dropdown + delete button + "+ Add Filter" link
+- Add "Cancel" and "Apply" buttons
+- Add search + "Clear All" / "Select All" to Columns dropdown (matching image-63)
 
-| File | Content |
-|------|---------|
-| `src/contexts/VisualEffectsContext.tsx` | Context with `ambientBackground`, `numberAnimations`, `floatingIsland` booleans. Persisted to localStorage. `toggle(key)` function. |
+### Phase 4: Fix all broken tables
 
-### 2. Files to modify
+**`src/components/profitability/ProductsPnLTable.tsx`**
+- Remove duplicate "Product Details" `TableHead` on line 103
+- Fix total row colSpan to match actual column count (should be 1, not 2 for product details)
 
-**`src/components/layout/AppSidebar.tsx`** — Add AMC group between Catalog and BI. Add missing settings sub-items (Invites, Configuration).
+**All advertising tables** (CampaignTable, AdGroupsTable, KeywordTargetingTable, SearchTermsTable, ProductAdsTable, PageTypeTable, PlatformTable):
+- Ensure total row `colSpan` values exactly match the number of preceding non-metric columns
+- Add `whitespace-nowrap` to all `TableHead` elements
+- Ensure `overflow-x-auto` wrapper is on the immediate parent of `<Table>`
 
-```text
-Current sidebar order:
-  Workspace → Profitability → Advertising → Catalog → BI → DayParting → Settings
-
-New order:
-  Workspace → Profitability → Advertising → Catalog → AMC → BI → DayParting → Settings
-
-Settings items:
-  Preferences, Accounts, Users, Invites, Logs, Configuration
-```
-
-**`src/components/layout/AppLayout.tsx`** — Add `useLocation()`, conditionally hide `<AppTaskbar />` on settings/login/onboarding routes. Use `useDensity()` for dynamic main padding.
-
-**`src/App.tsx`** — Add all new route imports and `<Route>` entries. Wrap with `VisualEffectsProvider`.
-
-**`src/features/creative/CreativeFeatures.tsx`** — Read from `useVisualEffects()` context to conditionally render `AmbientBackground`, `FloatingActionIsland`.
-
-**`src/features/creative/KeyboardNavigation.tsx`** — On mount, read custom shortcut overrides from `localStorage('anarix-custom-shortcuts')`. Merge with defaults. Custom shortcuts take priority.
-
-**`src/pages/settings/Preferences.tsx`** — Replace `<input type="checkbox">` with `<Switch>` wired to `useVisualEffects()`. Add per-shortcut "Edit" button that captures next keypress. Add "Reset to Defaults" per category. 
-
-**`src/index.css`** — Expand `.density-compact` rules:
-- Body font: 13px
-- Page main padding: 16px (vs 24px)
-- H1: 28px, H2: 20px, H3: 16px
-- Button height: 36px
-- Card gap: 12px
-- Sidebar item padding: `py-1.5`
-- KPI card internal spacing tighter
-- Section gaps reduced
+**`src/components/tables/CampaignTableTotalRow.tsx`**
+- Fix `colSpan={4}` — should be 4 (checkbox + active + status + name) which is correct, but verify it matches when `showTotalBudget` changes
 
 ---
 
-## Files summary
+## Files Summary
 
 | File | Action |
 |------|--------|
-| `src/contexts/VisualEffectsContext.tsx` | Create |
-| `src/data/mockAMC.ts` | Create |
-| `src/pages/amc/Queries.tsx` | Create |
-| `src/pages/amc/ExecutedQueries.tsx` | Create |
-| `src/pages/amc/Schedules.tsx` | Create |
-| `src/pages/amc/Audiences.tsx` | Create |
-| `src/pages/amc/CreatedAudiences.tsx` | Create |
-| `src/pages/amc/Instances.tsx` | Create |
-| `src/pages/settings/Users.tsx` | Create |
-| `src/pages/settings/Invites.tsx` | Create |
-| `src/pages/settings/Logs.tsx` | Create |
-| `src/pages/settings/Configuration.tsx` | Create |
-| `src/components/layout/AppSidebar.tsx` | Modify — add AMC group + settings items |
-| `src/components/layout/AppLayout.tsx` | Modify — conditional taskbar + density padding |
-| `src/App.tsx` | Modify — add routes + VisualEffectsProvider |
-| `src/features/creative/CreativeFeatures.tsx` | Modify — consume visual effects context |
-| `src/features/creative/KeyboardNavigation.tsx` | Modify — custom shortcuts from localStorage |
-| `src/pages/settings/Preferences.tsx` | Modify — functional Switch toggles + editable shortcuts |
-| `src/index.css` | Modify — expanded density rules |
+| `src/contexts/FilterContext.tsx` | **Create** — ad type, frequency, date range global state |
+| `src/components/ui/table.tsx` | **Modify** — tighter padding, nowrap defaults |
+| `src/components/layout/AppTaskbar.tsx` | **Modify** — add Ad Type, Frequency, Date Range dropdowns |
+| `src/App.tsx` | **Modify** — wrap with FilterProvider |
+| `src/components/advertising/DataTableToolbar.tsx` | **Modify** — add inline filter builder + enhanced columns dropdown |
+| `src/pages/advertising/CampaignManager.tsx` | **Modify** — wire columns/filters state |
+| `src/components/profitability/ProductsPnLTable.tsx` | **Modify** — remove duplicate header, fix colSpan |
+| `src/components/tables/AdGroupsTable.tsx` | **Modify** — fix total row colSpan |
+| `src/components/tables/KeywordTargetingTable.tsx` | **Modify** — fix total row colSpan |
+| `src/components/tables/ProductAdsTable.tsx` | **Modify** — fix total row colSpan |
+| `src/components/tables/SearchTermsTable.tsx` | **Modify** — fix total row colSpan |
 
-## Implementation order
-1. Create `VisualEffectsContext`
-2. Create all AMC pages + mock data
-3. Create all missing Settings pages
-4. Update `AppSidebar` (AMC group + settings items)
-5. Update `AppLayout` (conditional taskbar + density padding)
-6. Update `App.tsx` (routes + provider)
-7. Update `CreativeFeatures` + `KeyboardNavigation`
-8. Rewrite `Preferences` page
-9. Expand density CSS
+## Implementation Order
+1. Create FilterContext
+2. Fix table.tsx base component
+3. Add universal taskbar controls
+4. Fix ProductsPnLTable duplicate header
+5. Fix all total row colSpans across tables
+6. Make DataTableToolbar filter/columns functional
+7. Wire CampaignManager to toolbar
 
