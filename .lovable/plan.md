@@ -1,53 +1,131 @@
+# Taskbar Visibility, Functional Settings, and Density Enhancement
 
-# Hard Fix: Sidebar Position and Geography Map Replacement
+## Problem Summary
 
-## Two Critical Issues
+1. **Taskbar shows on settings pages** — should be hidden on `/settings/*`, `/login`, `/onboarding/*`
+2. **Visual Effects toggles are non-functional** — plain HTML checkboxes with `defaultChecked`, no state persistence, no actual effect on features
+3. **Keyboard shortcuts are read-only** — not editable
+4. **Display density has weak visual impact** — only affects table rows and some card padding; needs to affect more elements (sidebar items, KPI cards, page padding, heading sizes, button sizes, gaps)
 
-### Issue 1: Sidebar Pushed Below Page
+## Phase 1: Conditional Taskbar Visibility
 
-**Root cause**: In `AppSidebar.tsx` line 194, the Sidebar has `z-0` in its className. The shadcn sidebar uses a two-layer system: an outer wrapper div and an inner `fixed inset-y-0 z-10` div. When you put `z-0` on the outer wrapper, it creates a new stacking context. The inner `z-10` only applies WITHIN that `z-0` context, making the entire sidebar render behind the main content.
+### File: `src/components/layout/AppLayout.tsx`
 
-**Fix**: Remove `z-0` from the Sidebar className in `AppSidebar.tsx` line 194. Change:
+Add `useLocation()` and check if the current route starts with `/settings`, `/login`, or `/onboarding`. If so, skip rendering `<AppTaskbar />`.
+
 ```
-"border-r border-sidebar-border bg-sidebar transition-all duration-300 relative z-0"
-```
-to:
-```
-"border-r border-sidebar-border bg-sidebar transition-all duration-300"
+const isSettingsOrAuth = pathname.startsWith("/settings") || pathname.startsWith("/login") || pathname.startsWith("/onboarding");
 ```
 
-That is the entire fix. One class removal.
+Then conditionally render: `{!isSettingsOrAuth && <AppTaskbar />}`
 
-### Issue 2: Geography Map Still Old Hexagonal Dots
+## Phase 2: Create Visual Effects Context
 
-The file `src/components/profitability/GeographyMap.tsx` still contains the exact same hexagonal dot-grid code from the original implementation (330 lines of hex coordinate arrays). Despite being in multiple plans, the rewrite never took effect.
+### New file: `src/contexts/VisualEffectsContext.tsx`
 
-**Fix**: Delete the entire file and recreate it from scratch. The new implementation will use small circles arranged in a refined dot-matrix pattern forming recognizable continent shapes. Key differences from current broken version:
+Create a context that manages boolean toggles persisted to localStorage:
 
-- Use `circle` elements instead of hex `path` elements (cleaner, rounder dots)
-- Increase grid density for better continent recognition (80+ cols, 40+ rows)
-- Proper geographic proportions (North America left, Europe/Africa center, Asia right)
-- Active countries (USA, CAN, MEX) use data-intensity fills with `hsl(var(--primary))` at varying opacity
-- Inactive regions use `hsl(var(--muted-foreground) / 0.1)` - very subtle
-- Floating callout cards positioned near each active country showing name + sales value
-- Zoom/pan controls preserved
-- Hover tooltip at bottom-left
-- Legend bar at bottom
+- `ambientBackground: boolean`
+- `numberAnimations: boolean`
+- `floatingIsland: boolean`
 
-The map country codes will be updated to match what `Geographical.tsx` sends: `USA`, `CAN`, `MEX` (matching `activeCountryData` keys). The `onRegionSelect` callback will fire these same codes.
+Expose `toggle(key)` and individual getters. Default all to `true`.
 
----
+### File: `src/features/creative/CreativeFeatures.tsx`
 
-## Files to Modify
+Read from `useVisualEffects()` context instead of hardcoded `features` prop. Pass context values to conditionally render `AmbientBackground`, `FloatingActionIsland`, and provide a `numberAnimations` flag for downstream components.
 
-| File | Change |
-|------|--------|
-| `src/components/layout/AppSidebar.tsx` | Remove `z-0` and `relative` from Sidebar className (line 194) |
-| `src/components/profitability/GeographyMap.tsx` | Complete delete and rewrite with refined circle-dot world map |
+### File: `src/pages/settings/Preferences.tsx`
+
+Replace raw `<input type="checkbox">` with `<Switch>` from the existing UI library, wired to the `useVisualEffects()` context so toggling actually enables/disables each feature in real-time.
+
+## Phase 3: Editable Keyboard Shortcuts
+
+### File: `src/pages/settings/Preferences.tsx`
+
+Add an "Edit" button per shortcut row. When clicked, the key display becomes an input that captures the next keypress (using a `keydown` listener). Store custom shortcuts in localStorage via a new small context or direct localStorage read in the `KeyboardNavigation` provider.
+
+### File: `src/features/creative/KeyboardNavigation.tsx`
+
+On mount, read any overridden shortcuts from localStorage and merge them with defaults. This allows user-customized bindings.
+
+Add a "Reset to Defaults" button per category.
+
+## Phase 4: Enhanced Density Impact
+
+### File: `src/index.css` (density section)
+
+Expand the `.density-compact` class to affect more elements:
+
+- **Page padding**: `main` padding from `p-6` → `p-4` (via `--page-padding`)
+- **Card gaps**: reduce `gap` between KPI cards and sections
+- **Font sizes**: body text `13px` in compact, headings scale down 2px each
+- **Button height**: `36px` compact vs `40px` comfortable
+- **Sidebar menu items**: reduce padding from `py-2` to `py-1`
+- **KPI card internal spacing**: tighter vertical gaps
+- **Section spacing**: `space-y-6` → `space-y-4` equivalent
+
+Add CSS custom properties for all these, consumed via `var()` in the relevant classes.
+
+### File: `src/components/layout/AppLayout.tsx`
+
+Use `useDensity()` to dynamically set main padding class (`p-6` vs `p-4`).
+
+## Files to Create/Modify
+
+
+| File                                           | Action                                                                          |
+| ---------------------------------------------- | ------------------------------------------------------------------------------- |
+| `src/contexts/VisualEffectsContext.tsx`        | **Create** — context for ambient bg, number animations, floating island toggles |
+| `src/components/layout/AppLayout.tsx`          | **Modify** — conditional taskbar, density-aware main padding                    |
+| `src/pages/settings/Preferences.tsx`           | **Modify** — wire Switch to visual effects context, add editable shortcut UI    |
+| `src/features/creative/CreativeFeatures.tsx`   | **Modify** — consume visual effects context                                     |
+| `src/features/creative/KeyboardNavigation.tsx` | **Modify** — read custom shortcuts from localStorage                            |
+| `src/index.css`                                | **Modify** — expand density-compact rules (fonts, gaps, padding, buttons)       |
+| `src/App.tsx`                                  | **Modify** — wrap with `VisualEffectsProvider`                                  |
+
 
 ## Implementation Order
 
-1. Remove `z-0` from AppSidebar (one-line fix, instant sidebar fix)
-2. Delete and rewrite GeographyMap.tsx with new circle-dot implementation
-3. the tables are still showing data overlap on the fixed side under product name 
-4. data visulization and app style to match orian refrence
+1. Create `VisualEffectsContext`
+2. Wire it into `App.tsx` and `CreativeFeatures.tsx`
+3. Update `AppLayout.tsx` (conditional taskbar + density padding)
+4. Rewrite Preferences page (Switch components, editable shortcuts)
+5. Update `KeyboardNavigation.tsx` (custom shortcut support)
+6. Expand density CSS rules in `index.css`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Scan entire repo and extract:
+
+- All Sidebar module entries
+- All Sub-navigation items per module
+- All Header dropdown menus
+- All Ad Type options
+- All Marketplace options
+- All Date Presets
+- All Frequency dropdown options
+- All Table column definitions per module
+- All Filter field definitions per module
+- All Filter operators per data type
+- All Status badge values                                                                                                                                                                                                                                                                                                              Event priority system:
+
+1. Marketplace change → closes panels & modals
+2. Date change → closes panels & modals
+3. Module change → closes panels
+4. Opening new side panel → closes previous
+5. Modal open → locks panel switching
+6. Density change → recalculates layout but keeps panel open                                                                                                                                                                                                                                                   Visual Effects Scope Rule
+  Visual effects must:
+
+- Never affect table rendering
+- Never affect numeric precision display
+- Never affect accounting formatting
+- Be limited to:
+
+- Background ambient
+- Floating island
+- Creative module only                                                                                                                                                                                                                                                                                                                              **Before making any UI modification:**
+  1. **Extract all menus, filters, column schemas from the git repo.**
+  2. **Output a structured audit in chat.**
+  3. **Confirm missing items with me.**
+  4. **Only after approval proceed with refactoring.**
+  # **Do not assume.**  
+  **Do not hardcode.**  
+  **Do not guess.**
