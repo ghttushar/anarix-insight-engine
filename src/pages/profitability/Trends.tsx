@@ -1,48 +1,192 @@
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ScatterPlotChart } from "@/components/profitability/ScatterPlotChart";
-import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
-import { scatterData, profitabilityProducts } from "@/data/mockProfitability";
+import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModal";
+import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
+import { scatterData, profitabilityProducts, profitabilityMetrics } from "@/data/mockProfitability";
+import { ProfitabilityProduct } from "@/types/profitability";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Play } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Play, Download, TrendingUp } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
+
+const COLUMN_DEFS = [
+  { id: "weeklyData", label: "Weekly Data", visible: true },
+  { id: "total", label: "Total", visible: true },
+];
+
+const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Price"];
 
 export default function ProfitabilityTrends() {
+  const [selectedMetric, setSelectedMetric] = useState("Total Sales");
+  const [dateRange, setDateRange] = useState("quarter");
+  const [searchValue, setSearchValue] = useState("");
+  const [columns, setColumns] = useState(COLUMN_DEFS);
+  const [activeFilters, setActiveFilters] = useState<any[]>([]);
+  const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+
+  const filteredProducts = profitabilityProducts.filter((p) =>
+    p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+    p.itemId.toLowerCase().includes(searchValue.toLowerCase()) ||
+    p.sku.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  const weeks = ["Week-01", "Week-02", "Week-04", "Week-05"];
+
   return (
     <AppLayout>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-heading text-2xl font-semibold text-foreground">Profitability Trends</h1>
             <p className="text-sm text-muted-foreground">Analyze product performance quadrants</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search by Item ID/Product Name/SKU" className="pl-10 w-[280px]" />
-            </div>
-            <Select defaultValue="quarter">
-              <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+            {selectedProducts.length > 0 && (
+              <Badge variant="secondary" className="px-3 py-1">
+                {selectedProducts.length} Product(s) Selected
+              </Badge>
+            )}
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger className="w-[180px] h-9 text-xs">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
+                <SelectItem value="week">Week (by days)</SelectItem>
+                <SelectItem value="month">Month (by days)</SelectItem>
                 <SelectItem value="quarter">A Quarter / 3 months</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
                 <SelectItem value="year">This Year</SelectItem>
               </SelectContent>
             </Select>
-            <Select defaultValue="sales">
-              <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+            <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+              <SelectTrigger className="w-[180px] h-9 text-xs">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                <SelectItem value="sales">Total Sales</SelectItem>
-                <SelectItem value="profit">Net Profit</SelectItem>
-                <SelectItem value="units">Units</SelectItem>
+                {profitabilityMetrics.map((m) => (
+                  <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            <Button><Play className="mr-2 h-4 w-4" />Run</Button>
+            <Button size="sm"><Play className="mr-2 h-4 w-4" />Run</Button>
+            <Button variant="outline" size="sm"><Download className="h-4 w-4" /></Button>
           </div>
         </div>
+
+        {/* Scatter Chart */}
         <ScatterPlotChart data={scatterData} />
-        <ProductsPnLTable products={profitabilityProducts} />
+
+        {/* Product Table */}
+        <div className="rounded-lg border border-border bg-card">
+          <div className="border-b border-border p-4">
+            <DataTableToolbar
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              searchPlaceholder="Search by Item ID / Product Name / SKU..."
+              columns={columns}
+              onColumnToggle={(id) => setColumns((prev) => prev.map((c) => c.id === id ? { ...c, visible: !c.visible } : c))}
+              onSelectAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: true })))}
+              onClearAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: false })))}
+              activeFilters={activeFilters}
+              onFiltersChange={setActiveFilters}
+              filterFields={FILTER_FIELDS}
+              onDownload={() => {}}
+            />
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted">
+                  <TableHead className="sticky left-0 z-20 bg-muted min-w-[300px]">Product Details</TableHead>
+                  {weeks.map((w) => (
+                    <TableHead key={w} className="text-right min-w-[100px]">{w}</TableHead>
+                  ))}
+                  <TableHead className="text-right min-w-[120px] font-semibold">Total</TableHead>
+                  <TableHead className="text-center">Trends</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredProducts.map((product) => {
+                  const total = weeks.reduce((sum, w) => sum + (product.weeklyData?.[w] || 0), 0);
+                  return (
+                    <TableRow key={product.id} className="hover:bg-muted/30 group">
+                      <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-muted/30 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <img src={product.image} alt={product.name} className="h-10 w-10 rounded-md border border-border object-cover flex-shrink-0" />
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-medium text-foreground line-clamp-1">{product.name}</span>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span>{product.itemId}</span>
+                              <span>•</span>
+                              <span>{product.sku}</span>
+                              <span>•</span>
+                              <span>{formatCurrency(product.price)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      {weeks.map((w) => (
+                        <TableCell key={w} className="text-right">
+                          {product.weeklyData?.[w] ? formatCurrency(product.weeklyData[w]) : "-"}
+                        </TableCell>
+                      ))}
+                      <TableCell className="text-right font-medium">{formatCurrency(total)}</TableCell>
+                      <TableCell className="text-center">
+                        <button
+                          onClick={() => setTrendsProduct(product)}
+                          className="text-xs text-primary hover:underline flex items-center gap-1 mx-auto"
+                        >
+                          <TrendingUp className="h-3 w-3" />
+                          Trends
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {/* Total Row */}
+                <TableRow className="bg-muted font-medium">
+                  <TableCell className="sticky left-0 z-10 bg-muted">Total</TableCell>
+                  {weeks.map((w) => (
+                    <TableCell key={w} className="text-right">
+                      {formatCurrency(filteredProducts.reduce((sum, p) => sum + (p.weeklyData?.[w] || 0), 0))}
+                    </TableCell>
+                  ))}
+                  <TableCell className="text-right">
+                    {formatCurrency(filteredProducts.reduce((sum, p) => sum + weeks.reduce((s, w) => s + (p.weeklyData?.[w] || 0), 0), 0))}
+                  </TableCell>
+                  <TableCell />
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
+
+      <ProductTrendsModal
+        product={trendsProduct}
+        isOpen={!!trendsProduct}
+        onClose={() => setTrendsProduct(null)}
+      />
     </AppLayout>
   );
 }

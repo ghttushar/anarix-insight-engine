@@ -30,6 +30,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
 
@@ -62,12 +63,11 @@ export function AppTaskbar() {
   }, [mergedDropdownOpen]);
 
   return (
-    <div className="flex h-12 items-center justify-between border-b border-border bg-card px-4 shrink-0">
-      {/* Left: Universal Controls */}
-      <div className="flex items-center gap-2">
-        {/* Ad Type */}
+    <div className="flex h-12 items-center border-b border-border bg-card px-4 shrink-0">
+      {/* Left Zone: Universal Filters grouped */}
+      <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-1.5 py-1">
         <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
-          <SelectTrigger className="h-8 w-[90px] text-xs">
+          <SelectTrigger className="h-7 w-[80px] text-xs border-0 bg-transparent shadow-none">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -77,9 +77,10 @@ export function AppTaskbar() {
           </SelectContent>
         </Select>
 
-        {/* Frequency */}
+        <Separator orientation="vertical" className="h-5" />
+
         <Select value={frequency} onValueChange={(v) => setFrequency(v as any)}>
-          <SelectTrigger className="h-8 w-[100px] text-xs">
+          <SelectTrigger className="h-7 w-[90px] text-xs border-0 bg-transparent shadow-none">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -89,12 +90,13 @@ export function AppTaskbar() {
           </SelectContent>
         </Select>
 
-        {/* Date Range */}
+        <Separator orientation="vertical" className="h-5" />
+
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs font-normal">
-              <CalendarIcon className="h-3.5 w-3.5" />
-              {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
+            <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-xs font-normal px-2">
+              <CalendarIcon className="h-3 w-3" />
+              {format(dateRange.from, "MMM dd")} - {format(dateRange.to, "MMM dd, yyyy")}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -115,20 +117,23 @@ export function AppTaskbar() {
         </Popover>
       </div>
 
-      {/* Right: Marketplace/Store + Theme + Profile */}
+      {/* Center Spacer */}
+      <div className="flex-1" />
+
+      {/* Right Zone: Marketplace + Theme + Profile */}
       <div className="flex items-center gap-2">
-        {/* Merged Marketplace + Store Selector */}
+        {/* Marketplace + Store */}
         <DropdownMenu open={mergedDropdownOpen} onOpenChange={setMergedDropdownOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors max-w-[260px]">
+            <button className="flex items-center gap-2 rounded-md border border-border bg-background px-2.5 py-1.5 text-sm font-medium hover:bg-muted transition-colors max-w-[240px]">
               <img
                 src={marketplace === "amazon" ? amazonLogo : walmartLogo}
                 alt={marketplace}
                 className="h-4 w-auto object-contain"
               />
               <StatusDot status={currentAccount?.status || "connected"} />
-              <span className="truncate">{displayAccountName}</span>
-              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              <span className="truncate text-xs">{displayAccountName}</span>
+              <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[260px] p-0">
@@ -193,7 +198,7 @@ export function AppTaskbar() {
         {/* Profile Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-md hover:bg-muted px-2 py-1 transition-colors">
+            <button className="flex items-center gap-2 rounded-md hover:bg-muted px-1.5 py-1 transition-colors">
               <Avatar className="h-7 w-7">
                 <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">JD</AvatarFallback>
               </Avatar>
