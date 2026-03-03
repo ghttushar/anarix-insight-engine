@@ -101,8 +101,7 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
               </TableRow>
             ))}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={5} className="font-semibold">Total ({filteredAds.length} product ads)</TableCell>
-              <TableCell colSpan={4}></TableCell>
+              <TableCell colSpan={9} className="font-semibold">Total ({filteredAds.length} product ads)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.clicks)}</TableCell>
               <TableCell className="text-right text-foreground">{formatPercent(productAdsTotals.ctr)}</TableCell>

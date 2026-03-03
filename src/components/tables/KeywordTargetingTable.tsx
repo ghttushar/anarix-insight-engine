@@ -109,8 +109,7 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
               </TableRow>
             ))}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={6} className="font-semibold">Total ({filteredKeywords.length} keywords)</TableCell>
-              <TableCell colSpan={4}></TableCell>
+              <TableCell colSpan={10} className="font-semibold">Total ({filteredKeywords.length} keywords)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.clicks)}</TableCell>
               <TableCell className="text-right text-foreground">{formatPercent(keywordsTotals.ctr)}</TableCell>

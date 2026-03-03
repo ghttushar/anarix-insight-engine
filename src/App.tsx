@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MarketplaceProvider } from "@/contexts/MarketplaceContext";
+import { FilterProvider } from "@/contexts/FilterContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { DensityProvider } from "@/contexts/DensityContext";
 import { AccountProvider, useAccounts } from "@/contexts/AccountContext";
@@ -175,24 +176,26 @@ const App = () => (
       <DensityProvider>
         <AccountProvider>
           <MarketplaceProvider defaultMarketplace="walmart">
-            <AanProvider>
-              <InsightsProvider>
-                <VisualEffectsProvider>
-                  <TooltipProvider>
-                    <Toaster />
-                    <Sonner position="bottom-left" />
-                    <BrowserRouter>
-                      <CreativeFeatures>
-                        <WelcomeToasts />
-                        <AppRoutes />
-                        <AanPanel />
-                        <InsightsPanel />
-                      </CreativeFeatures>
-                    </BrowserRouter>
-                  </TooltipProvider>
-                </VisualEffectsProvider>
-              </InsightsProvider>
-            </AanProvider>
+            <FilterProvider>
+              <AanProvider>
+                <InsightsProvider>
+                  <VisualEffectsProvider>
+                    <TooltipProvider>
+                      <Toaster />
+                      <Sonner position="bottom-left" />
+                      <BrowserRouter>
+                        <CreativeFeatures>
+                          <WelcomeToasts />
+                          <AppRoutes />
+                          <AanPanel />
+                          <InsightsPanel />
+                        </CreativeFeatures>
+                      </BrowserRouter>
+                    </TooltipProvider>
+                  </VisualEffectsProvider>
+                </InsightsProvider>
+              </AanProvider>
+            </FilterProvider>
           </MarketplaceProvider>
         </AccountProvider>
       </DensityProvider>
