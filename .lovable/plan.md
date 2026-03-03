@@ -1,131 +1,136 @@
-# Taskbar Visibility, Functional Settings, and Density Enhancement
 
-## Problem Summary
 
-1. **Taskbar shows on settings pages** — should be hidden on `/settings/*`, `/login`, `/onboarding/*`
-2. **Visual Effects toggles are non-functional** — plain HTML checkboxes with `defaultChecked`, no state persistence, no actual effect on features
-3. **Keyboard shortcuts are read-only** — not editable
-4. **Display density has weak visual impact** — only affects table rows and some card padding; needs to affect more elements (sidebar items, KPI cards, page padding, heading sizes, button sizes, gaps)
+# AMC Module, Missing Settings Pages, and Functional Preferences
 
-## Phase 1: Conditional Taskbar Visibility
+## Audit: What exists vs. what's needed
 
-### File: `src/components/layout/AppLayout.tsx`
+### From the repo sidebar, AMC has 6 sub-pages:
+1. **Queries** — `/amc/queries`
+2. **Executed Queries** — `/amc/executed`
+3. **Schedules** — `/amc/schedules`
+4. **Audiences** — `/amc/audiences`
+5. **Created Audiences** — `/amc/created-audiences`
+6. **Instances** — `/amc/instances`
 
-Add `useLocation()` and check if the current route starts with `/settings`, `/login`, or `/onboarding`. If so, skip rendering `<AppTaskbar />`.
+### Settings pages in repo vs. current app:
 
+| Page | Repo | Current App |
+|------|------|-------------|
+| Accounts | Yes | Yes |
+| Preferences | N/A (new) | Yes |
+| Users | Yes | **Missing** |
+| Invites | Yes | **Missing** |
+| Logs | Yes | **Missing** (sidebar link exists but no page) |
+| Configuration | Yes | **Missing** |
+
+### Also from approved plan:
+- Conditional taskbar (hide on `/settings`, `/login`, `/onboarding`)
+- Visual Effects context (functional toggles)
+- Editable keyboard shortcuts
+- Enhanced density CSS
+
+---
+
+## Implementation
+
+### 1. New files to create
+
+**AMC pages** (6 placeholder pages with AppLayout, tables, and mock data):
+
+| File | Content |
+|------|---------|
+| `src/pages/amc/Queries.tsx` | Table: query name, status, last run, actions. Mock 5 rows. |
+| `src/pages/amc/ExecutedQueries.tsx` | Table: query name, execution time, status, results count. |
+| `src/pages/amc/Schedules.tsx` | Table: schedule name, frequency, next run, status. |
+| `src/pages/amc/Audiences.tsx` | Table: audience name, size, created date, status. |
+| `src/pages/amc/CreatedAudiences.tsx` | Table: audience name, type, size, last updated. |
+| `src/pages/amc/Instances.tsx` | Table: instance ID, region, status, created. |
+| `src/data/mockAMC.ts` | Mock data for all 6 AMC tables. |
+
+**Missing Settings pages** (4):
+
+| File | Content |
+|------|---------|
+| `src/pages/settings/Users.tsx` | Table: name, email, role, status, last login. Invite button. |
+| `src/pages/settings/Invites.tsx` | Table: email, role, status (pending/accepted), sent date. Send invite form. |
+| `src/pages/settings/Logs.tsx` | Table: timestamp, user, action, module, details. Filterable. |
+| `src/pages/settings/Configuration.tsx` | Form sections: default marketplace, default date range, notification preferences, API keys display. |
+
+**Visual Effects Context:**
+
+| File | Content |
+|------|---------|
+| `src/contexts/VisualEffectsContext.tsx` | Context with `ambientBackground`, `numberAnimations`, `floatingIsland` booleans. Persisted to localStorage. `toggle(key)` function. |
+
+### 2. Files to modify
+
+**`src/components/layout/AppSidebar.tsx`** — Add AMC group between Catalog and BI. Add missing settings sub-items (Invites, Configuration).
+
+```text
+Current sidebar order:
+  Workspace → Profitability → Advertising → Catalog → BI → DayParting → Settings
+
+New order:
+  Workspace → Profitability → Advertising → Catalog → AMC → BI → DayParting → Settings
+
+Settings items:
+  Preferences, Accounts, Users, Invites, Logs, Configuration
 ```
-const isSettingsOrAuth = pathname.startsWith("/settings") || pathname.startsWith("/login") || pathname.startsWith("/onboarding");
-```
 
-Then conditionally render: `{!isSettingsOrAuth && <AppTaskbar />}`
+**`src/components/layout/AppLayout.tsx`** — Add `useLocation()`, conditionally hide `<AppTaskbar />` on settings/login/onboarding routes. Use `useDensity()` for dynamic main padding.
 
-## Phase 2: Create Visual Effects Context
+**`src/App.tsx`** — Add all new route imports and `<Route>` entries. Wrap with `VisualEffectsProvider`.
 
-### New file: `src/contexts/VisualEffectsContext.tsx`
+**`src/features/creative/CreativeFeatures.tsx`** — Read from `useVisualEffects()` context to conditionally render `AmbientBackground`, `FloatingActionIsland`.
 
-Create a context that manages boolean toggles persisted to localStorage:
+**`src/features/creative/KeyboardNavigation.tsx`** — On mount, read custom shortcut overrides from `localStorage('anarix-custom-shortcuts')`. Merge with defaults. Custom shortcuts take priority.
 
-- `ambientBackground: boolean`
-- `numberAnimations: boolean`
-- `floatingIsland: boolean`
+**`src/pages/settings/Preferences.tsx`** — Replace `<input type="checkbox">` with `<Switch>` wired to `useVisualEffects()`. Add per-shortcut "Edit" button that captures next keypress. Add "Reset to Defaults" per category. 
 
-Expose `toggle(key)` and individual getters. Default all to `true`.
+**`src/index.css`** — Expand `.density-compact` rules:
+- Body font: 13px
+- Page main padding: 16px (vs 24px)
+- H1: 28px, H2: 20px, H3: 16px
+- Button height: 36px
+- Card gap: 12px
+- Sidebar item padding: `py-1.5`
+- KPI card internal spacing tighter
+- Section gaps reduced
 
-### File: `src/features/creative/CreativeFeatures.tsx`
+---
 
-Read from `useVisualEffects()` context instead of hardcoded `features` prop. Pass context values to conditionally render `AmbientBackground`, `FloatingActionIsland`, and provide a `numberAnimations` flag for downstream components.
+## Files summary
 
-### File: `src/pages/settings/Preferences.tsx`
+| File | Action |
+|------|--------|
+| `src/contexts/VisualEffectsContext.tsx` | Create |
+| `src/data/mockAMC.ts` | Create |
+| `src/pages/amc/Queries.tsx` | Create |
+| `src/pages/amc/ExecutedQueries.tsx` | Create |
+| `src/pages/amc/Schedules.tsx` | Create |
+| `src/pages/amc/Audiences.tsx` | Create |
+| `src/pages/amc/CreatedAudiences.tsx` | Create |
+| `src/pages/amc/Instances.tsx` | Create |
+| `src/pages/settings/Users.tsx` | Create |
+| `src/pages/settings/Invites.tsx` | Create |
+| `src/pages/settings/Logs.tsx` | Create |
+| `src/pages/settings/Configuration.tsx` | Create |
+| `src/components/layout/AppSidebar.tsx` | Modify — add AMC group + settings items |
+| `src/components/layout/AppLayout.tsx` | Modify — conditional taskbar + density padding |
+| `src/App.tsx` | Modify — add routes + VisualEffectsProvider |
+| `src/features/creative/CreativeFeatures.tsx` | Modify — consume visual effects context |
+| `src/features/creative/KeyboardNavigation.tsx` | Modify — custom shortcuts from localStorage |
+| `src/pages/settings/Preferences.tsx` | Modify — functional Switch toggles + editable shortcuts |
+| `src/index.css` | Modify — expanded density rules |
 
-Replace raw `<input type="checkbox">` with `<Switch>` from the existing UI library, wired to the `useVisualEffects()` context so toggling actually enables/disables each feature in real-time.
-
-## Phase 3: Editable Keyboard Shortcuts
-
-### File: `src/pages/settings/Preferences.tsx`
-
-Add an "Edit" button per shortcut row. When clicked, the key display becomes an input that captures the next keypress (using a `keydown` listener). Store custom shortcuts in localStorage via a new small context or direct localStorage read in the `KeyboardNavigation` provider.
-
-### File: `src/features/creative/KeyboardNavigation.tsx`
-
-On mount, read any overridden shortcuts from localStorage and merge them with defaults. This allows user-customized bindings.
-
-Add a "Reset to Defaults" button per category.
-
-## Phase 4: Enhanced Density Impact
-
-### File: `src/index.css` (density section)
-
-Expand the `.density-compact` class to affect more elements:
-
-- **Page padding**: `main` padding from `p-6` → `p-4` (via `--page-padding`)
-- **Card gaps**: reduce `gap` between KPI cards and sections
-- **Font sizes**: body text `13px` in compact, headings scale down 2px each
-- **Button height**: `36px` compact vs `40px` comfortable
-- **Sidebar menu items**: reduce padding from `py-2` to `py-1`
-- **KPI card internal spacing**: tighter vertical gaps
-- **Section spacing**: `space-y-6` → `space-y-4` equivalent
-
-Add CSS custom properties for all these, consumed via `var()` in the relevant classes.
-
-### File: `src/components/layout/AppLayout.tsx`
-
-Use `useDensity()` to dynamically set main padding class (`p-6` vs `p-4`).
-
-## Files to Create/Modify
-
-
-| File                                           | Action                                                                          |
-| ---------------------------------------------- | ------------------------------------------------------------------------------- |
-| `src/contexts/VisualEffectsContext.tsx`        | **Create** — context for ambient bg, number animations, floating island toggles |
-| `src/components/layout/AppLayout.tsx`          | **Modify** — conditional taskbar, density-aware main padding                    |
-| `src/pages/settings/Preferences.tsx`           | **Modify** — wire Switch to visual effects context, add editable shortcut UI    |
-| `src/features/creative/CreativeFeatures.tsx`   | **Modify** — consume visual effects context                                     |
-| `src/features/creative/KeyboardNavigation.tsx` | **Modify** — read custom shortcuts from localStorage                            |
-| `src/index.css`                                | **Modify** — expand density-compact rules (fonts, gaps, padding, buttons)       |
-| `src/App.tsx`                                  | **Modify** — wrap with `VisualEffectsProvider`                                  |
-
-
-## Implementation Order
-
+## Implementation order
 1. Create `VisualEffectsContext`
-2. Wire it into `App.tsx` and `CreativeFeatures.tsx`
-3. Update `AppLayout.tsx` (conditional taskbar + density padding)
-4. Rewrite Preferences page (Switch components, editable shortcuts)
-5. Update `KeyboardNavigation.tsx` (custom shortcut support)
-6. Expand density CSS rules in `index.css`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               Scan entire repo and extract:
+2. Create all AMC pages + mock data
+3. Create all missing Settings pages
+4. Update `AppSidebar` (AMC group + settings items)
+5. Update `AppLayout` (conditional taskbar + density padding)
+6. Update `App.tsx` (routes + provider)
+7. Update `CreativeFeatures` + `KeyboardNavigation`
+8. Rewrite `Preferences` page
+9. Expand density CSS
 
-- All Sidebar module entries
-- All Sub-navigation items per module
-- All Header dropdown menus
-- All Ad Type options
-- All Marketplace options
-- All Date Presets
-- All Frequency dropdown options
-- All Table column definitions per module
-- All Filter field definitions per module
-- All Filter operators per data type
-- All Status badge values                                                                                                                                                                                                                                                                                                              Event priority system:
-
-1. Marketplace change → closes panels & modals
-2. Date change → closes panels & modals
-3. Module change → closes panels
-4. Opening new side panel → closes previous
-5. Modal open → locks panel switching
-6. Density change → recalculates layout but keeps panel open                                                                                                                                                                                                                                                   Visual Effects Scope Rule
-  Visual effects must:
-
-- Never affect table rendering
-- Never affect numeric precision display
-- Never affect accounting formatting
-- Be limited to:
-
-- Background ambient
-- Floating island
-- Creative module only                                                                                                                                                                                                                                                                                                                              **Before making any UI modification:**
-  1. **Extract all menus, filters, column schemas from the git repo.**
-  2. **Output a structured audit in chat.**
-  3. **Confirm missing items with me.**
-  4. **Only after approval proceed with refactoring.**
-  # **Do not assume.**  
-  **Do not hardcode.**  
-  **Do not guess.**
