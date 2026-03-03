@@ -1,93 +1,122 @@
 
 
-# Fix Tables, Add Universal Taskbar Features, Fix Filter/Column Controls
+# Universal DataTableToolbar, Taskbar Layout Fix, and Full Profitability Pages
 
-## Three Issues Identified
+## Three problems to solve
 
-### Issue 1: No universal features in the top taskbar
-From the reference images (image-64), the taskbar should include **Ad Type** dropdown (`All`, `SP`, `SB`, `SD`, `SV`), **Frequency** dropdown (`Daily`, `Weekly`, `Monthly`), and **Date Range** selector — positioned in the taskbar alongside the existing Marketplace/Store selector. These are universal controls that persist across modules.
-
-### Issue 2: Filter and Column dropdowns on tables are not functional
-The `DataTableToolbar` has the UI but `CampaignManager` passes `onFilter={() => {}}` (empty handler) and does not pass `columns` prop at all. The Filter button opens nothing. The Columns button doesn't render because no columns are provided.
-
-### Issue 3: Tables are visually broken — overlapping/crooked
-The root cause is the `Table` component's wrapper uses `overflow-auto` without constraining the table layout. Combined with `min-w-[200px]`+ many columns, the HTML table overflows its container. The `ProductsPnLTable` has a duplicate sticky column header (line 102-103 both say "Product Details"). Several total rows have incorrect `colSpan` counts that don't match the actual number of header columns.
+1. **DataTableToolbar only used in Advertising** — needs to be reusable and applied to ALL tables (Profitability ProductsPnLTable, Catalog, BI, DayParting, AMC)
+2. **Taskbar layout is cluttered** — controls scattered without visual grouping; needs left group (filters) separated cleanly from right group (marketplace/theme/profile) with proper spacing
+3. **Profitability pages are skeletal** — need full interactive pages per the documentation (Dashboard with KPI selection, COGS edit modal, Products/Orders toggle; Trends with scatter chart + product modal; P&L with hierarchical summary + product table; Geography with Coming Soon state)
 
 ---
 
-## Plan
+## Phase 1: Fix Taskbar Layout
 
-### Phase 1: Fix the base Table component
-**File: `src/components/ui/table.tsx`**
-- Add `table-fixed` option or ensure the overflow wrapper constrains properly
-- Reduce default cell padding from `p-4` to `px-3 py-2` for data-dense tables (row height 44px per spec)
-- Add `whitespace-nowrap` to `TableHead` and `TableCell` defaults to prevent line-wrapping that causes layout shifts
-
-### Phase 2: Add universal controls to AppTaskbar
 **File: `src/components/layout/AppTaskbar.tsx`**
-Add three new dropdowns between the left area and the right marketplace section:
-1. **Ad Type** — Select with options: `All`, `SP`, `SB`, `SD`, `SV`
-2. **Frequency** — Select with options: `Daily`, `Weekly`, `Monthly`
-3. **Date Range** — Display current range (e.g., "Feb 24, 2026 - Mar 02, 2026") with preset options
 
-**New context file: `src/contexts/FilterContext.tsx`**
-- Store `adType`, `frequency`, `dateRange` globally
-- Expose setters
-- Persist to localStorage
+Restructure the taskbar into three visual zones with a separator:
+- **Left zone**: Ad Type | Frequency | Date Range (grouped with `gap-1.5`, subtle bg container `bg-muted/50 rounded-md px-1 py-0.5`)
+- **Center spacer**: `flex-1`
+- **Right zone**: Marketplace+Store | Theme toggle | Profile avatar
 
-**File: `src/App.tsx`** — Wrap with `FilterProvider`
+Add a thin visual divider between left and right via a `Separator` or spacing. This cleans up the "scattered" look.
 
-### Phase 3: Make Filter and Columns functional in CampaignManager
-**File: `src/pages/advertising/CampaignManager.tsx`**
-- Add `columns` state array with all column definitions and `visible` boolean
-- Add `filters` state array for active filters
-- Add `filterPanelOpen` state that toggles a filter row (matching image-62: "Where [Campaign Status] [is] [Live]")
-- Pass these to `DataTableToolbar` with proper handlers
-- Pass `visibleColumns` to each table component
+## Phase 2: Make DataTableToolbar Universal
 
-**File: `src/components/advertising/DataTableToolbar.tsx`**
-- Add inline filter builder row: field dropdown + operator dropdown + value dropdown + delete button + "+ Add Filter" link
-- Add "Cancel" and "Apply" buttons
-- Add search + "Clear All" / "Select All" to Columns dropdown (matching image-63)
+The existing `DataTableToolbar` already accepts `columns`, `activeFilters`, `filterFields`, `onDownload` etc. The issue is that **no other page uses it**.
 
-### Phase 4: Fix all broken tables
+**Pages to add DataTableToolbar to:**
 
-**`src/components/profitability/ProductsPnLTable.tsx`**
-- Remove duplicate "Product Details" `TableHead` on line 103
-- Fix total row colSpan to match actual column count (should be 1, not 2 for product details)
+| Page | File | Current toolbar |
+|------|------|----------------|
+| Profitability Dashboard | `ProductsPnLTable.tsx` | Has its own inline toolbar (search, upload COGS, filters, columns, download buttons — all non-functional) |
+| Profitability Trends | `Trends.tsx` | No table toolbar |
+| Profitability P&L | `ProfitLoss.tsx` | No table toolbar |
+| Catalog Products | `CatalogProductsTable.tsx` | Has its own non-functional toolbar |
+| BI Keyword Tracker | `KeywordTracker.tsx` | Has its own search |
+| DayParting tables | Various | No toolbar |
 
-**All advertising tables** (CampaignTable, AdGroupsTable, KeywordTargetingTable, SearchTermsTable, ProductAdsTable, PageTypeTable, PlatformTable):
-- Ensure total row `colSpan` values exactly match the number of preceding non-metric columns
-- Add `whitespace-nowrap` to all `TableHead` elements
-- Ensure `overflow-x-auto` wrapper is on the immediate parent of `<Table>`
+**Approach**: Replace each page's custom toolbar with `DataTableToolbar`, passing appropriate column definitions and filter fields. Each page defines its own `COLUMN_DEFS` and `FILTER_FIELDS` arrays (same pattern as CampaignManager).
 
-**`src/components/tables/CampaignTableTotalRow.tsx`**
-- Fix `colSpan={4}` — should be 4 (checkbox + active + status + name) which is correct, but verify it matches when `showTotalBudget` changes
+## Phase 3: Rebuild Profitability Pages
 
----
+### 3a. Dashboard (`src/pages/profitability/Dashboard.tsx`)
+
+Full rebuild with:
+- **KPI Period Blocks** (Today, Yesterday, This Month, Last Month) — already exist via `PeriodSummaryCard`
+- **Selectable KPI cards** — clicking a card updates the graph below (state: `selectedPeriod`)
+- **Graph section** — `ProfitabilityTrendChart` updates based on selected KPI period
+- **Products/Orders toggle** below graph (tabs switching table columns)
+- **ProductsPnLTable** with `DataTableToolbar` (search, filter, columns, export, Upload COGS button)
+- **Inline COGS edit modal** — small dialog with product image, name, SKU, Item ID, current COGS, editable input, Cancel/Change Cost buttons
+- **"More" product detail panel** — right-side slide panel (reuse `PeriodBreakdownPanel` pattern) showing per-product financial breakdown
+- **Only one KPI panel open at a time** (state management)
+
+### 3b. Trends (`src/pages/profitability/Trends.tsx`)
+
+Full rebuild with:
+- Search bar (Item ID / Product Name / SKU)
+- Product multi-select with count badge
+- Date range selector (Week, Month, Quarter, Year, Custom)
+- Metrics selector (large dropdown: Total Sales, Net Profit, Order Sales, etc.)
+- Run button
+- Download button
+- **Scatter chart** with red/yellow/green background zones (already exists, enhance tooltip to show product image)
+- **Product table** with dynamic time-based columns
+- **Product Trends modal** — dialog with per-product graph, frequency selector, multi-metric lines
+- Pagination
+
+### 3c. P&L (`src/pages/profitability/ProfitLoss.tsx`)
+
+Full rebuild with:
+- Product multi-select search with count badge + Select All
+- Date range selector (Week, Month, Quarter, Year)
+- Run button
+- Download button
+- **P&L Summary Table** (hierarchical, already exists via `PnLParameterTable`) — expand with full row set from documentation (Sales > Organic/SP/SB/SV, Expenses > all sub-items, Orders, Units, Net Profit, ROAS, TACOS)
+- **Bottom Product Table** with `DataTableToolbar` (Search, Products/Orders toggle, Filters, Columns, Download)
+- **Product "More" modal** — overlay with per-product breakdown (Sales, COGS, Expenses, Units, Inventory, Calculated Metrics)
+- Note: Bottom table filters apply immediately (no Run required). Top controls require Run.
+
+### 3d. Geography (`src/pages/profitability/Geographical.tsx`)
+
+- Add "Coming Soon" banner overlay
+- Keep existing map + table but disable interactions
+- Show informational text: "This feature is coming soon. The UI is ready but data is not yet active."
+
+## Phase 4: Expand Mock Data
+
+**File: `src/data/mockProfitability.ts`**
+
+- Add expanded `pnlData` with all hierarchical rows from the documentation (full Sales breakdown, full Expenses breakdown including Walmart Adjustment, Commission, WFS Fee, etc., Orders by ad type, Units by ad type, Net Profit, ROAS, TACOS)
+- Add `profitabilityMetrics` array for Trends metrics dropdown
 
 ## Files Summary
 
 | File | Action |
 |------|--------|
-| `src/contexts/FilterContext.tsx` | **Create** — ad type, frequency, date range global state |
-| `src/components/ui/table.tsx` | **Modify** — tighter padding, nowrap defaults |
-| `src/components/layout/AppTaskbar.tsx` | **Modify** — add Ad Type, Frequency, Date Range dropdowns |
-| `src/App.tsx` | **Modify** — wrap with FilterProvider |
-| `src/components/advertising/DataTableToolbar.tsx` | **Modify** — add inline filter builder + enhanced columns dropdown |
-| `src/pages/advertising/CampaignManager.tsx` | **Modify** — wire columns/filters state |
-| `src/components/profitability/ProductsPnLTable.tsx` | **Modify** — remove duplicate header, fix colSpan |
-| `src/components/tables/AdGroupsTable.tsx` | **Modify** — fix total row colSpan |
-| `src/components/tables/KeywordTargetingTable.tsx` | **Modify** — fix total row colSpan |
-| `src/components/tables/ProductAdsTable.tsx` | **Modify** — fix total row colSpan |
-| `src/components/tables/SearchTermsTable.tsx` | **Modify** — fix total row colSpan |
+| `src/components/layout/AppTaskbar.tsx` | Modify — restructure into grouped zones |
+| `src/components/profitability/ProductsPnLTable.tsx` | Modify — replace inline toolbar with DataTableToolbar, add COGS edit modal, "More" panel |
+| `src/pages/profitability/Dashboard.tsx` | Rewrite — selectable KPI cards, Products/Orders toggle, COGS modal, full interactions |
+| `src/pages/profitability/Trends.tsx` | Rewrite — full page with controls, multi-select, scatter chart, dynamic table, product modal |
+| `src/pages/profitability/ProfitLoss.tsx` | Rewrite — multi-select, Run paradigm, expanded P&L table, product table with toolbar, "More" modal |
+| `src/pages/profitability/Geographical.tsx` | Modify — add Coming Soon overlay |
+| `src/data/mockProfitability.ts` | Modify — expand pnlData with all documented rows, add metrics list |
+| `src/components/profitability/COGSEditModal.tsx` | Create — inline COGS edit dialog |
+| `src/components/profitability/ProductDetailPanel.tsx` | Create — right-side product breakdown panel |
+| `src/components/profitability/ProductTrendsModal.tsx` | Create — per-product trends dialog with graph |
+| `src/components/profitability/ProductsOrdersToggle.tsx` | Create — Products/Orders table toggle |
+| `src/pages/catalog/Products.tsx` | Modify — add DataTableToolbar |
+| `src/components/catalog/CatalogProductsTable.tsx` | Modify — integrate DataTableToolbar |
 
 ## Implementation Order
-1. Create FilterContext
-2. Fix table.tsx base component
-3. Add universal taskbar controls
-4. Fix ProductsPnLTable duplicate header
-5. Fix all total row colSpans across tables
-6. Make DataTableToolbar filter/columns functional
-7. Wire CampaignManager to toolbar
+
+1. Fix AppTaskbar layout grouping
+2. Expand mockProfitability data
+3. Create COGS edit modal, product detail panel, product trends modal
+4. Rewrite Dashboard page
+5. Rewrite Trends page
+6. Rewrite P&L page
+7. Update Geography with Coming Soon
+8. Add DataTableToolbar to Catalog and remaining pages
 
