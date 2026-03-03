@@ -105,8 +105,7 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
               </TableRow>
             ))}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={4} className="font-semibold">Total ({filteredGroups.length} ad groups)</TableCell>
-              <TableCell colSpan={4}></TableCell>
+              <TableCell colSpan={8} className="font-semibold">Total ({filteredGroups.length} ad groups)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(adGroupsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(adGroupsTotals.clicks)}</TableCell>
               <TableCell className="text-right text-foreground">{formatPercent(adGroupsTotals.ctr)}</TableCell>

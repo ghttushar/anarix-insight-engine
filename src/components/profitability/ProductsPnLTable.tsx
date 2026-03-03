@@ -100,7 +100,6 @@ export function ProductsPnLTable({ products }: ProductsPnLTableProps) {
           <TableHeader>
             <TableRow className="bg-muted">
               <TableHead className="sticky left-0 z-20 bg-muted min-w-[300px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.15)] dark:shadow-[2px_0_5px_-2px_rgba(0,0,0,0.3)]">Product Details</TableHead>
-              <TableHead className="sticky left-0 z-20 bg-muted min-w-[300px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Product Details</TableHead>
               <TableHead className="text-right">Units</TableHead>
               <TableHead className="text-right">Refund Units</TableHead>
               <TableHead className="text-right">Cancelled Units</TableHead>
