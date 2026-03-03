@@ -51,8 +51,8 @@ export default function Login() {
           <img
             src={logoWhite}
             alt="Anarix"
-            className="h-12 w-auto mb-12"
-          />
+            className="h-12 w-auto mb-12 object-contain" />
+          
 
           <h1 className="text-4xl font-heading font-bold mb-4 leading-tight">
             The intelligence layer
@@ -67,14 +67,14 @@ export default function Login() {
 
           <div className="mt-12 flex items-center gap-4">
             <div className="flex -space-x-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-xs font-medium"
-                >
+              {[1, 2, 3, 4].map((i) =>
+              <div
+                key={i}
+                className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-xs font-medium">
+                
                   {String.fromCharCode(64 + i)}
                 </div>
-              ))}
+              )}
             </div>
             <p className="text-sm text-white/70">
               Join 2,000+ brands managing $500M+ in ad spend
@@ -110,8 +110,8 @@ export default function Login() {
                   className="pl-10"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+                  required />
+                
               </div>
             </div>
 
@@ -120,8 +120,8 @@ export default function Login() {
                 <Label htmlFor="password">Password</Label>
                 <button
                   type="button"
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
-                >
+                  className="text-sm text-primary hover:text-primary/80 transition-colors">
+                  
                   Forgot Password?
                 </button>
               </div>
@@ -134,13 +134,13 @@ export default function Login() {
                   className="pl-10 pr-10"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                  required />
+                
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
@@ -174,6 +174,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
