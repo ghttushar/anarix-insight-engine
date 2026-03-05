@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, Sun, Moon, User, LogOut, Blocks, Database, Mail, Wrench, Gauge, Wheat, Bell, Activity, Layers } from "lucide-react";
+import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, Sun, Moon, User, LogOut, Blocks, Database, Mail, Wrench, Gauge, Wheat, Bell, Activity, Layers, Image, DollarSign as PriceIcon, FlaskConical, PackageCheck, FileBarChart, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -50,11 +50,16 @@ const navigationGroups: NavGroup[] = [{
     { title: "Budget Pacing", url: "/advertising/budget-pacing", icon: Gauge },
     { title: "Search Harvesting", url: "/advertising/search-harvesting", icon: Wheat },
     { title: "Anomaly Alerts", url: "/advertising/anomaly-alerts", icon: Bell },
+    { title: "Creative Analyzer", url: "/advertising/creative-analyzer", icon: Image },
+    { title: "Rule Builder", url: "/advertising/rules", icon: FlaskConical },
   ]
 }, {
   label: "Catalog",
   icon: ShoppingBag,
-  items: [{ title: "Products", url: "/catalog/products", icon: Package }]
+  items: [
+    { title: "Products", url: "/catalog/products", icon: Package },
+    { title: "Inventory & Ads", url: "/catalog/inventory-ads", icon: PackageCheck },
+  ]
 }, {
   label: "AMC",
   icon: Database,
@@ -74,6 +79,7 @@ const navigationGroups: NavGroup[] = [{
     { title: "Keyword Tracker", url: "/bi/keyword-tracker", icon: Search },
     { title: "Keyword SOV", url: "/bi/keyword-sov", icon: BarChart3 },
     { title: "Product SOV", url: "/bi/product-sov", icon: Package },
+    { title: "Competitor Pricing", url: "/bi/competitor-pricing", icon: BarChart3 },
   ]
 }, {
   label: "Day Parting",
@@ -83,6 +89,12 @@ const navigationGroups: NavGroup[] = [{
     { title: "Campaigns", url: "/dayparting/campaigns", icon: CalendarClock },
     { title: "History", url: "/dayparting/history", icon: History },
     { title: "Scheduled Jobs", url: "/dayparting/scheduled", icon: ListTodo },
+  ]
+}, {
+  label: "Reports",
+  icon: FileBarChart,
+  items: [
+    { title: "Client Portal", url: "/reports/client-portal", icon: Send },
   ]
 }, {
   label: "Settings",
