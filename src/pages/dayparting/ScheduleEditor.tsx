@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { TimeSelector } from "@/components/dayparting/TimeSelector";
 import { DaySelector } from "@/components/dayparting/DaySelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Save, Play, Clock } from "lucide-react";
+import { Save, Play, Clock } from "lucide-react";
 import { dayPartingCampaigns, schedules } from "@/data/mockDayParting";
 import { DayPartingSchedule } from "@/types/dayparting";
+import { toast } from "sonner";
 
 export default function ScheduleEditor() {
   const navigate = useNavigate();
@@ -27,7 +28,6 @@ export default function ScheduleEditor() {
   const [repeatType, setRepeatType] = useState<"daily" | "weekly" | "once">("daily");
   const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
 
-  // Load existing schedule if editing
   useEffect(() => {
     if (isEdit && scheduleId) {
       const existing = schedules.find((s) => s.id === scheduleId);
@@ -64,8 +64,8 @@ export default function ScheduleEditor() {
       startDate,
       status: activate ? "active" : "draft",
     };
-    
     console.log("Saving schedule:", schedule);
+    toast.success(activate ? "Schedule activated" : "Draft saved");
     navigate("/dayparting/scheduled");
   };
 
@@ -73,30 +73,30 @@ export default function ScheduleEditor() {
 
   return (
     <AppLayout>
-      <div className="space-y-6 max-w-4xl">
-        {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="font-heading text-2xl font-semibold text-foreground">
-              {isEdit ? "Edit Schedule" : "Create Schedule"}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Configure day parting rules for your campaigns
-            </p>
-          </div>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title={isEdit ? "Edit Schedule" : "Create Schedule"}
+          subtitle="Configure day parting rules for your campaigns"
+          actions={
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={() => navigate(-1)}>Cancel</Button>
+              <Button variant="outline" onClick={() => handleSave(false)} disabled={!isValid}>
+                <Save className="mr-2 h-4 w-4" />Save as Draft
+              </Button>
+              <Button onClick={() => handleSave(true)} disabled={!isValid}>
+                <Play className="mr-2 h-4 w-4" />Activate Schedule
+              </Button>
+            </div>
+          }
+        />
 
-        {/* Form */}
-        <div className="space-y-6">
-          {/* Schedule Name */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Schedule Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        {/* Two-column layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column — Configuration */}
+          <div className="space-y-6">
+            {/* Schedule Name */}
+            <section className="space-y-3">
+              <h3 className="font-heading text-sm font-semibold text-foreground">Schedule Details</h3>
               <div className="space-y-2">
                 <Label htmlFor="name">Schedule Name</Label>
                 <Input
@@ -106,47 +106,32 @@ export default function ScheduleEditor() {
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Campaign Selection */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Select Campaigns</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {dayPartingCampaigns.map((campaign) => (
-                  <div key={campaign.id} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/30">
-                    <Checkbox
-                      id={campaign.id}
-                      checked={selectedCampaigns.includes(campaign.id)}
-                      onCheckedChange={() => toggleCampaign(campaign.id)}
-                    />
-                    <Label htmlFor={campaign.id} className="flex-1 cursor-pointer">
-                      <span className="font-medium">{campaign.name}</span>
-                      <span className="text-sm text-muted-foreground ml-2">
-                        Budget: ${campaign.budget} • ROAS: {campaign.roas.toFixed(2)}x
-                      </span>
-                    </Label>
-                  </div>
-                ))}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Repeat</Label>
+                  <Select value={repeatType} onValueChange={(v) => setRepeatType(v as typeof repeatType)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="once">Once</SelectItem>
+                      <SelectItem value="daily">Daily</SelectItem>
+                      <SelectItem value="weekly">Weekly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Start Date</Label>
+                  <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </section>
 
-          {/* Action Type */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Action</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            {/* Action Type */}
+            <section className="space-y-3">
+              <h3 className="font-heading text-sm font-semibold text-foreground">Action</h3>
               <div className="space-y-2">
                 <Label>Action Type</Label>
                 <Select value={actionType} onValueChange={(v) => setActionType(v as typeof actionType)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="pause">Pause Campaign</SelectItem>
                     <SelectItem value="reduce_budget">Reduce Budget</SelectItem>
@@ -154,15 +139,12 @@ export default function ScheduleEditor() {
                   </SelectContent>
                 </Select>
               </div>
-
               {actionType !== "pause" && (
                 <div className="space-y-2">
                   <Label>Budget Modifier (%)</Label>
                   <div className="flex items-center gap-2">
                     <Input
-                      type="number"
-                      min={1}
-                      max={100}
+                      type="number" min={1} max={100}
                       value={budgetModifier}
                       onChange={(e) => setBudgetModifier(parseInt(e.target.value) || 0)}
                       className="w-24"
@@ -173,58 +155,56 @@ export default function ScheduleEditor() {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </section>
 
-          {/* Time Selection */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Schedule Timing</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <TimeSelector selectedHours={selectedHours} onHoursChange={setSelectedHours} />
-              <DaySelector selectedDays={selectedDays} onDaysChange={setSelectedDays} />
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Repeat</Label>
-                  <Select value={repeatType} onValueChange={(v) => setRepeatType(v as typeof repeatType)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="once">Once</SelectItem>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Start Date</Label>
-                  <Input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                  />
-                </div>
+            {/* Campaign Selection */}
+            <section className="space-y-3">
+              <h3 className="font-heading text-sm font-semibold text-foreground">
+                Campaigns ({selectedCampaigns.length} selected)
+              </h3>
+              <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                {dayPartingCampaigns.map((campaign) => (
+                  <div key={campaign.id} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors">
+                    <Checkbox
+                      id={campaign.id}
+                      checked={selectedCampaigns.includes(campaign.id)}
+                      onCheckedChange={() => toggleCampaign(campaign.id)}
+                    />
+                    <Label htmlFor={campaign.id} className="flex-1 cursor-pointer">
+                      <span className="font-medium text-sm">{campaign.name}</span>
+                      <span className="text-xs text-muted-foreground ml-2">
+                        ${campaign.budget} • {campaign.roas.toFixed(2)}x ROAS
+                      </span>
+                    </Label>
+                  </div>
+                ))}
               </div>
-            </CardContent>
-          </Card>
+            </section>
+          </div>
 
-          {/* Preview */}
-          <Card className="bg-muted/30">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Clock className="h-4 w-4" />
+          {/* Right Column — Timing & Preview */}
+          <div className="space-y-6">
+            <section className="space-y-3">
+              <h3 className="font-heading text-sm font-semibold text-foreground">Hours</h3>
+              <TimeSelector selectedHours={selectedHours} onHoursChange={setSelectedHours} />
+            </section>
+
+            <section className="space-y-3">
+              <h3 className="font-heading text-sm font-semibold text-foreground">Days</h3>
+              <DaySelector selectedDays={selectedDays} onDaysChange={setSelectedDays} />
+            </section>
+
+            {/* Preview */}
+            <section className="rounded-lg border border-border bg-muted/20 p-4 space-y-2">
+              <h3 className="font-heading text-sm font-semibold text-foreground flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
                 Schedule Preview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {selectedCampaigns.length > 0 ? (
                   <>
                     Will{" "}
-                    <strong>
+                    <strong className="text-foreground">
                       {actionType === "pause"
                         ? "pause"
                         : actionType === "reduce_budget"
@@ -232,30 +212,17 @@ export default function ScheduleEditor() {
                         : `increase budget by ${budgetModifier}%`}
                     </strong>{" "}
                     for {selectedCampaigns.length} campaign(s) during{" "}
-                    {selectedHours.length > 0 ? `${selectedHours.length} hour(s)` : "no hours"} on{" "}
-                    {selectedDays.length > 0 ? `${selectedDays.length} day(s)` : "no days"} each week.
+                    {selectedHours.length > 0 ? `${selectedHours.length} hour(s)` : "no hours selected"} on{" "}
+                    {selectedDays.length > 0 ? `${selectedDays.length} day(s)` : "no days selected"} — repeats{" "}
+                    <strong className="text-foreground">{repeatType}</strong>, starting{" "}
+                    <strong className="text-foreground">{startDate}</strong>.
                   </>
                 ) : (
                   "Select campaigns and configure timing to see preview."
                 )}
               </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            Cancel
-          </Button>
-          <Button variant="outline" onClick={() => handleSave(false)} disabled={!isValid}>
-            <Save className="mr-2 h-4 w-4" />
-            Save as Draft
-          </Button>
-          <Button onClick={() => handleSave(true)} disabled={!isValid}>
-            <Play className="mr-2 h-4 w-4" />
-            Activate Schedule
-          </Button>
+            </section>
+          </div>
         </div>
       </div>
     </AppLayout>

@@ -72,15 +72,13 @@ export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: Hour
   };
 
   const getColor = (intensity: number, isGoodHigher: boolean): string => {
-    // For metrics like ROAS where higher is better, use green
-    // For metrics like ACOS where lower is better, invert
     const effectiveIntensity = isGoodHigher ? intensity : 1 - intensity;
     
-    if (effectiveIntensity < 0.2) return "bg-destructive/20";
-    if (effectiveIntensity < 0.4) return "bg-warning/30";
-    if (effectiveIntensity < 0.6) return "bg-muted";
-    if (effectiveIntensity < 0.8) return "bg-success/30";
-    return "bg-success/50";
+    if (effectiveIntensity < 0.2) return "bg-primary/5";
+    if (effectiveIntensity < 0.4) return "bg-primary/15";
+    if (effectiveIntensity < 0.6) return "bg-primary/30";
+    if (effectiveIntensity < 0.8) return "bg-primary/50";
+    return "bg-primary/70";
   };
 
   const isHigherBetter = ["revenue", "roas", "orders", "units", "clicks", "ctr", "cvr"].includes(metric);
@@ -149,11 +147,11 @@ export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: Hour
             {isHigherBetter ? "Low" : "High"}
           </span>
           <div className="flex rounded overflow-hidden">
-            <div className="h-4 w-8 bg-destructive/20" />
-            <div className="h-4 w-8 bg-warning/30" />
-            <div className="h-4 w-8 bg-muted" />
-            <div className="h-4 w-8 bg-success/30" />
-            <div className="h-4 w-8 bg-success/50" />
+            <div className="h-4 w-8 bg-primary/5" />
+            <div className="h-4 w-8 bg-primary/15" />
+            <div className="h-4 w-8 bg-primary/30" />
+            <div className="h-4 w-8 bg-primary/50" />
+            <div className="h-4 w-8 bg-primary/70" />
           </div>
           <span className="text-xs text-muted-foreground">
             {isHigherBetter ? "High" : "Low"}
