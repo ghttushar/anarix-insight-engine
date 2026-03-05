@@ -1,5 +1,12 @@
-import { ArrowDown, ArrowUp, Minus } from "lucide-react";
+import { useState } from "react";
+import { ArrowDown, ArrowUp, Minus, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface KPIItem {
   label: string;
@@ -9,19 +16,22 @@ interface KPIItem {
   accentColor?: string;
 }
 
+interface AvailableMetric {
+  key: string;
+  label: string;
+  format: "currency" | "number" | "percentage" | "decimal";
+}
+
 interface InlineKPIStripProps {
   items: KPIItem[];
+  availableMetrics?: AvailableMetric[];
+  onMetricChange?: (index: number, metricKey: string) => void;
 }
 
 function formatValue(value: number, format: string): string {
   switch (format) {
     case "currency":
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(value);
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
     case "percentage":
       return `${value.toFixed(2)}%`;
     case "decimal":
@@ -45,7 +55,7 @@ const accentColors: Record<string, string> = {
   accent: "border-l-accent",
 };
 
-export function InlineKPIStrip({ items }: InlineKPIStripProps) {
+export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: InlineKPIStripProps) {
   return (
     <div className="flex gap-1 rounded-lg bg-card p-1">
       {items.map((item, index) => {
@@ -56,15 +66,39 @@ export function InlineKPIStrip({ items }: InlineKPIStripProps) {
 
         return (
           <div
-            key={item.label}
+            key={`${item.label}-${index}`}
             className={cn(
               "flex flex-1 flex-col gap-1 border-l-4 bg-background/50 px-4 py-3 first:rounded-l-md last:rounded-r-md",
               colorClass
             )}
           >
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {item.label}
-            </span>
+            <div className="flex items-center justify-between">
+              {availableMetrics && onMetricChange ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
+                      {item.label}
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="max-h-[240px] overflow-auto">
+                    {availableMetrics.map((metric) => (
+                      <DropdownMenuItem
+                        key={metric.key}
+                        onClick={() => onMetricChange(index, metric.key)}
+                        className="text-xs cursor-pointer"
+                      >
+                        {metric.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  {item.label}
+                </span>
+              )}
+            </div>
             <div className="flex items-baseline justify-between gap-2">
               <span className="text-xl font-semibold text-foreground">
                 {formatValue(item.value, item.format)}

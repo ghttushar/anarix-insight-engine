@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { Sun, Moon, ChevronDown, User, Settings, LogOut, Search, Check, CalendarIcon } from "lucide-react";
+import { ChevronDown, Search, Check, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/contexts/ThemeContext";
 import { useMarketplace, Marketplace } from "@/contexts/MarketplaceContext";
 import { useAccounts } from "@/contexts/AccountContext";
 import { useFilter } from "@/contexts/FilterContext";
@@ -29,7 +28,6 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
@@ -40,7 +38,6 @@ function StatusDot({ status, className }: { status: "connected" | "syncing" | "e
 }
 
 export function AppTaskbar() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
   const { marketplace, setMarketplace } = useMarketplace();
   const { accounts, currentAccount, setCurrentAccount } = useAccounts();
   const { adType, setAdType, frequency, setFrequency, dateRange, setDateRange } = useFilter();
@@ -63,9 +60,9 @@ export function AppTaskbar() {
   }, [mergedDropdownOpen]);
 
   return (
-    <div className="flex h-12 items-center border-b border-border bg-card px-4 shrink-0">
+    <div className="flex h-10 items-center rounded-lg border border-border bg-card px-3 shrink-0">
       {/* Left Zone: Universal Filters grouped */}
-      <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-1.5 py-1">
+      <div className="flex items-center gap-1.5">
         <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
           <SelectTrigger className="h-7 w-[80px] text-xs border-0 bg-transparent shadow-none">
             <SelectValue />
@@ -120,9 +117,8 @@ export function AppTaskbar() {
       {/* Center Spacer */}
       <div className="flex-1" />
 
-      {/* Right Zone: Marketplace + Theme + Profile */}
-      <div className="flex items-center gap-2">
-        {/* Marketplace + Store */}
+      {/* Right Zone: Marketplace + Store only */}
+      <div className="flex items-center">
         <DropdownMenu open={mergedDropdownOpen} onOpenChange={setMergedDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 rounded-md border border-border bg-background px-2.5 py-1.5 text-sm font-medium hover:bg-muted transition-colors max-w-[240px]">
@@ -183,37 +179,6 @@ export function AppTaskbar() {
                 </div>
               )}
             </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Light/Dark Toggle */}
-        <button
-          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-          className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background hover:bg-muted transition-colors"
-          title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {resolvedTheme === "dark" ? <Sun className="h-4 w-4 text-foreground" /> : <Moon className="h-4 w-4 text-foreground" />}
-        </button>
-
-        {/* Profile Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-md hover:bg-muted px-1.5 py-1 transition-colors">
-              <Avatar className="h-7 w-7">
-                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">JD</AvatarFallback>
-              </Avatar>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[180px]">
-            <div className="px-2 py-1.5">
-              <p className="text-sm font-medium">John Doe</p>
-              <p className="text-xs text-muted-foreground">john@anarix.com</p>
-            </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="flex items-center gap-2 cursor-pointer"><User className="h-4 w-4" /><span>Profile</span></DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center gap-2 cursor-pointer"><Settings className="h-4 w-4" /><span>Settings</span></DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-destructive"><LogOut className="h-4 w-4" /><span>Logout</span></DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

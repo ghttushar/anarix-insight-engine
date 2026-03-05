@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ export default function Invites() {
   const [role, setRole] = useState("Viewer");
 
   const handleSendInvite = () => {
-    if (!email) return;
+    if (!email) { toast.error("Please enter an email address"); return; }
     toast.success(`Invitation sent to ${email}`);
     setEmail("");
   };
@@ -34,13 +35,9 @@ export default function Invites() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-4xl space-y-6">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold text-foreground">Invitations</h1>
-          <p className="text-sm text-muted-foreground">Invite team members to join your workspace</p>
-        </div>
+        <PageHeader title="Invitations" subtitle="Invite team members to join your workspace" hideTaskbar />
         <Separator />
 
-        {/* Send Invite Form */}
         <div className="rounded-lg border border-border bg-card p-4 space-y-4">
           <h2 className="font-heading text-lg font-medium text-foreground">Send Invitation</h2>
           <div className="flex gap-3">
@@ -57,7 +54,6 @@ export default function Invites() {
           </div>
         </div>
 
-        {/* Invites Table */}
         <div className="rounded-lg border border-border bg-card">
           <Table>
             <TableHeader>

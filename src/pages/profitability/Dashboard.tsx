@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { PeriodSummaryCard } from "@/components/profitability/PeriodSummaryCard";
 import { ProfitabilityTrendChart } from "@/components/profitability/ProfitabilityTrendChart";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
@@ -9,10 +10,11 @@ import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModa
 import { ProductsOrdersToggle } from "@/components/profitability/ProductsOrdersToggle";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { profitabilitySummaries, profitabilityProducts, trendData } from "@/data/mockProfitability";
-import { ProfitabilitySummary, ProfitabilityProduct } from "@/types/profitability";
-import { Upload } from "lucide-react";
+import { ProfitabilityProduct } from "@/types/profitability";
+import { Upload, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const accentColors = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
@@ -49,8 +51,7 @@ export default function ProfitabilityDashboard() {
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
 
-  // KPI panel state
-  const [openKPIPanel, setOpenKPIPanel] = useState<string | null>(null);
+  const cogsFileInputRef = useState<HTMLInputElement | null>(null);
 
   const handleCogsSave = (productId: string, newCogs: number) => {
     setProducts((prev) => prev.map((p) => p.id === productId ? { ...p, cogs: newCogs } : p));
@@ -58,6 +59,26 @@ export default function ProfitabilityDashboard() {
 
   const handleColumnToggle = (columnId: string) => {
     setColumns((prev) => prev.map((c) => c.id === columnId ? { ...c, visible: !c.visible } : c));
+  };
+
+  const handleUploadCOGS = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".csv,.xlsx,.xls";
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        toast.info(`Analyzing ${file.name}...`);
+        setTimeout(() => {
+          toast.success("COGS uploaded successfully. Table refreshed.");
+        }, 1500);
+      }
+    };
+    input.click();
+  };
+
+  const handleDownload = () => {
+    toast.success("Exporting data as CSV...");
   };
 
   const filteredProducts = products.filter((p) =>
@@ -69,10 +90,7 @@ export default function ProfitabilityDashboard() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold text-foreground">Profitability Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Track your profit metrics and financial performance</p>
-        </div>
+        <PageHeader title="Profitability Dashboard" subtitle="Track your profit metrics and financial performance" />
 
         {/* KPI Period Blocks + Chart */}
         <div className="grid gap-6 lg:grid-cols-3">
@@ -89,6 +107,7 @@ export default function ProfitabilityDashboard() {
                 <PeriodSummaryCard
                   summary={summary}
                   accentColor={accentColors[index % accentColors.length]}
+                  
                 />
               </div>
             ))}
@@ -103,10 +122,16 @@ export default function ProfitabilityDashboard() {
           <div className="border-b border-border p-4 space-y-3">
             <div className="flex items-center justify-between">
               <ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />
-              <Button variant="outline" size="sm">
-                <Upload className="mr-2 h-4 w-4" />
-                Upload COGS
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={handleUploadCOGS}>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload COGS
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleDownload}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+              </div>
             </div>
             <DataTableToolbar
               searchValue={searchValue}
@@ -119,7 +144,7 @@ export default function ProfitabilityDashboard() {
               activeFilters={activeFilters}
               onFiltersChange={setActiveFilters}
               filterFields={FILTER_FIELDS}
-              onDownload={() => {}}
+              onDownload={handleDownload}
             />
           </div>
 
@@ -150,6 +175,8 @@ export default function ProfitabilityDashboard() {
         isOpen={!!trendsProduct}
         onClose={() => setTrendsProduct(null)}
       />
+
+
     </AppLayout>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { ScatterPlotChart } from "@/components/profitability/ScatterPlotChart";
 import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModal";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -8,22 +9,14 @@ import { ProfitabilityProduct } from "@/types/profitability";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Play, Download, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
@@ -43,6 +36,7 @@ export default function ProfitabilityTrends() {
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -52,51 +46,56 @@ export default function ProfitabilityTrends() {
 
   const weeks = ["Week-01", "Week-02", "Week-04", "Week-05"];
 
+  const handleRun = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 800);
+    toast.info("Refreshing data...");
+  };
+
+  const handleDownload = () => {
+    toast.success("Exporting data as CSV...");
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-heading text-2xl font-semibold text-foreground">Profitability Trends</h1>
-            <p className="text-sm text-muted-foreground">Analyze product performance quadrants</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {selectedProducts.length > 0 && (
-              <Badge variant="secondary" className="px-3 py-1">
-                {selectedProducts.length} Product(s) Selected
-              </Badge>
-            )}
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[180px] h-9 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="week">Week (by days)</SelectItem>
-                <SelectItem value="month">Month (by days)</SelectItem>
-                <SelectItem value="quarter">A Quarter / 3 months</SelectItem>
-                <SelectItem value="year">This Year</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={selectedMetric} onValueChange={setSelectedMetric}>
-              <SelectTrigger className="w-[180px] h-9 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {profitabilityMetrics.map((m) => (
-                  <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button size="sm"><Play className="mr-2 h-4 w-4" />Run</Button>
-            <Button variant="outline" size="sm"><Download className="h-4 w-4" /></Button>
-          </div>
-        </div>
+        <PageHeader
+          title="Profitability Trends"
+          subtitle="Analyze product performance quadrants"
+          actions={
+            <>
+              {selectedProducts.length > 0 && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  {selectedProducts.length} Product(s) Selected
+                </Badge>
+              )}
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger className="w-[180px] h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">Week (by days)</SelectItem>
+                  <SelectItem value="month">Month (by days)</SelectItem>
+                  <SelectItem value="quarter">A Quarter / 3 months</SelectItem>
+                  <SelectItem value="year">This Year</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+                <SelectTrigger className="w-[180px] h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {profitabilityMetrics.map((m) => (
+                    <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button size="sm" onClick={handleRun} disabled={isLoading}>
+                <Play className="mr-2 h-4 w-4" />{isLoading ? "Running..." : "Run"}
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleDownload}><Download className="h-4 w-4" /></Button>
+            </>
+          }
+        />
 
-        {/* Scatter Chart */}
         <ScatterPlotChart data={scatterData} />
 
-        {/* Product Table */}
         <div className="rounded-lg border border-border bg-card">
           <div className="border-b border-border p-4">
             <DataTableToolbar
@@ -110,7 +109,7 @@ export default function ProfitabilityTrends() {
               activeFilters={activeFilters}
               onFiltersChange={setActiveFilters}
               filterFields={FILTER_FIELDS}
-              onDownload={() => {}}
+              onDownload={handleDownload}
             />
           </div>
           <div className="overflow-x-auto">
@@ -136,11 +135,7 @@ export default function ProfitabilityTrends() {
                           <div className="flex flex-col min-w-0">
                             <span className="font-medium text-foreground line-clamp-1">{product.name}</span>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span>{product.itemId}</span>
-                              <span>•</span>
-                              <span>{product.sku}</span>
-                              <span>•</span>
-                              <span>{formatCurrency(product.price)}</span>
+                              <span>{product.itemId}</span><span>•</span><span>{product.sku}</span><span>•</span><span>{formatCurrency(product.price)}</span>
                             </div>
                           </div>
                         </div>
@@ -152,18 +147,13 @@ export default function ProfitabilityTrends() {
                       ))}
                       <TableCell className="text-right font-medium">{formatCurrency(total)}</TableCell>
                       <TableCell className="text-center">
-                        <button
-                          onClick={() => setTrendsProduct(product)}
-                          className="text-xs text-primary hover:underline flex items-center gap-1 mx-auto"
-                        >
-                          <TrendingUp className="h-3 w-3" />
-                          Trends
+                        <button onClick={() => setTrendsProduct(product)} className="text-xs text-primary hover:underline flex items-center gap-1 mx-auto">
+                          <TrendingUp className="h-3 w-3" />Trends
                         </button>
                       </TableCell>
                     </TableRow>
                   );
                 })}
-                {/* Total Row */}
                 <TableRow className="bg-muted font-medium">
                   <TableCell className="sticky left-0 z-10 bg-muted">Total</TableCell>
                   {weeks.map((w) => (
@@ -182,11 +172,7 @@ export default function ProfitabilityTrends() {
         </div>
       </div>
 
-      <ProductTrendsModal
-        product={trendsProduct}
-        isOpen={!!trendsProduct}
-        onClose={() => setTrendsProduct(null)}
-      />
+      <ProductTrendsModal product={trendsProduct} isOpen={!!trendsProduct} onClose={() => setTrendsProduct(null)} />
     </AppLayout>
   );
 }

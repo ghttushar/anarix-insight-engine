@@ -63,9 +63,10 @@ export function ProductDetailPanel({ product, isOpen, onClose }: ProductDetailPa
 
   return (
     <>
+      {/* Click-away backdrop — no blur */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/4 backdrop-blur-[1px] transition-opacity"
+          className="fixed inset-0 z-40"
           onClick={onClose}
         />
       )}
@@ -75,7 +76,7 @@ export function ProductDetailPanel({ product, isOpen, onClose }: ProductDetailPa
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
-        <div className="relative overflow-hidden border-b border-border">
+        <div className="relative overflow-hidden border-b border-border shrink-0">
           <div className="relative flex items-center gap-3 px-4 py-4">
             <img
               src={product.image}
@@ -92,7 +93,7 @@ export function ProductDetailPanel({ product, isOpen, onClose }: ProductDetailPa
           </div>
         </div>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea className="flex-1 overflow-hidden">
           <div className="space-y-6 p-4">
             {sections.map((section) => (
               <div key={section.title}>

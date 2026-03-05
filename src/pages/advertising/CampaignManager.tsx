@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -43,74 +44,39 @@ const tabs = [
 
 const COLUMN_DEFS: Record<string, { id: string; label: string }[]> = {
   campaigns: [
-    { id: "active", label: "Active" },
-    { id: "status", label: "Status" },
-    { id: "name", label: "Campaign Name" },
-    { id: "dailyBudget", label: "Daily Budget" },
-    { id: "totalBudget", label: "Total Budget" },
-    { id: "spend", label: "Spend" },
-    { id: "sales", label: "Sales" },
-    { id: "roas", label: "ROAS" },
-    { id: "impressions", label: "Impressions" },
-    { id: "clicks", label: "Clicks" },
-    { id: "ctr", label: "CTR" },
-    { id: "acos", label: "ACOS" },
+    { id: "active", label: "Active" }, { id: "status", label: "Status" }, { id: "name", label: "Campaign Name" },
+    { id: "dailyBudget", label: "Daily Budget" }, { id: "totalBudget", label: "Total Budget" }, { id: "spend", label: "Spend" },
+    { id: "sales", label: "Sales" }, { id: "roas", label: "ROAS" }, { id: "impressions", label: "Impressions" },
+    { id: "clicks", label: "Clicks" }, { id: "ctr", label: "CTR" }, { id: "acos", label: "ACOS" },
   ],
   "ad-groups": [
-    { id: "status", label: "Status" },
-    { id: "name", label: "Ad Group" },
-    { id: "campaign", label: "Campaign" },
-    { id: "bidAuto", label: "Bid Auto" },
-    { id: "impressions", label: "Impressions" },
-    { id: "clicks", label: "Clicks" },
-    { id: "ctr", label: "CTR" },
-    { id: "adSpend", label: "Ad Spend" },
-    { id: "adSales", label: "Ad Sales" },
-    { id: "roas", label: "ROAS" },
-    { id: "acos", label: "ACOS" },
+    { id: "status", label: "Status" }, { id: "name", label: "Ad Group" }, { id: "campaign", label: "Campaign" },
+    { id: "bidAuto", label: "Bid Auto" }, { id: "impressions", label: "Impressions" }, { id: "clicks", label: "Clicks" },
+    { id: "ctr", label: "CTR" }, { id: "adSpend", label: "Ad Spend" }, { id: "adSales", label: "Ad Sales" },
+    { id: "roas", label: "ROAS" }, { id: "acos", label: "ACOS" },
   ],
   "product-ads": [
-    { id: "status", label: "Status" },
-    { id: "productAd", label: "Product Ad" },
-    { id: "adGroup", label: "Ad Group" },
-    { id: "campaign", label: "Campaign" },
-    { id: "impressions", label: "Impressions" },
-    { id: "clicks", label: "Clicks" },
-    { id: "ctr", label: "CTR" },
-    { id: "adSpend", label: "Ad Spend" },
+    { id: "status", label: "Status" }, { id: "productAd", label: "Product Ad" }, { id: "adGroup", label: "Ad Group" },
+    { id: "campaign", label: "Campaign" }, { id: "impressions", label: "Impressions" }, { id: "clicks", label: "Clicks" },
+    { id: "ctr", label: "CTR" }, { id: "adSpend", label: "Ad Spend" },
   ],
   keywords: [
-    { id: "status", label: "Status" },
-    { id: "keyword", label: "Keyword" },
-    { id: "matchType", label: "Match Type" },
-    { id: "adGroup", label: "Ad Group" },
-    { id: "campaign", label: "Campaign" },
-    { id: "impressions", label: "Impressions" },
-    { id: "clicks", label: "Clicks" },
-    { id: "adSpend", label: "Ad Spend" },
+    { id: "status", label: "Status" }, { id: "keyword", label: "Keyword" }, { id: "matchType", label: "Match Type" },
+    { id: "adGroup", label: "Ad Group" }, { id: "campaign", label: "Campaign" }, { id: "impressions", label: "Impressions" },
+    { id: "clicks", label: "Clicks" }, { id: "adSpend", label: "Ad Spend" },
   ],
   "search-terms": [
-    { id: "searchTerm", label: "Search Term" },
-    { id: "productAd", label: "Product Ad" },
-    { id: "keyword", label: "Keyword" },
-    { id: "matchType", label: "Match Type" },
-    { id: "impressions", label: "Impressions" },
-    { id: "clicks", label: "Clicks" },
+    { id: "searchTerm", label: "Search Term" }, { id: "productAd", label: "Product Ad" }, { id: "keyword", label: "Keyword" },
+    { id: "matchType", label: "Match Type" }, { id: "impressions", label: "Impressions" }, { id: "clicks", label: "Clicks" },
     { id: "adSpend", label: "Ad Spend" },
   ],
   "page-type": [
-    { id: "pageType", label: "Page Type" },
-    { id: "bidModifier", label: "Bid Modifier" },
-    { id: "impressions", label: "Impressions" },
-    { id: "adSpend", label: "Ad Spend" },
-    { id: "roas", label: "ROAS" },
+    { id: "pageType", label: "Page Type" }, { id: "bidModifier", label: "Bid Modifier" },
+    { id: "impressions", label: "Impressions" }, { id: "adSpend", label: "Ad Spend" }, { id: "roas", label: "ROAS" },
   ],
   platform: [
-    { id: "platform", label: "Platform" },
-    { id: "bidModifier", label: "Bid Modifier" },
-    { id: "impressions", label: "Impressions" },
-    { id: "adSpend", label: "Ad Spend" },
-    { id: "roas", label: "ROAS" },
+    { id: "platform", label: "Platform" }, { id: "bidModifier", label: "Bid Modifier" },
+    { id: "impressions", label: "Impressions" }, { id: "adSpend", label: "Ad Spend" }, { id: "roas", label: "ROAS" },
   ],
 };
 
@@ -124,13 +90,17 @@ const FILTER_FIELDS: Record<string, string[]> = {
   platform: ["Platform", "Bid Modifier", "ROAS"],
 };
 
-const kpiItems = mockKPIData.map((kpi, index) => ({
-  label: kpi.label,
-  value: kpi.value,
-  previousValue: kpi.previousValue,
-  format: kpi.format as "currency" | "number" | "percentage" | "decimal",
-  accentColor: index === 0 ? "primary" : index === 1 ? "success" : index === 2 ? "accent" : "warning",
-}));
+const AVAILABLE_METRICS = [
+  { key: "impressions", label: "Impressions", format: "number" as const },
+  { key: "clicks", label: "Clicks", format: "number" as const },
+  { key: "spend", label: "Ad Spend", format: "currency" as const },
+  { key: "sales", label: "Ad Sales", format: "currency" as const },
+  { key: "orders", label: "Ad Orders", format: "number" as const },
+  { key: "roas", label: "ROAS", format: "decimal" as const },
+  { key: "acos", label: "ACOS", format: "percentage" as const },
+  { key: "ctr", label: "CTR", format: "percentage" as const },
+  { key: "cpc", label: "CPC", format: "currency" as const },
+];
 
 export default function CampaignManager() {
   const { isWalmart } = useMarketplace();
@@ -141,18 +111,27 @@ export default function CampaignManager() {
   const [viewMode, setViewMode] = useState<"view" | "edit">("view");
   const [activeFilters, setActiveFilters] = useState<FilterRule[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
+  const [selectedKPIs, setSelectedKPIs] = useState<string[]>(
+    mockKPIData.slice(0, 4).map((k) => k.label)
+  );
+
+  const kpiItems = mockKPIData
+    .filter((kpi) => selectedKPIs.includes(kpi.label))
+    .map((kpi, index) => ({
+      label: kpi.label,
+      value: kpi.value,
+      previousValue: kpi.previousValue,
+      format: kpi.format as "currency" | "number" | "percentage" | "decimal",
+      accentColor: index === 0 ? "primary" : index === 1 ? "success" : index === 2 ? "accent" : "warning",
+    }));
 
   const currentColumnDefs = COLUMN_DEFS[activeTab] || [];
-  const columns = currentColumnDefs.map((c) => ({
-    ...c,
-    visible: !hiddenColumns.has(c.id),
-  }));
+  const columns = currentColumnDefs.map((c) => ({ ...c, visible: !hiddenColumns.has(c.id) }));
 
   const handleColumnToggle = (columnId: string) => {
     setHiddenColumns((prev) => {
       const next = new Set(prev);
-      if (next.has(columnId)) next.delete(columnId);
-      else next.add(columnId);
+      if (next.has(columnId)) next.delete(columnId); else next.add(columnId);
       return next;
     });
   };
@@ -162,42 +141,43 @@ export default function CampaignManager() {
 
   const handleActiveToggle = (id: string, isActive: boolean) => {
     setCampaigns((prev) =>
-      prev.map((c) =>
-        c.id === id ? { ...c, isActive, status: isActive ? "live" : "paused" } : c
-      )
+      prev.map((c) => c.id === id ? { ...c, isActive, status: isActive ? "live" : "paused" } : c)
     );
+  };
+
+  const handleKPISwap = (index: number, newMetricKey: string) => {
+    const metric = AVAILABLE_METRICS.find((m) => m.key === newMetricKey);
+    if (!metric) return;
+    setSelectedKPIs((prev) => {
+      const next = [...prev];
+      next[index] = metric.label;
+      return next;
+    });
   };
 
   const renderTable = () => {
     switch (activeTab) {
-      case "campaigns":
-        return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} showTotalBudget={isWalmart} searchQuery={searchQuery} />;
-      case "ad-groups":
-        return <AdGroupsTable searchQuery={searchQuery} />;
-      case "product-ads":
-        return <ProductAdsTable searchQuery={searchQuery} />;
-      case "keywords":
-        return <KeywordTargetingTable searchQuery={searchQuery} />;
-      case "search-terms":
-        return <SearchTermsTable searchQuery={searchQuery} />;
-      case "page-type":
-        return <PageTypeTable searchQuery={searchQuery} />;
-      case "platform":
-        return <PlatformTable searchQuery={searchQuery} />;
-      default:
-        return null;
+      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} showTotalBudget={isWalmart} searchQuery={searchQuery} />;
+      case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} />;
+      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} />;
+      case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} />;
+      case "search-terms": return <SearchTermsTable searchQuery={searchQuery} />;
+      case "page-type": return <PageTypeTable searchQuery={searchQuery} />;
+      case "platform": return <PlatformTable searchQuery={searchQuery} />;
+      default: return null;
     }
   };
 
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold text-foreground">Campaign Manager</h1>
-          <p className="text-sm text-muted-foreground">Manage and optimize your advertising campaigns</p>
-        </div>
+        <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
 
-        <InlineKPIStrip items={kpiItems} />
+        <InlineKPIStrip
+          items={kpiItems}
+          availableMetrics={AVAILABLE_METRICS}
+          onMetricChange={handleKPISwap}
+        />
 
         {showChart && (
           <div className="rounded-lg border border-border bg-card">
@@ -209,9 +189,7 @@ export default function CampaignManager() {
                 <Button variant="ghost" size="sm"><Download className="h-4 w-4" /></Button>
               </div>
             </div>
-            <div className="p-4">
-              <PerformanceChart data={mockChartData} />
-            </div>
+            <div className="p-4"><PerformanceChart data={mockChartData} /></div>
           </div>
         )}
 

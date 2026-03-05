@@ -11,11 +11,7 @@ interface PeriodBreakdownPanelProps {
 }
 
 const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(value);
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
 };
 
 const formatPercent = (value: number) => `${value.toFixed(1)}%`;
@@ -62,23 +58,23 @@ export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdo
 
   return (
     <>
-      {/* Backdrop - same as Aan panel */}
+      {/* Click-away backdrop — no blur, no tint */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/4 backdrop-blur-[1px] transition-opacity"
+          className="fixed inset-0 z-40"
           onClick={onClose}
         />
       )}
 
-      {/* Panel - Aan-style slide-in */}
+      {/* Panel */}
       <div
         className={cn(
           "fixed right-0 top-0 z-50 flex h-full w-[400px] flex-col border-l border-border bg-background transition-transform duration-300 ease-out",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
-        {/* Header with gradient accent */}
-        <div className="relative overflow-hidden border-b border-border">
+        {/* Header */}
+        <div className="relative overflow-hidden border-b border-border shrink-0">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5" />
           <div className="relative flex items-center justify-between px-4 py-4">
             <div>
@@ -93,8 +89,8 @@ export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdo
           </div>
         </div>
 
-        {/* Content */}
-        <ScrollArea className="flex-1">
+        {/* Content — independent scroll */}
+        <ScrollArea className="flex-1 overflow-hidden">
           <div className="space-y-6 p-4">
             {sections.map((section) => (
               <div key={section.title}>
@@ -103,17 +99,9 @@ export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdo
                 </h3>
                 <div className="space-y-2">
                   {section.items.map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2"
-                    >
+                    <div key={item.label} className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
                       <span className="text-sm text-muted-foreground">{item.label}</span>
-                      <span
-                        className={cn(
-                          "font-medium",
-                          item.highlight ? "text-success" : "text-foreground"
-                        )}
-                      >
+                      <span className={cn("font-medium", item.highlight ? "text-success" : "text-foreground")}>
                         {item.value}
                       </span>
                     </div>
