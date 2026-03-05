@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { KeywordTrackerTable } from "@/components/bi/KeywordTrackerTable";
 import { AddKeywordModal } from "@/components/bi/AddKeywordModal";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { trackedKeywords as initialKeywords } from "@/data/mockBrandSOV";
 import { TrackedKeyword } from "@/types/bi";
+import { toast } from "sonner";
 
 export default function KeywordTracker() {
   const [keywords, setKeywords] = useState<TrackedKeyword[]>(initialKeywords);
@@ -41,17 +42,18 @@ export default function KeywordTracker() {
           actions={<Button onClick={() => setIsAddModalOpen(true)}><Plus className="mr-2 h-4 w-4" />Add Keyword</Button>}
         />
 
+        <DataTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search by keyword..."
+          onDownload={() => toast.success("Exporting keywords...")}
+        />
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <div className="flex items-center justify-between">
-            <TabsList>
-              <TabsTrigger value="active">Active ({activeKeywords.length})</TabsTrigger>
-              <TabsTrigger value="inactive">Inactive ({inactiveKeywords.length})</TabsTrigger>
-            </TabsList>
-            <div className="relative w-72">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search by keyword..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
-            </div>
-          </div>
+          <TabsList>
+            <TabsTrigger value="active">Active ({activeKeywords.length})</TabsTrigger>
+            <TabsTrigger value="inactive">Inactive ({inactiveKeywords.length})</TabsTrigger>
+          </TabsList>
           <TabsContent value="active" className="mt-4"><KeywordTrackerTable keywords={filteredKeywords} onStatusChange={handleStatusChange} onDelete={handleDelete} /></TabsContent>
           <TabsContent value="inactive" className="mt-4"><KeywordTrackerTable keywords={filteredKeywords} onStatusChange={handleStatusChange} onDelete={handleDelete} /></TabsContent>
         </Tabs>
