@@ -77,18 +77,6 @@ export default function TargetingActions() {
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">Date Range:</span>
-            <Select defaultValue="last-30">
-              <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="last-7">Last 7 days</SelectItem>
-                <SelectItem value="last-14">Last 14 days</SelectItem>
-                <SelectItem value="last-30">Last 30 days</SelectItem>
-                <SelectItem value="last-60">Last 60 days</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-muted-foreground">Priority:</span>
             <Select defaultValue="high">
               <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>

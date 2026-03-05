@@ -62,62 +62,53 @@ export function ProductDetailPanel({ product, isOpen, onClose }: ProductDetailPa
   ];
 
   return (
-    <>
-      {/* Click-away backdrop — no blur */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={onClose}
-        />
+    <div
+      className={cn(
+        "fixed right-0 top-0 z-50 flex h-full w-[400px] flex-col border-l border-border bg-background transition-transform duration-200 ease-out",
+        isOpen ? "translate-x-0" : "translate-x-full"
       )}
-      <div
-        className={cn(
-          "fixed right-0 top-0 z-50 flex h-full w-[400px] flex-col border-l border-border bg-background transition-transform duration-200 ease-out",
-          isOpen ? "translate-x-0" : "translate-x-full"
-        )}
-      >
-        <div className="relative overflow-hidden border-b border-border shrink-0">
-          <div className="relative flex items-center gap-3 px-4 py-4">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="h-10 w-10 rounded-md border border-border object-cover flex-shrink-0"
-            />
-            <div className="min-w-0 flex-1">
-              <h2 className="font-heading text-sm font-semibold text-foreground line-clamp-1">{product.name}</h2>
-              <p className="text-xs text-muted-foreground">{product.itemId} • {product.sku}</p>
-            </div>
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 shrink-0">
-              <X className="h-4 w-4" />
-            </Button>
+    >
+      <div className="border-b border-border shrink-0">
+        <div className="flex items-center gap-3 px-4 py-4">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="h-10 w-10 rounded-md border border-border object-cover flex-shrink-0"
+          />
+          <div className="min-w-0 flex-1">
+            <h2 className="font-heading text-sm font-semibold text-foreground line-clamp-1">{product.name}</h2>
+            <p className="text-xs text-muted-foreground">{product.itemId} • {product.sku}</p>
           </div>
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 shrink-0">
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-
-        <ScrollArea className="flex-1 overflow-hidden">
-          <div className="space-y-6 p-4">
-            {sections.map((section) => (
-              <div key={section.title}>
-                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  {section.title}
-                </h3>
-                <div className="space-y-2">
-                  {section.items.map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2"
-                    >
-                      <span className="text-sm text-muted-foreground">{item.label}</span>
-                      <span className={cn("font-medium", item.highlight ? "text-success" : "text-foreground")}>
-                        {item.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
       </div>
-    </>
+
+      <ScrollArea className="flex-1 overflow-hidden">
+        <div className="space-y-6 p-4">
+          {sections.map((section) => (
+            <div key={section.title}>
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                {section.title}
+              </h3>
+              <div className="space-y-2">
+                {section.items.map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2"
+                  >
+                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                    <span className={cn("font-medium", item.highlight ? "text-success" : "text-foreground")}>
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
