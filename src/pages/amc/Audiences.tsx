@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { mockAudiences } from "@/data/mockAMC";
+import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
   ready: "bg-success/10 text-success",
@@ -10,18 +14,30 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AMCAudiences() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filtered = mockAudiences.filter((a) =>
+    a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    a.source.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold text-foreground">AMC Audiences</h1>
-          <p className="text-sm text-muted-foreground">Audiences generated from AMC query results</p>
-        </div>
+        <PageHeader title="AMC Audiences" subtitle="Audiences generated from AMC query results" />
 
         <div className="rounded-lg border border-border bg-card">
+          <div className="border-b border-border p-4">
+            <DataTableToolbar
+              searchValue={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder="Search audiences..."
+              onDownload={() => toast.success("Exporting audiences...")}
+            />
+          </div>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
                 <TableHead>Audience Name</TableHead>
                 <TableHead>Size</TableHead>
                 <TableHead>Source Query</TableHead>
@@ -30,7 +46,7 @@ export default function AMCAudiences() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockAudiences.map(a => (
+              {filtered.map(a => (
                 <TableRow key={a.id}>
                   <TableCell className="font-medium">{a.name}</TableCell>
                   <TableCell>{a.size.toLocaleString()}</TableCell>
@@ -39,6 +55,9 @@ export default function AMCAudiences() {
                   <TableCell><Badge className={statusColors[a.status]}>{a.status}</Badge></TableCell>
                 </TableRow>
               ))}
+              {filtered.length === 0 && (
+                <TableRow><TableCell colSpan={5} className="h-32 text-center text-muted-foreground">No audiences found</TableCell></TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

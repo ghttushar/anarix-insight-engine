@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { mockExecutedQueries } from "@/data/mockAMC";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
   completed: "bg-success/10 text-success",
@@ -11,18 +15,29 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AMCExecutedQueries() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filtered = mockExecutedQueries.filter((eq) =>
+    eq.queryName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold text-foreground">Executed Queries</h1>
-          <p className="text-sm text-muted-foreground">View query execution history and results</p>
-        </div>
+        <PageHeader title="Executed Queries" subtitle="View query execution history and results" />
 
         <div className="rounded-lg border border-border bg-card">
+          <div className="border-b border-border p-4">
+            <DataTableToolbar
+              searchValue={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder="Search executed queries..."
+              onDownload={() => toast.success("Exporting executed queries...")}
+            />
+          </div>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
                 <TableHead>Query Name</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Execution Time</TableHead>
@@ -31,7 +46,7 @@ export default function AMCExecutedQueries() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockExecutedQueries.map(eq => (
+              {filtered.map(eq => (
                 <TableRow key={eq.id}>
                   <TableCell className="font-medium">{eq.queryName}</TableCell>
                   <TableCell>
@@ -45,6 +60,9 @@ export default function AMCExecutedQueries() {
                   <TableCell className="text-muted-foreground">{eq.executedAt}</TableCell>
                 </TableRow>
               ))}
+              {filtered.length === 0 && (
+                <TableRow><TableCell colSpan={5} className="h-32 text-center text-muted-foreground">No executed queries found</TableCell></TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

@@ -116,7 +116,7 @@ export function DataTableToolbar({
     <div className="space-y-3">
       {/* Main Toolbar Row */}
       <div className="flex items-center justify-between gap-4">
-        {/* Left Side */}
+        {/* Left Side: Search + View Toggle */}
         <div className="flex items-center gap-2">
           {showViewToggle && onViewModeChange && (
             <div className="flex rounded-lg border border-border bg-background p-0.5">
@@ -142,11 +142,8 @@ export function DataTableToolbar({
               </button>
             </div>
           )}
-        </div>
 
-        {/* Right Side */}
-        <div className="flex items-center gap-2">
-          {/* Search */}
+          {/* Search — always on left */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -156,7 +153,10 @@ export function DataTableToolbar({
               className="h-9 w-64 pl-9"
             />
           </div>
+        </div>
 
+        {/* Right Side: Columns + Filter + Download */}
+        <div className="flex items-center gap-2">
           {/* Columns Dropdown */}
           {columns.length > 0 && onColumnToggle && (
             <DropdownMenu>

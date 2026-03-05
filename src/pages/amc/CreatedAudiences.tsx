@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { mockCreatedAudiences } from "@/data/mockAMC";
+import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
   active: "bg-success/10 text-success",
@@ -15,18 +19,29 @@ const typeColors: Record<string, string> = {
 };
 
 export default function AMCCreatedAudiences() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filtered = mockCreatedAudiences.filter((ca) =>
+    ca.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="font-heading text-2xl font-semibold text-foreground">Created Audiences</h1>
-          <p className="text-sm text-muted-foreground">Audiences created for activation in DSP campaigns</p>
-        </div>
+        <PageHeader title="Created Audiences" subtitle="Audiences created for activation in DSP campaigns" />
 
         <div className="rounded-lg border border-border bg-card">
+          <div className="border-b border-border p-4">
+            <DataTableToolbar
+              searchValue={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder="Search audiences..."
+              onDownload={() => toast.success("Exporting audiences...")}
+            />
+          </div>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
                 <TableHead>Audience Name</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Size</TableHead>
@@ -35,7 +50,7 @@ export default function AMCCreatedAudiences() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockCreatedAudiences.map(ca => (
+              {filtered.map(ca => (
                 <TableRow key={ca.id}>
                   <TableCell className="font-medium">{ca.name}</TableCell>
                   <TableCell><Badge className={typeColors[ca.type]}>{ca.type}</Badge></TableCell>
@@ -44,6 +59,9 @@ export default function AMCCreatedAudiences() {
                   <TableCell><Badge className={statusColors[ca.status]}>{ca.status}</Badge></TableCell>
                 </TableRow>
               ))}
+              {filtered.length === 0 && (
+                <TableRow><TableCell colSpan={5} className="h-32 text-center text-muted-foreground">No audiences found</TableCell></TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
