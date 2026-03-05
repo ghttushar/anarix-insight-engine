@@ -154,9 +154,9 @@ export default function TargetingActions() {
                       </Select>
                     </TableCell>
                     {(["broad", "exact", "phrase"] as const).map((matchType) => (
-                      <TableCell key={matchType} className="text-center">
-                        <div className="flex flex-col items-center gap-1">
-                          <Checkbox checked={action.matchTypes[matchType].selected} className="mb-1" />
+                      <TableCell key={matchType} className="text-center px-2">
+                        <div className="flex items-center justify-center gap-2">
+                          <Checkbox checked={action.matchTypes[matchType].selected} />
                           <Input type="number" value={action.matchTypes[matchType].bid} className="h-7 w-16 text-center text-xs" step={0.01} />
                         </div>
                       </TableCell>
