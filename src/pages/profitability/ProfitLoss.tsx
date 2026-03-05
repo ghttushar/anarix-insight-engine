@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { PnLParameterTable } from "@/components/profitability/PnLParameterTable";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
 import { ProductDetailPanel } from "@/components/profitability/ProductDetailPanel";
@@ -10,13 +11,10 @@ import { ProfitabilityProduct } from "@/types/profitability";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Download, Play } from "lucide-react";
+import { toast } from "sonner";
 
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },
@@ -41,6 +39,7 @@ export default function ProfitLoss() {
   const [columns, setColumns] = useState(COLUMN_DEFS);
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -48,37 +47,44 @@ export default function ProfitLoss() {
     p.sku.toLowerCase().includes(searchValue.toLowerCase())
   );
 
+  const handleRun = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 800);
+    toast.info("Refreshing data...");
+  };
+
+  const handleDownload = () => {
+    toast.success("Exporting data as CSV...");
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-heading text-2xl font-semibold text-foreground">Profit & Loss</h1>
-            <p className="text-sm text-muted-foreground">Detailed P&L breakdown by period</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="px-3 py-1">{selectedCount} Product(s) Selected</Badge>
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[180px] h-9 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="week">Week (by days)</SelectItem>
-                <SelectItem value="month">Month (by days)</SelectItem>
-                <SelectItem value="quarter">A Quarter / 3 months</SelectItem>
-                <SelectItem value="year">This Year</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button size="sm"><Play className="mr-2 h-4 w-4" />Run</Button>
-            <Button variant="outline" size="sm"><Download className="h-4 w-4" /></Button>
-          </div>
-        </div>
+        <PageHeader
+          title="Profit & Loss"
+          subtitle="Detailed P&L breakdown by period"
+          actions={
+            <>
+              <Badge variant="secondary" className="px-3 py-1">{selectedCount} Product(s) Selected</Badge>
+              <Select value={dateRange} onValueChange={setDateRange}>
+                <SelectTrigger className="w-[180px] h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">Week (by days)</SelectItem>
+                  <SelectItem value="month">Month (by days)</SelectItem>
+                  <SelectItem value="quarter">A Quarter / 3 months</SelectItem>
+                  <SelectItem value="year">This Year</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button size="sm" onClick={handleRun} disabled={isLoading}>
+                <Play className="mr-2 h-4 w-4" />{isLoading ? "Running..." : "Run"}
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleDownload}><Download className="h-4 w-4" /></Button>
+            </>
+          }
+        />
 
-        {/* P&L Summary Table (hierarchical) */}
         <PnLParameterTable data={pnlData} weeks={weeks} />
 
-        {/* Bottom Product Table */}
         <div className="rounded-lg border border-border bg-card">
           <div className="border-b border-border p-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -95,7 +101,7 @@ export default function ProfitLoss() {
               activeFilters={activeFilters}
               onFiltersChange={setActiveFilters}
               filterFields={FILTER_FIELDS}
-              onDownload={() => {}}
+              onDownload={handleDownload}
             />
           </div>
 
@@ -107,11 +113,7 @@ export default function ProfitLoss() {
         </div>
       </div>
 
-      <ProductDetailPanel
-        product={detailProduct}
-        isOpen={!!detailProduct}
-        onClose={() => setDetailProduct(null)}
-      />
+      <ProductDetailPanel product={detailProduct} isOpen={!!detailProduct} onClose={() => setDetailProduct(null)} />
     </AppLayout>
   );
 }
