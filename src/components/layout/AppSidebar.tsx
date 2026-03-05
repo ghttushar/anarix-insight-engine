@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, PanelLeftClose, PanelLeftOpen, Blocks, Database, Mail, Wrench, Sun, Moon, User, LogOut } from "lucide-react";
+import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, Sun, Moon, User, LogOut, Blocks, Database, Mail, Wrench } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -22,17 +22,14 @@ interface NavGroup {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   items: NavItem[];
-  defaultOpen?: boolean;
 }
 const navigationGroups: NavGroup[] = [{
   label: "Workspace",
   icon: Blocks,
-  defaultOpen: false,
   items: [{ title: "Dashboard Builder", url: "/workspace", icon: Blocks }]
 }, {
   label: "Profitability",
   icon: DollarSign,
-  defaultOpen: true,
   items: [
     { title: "Dashboard", url: "/profitability/dashboard", icon: LayoutDashboard },
     { title: "Trends", url: "/profitability/trends", icon: TrendingUp },
@@ -42,7 +39,6 @@ const navigationGroups: NavGroup[] = [{
 }, {
   label: "Advertising",
   icon: Megaphone,
-  defaultOpen: true,
   items: [
     { title: "Campaign Manager", url: "/advertising/campaigns", icon: Megaphone },
     { title: "Impact Analysis", url: "/advertising/impact", icon: Target },
@@ -95,7 +91,7 @@ const navigationGroups: NavGroup[] = [{
 }];
 
 export function AppSidebar() {
-  const { state, toggleSidebar } = useSidebar();
+  const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const currentPath = location.pathname;
@@ -106,23 +102,38 @@ export function AppSidebar() {
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
-  const [openSection, setOpenSection] = useState<string | null>(() => {
+
+  // Allow multiple sections open. Initialize with the active section.
+  const [openSections, setOpenSections] = useState<Set<string>>(() => {
+    const initial = new Set<string>();
     for (const group of navigationGroups) {
-      const hasActiveItem = group.items.some(item => currentPath.startsWith(item.url));
-      if (hasActiveItem || group.defaultOpen) return group.label;
+      if (group.items.some(item => currentPath.startsWith(item.url))) {
+        initial.add(group.label);
+      }
     }
-    return null;
+    // If nothing active, open Profitability by default
+    if (initial.size === 0) initial.add("Profitability");
+    return initial;
   });
 
+  // When route changes, ensure the active section is open
+  useEffect(() => {
+    for (const group of navigationGroups) {
+      if (group.items.some(item => currentPath.startsWith(item.url))) {
+        setOpenSections(prev => {
+          if (prev.has(group.label)) return prev;
+          const next = new Set(prev);
+          next.add(group.label);
+          return next;
+        });
+      }
+    }
+  }, [currentPath]);
+
   const handleMouseEnter = useCallback((label: string) => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
+    if (hoverTimeoutRef.current) { clearTimeout(hoverTimeoutRef.current); hoverTimeoutRef.current = null; }
     const trigger = triggerRefs.current[label];
-    if (trigger) {
-      setTriggerRects(prev => ({ ...prev, [label]: trigger.getBoundingClientRect() }));
-    }
+    if (trigger) setTriggerRects(prev => ({ ...prev, [label]: trigger.getBoundingClientRect() }));
     setHoveredGroup(label);
   }, []);
 
@@ -135,7 +146,11 @@ export function AppSidebar() {
   }, []);
 
   const toggleSection = (label: string) => {
-    setOpenSection(prev => prev === label ? null : label);
+    setOpenSections(prev => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label); else next.add(label);
+      return next;
+    });
   };
 
   const isActive = (path: string) => currentPath.startsWith(path);
@@ -169,7 +184,6 @@ export function AppSidebar() {
           )}
         </div>
 
-        {/* Divider */}
         <div className="mx-3 mb-4 border-t border-border" />
 
         {/* Navigation Groups */}
@@ -177,14 +191,14 @@ export function AppSidebar() {
           {navigationGroups.map(group => (
             <SidebarGroup key={group.label} className="relative">
               {!collapsed ? (
-                <Collapsible open={openSection === group.label} onOpenChange={() => toggleSection(group.label)}>
+                <Collapsible open={openSections.has(group.label)} onOpenChange={() => toggleSection(group.label)}>
                   <CollapsibleTrigger asChild>
                     <SidebarGroupLabel className="flex cursor-pointer items-center justify-between px-3 py-2.5 text-sm font-semibold uppercase tracking-wide text-foreground hover:bg-sidebar-accent transition-colors rounded-md mx-2">
                       <div className="flex items-center gap-2.5">
                         <group.icon className="h-4 w-4" />
                         <span className="my-0 py-0">{group.label}</span>
                       </div>
-                      {openSection === group.label ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                      {openSections.has(group.label) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                     </SidebarGroupLabel>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="overflow-hidden transition-all duration-200 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
@@ -221,14 +235,29 @@ export function AppSidebar() {
           ))}
         </div>
 
-        {/* Footer: Profile + Theme + Collapse */}
-        <div className="mt-auto px-3 pt-4 border-t border-border space-y-2">
+        {/* Footer: Profile + Theme only — no collapse button */}
+        <div className="mt-auto px-3 pt-4 border-t border-border space-y-3">
+          {/* Theme Toggle */}
+          <div className={cn("flex items-center", collapsed ? "justify-center" : "px-2")}>
+            <button
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className={cn(
+                "flex items-center gap-2 rounded-md border border-border bg-background hover:bg-muted transition-colors",
+                collapsed ? "h-8 w-8 justify-center" : "h-8 px-3 py-1"
+              )}
+              title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {resolvedTheme === "dark" ? <Sun className="h-4 w-4 text-foreground" /> : <Moon className="h-4 w-4 text-foreground" />}
+              {!collapsed && <span className="text-xs text-muted-foreground">{resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
+            </button>
+          </div>
+
           {/* Profile */}
           {!collapsed ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-sm hover:bg-sidebar-accent transition-colors">
-                  <Avatar className="h-7 w-7">
+                <button className="flex w-full items-center gap-2.5 rounded-md px-2 py-2.5 text-sm hover:bg-sidebar-accent transition-colors">
+                  <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">JD</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-left min-w-0">
@@ -249,7 +278,7 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex w-full items-center justify-center rounded-md p-2 hover:bg-sidebar-accent transition-colors">
-                  <Avatar className="h-7 w-7">
+                  <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">JD</AvatarFallback>
                   </Avatar>
                 </button>
@@ -267,23 +296,6 @@ export function AppSidebar() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-
-          {/* Theme + Collapse row */}
-          <div className={cn("flex items-center", collapsed ? "flex-col gap-2" : "gap-2")}>
-            <button
-              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-              className={cn("flex items-center justify-center rounded-md border border-border bg-background hover:bg-muted transition-colors", collapsed ? "h-8 w-8" : "h-8 w-8")}
-              title={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            >
-              {resolvedTheme === "dark" ? <Sun className="h-4 w-4 text-foreground" /> : <Moon className="h-4 w-4 text-foreground" />}
-            </button>
-            <button onClick={toggleSidebar} className={cn("flex items-center gap-2 rounded-md text-sm text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors", collapsed ? "justify-center p-2" : "px-2 py-2 flex-1")} title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
-              {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <>
-                <PanelLeftClose className="h-4 w-4" />
-                <span>Collapse</span>
-              </>}
-            </button>
-          </div>
         </div>
 
         {/* Hover popups for collapsed state */}

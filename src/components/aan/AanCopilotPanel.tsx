@@ -16,16 +16,15 @@ export function AanCopilotPanel() {
   return (
     <div
       className={cn(
-        "h-full w-[420px] shrink-0 flex flex-col border-l border-border bg-background transition-all duration-300 ease-out overflow-hidden",
-        isOpen ? "max-w-[420px] opacity-100" : "max-w-0 opacity-0 border-l-0"
+        "h-full shrink-0 flex flex-col border-l border-border bg-background transition-all duration-200 ease-out overflow-hidden",
+        isOpen ? "w-[420px] opacity-100" : "w-0 opacity-0 border-l-0"
       )}
     >
       {isOpen && (
         <>
           {/* Header with Aan gradient */}
-          <div className="relative overflow-hidden border-b border-border shrink-0">
-            <div className="absolute inset-0 aan-gradient opacity-10" />
-            <div className="relative flex items-center justify-between px-4 py-4">
+          <div className="border-b border-border shrink-0">
+            <div className="flex items-center justify-between px-4 py-4">
               <AanLogo />
               <div className="flex items-center gap-1">
                 <Button variant="ghost" size="icon" onClick={openWorkspace} className="h-8 w-8" title="Open full workspace">
@@ -38,7 +37,7 @@ export function AanCopilotPanel() {
             </div>
 
             {/* Context Bar */}
-            <div className="relative flex items-center gap-4 border-t border-border/50 bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-4 border-t border-border/50 bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <span className="font-medium">Context:</span>
                 <span>{context.page}</span>
@@ -53,11 +52,9 @@ export function AanCopilotPanel() {
           </div>
 
           {/* Conversation Area — independent scroll */}
-          <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-            <ScrollArea className="flex-1">
-              <AanConversation />
-            </ScrollArea>
-          </div>
+          <ScrollArea className="flex-1 min-h-0">
+            <AanConversation />
+          </ScrollArea>
 
           {/* Draft Preview (when active) */}
           <AanDraftPreview />

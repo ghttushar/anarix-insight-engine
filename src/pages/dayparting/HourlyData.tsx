@@ -5,7 +5,6 @@ import { HourlyHeatmap } from "@/components/dayparting/HourlyHeatmap";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Play, Download, Clock } from "lucide-react";
 import { hourlyData, calculateHourlySummary, dayPartingCampaigns } from "@/data/mockDayParting";
@@ -13,23 +12,12 @@ import { MetricType } from "@/types/dayparting";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-const DAYS = [
-  { value: 0, label: "Sun" }, { value: 1, label: "Mon" }, { value: 2, label: "Tue" },
-  { value: 3, label: "Wed" }, { value: 4, label: "Thu" }, { value: 5, label: "Fri" }, { value: 6, label: "Sat" },
-];
-
 export default function HourlyData() {
   const navigate = useNavigate();
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>(["camp-1"]);
-  const [dateRange, setDateRange] = useState("7days");
-  const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [metric, setMetric] = useState<MetricType>("roas");
 
   const summary = calculateHourlySummary(hourlyData);
-  const toggleDay = (day: number) => {
-    if (selectedDays.includes(day)) setSelectedDays(selectedDays.filter((d) => d !== day));
-    else setSelectedDays([...selectedDays, day].sort((a, b) => a - b));
-  };
   const formatCurrency = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 
   const handleExport = () => { toast.success("Exporting hourly data..."); };
@@ -49,24 +37,13 @@ export default function HourlyData() {
           }
         />
 
-        <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex-1 min-w-[200px] max-w-sm">
               <Label className="text-xs text-muted-foreground mb-1 block">Campaign</Label>
               <Select value={selectedCampaigns[0]} onValueChange={(v) => setSelectedCampaigns([v])}>
                 <SelectTrigger><SelectValue placeholder="Select campaign" /></SelectTrigger>
                 <SelectContent>{dayPartingCampaigns.map((camp) => (<SelectItem key={camp.id} value={camp.id}>{camp.name}</SelectItem>))}</SelectContent>
-              </Select>
-            </div>
-            <div className="w-[150px]">
-              <Label className="text-xs text-muted-foreground mb-1 block">Date Range</Label>
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7days">Last 7 Days</SelectItem>
-                  <SelectItem value="14days">Last 14 Days</SelectItem>
-                  <SelectItem value="30days">Last 30 Days</SelectItem>
-                </SelectContent>
               </Select>
             </div>
             <div className="w-[120px]">
@@ -85,17 +62,6 @@ export default function HourlyData() {
             </div>
             <div className="flex items-end">
               <Button onClick={handleRun}><Play className="mr-2 h-4 w-4" />Run</Button>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">Days:</span>
-            <div className="flex items-center gap-3">
-              {DAYS.map((day) => (
-                <div key={day.value} className="flex items-center gap-1.5">
-                  <Checkbox id={`day-${day.value}`} checked={selectedDays.includes(day.value)} onCheckedChange={() => toggleDay(day.value)} />
-                  <Label htmlFor={`day-${day.value}`} className="text-sm cursor-pointer">{day.label}</Label>
-                </div>
-              ))}
             </div>
           </div>
         </div>

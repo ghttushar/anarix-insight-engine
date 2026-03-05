@@ -57,61 +57,49 @@ export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdo
   ];
 
   return (
-    <>
-      {/* Click-away backdrop — no blur, no tint */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={onClose}
-        />
+    <div
+      className={cn(
+        "fixed right-0 top-0 z-50 flex h-full w-[400px] flex-col border-l border-border bg-background transition-transform duration-200 ease-out",
+        isOpen ? "translate-x-0" : "translate-x-full"
       )}
-
-      {/* Panel */}
-      <div
-        className={cn(
-          "fixed right-0 top-0 z-50 flex h-full w-[400px] flex-col border-l border-border bg-background transition-transform duration-300 ease-out",
-          isOpen ? "translate-x-0" : "translate-x-full"
-        )}
-      >
-        {/* Header */}
-        <div className="relative overflow-hidden border-b border-border shrink-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/5" />
-          <div className="relative flex items-center justify-between px-4 py-4">
-            <div>
-              <h2 className="font-heading text-base font-semibold text-foreground">
-                {summary.dateLabel} Breakdown
-              </h2>
-              <p className="text-xs text-muted-foreground">{summary.dateRange}</p>
-            </div>
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
-              <X className="h-4 w-4" />
-            </Button>
+    >
+      {/* Header */}
+      <div className="border-b border-border shrink-0">
+        <div className="flex items-center justify-between px-4 py-4">
+          <div>
+            <h2 className="font-heading text-base font-semibold text-foreground">
+              {summary.dateLabel} Breakdown
+            </h2>
+            <p className="text-xs text-muted-foreground">{summary.dateRange}</p>
           </div>
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-
-        {/* Content — independent scroll */}
-        <ScrollArea className="flex-1 overflow-hidden">
-          <div className="space-y-6 p-4">
-            {sections.map((section) => (
-              <div key={section.title}>
-                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  {section.title}
-                </h3>
-                <div className="space-y-2">
-                  {section.items.map((item) => (
-                    <div key={item.label} className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
-                      <span className="text-sm text-muted-foreground">{item.label}</span>
-                      <span className={cn("font-medium", item.highlight ? "text-success" : "text-foreground")}>
-                        {item.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
       </div>
-    </>
+
+      {/* Content — independent scroll */}
+      <ScrollArea className="flex-1 overflow-hidden">
+        <div className="space-y-6 p-4">
+          {sections.map((section) => (
+            <div key={section.title}>
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                {section.title}
+              </h3>
+              <div className="space-y-2">
+                {section.items.map((item) => (
+                  <div key={item.label} className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
+                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                    <span className={cn("font-medium", item.highlight ? "text-success" : "text-foreground")}>
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
   );
 }
