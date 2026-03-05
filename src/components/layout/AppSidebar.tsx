@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, Sun, Moon, User, LogOut, Blocks, Database, Mail, Wrench } from "lucide-react";
+import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, Sun, Moon, User, LogOut, Blocks, Database, Mail, Wrench, Gauge, Wheat, Bell, Activity, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -26,7 +26,10 @@ interface NavGroup {
 const navigationGroups: NavGroup[] = [{
   label: "Workspace",
   icon: Blocks,
-  items: [{ title: "Dashboard Builder", url: "/workspace", icon: Blocks }]
+  items: [
+    { title: "Dashboard Builder", url: "/workspace", icon: Blocks },
+    { title: "Health Score", url: "/workspace/health-score", icon: Activity },
+  ]
 }, {
   label: "Profitability",
   icon: DollarSign,
@@ -35,6 +38,7 @@ const navigationGroups: NavGroup[] = [{
     { title: "Trends", url: "/profitability/trends", icon: TrendingUp },
     { title: "Profit & Loss", url: "/profitability/pnl", icon: FileText },
     { title: "Geographical Data", url: "/profitability/geo", icon: MapPin },
+    { title: "Unified P&L", url: "/profitability/unified-pnl", icon: Layers },
   ]
 }, {
   label: "Advertising",
@@ -43,6 +47,9 @@ const navigationGroups: NavGroup[] = [{
     { title: "Campaign Manager", url: "/advertising/campaigns", icon: Megaphone },
     { title: "Impact Analysis", url: "/advertising/impact", icon: Target },
     { title: "Targeting Actions", url: "/advertising/targeting", icon: MousePointerClick },
+    { title: "Budget Pacing", url: "/advertising/budget-pacing", icon: Gauge },
+    { title: "Search Harvesting", url: "/advertising/search-harvesting", icon: Wheat },
+    { title: "Anomaly Alerts", url: "/advertising/anomaly-alerts", icon: Bell },
   ]
 }, {
   label: "Catalog",

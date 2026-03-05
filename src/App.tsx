@@ -24,12 +24,16 @@ import ConnectAccounts from "./pages/onboarding/ConnectAccounts";
 import CampaignManager from "./pages/advertising/CampaignManager";
 import ImpactAnalysis from "./pages/advertising/ImpactAnalysis";
 import TargetingActions from "./pages/advertising/TargetingActions";
+import BudgetPacing from "./pages/advertising/BudgetPacing";
+import SearchHarvesting from "./pages/advertising/SearchHarvesting";
+import AnomalyAlerts from "./pages/advertising/AnomalyAlerts";
 
 // Profitability
 import ProfitabilityDashboard from "./pages/profitability/Dashboard";
 import ProfitabilityTrends from "./pages/profitability/Trends";
 import ProfitLoss from "./pages/profitability/ProfitLoss";
 import Geographical from "./pages/profitability/Geographical";
+import UnifiedPnL from "./pages/profitability/UnifiedPnL";
 
 // Catalog
 import CatalogProducts from "./pages/catalog/Products";
@@ -56,6 +60,7 @@ import DayPartingHistory from "./pages/dayparting/History";
 import ScheduledJobs from "./pages/dayparting/ScheduledJobs";
 import ScheduleEditor from "./pages/dayparting/ScheduleEditor";
 import WorkspaceDashboard from "./pages/workspace/Dashboard";
+import HealthScore from "./pages/workspace/HealthScore";
 
 // Settings
 import Preferences from "./pages/settings/Preferences";
@@ -117,17 +122,22 @@ function AppRoutes() {
       {/* Sandbox */}
       <Route path="/workspace" element={<WorkspaceDashboard />} />
       <Route path="/workspace/:dashboardId" element={<WorkspaceDashboard />} />
+      <Route path="/workspace/health-score" element={<HealthScore />} />
 
       {/* Profitability */}
       <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />
       <Route path="/profitability/trends" element={<ProfitabilityTrends />} />
       <Route path="/profitability/pnl" element={<ProfitLoss />} />
       <Route path="/profitability/geo" element={<Geographical />} />
+      <Route path="/profitability/unified-pnl" element={<UnifiedPnL />} />
 
       {/* Advertising */}
       <Route path="/advertising/campaigns" element={<CampaignManager />} />
       <Route path="/advertising/impact" element={<ImpactAnalysis />} />
       <Route path="/advertising/targeting" element={<TargetingActions />} />
+      <Route path="/advertising/budget-pacing" element={<BudgetPacing />} />
+      <Route path="/advertising/search-harvesting" element={<SearchHarvesting />} />
+      <Route path="/advertising/anomaly-alerts" element={<AnomalyAlerts />} />
 
       {/* Catalog */}
       <Route path="/catalog/products" element={<CatalogProducts />} />
