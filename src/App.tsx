@@ -27,6 +27,8 @@ import TargetingActions from "./pages/advertising/TargetingActions";
 import BudgetPacing from "./pages/advertising/BudgetPacing";
 import SearchHarvesting from "./pages/advertising/SearchHarvesting";
 import AnomalyAlerts from "./pages/advertising/AnomalyAlerts";
+import CreativeAnalyzer from "./pages/advertising/CreativeAnalyzer";
+import RuleBuilder from "./pages/advertising/RuleBuilder";
 
 // Profitability
 import ProfitabilityDashboard from "./pages/profitability/Dashboard";
@@ -37,12 +39,14 @@ import UnifiedPnL from "./pages/profitability/UnifiedPnL";
 
 // Catalog
 import CatalogProducts from "./pages/catalog/Products";
+import InventoryAds from "./pages/catalog/InventoryAds";
 
 // Business Intelligence
 import BrandSOV from "./pages/bi/BrandSOV";
 import KeywordTracker from "./pages/bi/KeywordTracker";
 import KeywordSOV from "./pages/bi/KeywordSOV";
 import ProductSOV from "./pages/bi/ProductSOV";
+import CompetitorPricing from "./pages/bi/CompetitorPricing";
 
 // AMC
 import AMCQueries from "./pages/amc/Queries";
@@ -61,6 +65,7 @@ import ScheduledJobs from "./pages/dayparting/ScheduledJobs";
 import ScheduleEditor from "./pages/dayparting/ScheduleEditor";
 import WorkspaceDashboard from "./pages/workspace/Dashboard";
 import HealthScore from "./pages/workspace/HealthScore";
+import ClientPortal from "./pages/reports/ClientPortal";
 
 // Settings
 import Preferences from "./pages/settings/Preferences";
@@ -138,15 +143,19 @@ function AppRoutes() {
       <Route path="/advertising/budget-pacing" element={<BudgetPacing />} />
       <Route path="/advertising/search-harvesting" element={<SearchHarvesting />} />
       <Route path="/advertising/anomaly-alerts" element={<AnomalyAlerts />} />
+      <Route path="/advertising/creative-analyzer" element={<CreativeAnalyzer />} />
+      <Route path="/advertising/rules" element={<RuleBuilder />} />
 
       {/* Catalog */}
       <Route path="/catalog/products" element={<CatalogProducts />} />
+      <Route path="/catalog/inventory-ads" element={<InventoryAds />} />
 
       {/* Business Intelligence */}
       <Route path="/bi/brand-sov" element={<BrandSOV />} />
       <Route path="/bi/keyword-tracker" element={<KeywordTracker />} />
       <Route path="/bi/keyword-sov" element={<KeywordSOV />} />
       <Route path="/bi/product-sov" element={<ProductSOV />} />
+      <Route path="/bi/competitor-pricing" element={<CompetitorPricing />} />
 
       {/* AMC */}
       <Route path="/amc/queries" element={<AMCQueries />} />
@@ -164,6 +173,9 @@ function AppRoutes() {
       <Route path="/dayparting/scheduled" element={<ScheduledJobs />} />
       <Route path="/dayparting/scheduled/new" element={<ScheduleEditor />} />
       <Route path="/dayparting/scheduled/:scheduleId/edit" element={<ScheduleEditor />} />
+
+      {/* Reports */}
+      <Route path="/reports/client-portal" element={<ClientPortal />} />
 
       {/* Settings */}
       <Route path="/settings/appearance" element={<Preferences />} />
