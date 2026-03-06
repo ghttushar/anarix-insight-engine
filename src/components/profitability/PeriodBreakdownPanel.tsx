@@ -17,6 +17,8 @@ const formatCurrency = (value: number) => {
 const formatPercent = (value: number) => `${value.toFixed(1)}%`;
 
 export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdownPanelProps) {
+  if (!isOpen) return null;
+
   const breakdown = summary.breakdown;
 
   const sections = [
@@ -57,12 +59,7 @@ export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdo
   ];
 
   return (
-    <div
-      className={cn(
-        "fixed right-0 top-0 z-50 flex h-full w-[400px] flex-col border-l border-border bg-background transition-transform duration-200 ease-out",
-        isOpen ? "translate-x-0" : "translate-x-full"
-      )}
-    >
+    <div className="flex h-full w-[400px] shrink-0 flex-col border-l border-border bg-background">
       {/* Header */}
       <div className="border-b border-border shrink-0">
         <div className="flex items-center justify-between px-4 py-4">

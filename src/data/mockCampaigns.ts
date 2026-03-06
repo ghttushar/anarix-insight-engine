@@ -9,6 +9,7 @@ export const mockCampaigns: Campaign[] = [
     isActive: true,
     dailyBudget: 150,
     totalBudget: 4500,
+    biddingStrategy: "Dynamic Down",
     spend: 2847.32,
     sales: 12453.87,
     roas: 4.37,
@@ -29,6 +30,7 @@ export const mockCampaigns: Campaign[] = [
     isActive: false,
     dailyBudget: 200,
     totalBudget: 6000,
+    biddingStrategy: "Dynamic Up/Down",
     spend: 1523.45,
     sales: 5678.90,
     roas: 3.73,
@@ -50,6 +52,7 @@ export const mockCampaigns: Campaign[] = [
     isActive: false,
     dailyBudget: 300,
     totalBudget: 9000,
+    biddingStrategy: "Fixed",
     spend: 8756.23,
     sales: 34521.67,
     roas: 3.94,
@@ -71,6 +74,7 @@ export const mockCampaigns: Campaign[] = [
     isActive: true,
     dailyBudget: 100,
     totalBudget: 3000,
+    biddingStrategy: "Dynamic Down",
     spend: 876.54,
     sales: 4532.10,
     roas: 5.17,
@@ -91,6 +95,7 @@ export const mockCampaigns: Campaign[] = [
     isActive: true,
     dailyBudget: 50,
     totalBudget: 1500,
+    biddingStrategy: "Dynamic Up/Down",
     spend: 1500.00,
     sales: 3245.67,
     roas: 2.16,
@@ -111,6 +116,7 @@ export const mockCampaigns: Campaign[] = [
     isActive: false,
     dailyBudget: 75,
     totalBudget: 2250,
+    biddingStrategy: "Fixed",
     spend: 0,
     sales: 0,
     roas: 0,
@@ -132,6 +138,7 @@ export const mockCampaigns: Campaign[] = [
     isActive: true,
     dailyBudget: 125,
     totalBudget: 3750,
+    biddingStrategy: "Dynamic Down",
     spend: 1234.56,
     sales: 6789.01,
     roas: 5.50,
@@ -152,6 +159,7 @@ export const mockCampaigns: Campaign[] = [
     isActive: false,
     dailyBudget: 80,
     totalBudget: 2400,
+    biddingStrategy: "Dynamic Up/Down",
     spend: 2400.00,
     sales: 9876.54,
     roas: 4.12,
@@ -179,37 +187,12 @@ export const mockChartData: ChartDataPoint[] = [
 ];
 
 export const mockKPIData: KPIData[] = [
-  {
-    label: "Ad Spend",
-    value: 8456.32,
-    previousValue: 7234.56,
-    format: "currency",
-    trend: "up",
-  },
-  {
-    label: "Ad Sales",
-    value: 38234.87,
-    previousValue: 32456.78,
-    format: "currency",
-    trend: "up",
-  },
-  {
-    label: "Ad Units",
-    value: 1203,
-    previousValue: 1087,
-    format: "number",
-    trend: "up",
-  },
-  {
-    label: "ROAS",
-    value: 4.52,
-    previousValue: 4.49,
-    format: "decimal",
-    trend: "up",
-  },
+  { label: "Ad Spend", value: 8456.32, previousValue: 7234.56, format: "currency", trend: "up" },
+  { label: "Ad Sales", value: 38234.87, previousValue: 32456.78, format: "currency", trend: "up" },
+  { label: "Ad Units", value: 1203, previousValue: 1087, format: "number", trend: "up" },
+  { label: "ROAS", value: 4.52, previousValue: 4.49, format: "decimal", trend: "up" },
 ];
 
-// Calculate totals for the total row
 export const campaignTotals = {
   spend: mockCampaigns.reduce((sum, c) => sum + c.spend, 0),
   sales: mockCampaigns.reduce((sum, c) => sum + c.sales, 0),
@@ -217,16 +200,8 @@ export const campaignTotals = {
   clicks: mockCampaigns.reduce((sum, c) => sum + c.clicks, 0),
   orders: mockCampaigns.reduce((sum, c) => sum + c.orders, 0),
   units: mockCampaigns.reduce((sum, c) => sum + c.units, 0),
-  get roas() {
-    return this.spend > 0 ? this.sales / this.spend : 0;
-  },
-  get ctr() {
-    return this.impressions > 0 ? (this.clicks / this.impressions) * 100 : 0;
-  },
-  get cpc() {
-    return this.clicks > 0 ? this.spend / this.clicks : 0;
-  },
-  get acos() {
-    return this.sales > 0 ? (this.spend / this.sales) * 100 : 0;
-  },
+  get roas() { return this.spend > 0 ? this.sales / this.spend : 0; },
+  get ctr() { return this.impressions > 0 ? (this.clicks / this.impressions) * 100 : 0; },
+  get cpc() { return this.clicks > 0 ? this.spend / this.clicks : 0; },
+  get acos() { return this.sales > 0 ? (this.spend / this.sales) * 100 : 0; },
 };

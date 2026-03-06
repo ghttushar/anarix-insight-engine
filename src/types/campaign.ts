@@ -8,6 +8,8 @@ export type CampaignStatus =
 
 export type CampaignType = "auto" | "manual";
 
+export type BiddingStrategy = "Dynamic Down" | "Dynamic Up/Down" | "Fixed";
+
 export interface Campaign {
   id: string;
   name: string;
@@ -16,6 +18,7 @@ export interface Campaign {
   isActive: boolean;
   dailyBudget: number;
   totalBudget?: number; // Walmart only
+  biddingStrategy: BiddingStrategy;
   spend: number;
   sales: number;
   roas: number;

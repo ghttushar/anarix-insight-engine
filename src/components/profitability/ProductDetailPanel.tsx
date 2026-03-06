@@ -14,7 +14,7 @@ const fmt = (v: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(v);
 
 export function ProductDetailPanel({ product, isOpen, onClose }: ProductDetailPanelProps) {
-  if (!product) return null;
+  if (!product || !isOpen) return null;
 
   const sections = [
     {
@@ -62,12 +62,7 @@ export function ProductDetailPanel({ product, isOpen, onClose }: ProductDetailPa
   ];
 
   return (
-    <div
-      className={cn(
-        "fixed right-0 top-0 z-50 flex h-full w-[400px] flex-col border-l border-border bg-background transition-transform duration-200 ease-out",
-        isOpen ? "translate-x-0" : "translate-x-full"
-      )}
-    >
+    <div className="flex h-full w-[400px] shrink-0 flex-col border-l border-border bg-background">
       <div className="border-b border-border shrink-0">
         <div className="flex items-center gap-3 px-4 py-4">
           <img

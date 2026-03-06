@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useDensity } from "@/contexts/DensityContext";
 import { useVisualEffects } from "@/contexts/VisualEffectsContext";
+import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
 import { cn } from "@/lib/utils";
 import { Pencil, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
@@ -140,6 +141,7 @@ function ShortcutRow({ shortcut, customKeys, onEdit, isEditing, onCaptured }: {
 export default function Preferences() {
   const { density, setDensity } = useDensity();
   const { effects, toggle } = useVisualEffects();
+  const { newFeaturesVisible, toggleNewFeatures } = useFeatureToggle();
   const [customShortcuts, setCustomShortcuts] = useState<Record<string, string[]>>(loadCustomShortcuts);
   const [editingKey, setEditingKey] = useState<string | null>(null);
 
@@ -202,6 +204,25 @@ export default function Preferences() {
                 <p className="text-xs text-muted-foreground">{d === "comfortable" ? "Default spacing" : "More data visible"}</p>
               </button>
             ))}
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* New Feature Pages Toggle */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="font-heading text-lg font-medium text-foreground">New Feature Pages</h2>
+            <p className="text-sm text-muted-foreground">Show or hide recently added feature pages in the sidebar navigation</p>
+          </div>
+          <div className="rounded-lg border border-border bg-card">
+            <label className="flex items-center justify-between cursor-pointer p-4">
+              <div>
+                <p className="font-medium text-foreground">Show New Feature Pages</p>
+                <p className="text-xs text-muted-foreground">Includes Workspace, Health Score, Budget Pacing, Search Harvesting, Anomaly Alerts, Creative Analyzer, Rule Builder, Inventory & Ads, Competitor Pricing, Client Portal, Unified P&L</p>
+              </div>
+              <Switch checked={newFeaturesVisible} onCheckedChange={toggleNewFeatures} />
+            </label>
           </div>
         </section>
 

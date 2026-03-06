@@ -46,6 +46,10 @@ export function CampaignTableTotalRow({ campaigns, showTotalBudget = true }: Cam
   return (
     <TableRow className="bg-muted/30 font-medium">
       <TableCell colSpan={4} className="text-foreground">Total ({campaigns.length} campaigns)</TableCell>
+      {/* Start Date, End Date, Bidding Strategy — empty for totals */}
+      <TableCell />
+      <TableCell />
+      <TableCell />
       <TableCell className="text-right"><TotalCell value={formatCurrency(totals.dailyBudget)} metric="dailyBudget" /></TableCell>
       {showTotalBudget && (
         <TableCell className="text-right"><TotalCell value={formatCurrency(totals.totalBudget)} metric="totalBudget" /></TableCell>

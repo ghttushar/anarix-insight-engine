@@ -51,8 +51,6 @@ export default function ProfitabilityDashboard() {
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
 
-  const cogsFileInputRef = useState<HTMLInputElement | null>(null);
-
   const handleCogsSave = (productId: string, newCogs: number) => {
     setProducts((prev) => prev.map((p) => p.id === productId ? { ...p, cogs: newCogs } : p));
   };
@@ -89,47 +87,41 @@ export default function ProfitabilityDashboard() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <PageHeader title="Profitability Dashboard" subtitle="Track your profit metrics and financial performance" />
+      <div className="flex flex-1 min-h-0">
+        <div className="flex-1 space-y-6 overflow-auto">
+          <PageHeader title="Profitability Dashboard" subtitle="Track your profit metrics and financial performance" />
 
-        {/* KPI Period Blocks + Chart */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-3">
-            {profitabilitySummaries.map((summary, index) => (
-              <div
-                key={summary.period}
-                onClick={() => setSelectedPeriod(summary.period)}
-                className={cn(
-                  "cursor-pointer rounded-lg transition-all",
-                  selectedPeriod === summary.period && "ring-2 ring-primary/50"
-                )}
-              >
-                <PeriodSummaryCard
-                  summary={summary}
-                  accentColor={accentColors[index % accentColors.length]}
-                  
-                />
-              </div>
-            ))}
+          {/* KPI Period Blocks + Chart */}
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2 space-y-3">
+              {profitabilitySummaries.map((summary, index) => (
+                <div
+                  key={summary.period}
+                  onClick={() => setSelectedPeriod(summary.period)}
+                  className={cn(
+                    "cursor-pointer rounded-lg transition-all",
+                    selectedPeriod === summary.period && "ring-2 ring-primary/50"
+                  )}
+                >
+                  <PeriodSummaryCard summary={summary} accentColor={accentColors[index % accentColors.length]} />
+                </div>
+              ))}
+            </div>
+            <div>
+              <ProfitabilityTrendChart data={trendData} />
+            </div>
           </div>
-          <div>
-            <ProfitabilityTrendChart data={trendData} />
-          </div>
-        </div>
 
-        {/* Products / Orders Table Section */}
-        <div className="rounded-lg border border-border bg-card">
-          <div className="border-b border-border p-4 space-y-3">
+          {/* Products / Orders Table Section */}
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={handleUploadCOGS}>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload COGS
+                  <Upload className="mr-2 h-4 w-4" />Upload COGS
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleDownload}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Export
+                  <Download className="mr-2 h-4 w-4" />Export
                 </Button>
               </div>
             </div>
@@ -146,16 +138,24 @@ export default function ProfitabilityDashboard() {
               filterFields={FILTER_FIELDS}
               onDownload={handleDownload}
             />
+            <div className="rounded-lg border border-border">
+              <ProductsPnLTable
+                products={filteredProducts}
+                visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
+                onCogsClick={(product) => setCogsProduct(product)}
+                onTrendsClick={(product) => setTrendsProduct(product)}
+                onMoreClick={(product) => setDetailProduct(product)}
+              />
+            </div>
           </div>
-
-          <ProductsPnLTable
-            products={filteredProducts}
-            visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
-            onCogsClick={(product) => setCogsProduct(product)}
-            onTrendsClick={(product) => setTrendsProduct(product)}
-            onMoreClick={(product) => setDetailProduct(product)}
-          />
         </div>
+
+        {/* Inline detail panel */}
+        <ProductDetailPanel
+          product={detailProduct}
+          isOpen={!!detailProduct}
+          onClose={() => setDetailProduct(null)}
+        />
       </div>
 
       {/* Modals */}
@@ -165,18 +165,11 @@ export default function ProfitabilityDashboard() {
         onClose={() => setCogsProduct(null)}
         onSave={handleCogsSave}
       />
-      <ProductDetailPanel
-        product={detailProduct}
-        isOpen={!!detailProduct}
-        onClose={() => setDetailProduct(null)}
-      />
       <ProductTrendsModal
         product={trendsProduct}
         isOpen={!!trendsProduct}
         onClose={() => setTrendsProduct(null)}
       />
-
-
     </AppLayout>
   );
 }
