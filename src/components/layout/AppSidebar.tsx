@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, Sun, Moon, User, LogOut, Blocks, Database, Mail, Wrench, Gauge, Wheat, Bell, Activity, Layers, Image, DollarSign as PriceIcon, FlaskConical, PackageCheck, FileBarChart, Send } from "lucide-react";
+import { LayoutDashboard, TrendingUp, FileText, MapPin, Megaphone, Target, MousePointerClick, Package, Brain, Search, BarChart3, Clock, CalendarClock, History, ListTodo, Settings, Users, FileStack, ChevronDown, ChevronRight, Sparkles, DollarSign, ShoppingBag, Link, Sun, Moon, User, LogOut, Blocks, Database, Mail, Wrench, Gauge, Wheat, Bell, Activity, Layers, Image, DollarSign as PriceIcon, FlaskConical, PackageCheck, FileBarChart, Send, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { SidebarHoverPopup } from "./SidebarHoverPopup";
 import { useAan } from "@/components/aan";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logoFull from "@/assets/logo-full.png";
@@ -17,18 +18,20 @@ interface NavItem {
   title: string;
   url: string;
   icon: React.ComponentType<{ className?: string }>;
+  isNewFeature?: boolean;
 }
 interface NavGroup {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   items: NavItem[];
 }
+
 const navigationGroups: NavGroup[] = [{
   label: "Workspace",
   icon: Blocks,
   items: [
-    { title: "Dashboard Builder", url: "/workspace", icon: Blocks },
-    { title: "Health Score", url: "/workspace/health-score", icon: Activity },
+    { title: "Dashboard Builder", url: "/workspace", icon: Blocks, isNewFeature: true },
+    { title: "Health Score", url: "/workspace/health-score", icon: Activity, isNewFeature: true },
   ]
 }, {
   label: "Profitability",
@@ -38,7 +41,7 @@ const navigationGroups: NavGroup[] = [{
     { title: "Trends", url: "/profitability/trends", icon: TrendingUp },
     { title: "Profit & Loss", url: "/profitability/pnl", icon: FileText },
     { title: "Geographical Data", url: "/profitability/geo", icon: MapPin },
-    { title: "Unified P&L", url: "/profitability/unified-pnl", icon: Layers },
+    { title: "Unified P&L", url: "/profitability/unified-pnl", icon: Layers, isNewFeature: true },
   ]
 }, {
   label: "Advertising",
@@ -47,18 +50,18 @@ const navigationGroups: NavGroup[] = [{
     { title: "Campaign Manager", url: "/advertising/campaigns", icon: Megaphone },
     { title: "Impact Analysis", url: "/advertising/impact", icon: Target },
     { title: "Targeting Actions", url: "/advertising/targeting", icon: MousePointerClick },
-    { title: "Budget Pacing", url: "/advertising/budget-pacing", icon: Gauge },
-    { title: "Search Harvesting", url: "/advertising/search-harvesting", icon: Wheat },
-    { title: "Anomaly Alerts", url: "/advertising/anomaly-alerts", icon: Bell },
-    { title: "Creative Analyzer", url: "/advertising/creative-analyzer", icon: Image },
-    { title: "Rule Builder", url: "/advertising/rules", icon: FlaskConical },
+    { title: "Budget Pacing", url: "/advertising/budget-pacing", icon: Gauge, isNewFeature: true },
+    { title: "Search Harvesting", url: "/advertising/search-harvesting", icon: Wheat, isNewFeature: true },
+    { title: "Anomaly Alerts", url: "/advertising/anomaly-alerts", icon: Bell, isNewFeature: true },
+    { title: "Creative Analyzer", url: "/advertising/creative-analyzer", icon: Image, isNewFeature: true },
+    { title: "Rule Builder", url: "/advertising/rules", icon: FlaskConical, isNewFeature: true },
   ]
 }, {
   label: "Catalog",
   icon: ShoppingBag,
   items: [
     { title: "Products", url: "/catalog/products", icon: Package },
-    { title: "Inventory & Ads", url: "/catalog/inventory-ads", icon: PackageCheck },
+    { title: "Inventory & Ads", url: "/catalog/inventory-ads", icon: PackageCheck, isNewFeature: true },
   ]
 }, {
   label: "AMC",
@@ -79,7 +82,7 @@ const navigationGroups: NavGroup[] = [{
     { title: "Keyword Tracker", url: "/bi/keyword-tracker", icon: Search },
     { title: "Keyword SOV", url: "/bi/keyword-sov", icon: BarChart3 },
     { title: "Product SOV", url: "/bi/product-sov", icon: Package },
-    { title: "Competitor Pricing", url: "/bi/competitor-pricing", icon: BarChart3 },
+    { title: "Competitor Pricing", url: "/bi/competitor-pricing", icon: BarChart3, isNewFeature: true },
   ]
 }, {
   label: "Day Parting",
@@ -94,7 +97,7 @@ const navigationGroups: NavGroup[] = [{
   label: "Reports",
   icon: FileBarChart,
   items: [
-    { title: "Client Portal", url: "/reports/client-portal", icon: Send },
+    { title: "Client Portal", url: "/reports/client-portal", icon: Send, isNewFeature: true },
   ]
 }, {
   label: "Settings",
@@ -110,19 +113,19 @@ const navigationGroups: NavGroup[] = [{
 }];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const currentPath = location.pathname;
   const { openWorkspace } = useAan();
   const { resolvedTheme, setTheme } = useTheme();
+  const { newFeaturesVisible } = useFeatureToggle();
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [triggerRects, setTriggerRects] = useState<Record<string, DOMRect | null>>({});
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
 
-  // Allow multiple sections open. Initialize with the active section.
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
     const initial = new Set<string>();
     for (const group of navigationGroups) {
@@ -130,12 +133,10 @@ export function AppSidebar() {
         initial.add(group.label);
       }
     }
-    // If nothing active, open Profitability by default
     if (initial.size === 0) initial.add("Profitability");
     return initial;
   });
 
-  // When route changes, ensure the active section is open
   useEffect(() => {
     for (const group of navigationGroups) {
       if (group.items.some(item => currentPath.startsWith(item.url))) {
@@ -174,6 +175,13 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath.startsWith(path);
 
+  // Filter groups based on feature toggle
+  const filteredGroups = navigationGroups.map(group => {
+    if (newFeaturesVisible) return group;
+    const filteredItems = group.items.filter(item => !item.isNewFeature);
+    return { ...group, items: filteredItems };
+  }).filter(group => group.items.length > 0);
+
   return (
     <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-300", collapsed ? "w-14" : "w-60")} collapsible="icon">
       <SidebarContent className="py-4 flex flex-col h-full">
@@ -207,7 +215,7 @@ export function AppSidebar() {
 
         {/* Navigation Groups */}
         <div className="flex-1 overflow-auto">
-          {navigationGroups.map(group => (
+          {filteredGroups.map(group => (
             <SidebarGroup key={group.label} className="relative">
               {!collapsed ? (
                 <Collapsible open={openSections.has(group.label)} onOpenChange={() => toggleSection(group.label)}>
@@ -254,8 +262,23 @@ export function AppSidebar() {
           ))}
         </div>
 
-        {/* Footer: Profile + Theme only — no collapse button */}
+        {/* Footer */}
         <div className="mt-auto px-3 pt-4 border-t border-border space-y-3">
+          {/* Collapse Toggle */}
+          <div className={cn("flex items-center", collapsed ? "justify-center" : "px-2")}>
+            <button
+              onClick={toggleSidebar}
+              className={cn(
+                "flex items-center gap-2 rounded-md border border-border bg-background hover:bg-muted transition-colors",
+                collapsed ? "h-8 w-8 justify-center" : "h-8 px-3 py-1"
+              )}
+              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {collapsed ? <PanelLeftOpen className="h-4 w-4 text-foreground" /> : <PanelLeftClose className="h-4 w-4 text-foreground" />}
+              {!collapsed && <span className="text-xs text-muted-foreground">Collapse</span>}
+            </button>
+          </div>
+
           {/* Theme Toggle */}
           <div className={cn("flex items-center", collapsed ? "justify-center" : "px-2")}>
             <button
@@ -318,7 +341,7 @@ export function AppSidebar() {
         </div>
 
         {/* Hover popups for collapsed state */}
-        {collapsed && navigationGroups.map(group => <SidebarHoverPopup key={group.label} items={group.items} isVisible={hoveredGroup === group.label} groupLabel={group.label} triggerRect={triggerRects[group.label] || null} currentPath={currentPath} onMouseEnter={() => handleMouseEnter(group.label)} onMouseLeave={handleMouseLeave} />)}
+        {collapsed && filteredGroups.map(group => <SidebarHoverPopup key={group.label} items={group.items} isVisible={hoveredGroup === group.label} groupLabel={group.label} triggerRect={triggerRects[group.label] || null} currentPath={currentPath} onMouseEnter={() => handleMouseEnter(group.label)} onMouseLeave={handleMouseLeave} />)}
       </SidebarContent>
     </Sidebar>
   );

@@ -49,13 +49,13 @@ export function AppTaskbar() {
   }, [mergedDropdownOpen]);
 
   return (
-    <div className="flex h-12 items-center rounded-lg border border-border bg-card px-4 shrink-0">
+    <div className="flex h-14 items-center rounded-lg border border-border bg-card px-4 shrink-0">
       {/* Left Zone: Labeled filter controls */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
+          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
           <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
-            <SelectTrigger className="h-7 w-[110px] text-xs border-0 bg-transparent shadow-none px-1.5">
+            <SelectTrigger className="h-8 w-[110px] text-sm border-0 bg-transparent shadow-none px-1.5">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -69,9 +69,9 @@ export function AppTaskbar() {
         </div>
 
         <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Frequency</span>
+          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Frequency</span>
           <Select value={frequency} onValueChange={(v) => setFrequency(v as any)}>
-            <SelectTrigger className="h-7 w-[90px] text-xs border-0 bg-transparent shadow-none px-1.5">
+            <SelectTrigger className="h-8 w-[90px] text-sm border-0 bg-transparent shadow-none px-1.5">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -83,10 +83,10 @@ export function AppTaskbar() {
         </div>
 
         <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
-          <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">Date Range</span>
+          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Date Range</span>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-xs font-normal px-1.5">
+              <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-sm font-normal px-1.5">
                 <CalendarIcon className="h-3 w-3" />
                 {format(dateRange.from, "MMM dd")} – {format(dateRange.to, "MMM dd, yyyy")}
               </Button>

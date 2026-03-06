@@ -59,34 +59,34 @@ export default function ProfitLoss() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <PageHeader
-          title="Profit & Loss"
-          subtitle="Detailed P&L breakdown by period"
-          actions={
-            <>
-              <Badge variant="secondary" className="px-3 py-1">{selectedCount} Product(s) Selected</Badge>
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-[180px] h-9 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="week">Week (by days)</SelectItem>
-                  <SelectItem value="month">Month (by days)</SelectItem>
-                  <SelectItem value="quarter">A Quarter / 3 months</SelectItem>
-                  <SelectItem value="year">This Year</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button size="sm" onClick={handleRun} disabled={isLoading}>
-                <Play className="mr-2 h-4 w-4" />{isLoading ? "Running..." : "Run"}
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleDownload}><Download className="h-4 w-4" /></Button>
-            </>
-          }
-        />
+      <div className="flex flex-1 min-h-0">
+        <div className="flex-1 space-y-6 overflow-auto">
+          <PageHeader
+            title="Profit & Loss"
+            subtitle="Detailed P&L breakdown by period"
+            actions={
+              <>
+                <Badge variant="secondary" className="px-3 py-1">{selectedCount} Product(s) Selected</Badge>
+                <Select value={dateRange} onValueChange={setDateRange}>
+                  <SelectTrigger className="w-[180px] h-9 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="week">Week (by days)</SelectItem>
+                    <SelectItem value="month">Month (by days)</SelectItem>
+                    <SelectItem value="quarter">A Quarter / 3 months</SelectItem>
+                    <SelectItem value="year">This Year</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="sm" onClick={handleRun} disabled={isLoading}>
+                  <Play className="mr-2 h-4 w-4" />{isLoading ? "Running..." : "Run"}
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleDownload}><Download className="h-4 w-4" /></Button>
+              </>
+            }
+          />
 
-        <PnLParameterTable data={pnlData} weeks={weeks} />
+          <PnLParameterTable data={pnlData} weeks={weeks} />
 
-        <div className="rounded-lg border border-border bg-card">
-          <div className="border-b border-border p-4 space-y-3">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />
             </div>
@@ -103,17 +103,19 @@ export default function ProfitLoss() {
               filterFields={FILTER_FIELDS}
               onDownload={handleDownload}
             />
+            <div className="rounded-lg border border-border">
+              <ProductsPnLTable
+                products={filteredProducts}
+                visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
+                onMoreClick={(product) => setDetailProduct(product)}
+              />
+            </div>
           </div>
-
-          <ProductsPnLTable
-            products={filteredProducts}
-            visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
-            onMoreClick={(product) => setDetailProduct(product)}
-          />
         </div>
-      </div>
 
-      <ProductDetailPanel product={detailProduct} isOpen={!!detailProduct} onClose={() => setDetailProduct(null)} />
+        {/* Inline detail panel */}
+        <ProductDetailPanel product={detailProduct} isOpen={!!detailProduct} onClose={() => setDetailProduct(null)} />
+      </div>
     </AppLayout>
   );
 }

@@ -123,7 +123,7 @@ export default function RuleBuilder() {
         </div>
 
         {/* Rules Table */}
-        <div className="rounded-lg border border-border bg-card">
+        <div className="rounded-lg border border-border">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
