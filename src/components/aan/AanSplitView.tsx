@@ -57,7 +57,7 @@ export function AanSplitView() {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/4 backdrop-blur-[1px] transition-opacity"
+          className="fixed inset-0 z-40 bg-black/4 transition-opacity"
           onClick={() => openCopilot()}
         />
       )}

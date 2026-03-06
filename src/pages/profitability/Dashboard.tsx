@@ -8,13 +8,15 @@ import { COGSEditModal } from "@/components/profitability/COGSEditModal";
 import { ProductDetailPanel } from "@/components/profitability/ProductDetailPanel";
 import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModal";
 import { ProductsOrdersToggle } from "@/components/profitability/ProductsOrdersToggle";
+import { PeriodBreakdownPanel } from "@/components/profitability/PeriodBreakdownPanel";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { profitabilitySummaries, profitabilityProducts, trendData } from "@/data/mockProfitability";
-import { ProfitabilityProduct } from "@/types/profitability";
+import { ProfitabilityProduct, ProfitabilitySummary } from "@/types/profitability";
 import { Upload, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 
 const accentColors = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
@@ -39,6 +41,7 @@ const COLUMN_DEFS = [
 const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Net Profit", "Ad Spend", "Units"];
 
 export default function ProfitabilityDashboard() {
+  const { activePanel, setActivePanel, closePanel } = useActivePanel();
   const [selectedPeriod, setSelectedPeriod] = useState<string>("today");
   const [tableTab, setTableTab] = useState<"products" | "orders">("products");
   const [searchValue, setSearchValue] = useState("");
@@ -46,10 +49,29 @@ export default function ProfitabilityDashboard() {
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [products, setProducts] = useState(profitabilityProducts);
 
-  // Modal states
+  // Panel data states
   const [cogsProduct, setCogsProduct] = useState<ProfitabilityProduct | null>(null);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
+  const [breakdownSummary, setBreakdownSummary] = useState<ProfitabilitySummary | null>(null);
+
+  const handleOpenDetail = (product: ProfitabilityProduct) => {
+    setBreakdownSummary(null);
+    setDetailProduct(product);
+    setActivePanel("productDetail");
+  };
+
+  const handleOpenBreakdown = (summary: ProfitabilitySummary) => {
+    setDetailProduct(null);
+    setBreakdownSummary(summary);
+    setActivePanel("periodBreakdown");
+  };
+
+  const handleCloseRightPanel = () => {
+    setDetailProduct(null);
+    setBreakdownSummary(null);
+    closePanel();
+  };
 
   const handleCogsSave = (productId: string, newCogs: number) => {
     setProducts((prev) => prev.map((p) => p.id === productId ? { ...p, cogs: newCogs } : p));
@@ -85,13 +107,15 @@ export default function ProfitabilityDashboard() {
     p.sku.toLowerCase().includes(searchValue.toLowerCase())
   );
 
+  const showProductDetail = activePanel === "productDetail" && detailProduct;
+  const showBreakdown = activePanel === "periodBreakdown" && breakdownSummary;
+
   return (
     <AppLayout>
       <div className="flex flex-1 min-h-0">
         <div className="flex-1 space-y-6 overflow-auto">
           <PageHeader title="Profitability Dashboard" subtitle="Track your profit metrics and financial performance" />
 
-          {/* KPI Period Blocks + Chart */}
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-3">
               {profitabilitySummaries.map((summary, index) => (
@@ -103,7 +127,11 @@ export default function ProfitabilityDashboard() {
                     selectedPeriod === summary.period && "ring-2 ring-primary/50"
                   )}
                 >
-                  <PeriodSummaryCard summary={summary} accentColor={accentColors[index % accentColors.length]} />
+                  <PeriodSummaryCard
+                    summary={summary}
+                    accentColor={accentColors[index % accentColors.length]}
+                    onViewMore={handleOpenBreakdown}
+                  />
                 </div>
               ))}
             </div>
@@ -112,7 +140,6 @@ export default function ProfitabilityDashboard() {
             </div>
           </div>
 
-          {/* Products / Orders Table Section */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />
@@ -144,21 +171,21 @@ export default function ProfitabilityDashboard() {
                 visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
                 onCogsClick={(product) => setCogsProduct(product)}
                 onTrendsClick={(product) => setTrendsProduct(product)}
-                onMoreClick={(product) => setDetailProduct(product)}
+                onMoreClick={handleOpenDetail}
               />
             </div>
           </div>
         </div>
 
-        {/* Inline detail panel */}
-        <ProductDetailPanel
-          product={detailProduct}
-          isOpen={!!detailProduct}
-          onClose={() => setDetailProduct(null)}
-        />
+        {/* Right-side panels — only one at a time */}
+        {showProductDetail && (
+          <ProductDetailPanel product={detailProduct} isOpen={true} onClose={handleCloseRightPanel} />
+        )}
+        {showBreakdown && (
+          <PeriodBreakdownPanel summary={breakdownSummary} isOpen={true} onClose={handleCloseRightPanel} />
+        )}
       </div>
 
-      {/* Modals */}
       <COGSEditModal
         product={cogsProduct}
         isOpen={!!cogsProduct}

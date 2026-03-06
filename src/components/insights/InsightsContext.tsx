@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 
 export type InsightCategory = "critical" | "attention" | "positive";
 
@@ -92,14 +93,16 @@ const mockInsights: Insight[] = [
 ];
 
 export function InsightsProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { activePanel, setActivePanel, closePanel: closePanelCtx } = useActivePanel();
+
+  const isOpen = activePanel === "insights";
 
   const criticalCount = mockInsights.filter((i) => i.category === "critical").length;
   const attentionCount = mockInsights.filter((i) => i.category === "attention").length;
   const positiveCount = mockInsights.filter((i) => i.category === "positive").length;
 
-  const openPanel = () => setIsOpen(true);
-  const closePanel = () => setIsOpen(false);
+  const openPanel = () => setActivePanel("insights");
+  const closePanel = () => closePanelCtx();
 
   return (
     <InsightsContext.Provider
