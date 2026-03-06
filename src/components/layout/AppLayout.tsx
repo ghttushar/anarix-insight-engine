@@ -3,23 +3,23 @@ import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AanCopilotPanel } from "@/components/aan/AanCopilotPanel";
 import { InsightsPanel } from "@/components/insights/InsightsPanel";
-import { useAan } from "@/components/aan";
-import { useInsights } from "@/components/insights/InsightsContext";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useDensity } from "@/contexts/DensityContext";
 import { cn } from "@/lib/utils";
 
 function LayoutInner({ children }: { children: ReactNode }) {
-  const { mode } = useAan();
-  const { isOpen: insightsOpen } = useInsights();
+  const { activePanel } = useActivePanel();
   const { setOpen } = useSidebar();
   const { density } = useDensity();
-  const copilotOpen = mode === "copilot";
+
+  const showCopilot = activePanel === "copilot";
+  const showInsights = activePanel === "insights";
 
   useEffect(() => {
-    if (copilotOpen || insightsOpen) {
+    if (showCopilot || showInsights) {
       setOpen(false);
     }
-  }, [copilotOpen, insightsOpen, setOpen]);
+  }, [showCopilot, showInsights, setOpen]);
 
   return (
     <div className="flex min-h-screen w-full">
@@ -31,8 +31,8 @@ function LayoutInner({ children }: { children: ReactNode }) {
         )}>
           {children}
         </main>
-        <InsightsPanel />
-        <AanCopilotPanel />
+        {showInsights && <InsightsPanel />}
+        {showCopilot && <AanCopilotPanel />}
       </div>
     </div>
   );

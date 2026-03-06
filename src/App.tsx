@@ -11,6 +11,7 @@ import { DensityProvider } from "@/contexts/DensityContext";
 import { AccountProvider, useAccounts } from "@/contexts/AccountContext";
 import { VisualEffectsProvider } from "@/contexts/VisualEffectsContext";
 import { FeatureToggleProvider } from "@/contexts/FeatureToggleContext";
+import { ActivePanelProvider } from "@/contexts/ActivePanelContext";
 import { AanProvider, AanPanel } from "@/components/aan";
 import { InsightsProvider } from "@/components/insights";
 import { CreativeFeatures } from "@/features/creative";
@@ -200,25 +201,27 @@ const App = () => (
         <AccountProvider>
           <MarketplaceProvider defaultMarketplace="walmart">
             <FilterProvider>
-              <AanProvider>
-                <InsightsProvider>
-                  <VisualEffectsProvider>
-                    <FeatureToggleProvider>
-                      <TooltipProvider>
-                        <Toaster />
-                        <Sonner position="bottom-left" />
-                        <BrowserRouter>
-                          <CreativeFeatures>
-                            <WelcomeToasts />
-                            <AppRoutes />
-                            <AanPanel />
-                          </CreativeFeatures>
-                        </BrowserRouter>
-                      </TooltipProvider>
-                    </FeatureToggleProvider>
-                  </VisualEffectsProvider>
-                </InsightsProvider>
-              </AanProvider>
+              <ActivePanelProvider>
+                <AanProvider>
+                  <InsightsProvider>
+                    <VisualEffectsProvider>
+                      <FeatureToggleProvider>
+                        <TooltipProvider>
+                          <Toaster />
+                          <Sonner position="bottom-left" />
+                          <BrowserRouter>
+                            <CreativeFeatures>
+                              <WelcomeToasts />
+                              <AppRoutes />
+                              <AanPanel />
+                            </CreativeFeatures>
+                          </BrowserRouter>
+                        </TooltipProvider>
+                      </FeatureToggleProvider>
+                    </VisualEffectsProvider>
+                  </InsightsProvider>
+                </AanProvider>
+              </ActivePanelProvider>
             </FilterProvider>
           </MarketplaceProvider>
         </AccountProvider>

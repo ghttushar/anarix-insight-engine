@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Download, Play } from "lucide-react";
 import { toast } from "sonner";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },
@@ -31,6 +32,7 @@ const COLUMN_DEFS = [
 const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Net Profit", "Units"];
 
 export default function ProfitLoss() {
+  const { activePanel, setActivePanel, closePanel } = useActivePanel();
   const weeks = ["Week-05", "Week-04", "Week-02", "Week-01"];
   const [dateRange, setDateRange] = useState("quarter");
   const [selectedCount] = useState(5);
@@ -47,6 +49,16 @@ export default function ProfitLoss() {
     p.sku.toLowerCase().includes(searchValue.toLowerCase())
   );
 
+  const handleOpenDetail = (product: ProfitabilityProduct) => {
+    setDetailProduct(product);
+    setActivePanel("productDetail");
+  };
+
+  const handleCloseDetail = () => {
+    setDetailProduct(null);
+    closePanel();
+  };
+
   const handleRun = () => {
     setIsLoading(true);
     setTimeout(() => setIsLoading(false), 800);
@@ -56,6 +68,8 @@ export default function ProfitLoss() {
   const handleDownload = () => {
     toast.success("Exporting data as CSV...");
   };
+
+  const showDetail = activePanel === "productDetail" && detailProduct;
 
   return (
     <AppLayout>
@@ -107,14 +121,15 @@ export default function ProfitLoss() {
               <ProductsPnLTable
                 products={filteredProducts}
                 visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
-                onMoreClick={(product) => setDetailProduct(product)}
+                onMoreClick={handleOpenDetail}
               />
             </div>
           </div>
         </div>
 
-        {/* Inline detail panel */}
-        <ProductDetailPanel product={detailProduct} isOpen={!!detailProduct} onClose={() => setDetailProduct(null)} />
+        {showDetail && (
+          <ProductDetailPanel product={detailProduct} isOpen={true} onClose={handleCloseDetail} />
+        )}
       </div>
     </AppLayout>
   );
