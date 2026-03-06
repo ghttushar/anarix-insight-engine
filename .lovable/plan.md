@@ -1,180 +1,130 @@
 
 
-# Phased Implementation Plan: Full App Polish, Fixes, and New Features
+# Phase 2.5: Unified Toolbars, Table Styling, Campaign Columns, Panel Fix, Settings Toggle, Sidebar Collapse, Taskbar Size
 
-This is a massive scope. To be transparent: implementing everything in a single pass will exceed credit limits. I am breaking this into **6 sequential phases**. You approve and I execute one phase at a time.
+This plan addresses 7 distinct requests in one pass.
 
 ---
 
-## Phase 1: Core Layout, Panel, and Table Fixes (Foundation)
+## 1. Unified Table Styling (Remove Card Wrappers)
 
-These are the broken fundamentals that affect every page.
+The Campaign Manager table renders without a card wrapper — just `rounded-lg border border-border` directly on the table. Many other pages wrap tables in `rounded-lg border border-border bg-card` with separate toolbar sections inside.
 
-### 1a. Insights Panel — Remove backdrop blur
-**File: `src/components/insights/InsightsPanel.tsx`** line 27
-- Remove `bg-black/4 backdrop-blur-[1px]` from backdrop div
-- Replace with `bg-transparent`
+**Action:** For every page that has a table, ensure the toolbar (`DataTableToolbar`) sits **outside** the table container (not inside a card header). The table itself uses only `rounded-lg border border-border` without `bg-card`. This matches the Campaign Manager pattern from image-80.
 
-### 1b. All right panels — open on same layer, not on top of app
-Right panels (PeriodBreakdownPanel, ProductDetailPanel, InsightsPanel) currently use `fixed` positioning with `z-50`, which covers the entire app. Change to inline flex layout within AppLayout, same pattern as AanCopilotPanel (which is already inline).
+**Files to update** (approx 15-20 pages):
+- All pages in `src/pages/profitability/`, `src/pages/bi/`, `src/pages/amc/`, `src/pages/dayparting/`, `src/pages/catalog/`, `src/pages/reports/`, `src/pages/advertising/BudgetPacing.tsx`, `RuleBuilder.tsx`, `CompetitorPricing.tsx`, `InventoryAds.tsx`, `ClientPortal.tsx`
+- Pattern: Extract `DataTableToolbar` above the table div. Remove `bg-card` from table wrapper. Remove inner `border-b border-border p-4` toolbar container.
+
+---
+
+## 2. Ensure All Pages Use DataTableToolbar
+
+Some newer pages (BudgetPacing, RuleBuilder, CompetitorPricing, InventoryAds, ClientPortal) have raw tables without `DataTableToolbar`. Add it with search, columns, filter, download for each.
+
+---
+
+## 3. Campaign Manager — New Columns + Edit Mode
+
+### 3a. Add fields to Campaign type
+**File: `src/types/campaign.ts`**
+- Add: `biddingStrategy: string` (values: "Dynamic Down", "Dynamic Up/Down", "Fixed")
+- `startDate` and `endDate` already exist.
+- `dailyBudget` already exists (serves as "Budget").
+
+### 3b. Add fields to mock data
+**File: `src/data/mockCampaigns.ts`**
+- Add `biddingStrategy` to each campaign.
+
+### 3c. Update CampaignTable columns
+**File: `src/components/tables/CampaignTable.tsx`**
+- After "Campaign Name" column, add: Start Date, End Date, Bidding Strategy, Budget (use dailyBudget).
+- Accept `viewMode` prop. When `viewMode === "edit"`, render inline editable cells for: Status (dropdown), Campaign Name (text input), Start Date (date input), End Date (date input), Bidding Strategy (dropdown), Daily Budget (number input).
+- Pass `onCampaignUpdate` callback for saving edits.
+
+### 3d. Update CampaignManager page
+**File: `src/pages/advertising/CampaignManager.tsx`**
+- Pass `viewMode` to `CampaignTable`.
+- Update `COLUMN_DEFS.campaigns` to include new columns.
+
+### 3e. Update CampaignTableTotalRow
+- Adjust `colSpan` to account for new columns.
+
+---
+
+## 4. Right Panels — Same Layer as Aan Copilot
+
+The Aan Copilot panel is rendered inside `AppLayout` as an inline flex sibling. But InsightsPanel, PeriodBreakdownPanel, and ProductDetailPanel still use `fixed right-0 top-0 z-50`.
+
+**Action:** Convert all three panels to the same inline pattern. However, since these panels are context-specific (only used on certain pages), the simplest fix is to change them from `fixed` to `absolute` within a `relative` parent, or better: render them as flex siblings in the pages that use them, matching how AanCopilotPanel works in AppLayout.
+
+**Practical approach:** Since InsightsPanel is rendered globally in `App.tsx`, and the profitability panels are page-specific, the cleanest fix is:
+- Change `fixed right-0 top-0 z-50` to `fixed right-0 top-0 z-30` and remove any overlay/backdrop. This keeps them as side panels that don't block interaction with the rest of the app.
+- Actually, the real issue is they need to push content. Convert to flex inline approach:
+  - For InsightsPanel: move from `App.tsx` global render into `AppLayout` as a flex sibling (like AanCopilotPanel).
+  - For PeriodBreakdownPanel and ProductDetailPanel: wrap page content + panel in a flex container at the page level.
 
 **Files:**
-- `src/components/layout/AppLayout.tsx` — Add slots for right panels inline (not fixed overlay)
-- `src/components/profitability/PeriodBreakdownPanel.tsx` — Convert from `fixed` to inline flex panel
-- `src/components/profitability/ProductDetailPanel.tsx` — Same conversion
-- `src/components/insights/InsightsPanel.tsx` — Same conversion
+- `src/App.tsx` — Remove `<InsightsPanel />` from global render
+- `src/components/layout/AppLayout.tsx` — Add InsightsPanel as flex sibling
+- `src/components/insights/InsightsPanel.tsx` — Change from `fixed` to inline flex panel
+- `src/components/profitability/PeriodBreakdownPanel.tsx` — Change from `fixed` to inline flex
+- `src/components/profitability/ProductDetailPanel.tsx` — Same
+- `src/pages/profitability/Dashboard.tsx` and `ProfitLoss.tsx` — Wrap content + panel in flex container
 
-### 1c. Independent scroll on all right panels
-All panels already use `ScrollArea` but some have containment issues. Ensure each panel has `h-full flex flex-col` with `overflow-hidden` outer and `overflow-y-auto` inner.
+---
 
-### 1d. Table hover overlap fix
-The `overflow-auto` wrapper on `Table` causes hover states to visually overlap when scrolling horizontally. Fix by adding `relative` to `TableRow` and ensuring the hover bg doesn't bleed.
+## 5. Settings Toggle — Hide/Show New Feature Pages
 
-**File: `src/components/ui/table.tsx`** — Add `relative` to `TableRow`
+**File: `src/pages/settings/Preferences.tsx`**
+- Add new section: "New Feature Pages" with a single Switch toggle.
+- Store state in localStorage key `anarix-new-features-visible` (default: true).
 
-### 1e. Unified table styling
-All tables must use the same `Table` component from `src/components/ui/table.tsx`. Audit all table pages to ensure consistent row height (44px), padding (px-3 py-2), and header styling.
+**File: `src/contexts/FeatureToggleContext.tsx`** (new)
+- Create context that reads/writes `anarix-new-features-visible` from localStorage.
+- Provides `newFeaturesVisible` boolean and `toggleNewFeatures` function.
 
-### 1f. Taskbar redesign — proper grouping and labels
-**File: `src/components/layout/AppTaskbar.tsx`**
-- Replace "All" with "Ad Type: All" or use full-form labels so users know what each dropdown is
-- Increase height from `h-10` to `h-12`
-- Use `bg-muted/30 rounded-md px-2 py-1` container around the left-side filter group
-- Proper alignment with consistent spacing
-
-### 1g. Sidebar — remove collapse button from footer, fix nav collapse behavior
 **File: `src/components/layout/AppSidebar.tsx`**
-- Remove the Collapse button from the footer entirely (sidebar already has the nook arrow on its edge)
-- Fix navigation: clicking a nav item (e.g., "Campaign Manager") should NOT collapse the parent section ("Advertising"). The active section should stay open. Only manually clicking the section header should toggle it.
-- Keep Profile + Theme toggle in footer, give them more breathing room
+- Consume `useFeatureToggle()`. When `newFeaturesVisible === false`, filter out these nav items:
+  - Health Score, Unified P&L, Budget Pacing, Search Harvesting, Anomaly Alerts, Creative Analyzer, Rule Builder, Inventory & Ads, Competitor Pricing, Client Portal, Dashboard Builder
 
-### 1h. Remove duplicate controls
-Several pages have their own date range / frequency selectors that duplicate the universal taskbar. Remove page-level duplicates from:
-- `src/pages/dayparting/HourlyData.tsx` (has its own Date Range selector)
-- `src/pages/advertising/TargetingActions.tsx` (has its own Date Range selector)
-- Any other page with redundant controls
+**File: `src/App.tsx`**
+- Wrap with `FeatureToggleProvider`.
 
 ---
 
-## Phase 2: Unified DataTableToolbar Everywhere + Toolbar Position Consistency
+## 6. Sidebar Collapse Button
 
-### 2a. Toolbar layout consistency
-In Profitability Dashboard, the search bar is part of DataTableToolbar (right-aligned). In the reference images (image-67, image-68), the search is on the LEFT and action buttons (Upload COGS, Export, Columns, Filter, Download) are on the RIGHT.
+The collapse button was removed from the footer. User wants it back somewhere.
 
-**File: `src/components/advertising/DataTableToolbar.tsx`**
-- Restructure: Search on LEFT, Columns + Filter + Download on RIGHT
-- This makes all pages consistent
+**Action:** Add a small collapse/expand chevron button at the very bottom of the sidebar, below the profile section. Use `PanelLeftClose` / `PanelLeftOpen` icons. When collapsed, show expand icon centered.
 
-### 2b. Apply DataTableToolbar to ALL table pages
-Every page with a table must use the same `DataTableToolbar` with appropriate `COLUMN_DEFS` and `FILTER_FIELDS`:
-- Catalog Products table
-- BI Keyword Tracker
-- Day Parting tables
-- AMC tables
-- All advertising sub-tables that don't already have it
+**File: `src/components/layout/AppSidebar.tsx`**
+- Add collapse toggle button at bottom of footer using `useSidebar().toggleSidebar`.
 
 ---
 
-## Phase 3: Page-Specific Fixes
+## 7. Universal Taskbar — Match Table Toolbar Height
 
-### 3a. Targeting Actions — fix Broad/Exact/Phrase layout
-The checkbox + bid input stack is cramped. Restructure to horizontal layout with proper spacing. Checkbox above, bid input below, centered in cell.
+Currently `h-12` (48px). The DataTableToolbar buttons are `h-9`. The taskbar feels small relative to toolbar.
 
-### 3b. Day Parting Heatmap — use brand color tints
-**File: `src/components/dayparting/HourlyHeatmap.tsx`**
-- Replace generic `bg-destructive/20`, `bg-warning/30`, `bg-success/50` with brand periwinkle tints:
-  - Lowest: `bg-primary/5`
-  - Low: `bg-primary/15`
-  - Medium: `bg-primary/30`
-  - High: `bg-primary/50`
-  - Highest: `bg-primary/70`
-- Remove the days checkbox row from HourlyData page
-
-### 3c. Schedule Editor redesign
-**File: `src/pages/dayparting/ScheduleEditor.tsx`**
-- Currently `max-w-4xl` which wastes right side. Use full width with two-column layout:
-  - Left: Form fields (schedule name, action type, campaigns)
-  - Right: Time grid + day selector + preview
-- Remove Card wrappers, use section headers instead
-
-### 3d. PeriodBreakdownPanel — "View More" opens inline, not overlay
-Already addressed in Phase 1b.
+**File: `src/components/layout/AppTaskbar.tsx`**
+- Change from `h-12` to `h-14` (56px).
+- Increase inner control heights from `h-7` to `h-8`.
+- Increase font sizes from `text-xs` to `text-sm` for labels and values.
 
 ---
 
-## Phase 4: New Feature Pages (Part 1)
+## Execution Order
 
-Create the first 5 competitive features as new pages with routes:
-
-### 4a. Budget Pacing Dashboard
-- New route: `/advertising/budget-pacing`
-- New file: `src/pages/advertising/BudgetPacing.tsx`
-- Visual timeline showing daily budget burn rate vs target
-- Projected overspend/underspend alerts
-- Campaign-level pacing cards
-
-### 4b. Search Term Harvesting
-- New route: `/advertising/search-harvesting`
-- New file: `src/pages/advertising/SearchHarvesting.tsx`
-- Cards showing high-performing search terms
-- "Add as Keyword" action with match type + bid suggestion
-- Aan AI explanation per term
-
-### 4c. Marketplace Health Score
-- New route: `/workspace/health-score`
-- New file: `src/pages/workspace/HealthScore.tsx`
-- Single composite score (0-100) with circular progress
-- Breakdown: profitability, ad efficiency, inventory health, keyword coverage
-
-### 4d. Cross-Marketplace Unified P&L
-- New route: `/profitability/unified-pnl`
-- New file: `src/pages/profitability/UnifiedPnL.tsx`
-- Side-by-side Amazon + Walmart P&L with Combined column
-
-### 4e. Aan Anomaly Alerts
-- New route: part of existing Insights system
-- Enhance `src/components/insights/InsightsContext.tsx` with anomaly detection alerts
-- In-app notification bell in sidebar
-
----
-
-## Phase 5: New Feature Pages (Part 2)
-
-### 5a. Creative Performance Analyzer
-- New route: `/advertising/creative-analyzer`
-- Upload creatives, correlation analysis with CTR/CVR
-
-### 5b. Competitor Price Tracking
-- New route: `/bi/competitor-pricing`
-- Price timeline chart, correlation with own sales
-
-### 5c. Rule Builder with Backtesting
-- New route: `/advertising/rules`
-- Rule definition form + historical simulation chart
-
-### 5d. Inventory-Aware Ad Optimization
-- New route: `/catalog/inventory-ads`
-- Stock level + ad spend correlation dashboard
-
-### 5e. Client Reporting Portal
-- New route: `/reports/client-portal`
-- Report builder, PDF preview, schedule configuration
-
----
-
-## Phase 6: Final Polish Pass
-
-- Verify every button works (toast feedback minimum)
-- Verify all panels have independent scroll
-- Verify all tables are visually identical
-- Verify no duplicate controls
-- Verify sidebar navigation behavior
-
----
-
-## Recommended Execution
-
-Each phase is one approval cycle. Phase 1 is the most critical — it fixes the broken foundation. Phases 4-5 add new pages. Phase 6 is the final audit.
-
-**I recommend starting with Phase 1 now.** It addresses the most user-visible issues: panel blur, overlay behavior, table styling, taskbar design, sidebar behavior, and duplicate controls.
+1. Create FeatureToggleContext
+2. Update types + mock data (campaign fields)
+3. Update CampaignTable (new columns + edit mode)
+4. Update CampaignManager + TotalRow
+5. Fix all right panels to inline flex
+6. Unify table styling across all pages
+7. Add DataTableToolbar to pages missing it
+8. Add sidebar collapse button
+9. Resize taskbar
+10. Add settings toggle
 
