@@ -10,8 +10,9 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { DensityProvider } from "@/contexts/DensityContext";
 import { AccountProvider, useAccounts } from "@/contexts/AccountContext";
 import { VisualEffectsProvider } from "@/contexts/VisualEffectsContext";
+import { FeatureToggleProvider } from "@/contexts/FeatureToggleContext";
 import { AanProvider, AanPanel } from "@/components/aan";
-import { InsightsProvider, InsightsPanel } from "@/components/insights";
+import { InsightsProvider } from "@/components/insights";
 import { CreativeFeatures } from "@/features/creative";
 import { toast } from "sonner";
 import NotFound from "./pages/NotFound";
@@ -202,18 +203,19 @@ const App = () => (
               <AanProvider>
                 <InsightsProvider>
                   <VisualEffectsProvider>
-                    <TooltipProvider>
-                      <Toaster />
-                      <Sonner position="bottom-left" />
-                      <BrowserRouter>
-                        <CreativeFeatures>
-                          <WelcomeToasts />
-                          <AppRoutes />
-                          <AanPanel />
-                          <InsightsPanel />
-                        </CreativeFeatures>
-                      </BrowserRouter>
-                    </TooltipProvider>
+                    <FeatureToggleProvider>
+                      <TooltipProvider>
+                        <Toaster />
+                        <Sonner position="bottom-left" />
+                        <BrowserRouter>
+                          <CreativeFeatures>
+                            <WelcomeToasts />
+                            <AppRoutes />
+                            <AanPanel />
+                          </CreativeFeatures>
+                        </BrowserRouter>
+                      </TooltipProvider>
+                    </FeatureToggleProvider>
                   </VisualEffectsProvider>
                 </InsightsProvider>
               </AanProvider>

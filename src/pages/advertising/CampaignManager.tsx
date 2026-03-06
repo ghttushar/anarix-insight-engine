@@ -45,7 +45,9 @@ const tabs = [
 const COLUMN_DEFS: Record<string, { id: string; label: string }[]> = {
   campaigns: [
     { id: "active", label: "Active" }, { id: "status", label: "Status" }, { id: "name", label: "Campaign Name" },
-    { id: "dailyBudget", label: "Daily Budget" }, { id: "totalBudget", label: "Total Budget" }, { id: "spend", label: "Spend" },
+    { id: "startDate", label: "Start Date" }, { id: "endDate", label: "End Date" },
+    { id: "biddingStrategy", label: "Bidding Strategy" }, { id: "dailyBudget", label: "Budget" },
+    { id: "totalBudget", label: "Total Budget" }, { id: "spend", label: "Spend" },
     { id: "sales", label: "Sales" }, { id: "roas", label: "ROAS" }, { id: "impressions", label: "Impressions" },
     { id: "clicks", label: "Clicks" }, { id: "ctr", label: "CTR" }, { id: "acos", label: "ACOS" },
   ],
@@ -81,7 +83,7 @@ const COLUMN_DEFS: Record<string, { id: string; label: string }[]> = {
 };
 
 const FILTER_FIELDS: Record<string, string[]> = {
-  campaigns: ["Campaign Status", "Campaign Name", "Campaign Type", "Daily Budget", "Spend", "ROAS", "ACOS"],
+  campaigns: ["Campaign Status", "Campaign Name", "Campaign Type", "Daily Budget", "Spend", "ROAS", "ACOS", "Bidding Strategy"],
   "ad-groups": ["Status", "Ad Group Name", "Campaign Name", "Impressions", "ROAS"],
   "product-ads": ["Status", "Product Name", "SKU", "Ad Group", "Campaign"],
   keywords: ["Status", "Keyword", "Match Type", "Ad Group", "Campaign"],
@@ -145,6 +147,12 @@ export default function CampaignManager() {
     );
   };
 
+  const handleCampaignUpdate = (id: string, updates: Partial<Campaign>) => {
+    setCampaigns((prev) =>
+      prev.map((c) => c.id === id ? { ...c, ...updates } : c)
+    );
+  };
+
   const handleKPISwap = (index: number, newMetricKey: string) => {
     const metric = AVAILABLE_METRICS.find((m) => m.key === newMetricKey);
     if (!metric) return;
@@ -157,7 +165,7 @@ export default function CampaignManager() {
 
   const renderTable = () => {
     switch (activeTab) {
-      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} showTotalBudget={isWalmart} searchQuery={searchQuery} />;
+      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} />;
       case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} />;
       case "product-ads": return <ProductAdsTable searchQuery={searchQuery} />;
       case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} />;
