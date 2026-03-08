@@ -41,7 +41,7 @@ function KPICard({ label, value, delta, highlight }: KPICardProps) {
           {value}
         </span>
         {delta !== undefined && (
-          <span className={cn("flex items-center gap-0.5 text-xs font-medium", getDeltaColor(delta))}>
+          <span className={cn("flex items-center gap-1 text-xs font-medium", getDeltaColor(delta))}>
             {getDeltaIcon(delta)}
             {delta > 0 ? "+" : ""}{delta.toFixed(1)}%
           </span>
