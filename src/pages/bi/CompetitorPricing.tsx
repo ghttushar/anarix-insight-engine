@@ -78,6 +78,7 @@ function PriceHistoryChart({ selected }: { selected: CompetitorProduct }) {
 }
 
 export default function CompetitorPricing() {
+  const { formatCurrency } = useCurrency();
   const [selected, setSelected] = useState<CompetitorProduct | null>(mockCompetitorProducts[0]);
 
   return (
