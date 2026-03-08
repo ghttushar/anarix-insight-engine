@@ -136,7 +136,10 @@ export default function ProfitabilityDashboard() {
               ))}
             </div>
             <div className="h-full">
-              <ProfitabilityTrendChart data={trendData} />
+              <ProfitabilityTrendChart
+                data={trendDataByPeriod[selectedPeriod] || trendDataByPeriod.this_month}
+                periodLabel={profitabilitySummaries.find((s) => s.period === selectedPeriod)?.dateLabel || ""}
+              />
             </div>
           </div>
 

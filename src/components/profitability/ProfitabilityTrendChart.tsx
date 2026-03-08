@@ -44,6 +44,10 @@ export function ProfitabilityTrendChart({ data, periodLabel }: ProfitabilityTren
 
   return (
     <div className="h-full rounded-lg border border-border bg-card p-4 flex flex-col">
+      {/* Header */}
+      {periodLabel && (
+        <div className="mb-1 text-xs text-muted-foreground">{periodLabel}</div>
+      )}
       {/* Controls */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
