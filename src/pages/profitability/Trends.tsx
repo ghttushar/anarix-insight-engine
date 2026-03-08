@@ -170,6 +170,7 @@ export default function ProfitabilityTrends() {
           </div>
           </div>
         </div>
+      </div>
 
       <ProductTrendsModal product={trendsProduct} isOpen={!!trendsProduct} onClose={() => setTrendsProduct(null)} />
     </AppLayout>
