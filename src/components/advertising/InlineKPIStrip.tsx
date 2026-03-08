@@ -114,9 +114,9 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
                 )}
               >
                 {isNeutral ? (
-                  <Minus className="h-3 w-3" />
+                  <Minus className="h-3.5 w-3.5" />
                 ) : isPositive ? (
-                  <ArrowUp className="h-3 w-3" />
+                  <ArrowUp className="h-3.5 w-3.5" />
                 ) : (
                   <ArrowDown className="h-3 w-3" />
                 )}
