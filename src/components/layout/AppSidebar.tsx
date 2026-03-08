@@ -5,7 +5,7 @@ import {
   MousePointerClick, Package, Database, Search, BarChart3, Clock,
   CalendarClock, History, ListTodo, Settings, Users, ChevronDown,
   ChevronRight, Sparkles, Layers, Image, FlaskConical, PackageCheck,
-  Send, PanelLeftClose, PanelLeftOpen, Sun, Moon, User, LogOut,
+  Send, ChevronLeft, Sun, Moon, User, LogOut,
   Gauge, Wheat, Bell, Activity, Link, Wrench, LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -186,7 +186,14 @@ export function AppSidebar() {
   }).filter(group => group.items.length > 0);
 
   return (
-    <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-300", collapsed ? "w-14" : "w-60")} collapsible="icon">
+    <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-300 relative", collapsed ? "w-14" : "w-60")} collapsible="icon">
+      {/* Edge notch collapse toggle — vertically centered on right edge */}
+      <button
+        onClick={toggleSidebar}
+        className="absolute top-1/2 -translate-y-1/2 -right-3 z-50 flex items-center justify-center h-6 w-6 rounded-full border border-border bg-sidebar shadow-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+      >
+        {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+      </button>
       <SidebarContent className="py-3 flex flex-col h-full">
         {/* Logo */}
         <div className={cn("flex items-center", collapsed ? "justify-center px-2 mb-3" : "px-4 mb-3")}>
@@ -293,20 +300,8 @@ export function AppSidebar() {
 
         {/* Footer */}
         <div className="mt-auto px-3 pt-2 border-t border-border/50 space-y-2">
-          {/* Utility bar: Collapse + Theme toggle */}
-          <div className={cn("flex items-center gap-1", collapsed ? "flex-col" : "justify-between px-1")}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={toggleSidebar}
-                  className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
-                >
-                  {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side={collapsed ? "right" : "top"}>{collapsed ? "Expand" : "Collapse"}</TooltipContent>
-            </Tooltip>
-
+          {/* Theme toggle only */}
+          <div className={cn("flex items-center", collapsed ? "justify-center" : "px-1")}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button

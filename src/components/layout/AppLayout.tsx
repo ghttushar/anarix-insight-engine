@@ -22,7 +22,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
   }, [showCopilot, showInsights, setOpen]);
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full relative">
       <AppSidebar />
       <div className="flex flex-1 min-h-screen overflow-hidden">
         <main className={cn(
