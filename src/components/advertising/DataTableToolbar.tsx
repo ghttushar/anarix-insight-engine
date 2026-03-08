@@ -48,6 +48,8 @@ interface DataTableToolbarProps {
   onViewModeChange?: (mode: "view" | "edit") => void;
   showViewToggle?: boolean;
   filterFields?: string[];
+  leftContent?: React.ReactNode;
+  rightContent?: React.ReactNode;
 }
 
 const OPERATORS = ["is", "is not", "contains", "starts with", "greater than", "less than"];
@@ -69,6 +71,8 @@ export function DataTableToolbar({
   onViewModeChange,
   showViewToggle = false,
   filterFields = [],
+  leftContent,
+  rightContent,
 }: DataTableToolbarProps) {
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState<FilterRule[]>(activeFilters);
@@ -116,8 +120,9 @@ export function DataTableToolbar({
     <div className="space-y-3">
       {/* Main Toolbar Row */}
       <div className="flex items-center justify-between gap-4">
-        {/* Left Side: Search + View Toggle */}
+        {/* Left Side: leftContent + View Toggle + Search */}
         <div className="flex items-center gap-2">
+          {leftContent}
           {showViewToggle && onViewModeChange && (
             <div className="flex rounded-lg border border-border bg-background p-0.5">
               <button
@@ -221,6 +226,8 @@ export function DataTableToolbar({
               <Download className="h-4 w-4" />
             </Button>
           )}
+
+          {rightContent}
         </div>
       </div>
 

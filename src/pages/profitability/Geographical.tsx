@@ -67,33 +67,34 @@ export default function Geographical() {
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex rounded-md border border-border">
-              <button
-                className={cn(
-                  "px-3 py-1.5 text-sm font-medium transition-colors",
-                  viewLevel === "state" ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
-                )}
-                onClick={() => setViewLevel("state")}
-              >
-                State Level
-              </button>
-              <button
-                className={cn(
-                  "px-3 py-1.5 text-sm font-medium transition-colors",
-                  viewLevel === "product" ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
-                )}
-                onClick={() => setViewLevel("product")}
-              >
-                Product Level
-              </button>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => toast.info("Upload COGS file...")}>
-              <Upload className="mr-2 h-4 w-4" />Upload COGS
-            </Button>
-          </div>
-
           <DataTableToolbar
+            leftContent={
+              <div className="flex rounded-md border border-border">
+                <button
+                  className={cn(
+                    "px-3 py-1.5 text-sm font-medium transition-colors",
+                    viewLevel === "state" ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
+                  )}
+                  onClick={() => setViewLevel("state")}
+                >
+                  State Level
+                </button>
+                <button
+                  className={cn(
+                    "px-3 py-1.5 text-sm font-medium transition-colors",
+                    viewLevel === "product" ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
+                  )}
+                  onClick={() => setViewLevel("product")}
+                >
+                  Product Level
+                </button>
+              </div>
+            }
+            rightContent={
+              <Button variant="outline" size="sm" onClick={() => toast.info("Upload COGS file...")}>
+                <Upload className="mr-2 h-4 w-4" />Upload COGS
+              </Button>
+            }
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             searchPlaceholder={viewLevel === "state" ? "Search region..." : "Search by Product Name / Item ID..."}
