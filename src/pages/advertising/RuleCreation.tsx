@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Copy, Trash2, ChevronDown, ChevronRight, Info, Home, ArrowRight, X } from "lucide-react";
+import { Plus, Copy, Trash2, ChevronDown, ChevronRight, Info, Home, ArrowRight, X, Save } from "lucide-react";
 import { ruleTemplates, metricOptions, operatorOptions, actionOptions, lookbackOptions, frequencyOptions, type RuleCriteria, type RuleCondition } from "@/data/mockRules";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,7 @@ export default function RuleCreation() {
   const navigate = useNavigate();
   const { templateId, ruleId } = useParams();
   const template = ruleTemplates.find((t) => t.id === templateId);
+  const isEdit = !!ruleId;
 
   const [ruleName, setRuleName] = useState(template ? `${template.name}` : "");
   const [status, setStatus] = useState(true);
@@ -99,12 +101,32 @@ export default function RuleCreation() {
     );
   };
 
+  const handleSaveDraft = () => {
+    toast.success("Rule saved as draft");
+    navigate("/advertising/rules/applied?tab=draft");
+  };
+
+  // Build breadcrumb items
+  const breadcrumbItems = [
+    { label: "Advertising", href: "/advertising" },
+    { label: "Rules", href: "/advertising/rules/agents" },
+    { label: "Agents", href: "/advertising/rules/agents" },
+    { label: isEdit ? "Edit Rule" : (template?.name || "Create Rule") },
+  ];
+
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
-          title={ruleId ? "Edit Rule" : "Create Rule"}
+          title={isEdit ? "Edit Rule" : "Create Rule"}
           subtitle={template ? `Based on: ${template.name}` : "Define conditions, actions, and apply to campaigns"}
+          actions={
+            <Button variant="outline" size="sm" onClick={handleSaveDraft}>
+              <Save className="mr-1.5 h-3.5 w-3.5" />
+              Save Draft
+            </Button>
+          }
         />
 
         {/* Basic Information */}
@@ -208,12 +230,6 @@ export default function RuleCreation() {
             Add Criteria
           </Button>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => {
-              toast.success("Rule saved as draft");
-              navigate("/advertising/rules/applied");
-            }}>
-              Save & Draft
-            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/advertising/rules/agents")}>
               <Home className="mr-1.5 h-3.5 w-3.5" />
               Home

@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,10 +18,21 @@ const statusStyles: Record<string, string> = {
   draft: "bg-muted text-muted-foreground border-muted",
 };
 
+const statusTabs = [
+  { value: "all", label: "All Rules", count: appliedRules.length },
+  { value: "active", label: "Active", count: appliedRules.filter((r) => r.status === "active").length },
+  { value: "paused", label: "Paused", count: appliedRules.filter((r) => r.status === "paused").length },
+  { value: "draft", label: "Drafts", count: appliedRules.filter((r) => r.status === "draft").length },
+];
+
 type SortKey = "name" | "ruleType" | "entitiesCount" | "frequency" | "lastRun" | "status";
 
 export default function AppliedRules() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get("tab") || "all";
+
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [rowsPerPage, setRowsPerPage] = useState("10");
   const [page, setPage] = useState(0);
   const [sortKey, setSortKey] = useState<SortKey>("name");
@@ -34,7 +47,16 @@ export default function AppliedRules() {
     }
   };
 
-  const sorted = [...appliedRules].sort((a, b) => {
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setPage(0);
+  };
+
+  const filteredRules = activeTab === "all"
+    ? appliedRules
+    : appliedRules.filter((rule) => rule.status === activeTab);
+
+  const sorted = [...filteredRules].sort((a, b) => {
     const av = a[sortKey];
     const bv = b[sortKey];
     const cmp = typeof av === "number" ? av - (bv as number) : String(av).localeCompare(String(bv));
@@ -60,6 +82,13 @@ export default function AppliedRules() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb
+          items={[
+            { label: "Advertising", href: "/advertising" },
+            { label: "Rules", href: "/advertising/rules/agents" },
+            { label: "Applied Rules" },
+          ]}
+        />
         <PageHeader
           title="Applied Rules"
           subtitle="Manage and monitor all active automation rules"
@@ -70,6 +99,9 @@ export default function AppliedRules() {
             </Button>
           }
         />
+
+        {/* Status Filter Tabs */}
+        <UnderlineTabs tabs={statusTabs} value={activeTab} onChange={handleTabChange} />
 
         <div className="rounded-lg border border-border">
           <Table>
@@ -85,39 +117,47 @@ export default function AppliedRules() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pageData.map((rule) => (
-                <TableRow key={rule.id}>
-                  <TableCell>
-                    <button
-                      className="text-sm font-medium text-primary hover:underline"
-                      onClick={() => navigate(`/advertising/rules/edit/${rule.id}`)}
-                    >
-                      {rule.name}
-                    </button>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{rule.ruleType}</TableCell>
-                  <TableCell>
-                    <button className="text-sm text-primary hover:underline">
-                      {rule.entitiesCount} {rule.entityLabel}
-                    </button>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{rule.frequency}</TableCell>
-                  <TableCell className="text-muted-foreground text-xs">{rule.lastRun}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={statusStyles[rule.status]}>{rule.status}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => navigate(`/advertising/rules/edit/${rule.id}`)}
-                    >
-                      <Edit className="h-3.5 w-3.5" />
-                    </Button>
+              {pageData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                    No {activeTab === "all" ? "" : activeTab} rules found.
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                pageData.map((rule) => (
+                  <TableRow key={rule.id}>
+                    <TableCell>
+                      <button
+                        className="text-sm font-medium text-primary hover:underline"
+                        onClick={() => navigate(`/advertising/rules/edit/${rule.id}`)}
+                      >
+                        {rule.name}
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{rule.ruleType}</TableCell>
+                    <TableCell>
+                      <button className="text-sm text-primary hover:underline">
+                        {rule.entitiesCount} {rule.entityLabel}
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{rule.frequency}</TableCell>
+                    <TableCell className="text-muted-foreground text-xs">{rule.lastRun}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={statusStyles[rule.status]}>{rule.status}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => navigate(`/advertising/rules/edit/${rule.id}`)}
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>
@@ -136,7 +176,7 @@ export default function AppliedRules() {
             </Select>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Page {page + 1} of {totalPages}</span>
+            <span>Page {page + 1} of {Math.max(totalPages, 1)}</span>
             <Button variant="ghost" size="icon" className="h-7 w-7" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
