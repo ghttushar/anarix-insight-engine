@@ -72,82 +72,82 @@ export function ChartContainer({
   const activeMetricCount = metrics?.filter((m) => m.active).length ?? 0;
   const totalMetricCount = metrics?.length ?? 0;
 
+  const controls = (
+    <>
+      {extraControls}
+
+      {metrics && metrics.length > 0 && onMetricToggle && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+              Metrics ({activeMetricCount}/{totalMetricCount})
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-48 p-2">
+            <div className="space-y-1">
+              {metrics.map((m) => (
+                <button
+                  key={m.key}
+                  onClick={() => onMetricToggle(m.key)}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors",
+                    m.active
+                      ? "bg-primary/10 text-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: m.color }} />
+                  <span className="flex-1 text-left">{m.label}</span>
+                  {m.active && <Check className="h-3 w-3 text-primary" />}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      )}
+
+      <Select value={chartType} onValueChange={(v) => onChartTypeChange(v as ChartType)}>
+        <SelectTrigger className="h-7 w-[80px] text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {availableChartTypes.map((t) => (
+            <SelectItem key={t} value={t} className="text-xs">
+              {CHART_TYPE_LABELS[t]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </>
+  );
+
   return (
     <>
       <div className={cn("rounded-lg border border-border bg-card p-4 flex flex-col", className)}>
-        {/* Header */}
         <div className="mb-3 flex items-center justify-between gap-2">
           <div className="min-w-0">
             {title && <h3 className="font-heading text-sm font-semibold text-foreground truncate">{title}</h3>}
             {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}
           </div>
-
           <div className="flex items-center gap-2 shrink-0">
-            {extraControls}
-
-            {/* Metric selector */}
-            {metrics && metrics.length > 0 && onMetricToggle && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
-                    Metrics ({activeMetricCount}/{totalMetricCount})
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="end" className="w-48 p-2">
-                  <div className="space-y-1">
-                    {metrics.map((m) => (
-                      <button
-                        key={m.key}
-                        onClick={() => onMetricToggle(m.key)}
-                        className={cn(
-                          "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors",
-                          m.active
-                            ? "bg-primary/10 text-foreground"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                        )}
-                      >
-                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: m.color }} />
-                        <span className="flex-1 text-left">{m.label}</span>
-                        {m.active && <Check className="h-3 w-3 text-primary" />}
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            )}
-
-            {/* Viz type selector */}
-            <Select value={chartType} onValueChange={(v) => onChartTypeChange(v as ChartType)}>
-              <SelectTrigger className="h-7 w-[80px] text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {availableChartTypes.map((t) => (
-                  <SelectItem key={t} value={t} className="text-xs">
-                    {CHART_TYPE_LABELS[t]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Expand */}
+            {controls}
             <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setIsExpanded(true)}>
               <Maximize2 className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
-
-        {/* Chart content */}
-        <div className="flex-1 min-h-0">
-          {children}
-        </div>
+        <div className="flex-1 min-h-0">{children}</div>
       </div>
 
-      {/* Expanded Dialog */}
       <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
         <DialogContent className="max-w-[90vw] max-h-[85vh] h-[75vh]">
           <DialogHeader>
-            <DialogTitle className="text-base">{title || "Chart"}</DialogTitle>
+            <div className="flex items-center justify-between gap-2">
+              <DialogTitle className="text-base">{title || "Chart"}</DialogTitle>
+              <div className="flex items-center gap-2 shrink-0 mr-6">
+                {controls}
+              </div>
+            </div>
             <DialogDescription className="sr-only">Expanded chart view</DialogDescription>
           </DialogHeader>
           <div className="flex-1 min-h-0 h-full">
