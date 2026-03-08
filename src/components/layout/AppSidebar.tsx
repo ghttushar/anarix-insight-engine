@@ -300,20 +300,8 @@ export function AppSidebar() {
 
         {/* Footer */}
         <div className="mt-auto px-3 pt-2 border-t border-border/50 space-y-2">
-          {/* Utility bar: Collapse + Theme toggle */}
-          <div className={cn("flex items-center gap-1", collapsed ? "flex-col" : "justify-between px-1")}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={toggleSidebar}
-                  className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
-                >
-                  {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side={collapsed ? "right" : "top"}>{collapsed ? "Expand" : "Collapse"}</TooltipContent>
-            </Tooltip>
-
+          {/* Theme toggle only */}
+          <div className={cn("flex items-center", collapsed ? "justify-center" : "px-1")}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
