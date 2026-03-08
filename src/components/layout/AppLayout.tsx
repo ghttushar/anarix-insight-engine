@@ -18,14 +18,14 @@ function CollapseNotch() {
       <TooltipTrigger asChild>
         <button
           onClick={toggleSidebar}
-          className="fixed top-1/2 -translate-y-1/2 z-20 flex items-center justify-center h-6 w-6 rounded-full bg-sidebar border border-border/60 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-all duration-200 shadow-sm"
+          className="fixed top-1/2 -translate-y-1/2 z-20 flex items-center justify-center h-8 w-8 rounded-full bg-sidebar border border-border/60 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-all duration-200 shadow-sm"
           style={{
             left: collapsed
-              ? "calc(var(--sidebar-width-icon) - 12px)"
-              : "calc(var(--sidebar-width) - 12px)",
+              ? "calc(var(--sidebar-width-icon) - 20px)"
+              : "calc(var(--sidebar-width) - 20px)",
           }}
         >
-          {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
       </TooltipTrigger>
       <TooltipContent side="right">{collapsed ? "Expand" : "Collapse"}</TooltipContent>
