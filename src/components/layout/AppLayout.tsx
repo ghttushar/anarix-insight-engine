@@ -6,22 +6,6 @@ import { InsightsPanel } from "@/components/insights/InsightsPanel";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useDensity } from "@/contexts/DensityContext";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-function CollapseNotch() {
-  const { state, toggleSidebar } = useSidebar();
-  const collapsed = state === "collapsed";
-
-  return (
-    <button
-      onClick={toggleSidebar}
-      className="fixed top-1/2 -translate-y-1/2 z-50 flex items-center justify-center h-6 w-6 rounded-full border border-border bg-sidebar shadow-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-all"
-      style={{ left: collapsed ? "calc(var(--sidebar-width-icon) - 12px)" : "calc(var(--sidebar-width) - 12px)" }}
-    >
-      {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
-    </button>
-  );
-}
 
 function LayoutInner({ children }: { children: ReactNode }) {
   const { activePanel } = useActivePanel();
@@ -40,7 +24,6 @@ function LayoutInner({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
-      <CollapseNotch />
       <div className="flex flex-1 min-h-screen overflow-hidden">
         <main className={cn(
           "flex-1 overflow-auto bg-background",

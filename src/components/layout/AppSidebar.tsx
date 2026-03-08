@@ -293,15 +293,27 @@ export function AppSidebar() {
 
         {/* Footer */}
         <div className="mt-auto px-3 pt-2 border-t border-border/50 space-y-2">
-          {/* Theme toggle only */}
-          <div className={cn("flex items-center", collapsed ? "justify-center" : "px-1")}>
+          {/* Collapse + Theme toggle */}
+          <div className={cn("flex items-center gap-1", collapsed ? "flex-col" : "justify-between px-1")}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={toggleSidebar}
+                  className="flex items-center justify-center h-7 w-7 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+                >
+                  {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side={collapsed ? "right" : "top"}>{collapsed ? "Expand" : "Collapse"}</TooltipContent>
+            </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-                  className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+                  className="flex items-center justify-center h-7 w-7 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
                 >
-                  {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                  {resolvedTheme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
                 </button>
               </TooltipTrigger>
               <TooltipContent side={collapsed ? "right" : "top"}>{resolvedTheme === "dark" ? "Light mode" : "Dark mode"}</TooltipContent>
