@@ -68,8 +68,8 @@ const navigationGroups: NavGroup[] = [{
     { title: "Search Harvesting", url: "/advertising/search-harvesting", icon: Wheat, isNewFeature: true },
     { title: "Anomaly Alerts", url: "/advertising/anomaly-alerts", icon: Bell, isNewFeature: true },
     { title: "Creative Analyzer", url: "/advertising/creative-analyzer", icon: Image, isNewFeature: true },
-    { title: "Rule Agents", url: "/advertising/rules/agents", icon: FlaskConical, isNewFeature: true },
-    { title: "Applied Rules", url: "/advertising/rules/applied", icon: FlaskConical, isNewFeature: true },
+    { title: "Rule Agents", url: "/advertising/rules/agents", icon: FlaskConical },
+    { title: "Applied Rules", url: "/advertising/rules/applied", icon: FlaskConical },
   ]
 }, {
   label: "Catalog",
