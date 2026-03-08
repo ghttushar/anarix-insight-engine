@@ -115,11 +115,7 @@ export function ProductsPnLTable({ products, visibleColumns, onCogsClick, onTren
               {cols.map((col) => (
                 <TableCell
                   key={col.id}
-                  className={cn(
-                    "text-right",
-                    col.className,
-                    col.getClassName ? col.getClassName(product) : undefined
-                  )}
+                  className="text-right"
                 >
                   {col.getValue(product)}
                 </TableCell>
