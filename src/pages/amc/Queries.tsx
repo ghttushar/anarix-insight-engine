@@ -149,70 +149,82 @@ export default function AMCQueries() {
             </Table>
           </div>
         ) : (
-          <div className="rounded-lg border border-border bg-card p-8 max-w-2xl">
-            <h2 className="text-xl font-semibold text-foreground mb-2">Custom Queries</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Provide custom query details, and the Anarix team will reach out to you shortly for assistance.
-            </p>
-            <p className="text-sm font-medium text-foreground mb-6">
-              Email ID : tech@anarix.ai
-            </p>
+          <div className="rounded-lg border border-border bg-card">
+            <div className="border-b border-border px-6 py-5">
+              <h2 className="text-base font-semibold text-foreground">Custom Queries</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Provide custom query details, and the Anarix team will reach out to you shortly for assistance.
+              </p>
+            </div>
 
-            <h3 className="text-lg font-semibold text-foreground mb-4">Send Request</h3>
-
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <Label className="font-medium">
-                  Query Title <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  placeholder="Name of the Query title"
-                  value={queryTitle}
-                  onChange={(e) => setQueryTitle(e.target.value)}
-                />
+            <div className="px-6 py-5 space-y-6">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Email ID :</span>
+                <span className="font-medium text-foreground">tech@anarix.ai</span>
               </div>
 
-              <div className="space-y-2">
-                <Label className="font-medium">
-                  Description <span className="text-destructive">*</span>
-                </Label>
-                <Textarea
-                  placeholder="Some Description about the request you're looking for..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={5}
-                />
-              </div>
+              <div className="border-t border-border pt-5">
+                <h3 className="text-sm font-semibold text-foreground mb-5">Send Request</h3>
 
-              <div className="space-y-2">
-                <Label className="font-medium">
-                  Select Your Available Time and Date <span className="text-destructive">*</span>
-                </Label>
-                <div className="flex gap-4">
-                  <div className="relative flex-1">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="space-y-4 max-w-xl">
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-foreground">
+                      Query Title <span className="text-destructive">*</span>
+                    </Label>
                     <Input
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      className="pl-10"
+                      placeholder="Name of the Query title"
+                      value={queryTitle}
+                      onChange={(e) => setQueryTitle(e.target.value)}
+                      className="h-10"
                     />
                   </div>
-                  <div className="relative flex-1">
-                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="time"
-                      value={selectedTime}
-                      onChange={(e) => setSelectedTime(e.target.value)}
-                      className="pl-10"
+
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-foreground">
+                      Description <span className="text-destructive">*</span>
+                    </Label>
+                    <Textarea
+                      placeholder="Some Description about the request you're looking for..."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      rows={4}
+                      className="resize-none"
                     />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-foreground">
+                      Select Your Available Time and Date <span className="text-destructive">*</span>
+                    </Label>
+                    <div className="flex gap-3">
+                      <div className="relative flex-1">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          type="date"
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                          className="pl-10 h-10"
+                        />
+                      </div>
+                      <div className="relative flex-1">
+                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          type="time"
+                          value={selectedTime}
+                          onChange={(e) => setSelectedTime(e.target.value)}
+                          className="pl-10 h-10"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <Button onClick={handleSubmitRequest} className="h-10">
+                      Submit
+                    </Button>
                   </div>
                 </div>
               </div>
-
-              <Button onClick={handleSubmitRequest}>
-                Submit
-              </Button>
             </div>
           </div>
         )}
