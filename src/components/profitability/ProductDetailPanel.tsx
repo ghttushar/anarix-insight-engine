@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { ProfitabilityProduct } from "@/types/profitability";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface ProductDetailPanelProps {
   product: ProfitabilityProduct | null;
@@ -10,10 +11,8 @@ interface ProductDetailPanelProps {
   onClose: () => void;
 }
 
-const fmt = (v: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(v);
-
 export function ProductDetailPanel({ product, isOpen, onClose }: ProductDetailPanelProps) {
+  const { formatCurrency: fmt } = useCurrency();
   if (!product || !isOpen) return null;
 
   const sections = [

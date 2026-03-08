@@ -10,6 +10,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { ProfitabilityProduct } from "@/types/profitability";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface COGSEditModalProps {
   product: ProfitabilityProduct | null;
@@ -18,10 +19,8 @@ interface COGSEditModalProps {
   onSave: (productId: string, newCogs: number) => void;
 }
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
-
 export function COGSEditModal({ product, isOpen, onClose, onSave }: COGSEditModalProps) {
+  const { formatCurrency } = useCurrency();
   const [cogsValue, setCogsValue] = useState("");
 
   const handleOpen = () => {

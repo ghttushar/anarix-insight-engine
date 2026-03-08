@@ -7,17 +7,17 @@ import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { GeographicalData } from "@/types/profitability";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface RegionalTableProps {
   data: GeographicalData[];
   searchValue?: string;
 }
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
 
 export function RegionalTable({ data, searchValue = "" }: RegionalTableProps) {
+  const { formatCurrency } = useCurrency();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const toggleRow = (id: string) => {

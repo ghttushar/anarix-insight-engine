@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { ProfitabilitySummary } from "@/types/profitability";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface PeriodBreakdownPanelProps {
   summary: ProfitabilitySummary;
@@ -10,13 +11,10 @@ interface PeriodBreakdownPanelProps {
   onClose: () => void;
 }
 
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
-};
-
 const formatPercent = (value: number) => `${value.toFixed(1)}%`;
 
 export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdownPanelProps) {
+  const { formatCurrency } = useCurrency();
   if (!isOpen) return null;
 
   const breakdown = summary.breakdown;

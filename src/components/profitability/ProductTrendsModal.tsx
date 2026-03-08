@@ -20,6 +20,7 @@ import {
 import { ProfitabilityProduct } from "@/types/profitability";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChartType } from "@/components/charts/ChartContainer";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface ProductTrendsModalProps {
   product: ProfitabilityProduct | null;
@@ -33,10 +34,8 @@ const METRICS_OPTIONS = [
   { key: "commission", label: "Commission on Product", color: "hsl(var(--chart-3))" },
 ];
 
-const formatCurrency = (v: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(v);
-
 export function ProductTrendsModal({ product, isOpen, onClose }: ProductTrendsModalProps) {
+  const { formatCurrency } = useCurrency();
   const [frequency, setFrequency] = useState("weekly");
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>(["orderSales", "totalSales"]);
   const [chartType, setChartType] = useState<ChartType>("line");
