@@ -126,6 +126,34 @@ export interface PageTypeData {
   acos: number;
 }
 
+// Product Targeting
+export interface ProductTarget {
+  id: string;
+  targetType: "asin" | "category";
+  targetValue: string;
+  targetLabel: string;
+  adGroupId: string;
+  adGroupName: string;
+  campaignId: string;
+  campaignName: string;
+  campaignType: CampaignType;
+  status: CampaignStatus;
+  bidAutomation: boolean;
+  minBid: number;
+  maxBid: number;
+  targetBid: number;
+  impressions: number;
+  clicks: number;
+  ctr: number;
+  adUnits: number;
+  cvr: number;
+  cpc: number;
+  adSpend: number;
+  adSales: number;
+  roas: number;
+  acos: number;
+}
+
 // Platform (Walmart specific)
 export interface PlatformData {
   id: string;

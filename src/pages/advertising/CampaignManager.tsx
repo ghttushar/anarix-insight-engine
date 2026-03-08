@@ -18,12 +18,14 @@ import { mockProductAds } from "@/data/mockProductAds";
 import { mockKeywords } from "@/data/mockKeywords";
 import { mockSearchTerms } from "@/data/mockSearchTerms";
 import { mockPageTypes, mockPlatforms } from "@/data/mockPageTypePlatform";
+import { mockProductTargets } from "@/data/mockProductTargeting";
+import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable";
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Campaign } from "@/types/campaign";
 import { Button } from "@/components/ui/button";
 import { Download, EyeOff, Maximize2 } from "lucide-react";
 
-type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "search-terms" | "page-type" | "platform";
+type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
 interface FilterRule {
   id: string;
@@ -37,6 +39,7 @@ const tabs = [
   { value: "ad-groups", label: "Ad Groups", count: mockAdGroups.length },
   { value: "product-ads", label: "Product Ads", count: mockProductAds.length },
   { value: "keywords", label: "Keyword Targeting", count: mockKeywords.length },
+  { value: "product-targeting", label: "Product Targeting", count: mockProductTargets.length },
   { value: "search-terms", label: "Search Terms", count: mockSearchTerms.length },
   { value: "page-type", label: "Page Type", count: mockPageTypes.length },
   { value: "platform", label: "Platform", count: mockPlatforms.length },
@@ -67,6 +70,12 @@ const COLUMN_DEFS: Record<string, { id: string; label: string }[]> = {
     { id: "adGroup", label: "Ad Group" }, { id: "campaign", label: "Campaign" }, { id: "impressions", label: "Impressions" },
     { id: "clicks", label: "Clicks" }, { id: "adSpend", label: "Ad Spend" },
   ],
+  "product-targeting": [
+    { id: "status", label: "Status" }, { id: "target", label: "Target" }, { id: "type", label: "Type" },
+    { id: "adGroup", label: "Ad Group" }, { id: "campaign", label: "Campaign" }, { id: "impressions", label: "Impressions" },
+    { id: "clicks", label: "Clicks" }, { id: "adSpend", label: "Ad Spend" }, { id: "adSales", label: "Ad Sales" },
+    { id: "roas", label: "ROAS" }, { id: "acos", label: "ACOS" },
+  ],
   "search-terms": [
     { id: "searchTerm", label: "Search Term" }, { id: "productAd", label: "Product Ad" }, { id: "keyword", label: "Keyword" },
     { id: "matchType", label: "Match Type" }, { id: "impressions", label: "Impressions" }, { id: "clicks", label: "Clicks" },
@@ -87,6 +96,7 @@ const FILTER_FIELDS: Record<string, string[]> = {
   "ad-groups": ["Status", "Ad Group Name", "Campaign Name", "Impressions", "ROAS"],
   "product-ads": ["Status", "Product Name", "SKU", "Ad Group", "Campaign"],
   keywords: ["Status", "Keyword", "Match Type", "Ad Group", "Campaign"],
+  "product-targeting": ["Status", "Target", "Type", "Ad Group", "Campaign"],
   "search-terms": ["Search Term", "Keyword", "Match Type", "Campaign"],
   "page-type": ["Page Type", "Bid Modifier", "ROAS"],
   platform: ["Platform", "Bid Modifier", "ROAS"],
@@ -169,6 +179,7 @@ export default function CampaignManager() {
       case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} />;
       case "product-ads": return <ProductAdsTable searchQuery={searchQuery} />;
       case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} />;
+      case "product-targeting": return <ProductTargetingTable searchQuery={searchQuery} />;
       case "search-terms": return <SearchTermsTable searchQuery={searchQuery} />;
       case "page-type": return <PageTypeTable searchQuery={searchQuery} />;
       case "platform": return <PlatformTable searchQuery={searchQuery} />;
