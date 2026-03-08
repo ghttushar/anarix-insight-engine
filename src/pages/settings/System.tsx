@@ -5,30 +5,56 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Eye, EyeOff, Copy, Globe } from "lucide-react";
-import { useCurrency, CURRENCIES } from "@/contexts/CurrencyContext";
+import { Eye, EyeOff, Copy, Search } from "lucide-react";
 
-export default function Configuration() {
+const mockLogs = [
+  { id: "l1", timestamp: "2025-12-02 09:15:32", user: "John Smith", action: "Login", module: "Auth", details: "Successful login from 192.168.1.1" },
+  { id: "l2", timestamp: "2025-12-02 09:18:45", user: "John Smith", action: "Campaign Updated", module: "Advertising", details: "Budget changed from $50 to $75 for 'Brand SP'" },
+  { id: "l3", timestamp: "2025-12-02 09:22:10", user: "Sarah Johnson", action: "Report Generated", module: "Reports", details: "Weekly Performance Report exported" },
+  { id: "l4", timestamp: "2025-12-01 16:42:00", user: "Sarah Johnson", action: "Rule Created", module: "Advertising", details: "Auto-bid rule 'ROAS Target 4x' created" },
+  { id: "l5", timestamp: "2025-12-01 14:30:15", user: "John Smith", action: "User Invited", module: "Settings", details: "Invitation sent to alex@partner.com" },
+  { id: "l6", timestamp: "2025-12-01 11:05:33", user: "Mike Chen", action: "Query Executed", module: "AMC", details: "Ran 'New-to-Brand Customers' query" },
+  { id: "l7", timestamp: "2025-11-30 09:00:00", user: "System", action: "Data Sync", module: "System", details: "Amazon SP data sync completed (245 campaigns)" },
+  { id: "l8", timestamp: "2025-11-29 15:20:00", user: "Emily Davis", action: "Account Connected", module: "Settings", details: "Walmart account 'Brand Store' connected" },
+];
+
+const moduleColors: Record<string, string> = {
+  Auth: "bg-muted text-muted-foreground",
+  Advertising: "bg-primary/10 text-primary",
+  Reports: "bg-accent/20 text-accent-foreground",
+  Settings: "bg-muted text-muted-foreground",
+  AMC: "bg-warning/10 text-warning",
+  System: "bg-success/10 text-success",
+};
+
+export default function System() {
   const [defaultMarketplace, setDefaultMarketplace] = useState("amazon");
   const [defaultDateRange, setDefaultDateRange] = useState("last30");
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [slackNotifs, setSlackNotifs] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
+  const [logSearch, setLogSearch] = useState("");
   const apiKey = "ak_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-
-  const { displayCurrency, setDisplayCurrency, exchangeRate, lastUpdated, currencyConfig } = useCurrency();
 
   const handleSave = () => toast.success("Configuration saved");
 
-  const currencyList = Object.values(CURRENCIES);
+  const filteredLogs = mockLogs.filter(l =>
+    !logSearch ||
+    l.user.toLowerCase().includes(logSearch.toLowerCase()) ||
+    l.action.toLowerCase().includes(logSearch.toLowerCase()) ||
+    l.module.toLowerCase().includes(logSearch.toLowerCase()) ||
+    l.details.toLowerCase().includes(logSearch.toLowerCase())
+  );
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-3xl space-y-8">
+      <div className="mx-auto max-w-4xl space-y-8">
         <div>
-          <h1 className="font-heading text-2xl font-semibold text-foreground">Configuration</h1>
-          <p className="text-sm text-muted-foreground">System-wide defaults and integration settings</p>
+          <h1 className="font-heading text-2xl font-semibold text-foreground">System</h1>
+          <p className="text-sm text-muted-foreground">Defaults, notifications, API keys, and activity logs</p>
         </div>
         <Separator />
 
@@ -60,65 +86,6 @@ export default function Configuration() {
                   <SelectItem value="lifetime">Lifetime</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
-        </section>
-
-        <Separator />
-
-        {/* Currency Display */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-muted-foreground" />
-            <h2 className="font-heading text-lg font-medium text-foreground">Currency Display</h2>
-          </div>
-          <div className="rounded-lg border border-border bg-card p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-foreground">Display Currency</p>
-                <p className="text-xs text-muted-foreground">All monetary values across the app will be converted to this currency</p>
-              </div>
-              <Select value={displayCurrency} onValueChange={setDisplayCurrency}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {currencyList.map((c) => (
-                    <SelectItem key={c.code} value={c.code}>
-                      {c.symbol} {c.code} — {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {displayCurrency !== "USD" && (
-              <>
-                <Separator />
-                <div className="rounded-md bg-muted/50 p-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-foreground font-medium">Current Rate</span>
-                    <span className="text-sm font-mono text-foreground">
-                      1 USD = {exchangeRate.toFixed(2)} {displayCurrency}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Last Updated</span>
-                    <span className="text-xs text-muted-foreground">
-                      {lastUpdated.toLocaleDateString()} {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                </div>
-              </>
-            )}
-
-            <Separator />
-            <div className="rounded-md border border-border bg-muted/30 p-3">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Exchange rates are calculated according to international market rates in realtime.
-                All underlying data is stored in the marketplace's base currency (USD).
-                The conversion is for display purposes only and does not affect actual billing or reporting values.
-              </p>
             </div>
           </div>
         </section>
@@ -161,6 +128,42 @@ export default function Configuration() {
         </section>
 
         <div className="flex justify-end"><Button onClick={handleSave}>Save Configuration</Button></div>
+
+        <Separator />
+
+        {/* Activity Logs */}
+        <section className="space-y-4">
+          <h2 className="font-heading text-lg font-medium text-foreground">Activity Logs</h2>
+          <p className="text-sm text-muted-foreground">Audit trail of all actions performed in the system</p>
+          <div className="relative max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Filter logs..." value={logSearch} onChange={e => setLogSearch(e.target.value)} className="pl-9" />
+          </div>
+          <div className="rounded-lg border border-border bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[180px]">Timestamp</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead>Action</TableHead>
+                  <TableHead>Module</TableHead>
+                  <TableHead>Details</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredLogs.map(l => (
+                  <TableRow key={l.id}>
+                    <TableCell className="text-muted-foreground font-mono text-xs">{l.timestamp}</TableCell>
+                    <TableCell className="font-medium">{l.user}</TableCell>
+                    <TableCell>{l.action}</TableCell>
+                    <TableCell><Badge className={moduleColors[l.module] || "bg-muted text-muted-foreground"}>{l.module}</Badge></TableCell>
+                    <TableCell className="text-muted-foreground text-sm max-w-[300px] truncate">{l.details}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </section>
       </div>
     </AppLayout>
   );

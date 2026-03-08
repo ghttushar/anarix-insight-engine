@@ -75,10 +75,8 @@ import Preferences from "./pages/settings/Preferences";
 import Accounts from "./pages/settings/Accounts";
 import ConnectAmazon from "./pages/settings/ConnectAmazon";
 import ConnectWalmart from "./pages/settings/ConnectWalmart";
-import SettingsUsers from "./pages/settings/Users";
-import SettingsInvites from "./pages/settings/Invites";
-import SettingsLogs from "./pages/settings/Logs";
-import SettingsConfiguration from "./pages/settings/Configuration";
+import SettingsTeam from "./pages/settings/Team";
+import SettingsSystem from "./pages/settings/System";
 
 const queryClient = new QueryClient();
 
@@ -185,10 +183,8 @@ function AppRoutes() {
       <Route path="/settings/accounts" element={<Accounts />} />
       <Route path="/settings/accounts/connect/amazon" element={<ConnectAmazon />} />
       <Route path="/settings/accounts/connect/walmart" element={<ConnectWalmart />} />
-      <Route path="/settings/users" element={<SettingsUsers />} />
-      <Route path="/settings/invites" element={<SettingsInvites />} />
-      <Route path="/settings/logs" element={<SettingsLogs />} />
-      <Route path="/settings/configuration" element={<SettingsConfiguration />} />
+      <Route path="/settings/team" element={<SettingsTeam />} />
+      <Route path="/settings/system" element={<SettingsSystem />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
