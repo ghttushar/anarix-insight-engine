@@ -25,7 +25,7 @@ import { Campaign } from "@/types/campaign";
 import { Button } from "@/components/ui/button";
 import { Download, EyeOff, Maximize2 } from "lucide-react";
 
-type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "search-terms" | "page-type" | "platform";
+type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
 interface FilterRule {
   id: string;
