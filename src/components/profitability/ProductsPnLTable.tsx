@@ -73,7 +73,7 @@ export function ProductsPnLTable({ products, visibleColumns, onCogsClick, onTren
         <TableBody>
           {products.map((product) => (
             <TableRow key={product.id} className="hover:bg-muted/30 group">
-              <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-muted/30 transition-colors">
+              <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors">
                 <div className="flex items-center gap-3">
                   <img
                     src={product.image}

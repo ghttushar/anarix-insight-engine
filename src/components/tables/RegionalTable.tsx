@@ -45,7 +45,7 @@ export function RegionalTable({ data }: RegionalTableProps) {
     return (
       <>
         <TableRow key={region.id} className={cn("hover:bg-muted/30 group", isChild && "bg-muted/10")}>
-          <TableCell className={cn("sticky left-0 z-10 border-r border-border transition-colors", isChild ? "bg-muted/10 group-hover:bg-muted/30" : "bg-card group-hover:bg-muted/30")}>
+          <TableCell className={cn("sticky left-0 z-10 border-r border-border transition-colors", isChild ? "bg-muted group-hover:bg-muted" : "bg-background group-hover:bg-muted")}>
             <div className={cn("flex items-center gap-2", isChild && "pl-8")}>
               {hasChildren ? (
                 <button onClick={() => toggleRow(region.id)} className="p-0.5 hover:bg-muted rounded">
