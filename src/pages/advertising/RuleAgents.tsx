@@ -42,6 +42,14 @@ export default function RuleAgents() {
         <PageHeader
           title="Rule Agents"
           subtitle="Create automation rules from templates or with AI assistance"
+          actions={
+            draftCount > 0 ? (
+              <Button variant="outline" size="sm" onClick={() => navigate("/advertising/rules/applied?tab=draft")}>
+                <FileText className="mr-1.5 h-3.5 w-3.5" />
+                View Drafts ({draftCount})
+              </Button>
+            ) : undefined
+          }
         />
 
         {/* AI Prompt Section */}
