@@ -9,8 +9,9 @@ import { useDensity } from "@/contexts/DensityContext";
 import { useCurrency, CURRENCIES } from "@/contexts/CurrencyContext";
 import { useVisualEffects } from "@/contexts/VisualEffectsContext";
 import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
+import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import { cn } from "@/lib/utils";
-import { Pencil, RotateCcw, Globe } from "lucide-react";
+import { Pencil, RotateCcw, Globe, Palette } from "lucide-react";
 import { toast } from "sonner";
 
 const CUSTOM_SHORTCUTS_KEY = "anarix-custom-shortcuts";
@@ -145,6 +146,7 @@ export default function Preferences() {
   const { displayCurrency, setDisplayCurrency, exchangeRate, lastUpdated } = useCurrency();
   const { effects, toggle } = useVisualEffects();
   const { newFeaturesVisible, toggleNewFeatures } = useFeatureToggle();
+  const { schemeId, setSchemeId, schemes, currentScheme } = useColorScheme();
   const currencyList = Object.values(CURRENCIES);
   const [customShortcuts, setCustomShortcuts] = useState<Record<string, string[]>>(loadCustomShortcuts);
   const [editingKey, setEditingKey] = useState<string | null>(null);
@@ -188,7 +190,78 @@ export default function Preferences() {
 
         <Separator />
 
-        {/* Display Density */}
+        {/* Color Scheme */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Palette className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <h2 className="font-heading text-lg font-medium text-foreground">Color Scheme</h2>
+              <p className="text-sm text-muted-foreground">Choose a color palette variant</p>
+            </div>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-foreground">Active Scheme</p>
+                <p className="text-xs text-muted-foreground">{currentScheme.description}</p>
+              </div>
+              <Select value={schemeId} onValueChange={setSchemeId}>
+                <SelectTrigger className="w-[220px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {schemes.map((scheme) => (
+                    <SelectItem key={scheme.id} value={scheme.id}>
+                      {scheme.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Separator />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {schemes.map((scheme) => (
+                <button
+                  key={scheme.id}
+                  onClick={() => setSchemeId(scheme.id)}
+                  className={cn(
+                    "rounded-lg border-2 p-3 text-left transition-colors",
+                    schemeId === scheme.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-card hover:border-primary/50"
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    {/* Color preview dots */}
+                    <div className="flex gap-1">
+                      <div
+                        className="h-3 w-3 rounded-full"
+                        style={{ backgroundColor: `hsl(${scheme.light["--primary"]})` }}
+                      />
+                      <div
+                        className="h-3 w-3 rounded-full"
+                        style={{ backgroundColor: `hsl(${scheme.light["--background"]})` }}
+                      />
+                      <div
+                        className="h-3 w-3 rounded-full border border-border"
+                        style={{ backgroundColor: `hsl(${scheme.light["--muted-foreground"]})` }}
+                      />
+                    </div>
+                  </div>
+                  <p className={cn(
+                    "text-sm font-medium",
+                    schemeId === scheme.id ? "text-primary" : "text-foreground"
+                  )}>
+                    {scheme.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{scheme.description}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <Separator />
         <section className="space-y-4">
           <div>
             <h2 className="font-heading text-lg font-medium text-foreground">Display Density</h2>
