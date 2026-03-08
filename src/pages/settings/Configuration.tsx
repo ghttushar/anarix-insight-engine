@@ -6,7 +6,8 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Eye, EyeOff, Copy } from "lucide-react";
+import { Eye, EyeOff, Copy, Globe } from "lucide-react";
+import { useCurrency, CURRENCIES } from "@/contexts/CurrencyContext";
 
 export default function Configuration() {
   const [defaultMarketplace, setDefaultMarketplace] = useState("amazon");
@@ -16,7 +17,11 @@ export default function Configuration() {
   const [showApiKey, setShowApiKey] = useState(false);
   const apiKey = "ak_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
+  const { displayCurrency, setDisplayCurrency, exchangeRate, lastUpdated, currencyConfig } = useCurrency();
+
   const handleSave = () => toast.success("Configuration saved");
+
+  const currencyList = Object.values(CURRENCIES);
 
   return (
     <AppLayout>
@@ -55,6 +60,65 @@ export default function Configuration() {
                   <SelectItem value="lifetime">Lifetime</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* Currency Display */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Globe className="h-5 w-5 text-muted-foreground" />
+            <h2 className="font-heading text-lg font-medium text-foreground">Currency Display</h2>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-foreground">Display Currency</p>
+                <p className="text-xs text-muted-foreground">All monetary values across the app will be converted to this currency</p>
+              </div>
+              <Select value={displayCurrency} onValueChange={setDisplayCurrency}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {currencyList.map((c) => (
+                    <SelectItem key={c.code} value={c.code}>
+                      {c.symbol} {c.code} — {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {displayCurrency !== "USD" && (
+              <>
+                <Separator />
+                <div className="rounded-md bg-muted/50 p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-foreground font-medium">Current Rate</span>
+                    <span className="text-sm font-mono text-foreground">
+                      1 USD = {exchangeRate.toFixed(2)} {displayCurrency}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Last Updated</span>
+                    <span className="text-xs text-muted-foreground">
+                      {lastUpdated.toLocaleDateString()} {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <Separator />
+            <div className="rounded-md border border-border bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Exchange rates are calculated according to international market rates in realtime.
+                All underlying data is stored in the marketplace's base currency (USD).
+                The conversion is for display purposes only and does not affect actual billing or reporting values.
+              </p>
             </div>
           </div>
         </section>

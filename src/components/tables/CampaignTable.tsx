@@ -5,14 +5,19 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Campaign, CampaignStatus, BiddingStrategy } from "@/types/campaign";
+import { Campaign, BiddingStrategy } from "@/types/campaign";
 import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { cn } from "@/lib/utils";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, CalendarIcon } from "lucide-react";
 import { CampaignTablePagination } from "./CampaignTablePagination";
 import { CampaignTableTotalRow } from "./CampaignTableTotalRow";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { format, parse } from "date-fns";
 
 interface CampaignTableProps {
   campaigns: Campaign[];
@@ -26,9 +31,6 @@ interface CampaignTableProps {
 type SortField = keyof Campaign | null;
 type SortDirection = "asc" | "desc";
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
-}
 function formatNumber(value: number): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
@@ -38,6 +40,54 @@ function formatPercent(value: number): string {
 
 const BIDDING_OPTIONS: BiddingStrategy[] = ["Dynamic Down", "Dynamic Up/Down", "Fixed"];
 
+function parseDateString(dateStr: string): Date | undefined {
+  if (!dateStr) return undefined;
+  try {
+    return parse(dateStr, "yyyy-MM-dd", new Date());
+  } catch {
+    return undefined;
+  }
+}
+
+function DatePickerCell({
+  value,
+  onChange,
+  placeholder = "Pick a date",
+}: {
+  value?: string;
+  onChange: (date: string | undefined) => void;
+  placeholder?: string;
+}) {
+  const selected = value ? parseDateString(value) : undefined;
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn(
+            "h-8 w-[130px] justify-start text-left text-xs font-normal",
+            !selected && "text-muted-foreground"
+          )}
+        >
+          <CalendarIcon className="mr-1.5 h-3 w-3" />
+          {selected ? format(selected, "MMM dd, yyyy") : placeholder}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          selected={selected}
+          onSelect={(date) => {
+            onChange(date ? format(date, "yyyy-MM-dd") : undefined);
+          }}
+          initialFocus
+          className={cn("p-3 pointer-events-auto")}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function CampaignTable({
   campaigns,
   onActiveToggle,
@@ -46,6 +96,7 @@ export function CampaignTable({
   searchQuery = "",
   viewMode = "view",
 }: CampaignTableProps) {
+  const { formatCurrency } = useCurrency();
   const filteredCampaigns = campaigns.filter((c) =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -144,12 +195,19 @@ export function CampaignTable({
                 </TableCell>
                 <TableCell>
                   {isEdit ? (
-                    <Input type="date" defaultValue={campaign.startDate} className="h-8 text-xs w-[130px]" onBlur={(e) => onCampaignUpdate?.(campaign.id, { startDate: e.target.value })} />
+                    <DatePickerCell
+                      value={campaign.startDate}
+                      onChange={(date) => onCampaignUpdate?.(campaign.id, { startDate: date || "" })}
+                    />
                   ) : <span className="text-sm text-foreground whitespace-nowrap">{campaign.startDate}</span>}
                 </TableCell>
                 <TableCell>
                   {isEdit ? (
-                    <Input type="date" defaultValue={campaign.endDate || ""} className="h-8 text-xs w-[130px]" onBlur={(e) => onCampaignUpdate?.(campaign.id, { endDate: e.target.value || undefined })} />
+                    <DatePickerCell
+                      value={campaign.endDate}
+                      onChange={(date) => onCampaignUpdate?.(campaign.id, { endDate: date || undefined })}
+                      placeholder="No end date"
+                    />
                   ) : <span className="text-sm text-foreground whitespace-nowrap">{campaign.endDate || "—"}</span>}
                 </TableCell>
                 <TableCell>
@@ -221,7 +279,7 @@ export function CampaignTable({
                 </TableCell>
               </TableRow>
             ))}
-            <CampaignTableTotalRow campaigns={campaigns} showTotalBudget={showTotalBudget} />
+            <CampaignTableTotalRow campaigns={campaigns} showTotalBudget={showTotalBudget} viewMode={viewMode} />
           </TableBody>
         </Table>
       </div>

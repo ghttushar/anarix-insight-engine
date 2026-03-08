@@ -2,14 +2,12 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Campaign } from "@/types/campaign";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface CampaignTableTotalRowProps {
   campaigns: Campaign[];
   showTotalBudget?: boolean;
-}
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
+  viewMode?: "view" | "edit";
 }
 
 function formatNumber(value: number): string {
@@ -20,7 +18,10 @@ function formatPercent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
-export function CampaignTableTotalRow({ campaigns, showTotalBudget = true }: CampaignTableTotalRowProps) {
+export function CampaignTableTotalRow({ campaigns, showTotalBudget = true, viewMode = "view" }: CampaignTableTotalRowProps) {
+  const { formatCurrency } = useCurrency();
+  const isEdit = viewMode === "edit";
+
   const totals = {
     dailyBudget: campaigns.reduce((sum, c) => sum + c.dailyBudget, 0),
     totalBudget: campaigns.reduce((sum, c) => sum + (c.totalBudget || 0), 0),
@@ -43,9 +44,13 @@ export function CampaignTableTotalRow({ campaigns, showTotalBudget = true }: Cam
     </div>
   );
 
+  // colSpan covers: Status + Campaign Name = 2
+  // In edit mode, Active column adds 1
+  const labelColSpan = isEdit ? 3 : 2;
+
   return (
     <TableRow className="bg-muted/30 font-medium">
-      <TableCell colSpan={4} className="text-foreground">Total ({campaigns.length} campaigns)</TableCell>
+      <TableCell colSpan={labelColSpan} className="text-foreground">Total ({campaigns.length} campaigns)</TableCell>
       {/* Start Date, End Date, Bidding Strategy — empty for totals */}
       <TableCell />
       <TableCell />
