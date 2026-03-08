@@ -75,10 +75,8 @@ import Preferences from "./pages/settings/Preferences";
 import Accounts from "./pages/settings/Accounts";
 import ConnectAmazon from "./pages/settings/ConnectAmazon";
 import ConnectWalmart from "./pages/settings/ConnectWalmart";
-import SettingsUsers from "./pages/settings/Users";
-import SettingsInvites from "./pages/settings/Invites";
-import SettingsLogs from "./pages/settings/Logs";
-import SettingsConfiguration from "./pages/settings/Configuration";
+import SettingsTeam from "./pages/settings/Team";
+import SettingsSystem from "./pages/settings/System";
 
 const queryClient = new QueryClient();
 
