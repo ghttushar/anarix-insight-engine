@@ -50,6 +50,27 @@ export default function AMCQueries() {
     setSelectedTime(format(new Date(), "HH:mm"));
   };
 
+  const handleEdit = (queryId: string) => {
+    toast.info("Opening query editor...");
+  };
+
+  const handleDuplicate = (queryId: string) => {
+    toast.success("Query duplicated successfully");
+  };
+
+  const handleDeleteClick = (queryId: string) => {
+    setQueryToDelete(queryId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (queryToDelete) {
+      toast.success("Query deleted successfully");
+      setQueryToDelete(null);
+    }
+    setDeleteDialogOpen(false);
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
