@@ -9,9 +9,73 @@ import { TrendingUp, TrendingDown, Download, RefreshCw } from "lucide-react";
 import { mockCompetitorProducts, type CompetitorProduct } from "@/data/mockCompetitorPricing";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
 
 const formatCurrency = (v: number) => `$${v.toFixed(2)}`;
+
+function PriceHistoryChart({ selected }: { selected: CompetitorProduct }) {
+  const [chartType, setChartType] = useState<ChartType>("line");
+  const [activeMetrics, setActiveMetrics] = useState<string[]>(["price"]);
+
+  const metrics: ChartMetric[] = [
+    { key: "price", label: "Competitor Price", color: "hsl(var(--primary))", active: activeMetrics.includes("price") },
+  ];
+
+  const toggleMetric = (key: string) => {
+    setActiveMetrics((prev) => prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]);
+  };
+
+  const renderChart = (height: number) => (
+    <ResponsiveContainer width="100%" height={height}>
+      {chartType === "bar" ? (
+        <BarChart data={selected.priceHistory}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} domain={["auto", "auto"]} />
+          <RechartsTooltip contentStyle={{ fontSize: 12 }} />
+          {activeMetrics.includes("price") && <Bar dataKey="price" fill="hsl(var(--primary))" name="Competitor Price" radius={[3, 3, 0, 0]} />}
+        </BarChart>
+      ) : chartType === "area" ? (
+        <AreaChart data={selected.priceHistory}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} domain={["auto", "auto"]} />
+          <RechartsTooltip contentStyle={{ fontSize: 12 }} />
+          {activeMetrics.includes("price") && <Area type="monotone" dataKey="price" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.15} name="Competitor Price" />}
+        </AreaChart>
+      ) : (
+        <LineChart data={selected.priceHistory}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} domain={["auto", "auto"]} />
+          <RechartsTooltip contentStyle={{ fontSize: 12 }} />
+          {activeMetrics.includes("price") && <Line type="monotone" dataKey="price" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} name="Competitor Price" />}
+        </LineChart>
+      )}
+    </ResponsiveContainer>
+  );
+
+  return (
+    <ChartContainer
+      title={`Price History — ${selected.productName}`}
+      metrics={metrics}
+      onMetricToggle={toggleMetric}
+      chartType={chartType}
+      onChartTypeChange={setChartType}
+      expandedChildren={renderChart(400)}
+    >
+      {renderChart(220)}
+      <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+        <span>Your Price: <strong className="text-foreground">{formatCurrency(selected.yourPrice)}</strong></span>
+        <span>Competitor: <strong className="text-foreground">{formatCurrency(selected.currentPrice)}</strong></span>
+        <span>Diff: <strong className={selected.currentPrice < selected.yourPrice ? "text-destructive" : "text-success"}>
+          {formatCurrency(selected.yourPrice - selected.currentPrice)}
+        </strong></span>
+      </div>
+    </ChartContainer>
+  );
+}
 
 export default function CompetitorPricing() {
   const [selected, setSelected] = useState<CompetitorProduct | null>(mockCompetitorProducts[0]);
@@ -52,28 +116,12 @@ export default function CompetitorPricing() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Price History Chart */}
-          <div className="lg:col-span-2 rounded-lg border border-border bg-card p-4">
-            <h3 className="font-heading text-sm font-semibold text-foreground mb-4">
-              Price History — {selected?.productName || "Select a product"}
-            </h3>
-            {selected && (
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={selected.priceHistory}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} domain={["auto", "auto"]} />
-                  <RechartsTooltip contentStyle={{ fontSize: 12 }} />
-                  <Line type="monotone" dataKey="price" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} name="Competitor Price" />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-            {selected && (
-              <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-                <span>Your Price: <strong className="text-foreground">{formatCurrency(selected.yourPrice)}</strong></span>
-                <span>Competitor: <strong className="text-foreground">{formatCurrency(selected.currentPrice)}</strong></span>
-                <span>Diff: <strong className={selected.currentPrice < selected.yourPrice ? "text-destructive" : "text-success"}>
-                  {formatCurrency(selected.yourPrice - selected.currentPrice)}
-                </strong></span>
+          <div className="lg:col-span-2">
+            {selected ? (
+              <PriceHistoryChart selected={selected} />
+            ) : (
+              <div className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground py-12">
+                Select a product to view price history
               </div>
             )}
           </div>
