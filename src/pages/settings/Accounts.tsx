@@ -133,6 +133,8 @@ export default function Accounts() {
   const navigate = useNavigate();
   const { accounts, removeAccount, updateAccount } = useAccounts();
   const [showMarketplaceModal, setShowMarketplaceModal] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
 
   const handleSelectMarketplace = (marketplace: "amazon" | "walmart") => {
     setShowMarketplaceModal(false);
