@@ -101,10 +101,8 @@ export default function ProfitLoss() {
           <PnLParameterTable data={pnlData} weeks={weeks} />
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />
-            </div>
             <DataTableToolbar
+              leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />}
               searchValue={searchValue}
               onSearchChange={setSearchValue}
               searchPlaceholder="Search by Product Name / Item ID / SKU..."

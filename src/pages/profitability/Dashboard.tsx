@@ -141,18 +141,18 @@ export default function ProfitabilityDashboard() {
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleUploadCOGS}>
-                  <Upload className="mr-2 h-4 w-4" />Upload COGS
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleDownload}>
-                  <Download className="mr-2 h-4 w-4" />Export
-                </Button>
-              </div>
-            </div>
             <DataTableToolbar
+              leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />}
+              rightContent={
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={handleUploadCOGS}>
+                    <Upload className="mr-2 h-4 w-4" />Upload COGS
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleDownload}>
+                    <Download className="mr-2 h-4 w-4" />Export
+                  </Button>
+                </div>
+              }
               searchValue={searchValue}
               onSearchChange={setSearchValue}
               searchPlaceholder="Search by Product Name / Item ID / SKU..."
