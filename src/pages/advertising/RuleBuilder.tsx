@@ -9,7 +9,9 @@ import { Plus, Play, Pause, FlaskConical, TrendingUp, TrendingDown } from "lucid
 import { mockRules, type AutomationRule } from "@/data/mockRuleBuilder";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { ChartContainer, ChartType } from "@/components/charts/ChartContainer";
+import { useState as useChartState } from "react";
 
 const statusStyles: Record<string, string> = {
   active: "bg-success/10 text-success border-success/20",
