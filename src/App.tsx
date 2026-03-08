@@ -227,6 +227,7 @@ const App = () => (
             </FilterProvider>
           </MarketplaceProvider>
         </AccountProvider>
+        </CurrencyProvider>
       </DensityProvider>
     </ThemeProvider>
   </QueryClientProvider>
