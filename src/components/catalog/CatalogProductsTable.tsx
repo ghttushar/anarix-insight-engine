@@ -347,8 +347,8 @@ export function CatalogProductsTable({ products }: CatalogProductsTableProps) {
             ))}
 
             {/* Total Row */}
-            <TableRow className="bg-muted/50 font-medium">
-              <TableCell className="sticky left-0 z-10 bg-muted/50">Total</TableCell>
+            <TableRow className="bg-muted font-medium">
+              <TableCell className="sticky left-0 z-10 bg-muted">Total</TableCell>
               {isGroupExpanded("performance") ? (
                 <>
                   <TableCell className="border-l border-border">-</TableCell>
