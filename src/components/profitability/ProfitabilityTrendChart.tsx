@@ -43,7 +43,7 @@ export function ProfitabilityTrendChart({ data }: ProfitabilityTrendChartProps) 
   }
 
   return (
-    <div className="h-full rounded-lg border border-border bg-card p-4 flex flex-colard p-4 flex flex-col">
+    <div className="h-full rounded-lg border border-border bg-card p-4 flex flex-col">
       {/* Controls */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
