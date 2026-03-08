@@ -38,7 +38,7 @@ const ALL_COLUMNS = [
   { id: "wfsFulfillmentFee", label: "WFS Fee", getValue: (p: ProfitabilityProduct) => formatCurrency(p.wfsFulfillmentFee) },
   { id: "shippingFees", label: "Shipping Fees", getValue: (p: ProfitabilityProduct) => formatCurrency(p.shippingFees) },
   { id: "cogs", label: "COGS", getValue: (p: ProfitabilityProduct) => formatCurrency(p.cogs) },
-  { id: "netProfit", label: "Net Profit", getValue: (p: ProfitabilityProduct) => formatCurrency(p.netProfit), getClassName: (p: ProfitabilityProduct) => p.netProfit >= 0 ? "text-green-600" : "text-red-500" },
+  { id: "netProfit", label: "Net Profit", getValue: (p: ProfitabilityProduct) => formatCurrency(p.netProfit) },
   { id: "additionalFee", label: "Additional Fee", getValue: (p: ProfitabilityProduct) => formatCurrency(p.additionalFee) },
 ];
 
