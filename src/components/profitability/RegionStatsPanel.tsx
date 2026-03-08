@@ -57,7 +57,7 @@ export function RegionStatsPanel({ region, dateRange }: RegionStatsPanelProps) {
       </div>
 
       {/* Calculated Metrics */}
-      <div className="border-t border-border pt-4">
+      <div className="border-t border-border pt-4 flex-1">
         <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Calculated Metrics
         </h4>

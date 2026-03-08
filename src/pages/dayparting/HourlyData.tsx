@@ -75,7 +75,7 @@ export default function HourlyData() {
             { label: "Orders", value: summary.totalOrders.toString() },
             { label: "Units", value: summary.totalUnits.toString() },
           ].map((item) => (
-            <Card key={item.label}>
+            <Card key={item.label} className="h-full">
               <CardHeader className="pb-2"><CardTitle className="text-xs font-medium text-muted-foreground uppercase">{item.label}</CardTitle></CardHeader>
               <CardContent><p className={`text-xl font-semibold ${item.className || ""}`}>{item.value}</p></CardContent>
             </Card>

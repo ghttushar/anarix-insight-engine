@@ -135,7 +135,7 @@ export default function ProfitabilityDashboard() {
                 </div>
               ))}
             </div>
-            <div>
+            <div className="h-full">
               <ProfitabilityTrendChart data={trendData} />
             </div>
           </div>

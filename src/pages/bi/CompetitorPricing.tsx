@@ -32,19 +32,19 @@ export default function CompetitorPricing() {
 
         {/* Summary */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Tracked Competitors</p>
             <p className="text-xl font-semibold text-foreground">{new Set(mockCompetitorProducts.map((p) => p.competitorName)).size}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Products Tracked</p>
             <p className="text-xl font-semibold text-foreground">{mockCompetitorProducts.length}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Price Undercut</p>
             <p className="text-xl font-semibold text-destructive">{mockCompetitorProducts.filter((p) => p.currentPrice < p.yourPrice).length}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Price Advantage</p>
             <p className="text-xl font-semibold text-success">{mockCompetitorProducts.filter((p) => p.currentPrice > p.yourPrice).length}</p>
           </CardContent></Card>

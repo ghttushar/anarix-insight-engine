@@ -24,13 +24,13 @@ export default function Geographical() {
         <PageHeader title="Geographical Data" subtitle="Regional performance breakdown across markets" />
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 h-full">
             <GeographyMap
               selectedRegion={selectedRegionCode}
               onRegionSelect={setSelectedRegionCode}
             />
           </div>
-          <div>
+          <div className="h-full">
             <RegionStatsPanel
               region={selectedRegion}
               dateRange="Jan 1 - Jan 30, 2026"

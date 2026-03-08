@@ -105,8 +105,8 @@ export default function HealthScore() {
 
 function DimensionCard({ dimension }: { dimension: HealthDimension }) {
   return (
-    <Card>
-      <CardContent className="pt-4 pb-3 px-4">
+    <Card className="h-full">
+      <CardContent className="pt-4 pb-3 px-4 h-full">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs text-muted-foreground">{dimension.label}</span>
           <TrendIcon trend={dimension.trend} />
