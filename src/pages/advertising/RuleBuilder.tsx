@@ -10,8 +10,7 @@ import { mockRules, type AutomationRule } from "@/data/mockRuleBuilder";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
-import { ChartContainer, ChartType } from "@/components/charts/ChartContainer";
-import { useState as useChartState } from "react";
+import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
 
 const statusStyles: Record<string, string> = {
   active: "bg-success/10 text-success border-success/20",
