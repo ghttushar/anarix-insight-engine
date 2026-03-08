@@ -96,6 +96,7 @@ const FILTER_FIELDS: Record<string, string[]> = {
   "ad-groups": ["Status", "Ad Group Name", "Campaign Name", "Impressions", "ROAS"],
   "product-ads": ["Status", "Product Name", "SKU", "Ad Group", "Campaign"],
   keywords: ["Status", "Keyword", "Match Type", "Ad Group", "Campaign"],
+  "product-targeting": ["Status", "Target", "Type", "Ad Group", "Campaign"],
   "search-terms": ["Search Term", "Keyword", "Match Type", "Campaign"],
   "page-type": ["Page Type", "Bid Modifier", "ROAS"],
   platform: ["Platform", "Bid Modifier", "ROAS"],
