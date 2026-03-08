@@ -310,10 +310,10 @@ export function CatalogProductsTable({ products }: CatalogProductsTableProps) {
                     <TableCell className="text-right">
                       {formatNumber(product.totalUnits)}
                     </TableCell>
-                    <TableCell className="text-right text-red-500">
+                    <TableCell className="text-right">
                       {formatCurrency(product.refundSales)}
                     </TableCell>
-                    <TableCell className="text-right text-orange-500">
+                    <TableCell className="text-right">
                       {formatCurrency(product.cancelledSales)}
                     </TableCell>
                   </>
