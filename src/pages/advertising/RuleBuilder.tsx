@@ -66,37 +66,11 @@ export default function RuleBuilder() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Backtest Chart */}
-          <div className="lg:col-span-2 rounded-lg border border-border bg-card p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-heading text-sm font-semibold text-foreground flex items-center gap-2">
-                <FlaskConical className="h-4 w-4 text-primary" />
-                Backtest: {selectedRule?.name || "Select a rule"}
-              </h3>
-              {selectedRule?.backtestResult && (
-                <Badge variant="outline" className="text-xs">{selectedRule.backtestResult.period}</Badge>
-              )}
-            </div>
-            {selectedRule?.backtestResult && (
-              <>
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={backtestData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                    <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
-                    <RechartsTooltip contentStyle={{ fontSize: 12 }} />
-                    <Bar dataKey="savings" fill="hsl(var(--success))" name="Savings" radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="revenueLoss" fill="hsl(var(--destructive))" fillOpacity={0.4} name="Revenue Loss" radius={[2, 2, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-                <div className="grid grid-cols-4 gap-3 mt-3 text-xs">
-                  <div><span className="text-muted-foreground block">Triggered</span><span className="font-medium text-foreground">{selectedRule.backtestResult.triggeredCount} times</span></div>
-                  <div><span className="text-muted-foreground block">Campaigns Affected</span><span className="font-medium text-foreground">{selectedRule.backtestResult.affectedCampaigns}</span></div>
-                  <div><span className="text-muted-foreground block">Projected Savings</span><span className="font-medium text-success">{formatCurrency(selectedRule.backtestResult.projectedSavings)}</span></div>
-                  <div><span className="text-muted-foreground block">Net Impact</span><span className="font-medium text-foreground">{formatCurrency(selectedRule.backtestResult.netImpact)}</span></div>
-                </div>
-              </>
-            )}
-          </div>
+          <BacktestChart
+            selectedRule={selectedRule}
+            backtestData={backtestData}
+            formatCurrency={formatCurrency}
+          />
 
           {/* Rule Details */}
           <div className="space-y-3">
