@@ -226,7 +226,7 @@ export function AppSidebar() {
         <div className="mx-3 border-t border-border/50" />
 
         {/* Navigation Groups */}
-        <div className="flex-1 overflow-auto mt-1 sidebar-scroll">
+        <div className="flex-1 overflow-auto mt-1">
           {filteredGroups.map(group => (
             <SidebarGroup key={group.label} className="relative py-0.5">
               {!collapsed ? (
