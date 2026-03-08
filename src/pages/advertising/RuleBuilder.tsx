@@ -95,6 +95,7 @@ function BacktestChart({ selectedRule, backtestData }: { selectedRule: Automatio
 }
 
 export default function RuleBuilder() {
+  const { formatCurrency } = useCurrency();
   const [selectedRule, setSelectedRule] = useState<AutomationRule | null>(mockRules[0]);
 
   const backtestData = selectedRule?.backtestResult?.dailyResults.slice(-14).map((d) => ({
