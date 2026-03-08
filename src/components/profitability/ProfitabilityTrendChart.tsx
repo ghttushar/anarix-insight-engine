@@ -21,9 +21,10 @@ import { cn } from "@/lib/utils";
 
 interface ProfitabilityTrendChartProps {
   data: TrendDataPoint[];
+  periodLabel?: string;
 }
 
-export function ProfitabilityTrendChart({ data }: ProfitabilityTrendChartProps) {
+export function ProfitabilityTrendChart({ data, periodLabel }: ProfitabilityTrendChartProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [frequency, setFrequency] = useState<"weekly" | "daily" | "monthly">("weekly");
   const [showOrders, setShowOrders] = useState(true);
