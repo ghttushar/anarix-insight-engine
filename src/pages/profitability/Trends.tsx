@@ -17,9 +17,7 @@ import {
 import { Play, Download, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const COLUMN_DEFS = [
   { id: "weeklyData", label: "Weekly Data", visible: true },

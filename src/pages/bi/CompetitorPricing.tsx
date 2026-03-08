@@ -11,10 +11,10 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
-
-const formatCurrency = (v: number) => `$${v.toFixed(2)}`;
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 function PriceHistoryChart({ selected }: { selected: CompetitorProduct }) {
+  const { formatCurrency } = useCurrency();
   const [chartType, setChartType] = useState<ChartType>("line");
   const [activeMetrics, setActiveMetrics] = useState<string[]>(["price"]);
 

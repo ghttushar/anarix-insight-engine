@@ -8,6 +8,7 @@ import { AlertTriangle, ArrowDown, ArrowUp, Minus, Pause, Play, RefreshCw } from
 import { mockInventoryProducts } from "@/data/mockInventoryAds";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const stockColors: Record<string, string> = {
   healthy: "bg-success/10 text-success border-success/20",
@@ -23,9 +24,8 @@ const actionIcons: Record<string, React.ReactNode> = {
   pause: <Pause className="h-3 w-3 text-destructive" />,
 };
 
-const formatCurrency = (v: number) => `$${v.toLocaleString()}`;
-
 export default function InventoryAds() {
+  const { formatCurrency } = useCurrency();
   const criticalCount = mockInventoryProducts.filter((p) => p.stockStatus === "critical").length;
   const overstockCount = mockInventoryProducts.filter((p) => p.stockStatus === "overstock").length;
   const totalSavings = mockInventoryProducts.reduce((s, p) => s + Math.max(0, p.dailyAdSpend - p.suggestedAdSpend), 0);
