@@ -74,8 +74,8 @@ export function RegionalProductTable({ searchValue = "" }: RegionalProductTableP
                     <TableCell className="text-right text-foreground">{formatCurrency(product.gmv)}</TableCell>
                     <TableCell className="text-right text-foreground">{formatCurrency(product.authSales)}</TableCell>
                     <TableCell className="text-right text-foreground">{formatCurrency(product.adSpend)}</TableCell>
-                    <TableCell className={cn("text-right font-medium", product.netProfit >= 0 ? "text-success" : "text-destructive")}>{formatCurrency(product.netProfit)}</TableCell>
-                    <TableCell className={cn("text-right", margin >= 0 ? "text-success" : "text-destructive")}>{margin.toFixed(1)}%</TableCell>
+                    <TableCell className="text-right font-medium text-foreground">{formatCurrency(product.netProfit)}</TableCell>
+                    <TableCell className="text-right text-foreground">{margin.toFixed(1)}%</TableCell>
                   </TableRow>
                 );
               })}

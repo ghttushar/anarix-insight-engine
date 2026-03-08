@@ -105,7 +105,7 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
               </span>
               <div
                 className={cn(
-                  "flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-medium",
+                  "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
                   isNeutral
                     ? "bg-muted text-muted-foreground"
                     : isPositive
@@ -114,11 +114,11 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
                 )}
               >
                 {isNeutral ? (
-                  <Minus className="h-3 w-3" />
+                  <Minus className="h-3.5 w-3.5" />
                 ) : isPositive ? (
-                  <ArrowUp className="h-3 w-3" />
+                  <ArrowUp className="h-3.5 w-3.5" />
                 ) : (
-                  <ArrowDown className="h-3 w-3" />
+                  <ArrowDown className="h-3.5 w-3.5" />
                 )}
                 <span>{Math.abs(delta).toFixed(1)}%</span>
               </div>

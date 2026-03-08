@@ -44,10 +44,7 @@ export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))"
               value={metric.value}
               format={metric.format}
               decimals={metric.format === "number" ? 0 : 2}
-              className={cn(
-                "text-sm whitespace-nowrap",
-                metric.highlight ? "text-success" : "text-foreground"
-              )}
+              className="text-sm whitespace-nowrap text-foreground"
             />
           </div>
         ))}

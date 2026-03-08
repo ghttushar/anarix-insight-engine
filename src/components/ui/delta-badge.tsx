@@ -14,15 +14,15 @@ export function DeltaBadge({ value, className }: DeltaBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-0.5 text-[11px] font-medium leading-none mt-0.5",
+        "inline-flex items-center gap-1 text-xs font-medium leading-none px-1 py-0.5",
         isPositive ? "text-success" : "text-destructive",
         className
       )}
     >
       {isPositive ? (
-        <ArrowUp className="h-3 w-3" />
+        <ArrowUp className="h-3.5 w-3.5" />
       ) : (
-        <ArrowDown className="h-3 w-3" />
+        <ArrowDown className="h-3.5 w-3.5" />
       )}
       {isPositive ? "+" : ""}
       {value.toFixed(1)}%

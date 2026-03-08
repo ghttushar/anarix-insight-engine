@@ -26,19 +26,19 @@ const formatNumber = (value: number) =>
 
 const ALL_COLUMNS = [
   { id: "units", label: "Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.units) },
-  { id: "refundUnits", label: "Refund Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.refundUnits), className: "text-red-500" },
-  { id: "cancelledUnits", label: "Cancelled Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.cancelledUnits), className: "text-orange-500" },
+  { id: "refundUnits", label: "Refund Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.refundUnits) },
+  { id: "cancelledUnits", label: "Cancelled Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.cancelledUnits) },
   { id: "gmv", label: "GMV", getValue: (p: ProfitabilityProduct) => formatCurrency(p.gmv) },
   { id: "authSales", label: "Auth Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.authSales) },
-  { id: "refundSales", label: "Refund Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.refundSales), className: "text-red-500" },
-  { id: "cancelledSales", label: "Cancelled Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.cancelledSales), className: "text-orange-500" },
+  { id: "refundSales", label: "Refund Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.refundSales) },
+  { id: "cancelledSales", label: "Cancelled Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.cancelledSales) },
   { id: "adSpend", label: "Ad Spend", getValue: (p: ProfitabilityProduct) => formatCurrency(p.adSpend) },
   { id: "commissionProduct", label: "Comm. Product", getValue: (p: ProfitabilityProduct) => formatCurrency(p.commissionProduct) },
   { id: "commissionShipping", label: "Comm. Shipping", getValue: (p: ProfitabilityProduct) => formatCurrency(p.commissionShipping) },
   { id: "wfsFulfillmentFee", label: "WFS Fee", getValue: (p: ProfitabilityProduct) => formatCurrency(p.wfsFulfillmentFee) },
   { id: "shippingFees", label: "Shipping Fees", getValue: (p: ProfitabilityProduct) => formatCurrency(p.shippingFees) },
   { id: "cogs", label: "COGS", getValue: (p: ProfitabilityProduct) => formatCurrency(p.cogs) },
-  { id: "netProfit", label: "Net Profit", getValue: (p: ProfitabilityProduct) => formatCurrency(p.netProfit), getClassName: (p: ProfitabilityProduct) => p.netProfit >= 0 ? "text-green-600" : "text-red-500" },
+  { id: "netProfit", label: "Net Profit", getValue: (p: ProfitabilityProduct) => formatCurrency(p.netProfit) },
   { id: "additionalFee", label: "Additional Fee", getValue: (p: ProfitabilityProduct) => formatCurrency(p.additionalFee) },
 ];
 
@@ -115,11 +115,7 @@ export function ProductsPnLTable({ products, visibleColumns, onCogsClick, onTren
               {cols.map((col) => (
                 <TableCell
                   key={col.id}
-                  className={cn(
-                    "text-right",
-                    col.className,
-                    col.getClassName ? col.getClassName(product) : undefined
-                  )}
+                  className="text-right"
                 >
                   {col.getValue(product)}
                 </TableCell>
@@ -143,11 +139,7 @@ export function ProductsPnLTable({ products, visibleColumns, onCogsClick, onTren
               return (
                 <TableCell
                   key={col.id}
-                  className={cn(
-                    "text-right",
-                    col.className,
-                    isNetProfit && (val >= 0 ? "text-green-600" : "text-red-500")
-                  )}
+                  className="text-right"
                 >
                   {col.id.includes("Unit") || col.id === "units" || col.id === "refundUnits" || col.id === "cancelledUnits"
                     ? formatNumber(val)
