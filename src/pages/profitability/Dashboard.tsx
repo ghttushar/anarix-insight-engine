@@ -10,7 +10,7 @@ import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModa
 import { ProductsOrdersToggle } from "@/components/profitability/ProductsOrdersToggle";
 import { PeriodBreakdownPanel } from "@/components/profitability/PeriodBreakdownPanel";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
-import { profitabilitySummaries, profitabilityProducts, trendData } from "@/data/mockProfitability";
+import { profitabilitySummaries, profitabilityProducts, trendDataByPeriod } from "@/data/mockProfitability";
 import { ProfitabilityProduct, ProfitabilitySummary } from "@/types/profitability";
 import { Upload, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
