@@ -409,6 +409,39 @@ export const trendData: TrendDataPoint[] = [
   { week: "Week 05", orders: 38, units: 59 },
 ];
 
+export const trendDataByPeriod: Record<string, TrendDataPoint[]> = {
+  today: [
+    { week: "6 AM", orders: 2, units: 3 },
+    { week: "9 AM", orders: 5, units: 8 },
+    { week: "12 PM", orders: 8, units: 12 },
+    { week: "3 PM", orders: 7, units: 11 },
+    { week: "6 PM", orders: 4, units: 7 },
+    { week: "9 PM", orders: 2, units: 4 },
+  ],
+  yesterday: [
+    { week: "6 AM", orders: 3, units: 5 },
+    { week: "9 AM", orders: 6, units: 9 },
+    { week: "12 PM", orders: 10, units: 15 },
+    { week: "3 PM", orders: 8, units: 12 },
+    { week: "6 PM", orders: 5, units: 8 },
+    { week: "9 PM", orders: 2, units: 3 },
+  ],
+  this_month: [
+    { week: "Week 01", orders: 28, units: 45 },
+    { week: "Week 02", orders: 34, units: 52 },
+    { week: "Week 03", orders: 31, units: 48 },
+    { week: "Week 04", orders: 42, units: 67 },
+    { week: "Week 05", orders: 38, units: 59 },
+  ],
+  last_month: [
+    { week: "Week 01", orders: 35, units: 54 },
+    { week: "Week 02", orders: 40, units: 61 },
+    { week: "Week 03", orders: 38, units: 58 },
+    { week: "Week 04", orders: 45, units: 72 },
+    { week: "Week 05", orders: 42, units: 65 },
+  ],
+};
+
 export const scatterData: ScatterDataPoint[] = [
   { id: "prod-001", name: "Premium Wireless Earbuds", profitMargin: 28.0, totalSales: 11580, quadrant: "winners" },
   { id: "prod-002", name: "Smart Home Hub Controller", profitMargin: 35.8, totalSales: 12749, quadrant: "winners" },

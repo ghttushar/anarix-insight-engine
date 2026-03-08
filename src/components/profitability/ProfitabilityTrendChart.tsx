@@ -21,9 +21,10 @@ import { cn } from "@/lib/utils";
 
 interface ProfitabilityTrendChartProps {
   data: TrendDataPoint[];
+  periodLabel?: string;
 }
 
-export function ProfitabilityTrendChart({ data }: ProfitabilityTrendChartProps) {
+export function ProfitabilityTrendChart({ data, periodLabel }: ProfitabilityTrendChartProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [frequency, setFrequency] = useState<"weekly" | "daily" | "monthly">("weekly");
   const [showOrders, setShowOrders] = useState(true);
@@ -43,6 +44,10 @@ export function ProfitabilityTrendChart({ data }: ProfitabilityTrendChartProps) 
 
   return (
     <div className="h-full rounded-lg border border-border bg-card p-4 flex flex-col">
+      {/* Header */}
+      {periodLabel && (
+        <div className="mb-1 text-xs text-muted-foreground">{periodLabel}</div>
+      )}
       {/* Controls */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
