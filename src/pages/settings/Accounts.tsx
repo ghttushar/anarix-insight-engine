@@ -198,7 +198,7 @@ export default function Accounts() {
               key={account.id}
               account={account}
               onSync={() => handleSync(account.id)}
-              onRemove={() => handleRemove(account.id)}
+              onRemove={() => handleRemoveClick(account.id)}
             />
           ))}
 
