@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AanCopilotPanel } from "@/components/aan/AanCopilotPanel";
@@ -35,23 +35,36 @@ function CollapseNotch() {
 
 function LayoutInner({ children }: { children: ReactNode }) {
   const { activePanel } = useActivePanel();
-  const { setOpen } = useSidebar();
+  const { open, setOpen } = useSidebar();
   const { density } = useDensity();
 
+  const autoCollapsedRef = useRef(false);
+  const prevPanelRef = useRef(activePanel);
+
+  const hasPanel = activePanel !== "none";
   const showCopilot = activePanel === "copilot";
   const showInsights = activePanel === "insights";
 
   useEffect(() => {
-    if (showCopilot || showInsights) {
+    const panelJustOpened = hasPanel && prevPanelRef.current === "none";
+    const panelJustClosed = !hasPanel && prevPanelRef.current !== "none";
+
+    if (panelJustOpened && open) {
+      autoCollapsedRef.current = true;
       setOpen(false);
+    } else if (panelJustClosed && autoCollapsedRef.current) {
+      autoCollapsedRef.current = false;
+      setOpen(true);
     }
-  }, [showCopilot, showInsights, setOpen]);
+
+    prevPanelRef.current = activePanel;
+  }, [activePanel, hasPanel, open, setOpen]);
 
   return (
     <div className="flex min-h-screen w-full">
       <AppSidebar />
       <CollapseNotch />
-      <div className="flex flex-1 min-h-screen overflow-hidden">
+      <div className="flex flex-1 h-screen overflow-hidden">
         <main className={cn(
           "flex-1 overflow-auto bg-background",
           density === "compact" ? "p-4" : "p-6"
