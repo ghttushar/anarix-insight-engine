@@ -11,6 +11,8 @@ import { Sparkles, ChevronLeft, ChevronRight, ArrowRight, FileText } from "lucid
 import { ruleTemplates, suggestionChips, appliedRules, type RuleTemplate } from "@/data/mockRules";
 import { cn } from "@/lib/utils";
 
+const draftCount = appliedRules.filter((r) => r.status === "draft").length;
+
 export default function RuleAgents() {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState("");
