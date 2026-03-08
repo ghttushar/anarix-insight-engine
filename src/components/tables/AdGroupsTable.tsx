@@ -20,8 +20,7 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
     group.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+  const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
