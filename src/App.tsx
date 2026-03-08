@@ -183,10 +183,8 @@ function AppRoutes() {
       <Route path="/settings/accounts" element={<Accounts />} />
       <Route path="/settings/accounts/connect/amazon" element={<ConnectAmazon />} />
       <Route path="/settings/accounts/connect/walmart" element={<ConnectWalmart />} />
-      <Route path="/settings/users" element={<SettingsUsers />} />
-      <Route path="/settings/invites" element={<SettingsInvites />} />
-      <Route path="/settings/logs" element={<SettingsLogs />} />
-      <Route path="/settings/configuration" element={<SettingsConfiguration />} />
+      <Route path="/settings/team" element={<SettingsTeam />} />
+      <Route path="/settings/system" element={<SettingsSystem />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

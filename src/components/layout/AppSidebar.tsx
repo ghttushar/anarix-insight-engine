@@ -105,10 +105,8 @@ const navigationGroups: NavGroup[] = [{
   items: [
     { title: "Preferences", url: "/settings/appearance", icon: Settings },
     { title: "Accounts", url: "/settings/accounts", icon: Link },
-    { title: "Users", url: "/settings/users", icon: Users },
-    { title: "Invitations", url: "/settings/invites", icon: Mail },
-    { title: "Activity Logs", url: "/settings/logs", icon: FileStack },
-    { title: "Configuration", url: "/settings/configuration", icon: Wrench },
+    { title: "Team", url: "/settings/team", icon: Users },
+    { title: "System", url: "/settings/system", icon: Wrench },
   ]
 }];
 
