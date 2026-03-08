@@ -179,6 +179,7 @@ export default function CampaignManager() {
       case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} />;
       case "product-ads": return <ProductAdsTable searchQuery={searchQuery} />;
       case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} />;
+      case "product-targeting": return <ProductTargetingTable searchQuery={searchQuery} />;
       case "search-terms": return <SearchTermsTable searchQuery={searchQuery} />;
       case "page-type": return <PageTypeTable searchQuery={searchQuery} />;
       case "platform": return <PlatformTable searchQuery={searchQuery} />;
