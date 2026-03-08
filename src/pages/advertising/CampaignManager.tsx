@@ -70,6 +70,12 @@ const COLUMN_DEFS: Record<string, { id: string; label: string }[]> = {
     { id: "adGroup", label: "Ad Group" }, { id: "campaign", label: "Campaign" }, { id: "impressions", label: "Impressions" },
     { id: "clicks", label: "Clicks" }, { id: "adSpend", label: "Ad Spend" },
   ],
+  "product-targeting": [
+    { id: "status", label: "Status" }, { id: "target", label: "Target" }, { id: "type", label: "Type" },
+    { id: "adGroup", label: "Ad Group" }, { id: "campaign", label: "Campaign" }, { id: "impressions", label: "Impressions" },
+    { id: "clicks", label: "Clicks" }, { id: "adSpend", label: "Ad Spend" }, { id: "adSales", label: "Ad Sales" },
+    { id: "roas", label: "ROAS" }, { id: "acos", label: "ACOS" },
+  ],
   "search-terms": [
     { id: "searchTerm", label: "Search Term" }, { id: "productAd", label: "Product Ad" }, { id: "keyword", label: "Keyword" },
     { id: "matchType", label: "Match Type" }, { id: "impressions", label: "Impressions" }, { id: "clicks", label: "Clicks" },
