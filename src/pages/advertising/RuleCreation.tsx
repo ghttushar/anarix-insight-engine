@@ -229,16 +229,10 @@ export default function RuleCreation() {
             <Plus className="mr-1.5 h-3.5 w-3.5" />
             Add Criteria
           </Button>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/advertising/rules/agents")}>
-              <Home className="mr-1.5 h-3.5 w-3.5" />
-              Home
-            </Button>
-            <Button size="sm" onClick={() => toast.info("Select campaigns to apply this rule to")}>
-              Select Campaigns
-              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-            </Button>
-          </div>
+          <Button size="sm" onClick={() => toast.info("Select campaigns to apply this rule to")}>
+            Select Campaigns
+            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+          </Button>
         </div>
       </div>
     </AppLayout>
