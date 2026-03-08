@@ -120,8 +120,9 @@ export function DataTableToolbar({
     <div className="space-y-3">
       {/* Main Toolbar Row */}
       <div className="flex items-center justify-between gap-4">
-        {/* Left Side: Search + View Toggle */}
+        {/* Left Side: leftContent + View Toggle + Search */}
         <div className="flex items-center gap-2">
+          {leftContent}
           {showViewToggle && onViewModeChange && (
             <div className="flex rounded-lg border border-border bg-background p-0.5">
               <button
