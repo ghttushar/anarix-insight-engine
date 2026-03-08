@@ -142,8 +142,10 @@ function ShortcutRow({ shortcut, customKeys, onEdit, isEditing, onCaptured }: {
 
 export default function Preferences() {
   const { density, setDensity } = useDensity();
+  const { displayCurrency, setDisplayCurrency, exchangeRate, lastUpdated } = useCurrency();
   const { effects, toggle } = useVisualEffects();
   const { newFeaturesVisible, toggleNewFeatures } = useFeatureToggle();
+  const currencyList = Object.values(CURRENCIES);
   const [customShortcuts, setCustomShortcuts] = useState<Record<string, string[]>>(loadCustomShortcuts);
   const [editingKey, setEditingKey] = useState<string | null>(null);
 
