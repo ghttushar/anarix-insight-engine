@@ -156,9 +156,9 @@ export default function AMCQueries() {
                         <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => toast.info("Running query...")}><Play className="h-4 w-4 mr-2" />Run</DropdownMenuItem>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>Duplicate</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(q.id)}>Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDuplicate(q.id)}>Duplicate</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteClick(q.id)} className="text-destructive">Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
