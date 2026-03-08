@@ -92,7 +92,7 @@ export default function ClientPortal() {
           subtitle="Auto-generate branded reports, send on schedule, and provide read-only client dashboard links"
           actions={
             <div className="flex gap-2">
-              <Button size="sm" onClick={() => toast.info("Opening report builder...")}><Plus className="mr-2 h-4 w-4" />Create Report</Button>
+              <Button size="sm" onClick={() => setCreateModalOpen(true)}><Plus className="mr-2 h-4 w-4" />Create Report</Button>
             </div>
           }
         />
