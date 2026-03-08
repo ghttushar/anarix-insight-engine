@@ -9,17 +9,12 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
-
-const formatCurrency = (v: number) => {
-  if (Math.abs(v) < 1 && v !== 0) return `${v.toFixed(2)}%`; // for margin row
-  const isNeg = v < 0;
-  const formatted = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(Math.abs(v));
-  return isNeg ? `(${formatted})` : formatted;
-};
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const isMarginRow = (label: string) => label.toLowerCase().includes("margin");
 
 export default function UnifiedPnL() {
+  const { formatCurrency } = useCurrency();
   // Summary cards
   const netProfit = mockUnifiedPnL.find((r) => r.label === "Net Profit");
   const grossRevenue = mockUnifiedPnL.find((r) => r.label === "Gross Revenue");

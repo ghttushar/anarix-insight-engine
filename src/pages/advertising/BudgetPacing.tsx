@@ -11,6 +11,7 @@ import { mockPacingCampaigns, mockPacingAlerts, type PacingCampaign } from "@/da
 import { toast } from "sonner";
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const statusConfig: Record<string, { label: string; class: string }> = {
   on_track: { label: "On Track", class: "bg-success/10 text-success border-success/20" },
@@ -24,8 +25,6 @@ const severityConfig: Record<string, string> = {
   warning: "border-l-warning bg-warning/5",
   info: "border-l-primary bg-primary/5",
 };
-
-const formatCurrency = (v: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(v);
 
 function HourlySpendChart({ selectedCampaign, chartData }: { selectedCampaign: PacingCampaign; chartData: { hour: string; spend: number; target: number }[] }) {
   const [chartType, setChartType] = useState<ChartType>("area");

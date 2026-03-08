@@ -27,6 +27,7 @@ const COLUMN_DEFS = [
 const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Price"];
 
 export default function ProfitabilityTrends() {
+  const { formatCurrency } = useCurrency();
   const [selectedMetric, setSelectedMetric] = useState("Total Sales");
   const [dateRange, setDateRange] = useState("quarter");
   const [searchValue, setSearchValue] = useState("");

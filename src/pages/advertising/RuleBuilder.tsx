@@ -11,16 +11,12 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const statusStyles: Record<string, string> = {
   active: "bg-success/10 text-success border-success/20",
   draft: "bg-muted text-muted-foreground border-muted",
   paused: "bg-warning/10 text-warning border-warning/20",
-};
-
-const formatCurrency = (v: number) => {
-  const abs = Math.abs(v);
-  return `${v < 0 ? "-" : ""}$${abs.toLocaleString()}`;
 };
 
 function BacktestChart({ selectedRule, backtestData }: { selectedRule: AutomationRule | null; backtestData: { date: string; savings: number; revenueLoss: number }[] }) {
