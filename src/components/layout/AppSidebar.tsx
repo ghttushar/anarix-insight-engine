@@ -5,7 +5,7 @@ import {
   MousePointerClick, Package, Database, Search, BarChart3, Clock,
   CalendarClock, History, ListTodo, Settings, Users, ChevronDown,
   ChevronRight, Sparkles, Layers, Image, FlaskConical, PackageCheck,
-  Send, PanelLeftClose, PanelLeftOpen, Sun, Moon, User, LogOut,
+  Send, ChevronLeft, Sun, Moon, User, LogOut,
   Gauge, Wheat, Bell, Activity, Link, Wrench, LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
