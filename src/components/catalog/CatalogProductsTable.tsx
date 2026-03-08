@@ -385,10 +385,10 @@ export function CatalogProductsTable({ products }: CatalogProductsTableProps) {
                   <TableCell className="text-right">
                     {formatNumber(totals.totalUnits)}
                   </TableCell>
-                  <TableCell className="text-right text-red-500">
+                  <TableCell className="text-right">
                     {formatCurrency(totals.refundSales)}
                   </TableCell>
-                  <TableCell className="text-right text-orange-500">
+                  <TableCell className="text-right">
                     {formatCurrency(totals.cancelledSales)}
                   </TableCell>
                 </>

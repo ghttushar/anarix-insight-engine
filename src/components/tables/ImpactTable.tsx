@@ -73,7 +73,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
         </span>
         <span
           className={cn(
-            "flex items-center gap-0.5 text-xs",
+            "flex items-center gap-1 text-xs font-medium",
             isNeutral
               ? "text-muted-foreground"
               : isPositive
@@ -81,7 +81,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
               : "text-destructive"
           )}
         >
-          {!isNeutral && (isPositive ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />)}
+          {!isNeutral && (isPositive ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />)}
           {Math.abs(delta).toFixed(1)}%
         </span>
       </div>

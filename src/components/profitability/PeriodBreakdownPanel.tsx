@@ -87,7 +87,7 @@ export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdo
                 {section.items.map((item) => (
                   <div key={item.label} className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
                     <span className="text-sm text-muted-foreground">{item.label}</span>
-                    <span className={cn("font-medium", item.highlight ? "text-success" : "text-foreground")}>
+                    <span className="font-medium text-foreground">
                       {item.value}
                     </span>
                   </div>

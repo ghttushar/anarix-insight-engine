@@ -143,11 +143,7 @@ export function ProductsPnLTable({ products, visibleColumns, onCogsClick, onTren
               return (
                 <TableCell
                   key={col.id}
-                  className={cn(
-                    "text-right",
-                    col.className,
-                    isNetProfit && (val >= 0 ? "text-green-600" : "text-red-500")
-                  )}
+                  className="text-right"
                 >
                   {col.id.includes("Unit") || col.id === "units" || col.id === "refundUnits" || col.id === "cancelledUnits"
                     ? formatNumber(val)

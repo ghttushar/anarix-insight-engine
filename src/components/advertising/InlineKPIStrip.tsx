@@ -118,7 +118,7 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
                 ) : isPositive ? (
                   <ArrowUp className="h-3.5 w-3.5" />
                 ) : (
-                  <ArrowDown className="h-3 w-3" />
+                  <ArrowDown className="h-3.5 w-3.5" />
                 )}
                 <span>{Math.abs(delta).toFixed(1)}%</span>
               </div>

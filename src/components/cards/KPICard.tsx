@@ -77,8 +77,8 @@ export function KPICard({
               {formatValue(value, format)}
             </span>
           </div>
-          <div className={cn("flex items-center gap-1 text-xs", trendColorClass)}>
-            <TrendIcon className="h-3 w-3" />
+          <div className={cn("flex items-center gap-1.5 text-xs", trendColorClass)}>
+            <TrendIcon className="h-3.5 w-3.5" />
             <span>{percentage.toFixed(1)}%</span>
             <span className="text-muted-foreground">vs previous period</span>
           </div>

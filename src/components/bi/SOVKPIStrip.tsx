@@ -21,9 +21,9 @@ function KPICard({ label, value, delta, highlight }: KPICardProps) {
   };
 
   const getDeltaIcon = (d: number) => {
-    if (d > 0) return <TrendingUp className="h-3 w-3" />;
-    if (d < 0) return <TrendingDown className="h-3 w-3" />;
-    return <Minus className="h-3 w-3" />;
+    if (d > 0) return <TrendingUp className="h-3.5 w-3.5" />;
+    if (d < 0) return <TrendingDown className="h-3.5 w-3.5" />;
+    return <Minus className="h-3.5 w-3.5" />;
   };
 
   return (
