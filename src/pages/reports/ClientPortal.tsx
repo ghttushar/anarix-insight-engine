@@ -132,7 +132,7 @@ export default function ClientPortal() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockClientReports.map((report) => (
+              {reports.map((report) => (
                 <TableRow key={report.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
