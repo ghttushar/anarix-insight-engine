@@ -87,6 +87,7 @@ function HourlySpendChart({ selectedCampaign, chartData }: { selectedCampaign: P
 }
 
 export default function BudgetPacing() {
+  const { formatCurrency } = useCurrency();
   const [selectedCampaign, setSelectedCampaign] = useState<PacingCampaign | null>(mockPacingCampaigns[0]);
 
   const totalDailyBudget = mockPacingCampaigns.reduce((s, c) => s + c.dailyBudget, 0);
