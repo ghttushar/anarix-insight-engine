@@ -26,7 +26,7 @@ export function RegionStatsPanel({ region, dateRange }: RegionStatsPanelProps) {
   const roi = (region.sales / region.amazonFees) * 100;
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="h-full rounded-lg border border-border bg-card p-4 flex flex-col">
       {/* Header */}
       <div className="mb-4 flex items-center gap-3 border-b border-border pb-4">
         <span className="text-3xl">{region.flag}</span>
