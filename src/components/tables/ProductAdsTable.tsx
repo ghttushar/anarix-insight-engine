@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -8,32 +6,17 @@ import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockProductAds, productAdsTotals } from "@/data/mockProductAds";
-import { cn } from "@/lib/utils";
 
 interface ProductAdsTableProps {
   searchQuery?: string;
 }
 
 export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-
   const filteredAds = mockProductAds.filter((ad) =>
     ad.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     ad.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
     ad.itemId.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const toggleRow = (id: string) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) newSelected.delete(id);
-    else newSelected.add(id);
-    setSelectedRows(newSelected);
-  };
-
-  const toggleAll = () => {
-    if (selectedRows.size === filteredAds.length) setSelectedRows(new Set());
-    else setSelectedRows(new Set(filteredAds.map((a) => a.id)));
-  };
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
@@ -53,7 +36,6 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-10"><Checkbox checked={selectedRows.size === filteredAds.length && filteredAds.length > 0} onCheckedChange={toggleAll} /></TableHead>
               <TableHead className="w-24">Status</TableHead>
               <TableHead className="min-w-[300px]">Product Ad</TableHead>
               <TableHead className="min-w-[150px]">Ad Group</TableHead>
@@ -73,8 +55,7 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredAds.map((ad) => (
-              <TableRow key={ad.id} className={cn("transition-colors", selectedRows.has(ad.id) && "bg-primary/5")}>
-                <TableCell><Checkbox checked={selectedRows.has(ad.id)} onCheckedChange={() => toggleRow(ad.id)} /></TableCell>
+              <TableRow key={ad.id}>
                 <TableCell><StatusBadge status={ad.status} /></TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -101,7 +82,7 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
               </TableRow>
             ))}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={9} className="font-semibold">Total ({filteredAds.length} product ads)</TableCell>
+              <TableCell colSpan={8} className="font-semibold">Total ({filteredAds.length} product ads)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.clicks)}</TableCell>
               <TableCell className="text-right text-foreground">{formatPercent(productAdsTotals.ctr)}</TableCell>

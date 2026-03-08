@@ -1,14 +1,11 @@
-import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
-import { AdGroup } from "@/types/advertising";
 import { mockAdGroups, adGroupsTotals } from "@/data/mockAdGroups";
 import { cn } from "@/lib/utils";
 
@@ -17,31 +14,17 @@ interface AdGroupsTableProps {
 }
 
 export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-
   const filteredGroups = mockAdGroups.filter((group) =>
     group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     group.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const toggleRow = (id: string) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) newSelected.delete(id);
-    else newSelected.add(id);
-    setSelectedRows(newSelected);
-  };
-
-  const toggleAll = () => {
-    if (selectedRows.size === filteredGroups.length) setSelectedRows(new Set());
-    else setSelectedRows(new Set(filteredGroups.map((g) => g.id)));
-  };
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
-  const NumCell = ({ value, formatted, id, metric }: { value: number; formatted: string; id: string; metric: string }) => (
+  const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
     <div className="flex flex-col items-end">
       <span className="text-foreground">{formatted}</span>
       <DeltaBadge value={getDelta(id, metric)} />
@@ -54,7 +37,6 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-10"><Checkbox checked={selectedRows.size === filteredGroups.length && filteredGroups.length > 0} onCheckedChange={toggleAll} /></TableHead>
               <TableHead className="w-24">Status</TableHead>
               <TableHead className="min-w-[200px]">Ad Group</TableHead>
               <TableHead className="min-w-[200px]">Campaign</TableHead>
@@ -76,8 +58,7 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredGroups.map((group) => (
-              <TableRow key={group.id} className={cn("transition-colors", selectedRows.has(group.id) && "bg-primary/5")}>
-                <TableCell><Checkbox checked={selectedRows.has(group.id)} onCheckedChange={() => toggleRow(group.id)} /></TableCell>
+              <TableRow key={group.id}>
                 <TableCell><StatusBadge status={group.status} /></TableCell>
                 <TableCell className="font-medium text-foreground">{group.name}</TableCell>
                 <TableCell>
@@ -92,20 +73,20 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
                 <TableCell className="text-right text-foreground">{formatCurrency(group.minBid)}</TableCell>
                 <TableCell className="text-right text-foreground">{formatCurrency(group.maxBid)}</TableCell>
                 <TableCell className="text-right text-foreground">{group.targetRoas.toFixed(1)}</TableCell>
-                <TableCell className="text-right"><NumCell value={group.impressions} formatted={formatNumber(group.impressions)} id={group.id} metric="impressions" /></TableCell>
-                <TableCell className="text-right"><NumCell value={group.clicks} formatted={formatNumber(group.clicks)} id={group.id} metric="clicks" /></TableCell>
-                <TableCell className="text-right"><NumCell value={group.ctr} formatted={formatPercent(group.ctr)} id={group.id} metric="ctr" /></TableCell>
-                <TableCell className="text-right"><NumCell value={group.adUnits} formatted={formatNumber(group.adUnits)} id={group.id} metric="adUnits" /></TableCell>
-                <TableCell className="text-right"><NumCell value={group.cvr} formatted={formatPercent(group.cvr)} id={group.id} metric="cvr" /></TableCell>
-                <TableCell className="text-right"><NumCell value={group.cpc} formatted={formatCurrency(group.cpc)} id={group.id} metric="cpc" /></TableCell>
-                <TableCell className="text-right"><NumCell value={group.adSpend} formatted={formatCurrency(group.adSpend)} id={group.id} metric="adSpend" /></TableCell>
-                <TableCell className="text-right"><NumCell value={group.adSales} formatted={formatCurrency(group.adSales)} id={group.id} metric="adSales" /></TableCell>
-                <TableCell className="text-right"><NumCell value={group.roas} formatted={group.roas.toFixed(2)} id={group.id} metric="roas" /></TableCell>
-                <TableCell className="text-right"><NumCell value={group.acos} formatted={formatPercent(group.acos)} id={group.id} metric="acos" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(group.impressions)} id={group.id} metric="impressions" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(group.clicks)} id={group.id} metric="clicks" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatPercent(group.ctr)} id={group.id} metric="ctr" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatNumber(group.adUnits)} id={group.id} metric="adUnits" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatPercent(group.cvr)} id={group.id} metric="cvr" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatCurrency(group.cpc)} id={group.id} metric="cpc" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatCurrency(group.adSpend)} id={group.id} metric="adSpend" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatCurrency(group.adSales)} id={group.id} metric="adSales" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={group.roas.toFixed(2)} id={group.id} metric="roas" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={formatPercent(group.acos)} id={group.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={8} className="font-semibold">Total ({filteredGroups.length} ad groups)</TableCell>
+              <TableCell colSpan={7} className="font-semibold">Total ({filteredGroups.length} ad groups)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(adGroupsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(adGroupsTotals.clicks)}</TableCell>
               <TableCell className="text-right text-foreground">{formatPercent(adGroupsTotals.ctr)}</TableCell>

@@ -1,13 +1,6 @@
-import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { ImpactComparison } from "@/types/advertising";
 import { cn } from "@/lib/utils";
@@ -20,36 +13,14 @@ interface ImpactTableProps {
 }
 
 export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactTableProps) {
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-
   const filteredData = data.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const toggleRow = (id: string) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedRows(newSelected);
-  };
-
-  const toggleAll = () => {
-    if (selectedRows.size === filteredData.length) {
-      setSelectedRows(new Set());
-    } else {
-      setSelectedRows(new Set(filteredData.map((d) => d.id)));
-    }
-  };
-
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
-
   const formatNumber = (value: number) =>
     new Intl.NumberFormat("en-US").format(value);
-
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
   const calculateDelta = (baseline: number, impact: number) => {
@@ -74,11 +45,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
         <span
           className={cn(
             "flex items-center gap-1 text-xs font-medium",
-            isNeutral
-              ? "text-muted-foreground"
-              : isPositive
-              ? "text-success"
-              : "text-destructive"
+            isNeutral ? "text-muted-foreground" : isPositive ? "text-success" : "text-destructive"
           )}
         >
           {!isNeutral && (isPositive ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />)}
@@ -94,12 +61,6 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-10">
-                <Checkbox
-                  checked={selectedRows.size === filteredData.length && filteredData.length > 0}
-                  onCheckedChange={toggleAll}
-                />
-              </TableHead>
               <TableHead className="min-w-[250px]">Name</TableHead>
               <TableHead className="w-28 text-center">Impact</TableHead>
               <TableHead className="min-w-[180px] text-right">Impressions</TableHead>
@@ -117,19 +78,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
               const isNeutral = item.impactPercentage === 0;
 
               return (
-                <TableRow
-                  key={item.id}
-                  className={cn(
-                    "transition-colors",
-                    selectedRows.has(item.id) && "bg-primary/5"
-                  )}
-                >
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedRows.has(item.id)}
-                      onCheckedChange={() => toggleRow(item.id)}
-                    />
-                  </TableCell>
+                <TableRow key={item.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {showType && item.type && (
@@ -164,27 +113,13 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
                       {Math.abs(item.impactPercentage).toFixed(1)}%
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    <DeltaCell baseline={item.baseline.impressions} impact={item.impact.impressions} />
-                  </TableCell>
-                  <TableCell>
-                    <DeltaCell baseline={item.baseline.clicks} impact={item.impact.clicks} />
-                  </TableCell>
-                  <TableCell>
-                    <DeltaCell baseline={item.baseline.ctr} impact={item.impact.ctr} format="percent" />
-                  </TableCell>
-                  <TableCell>
-                    <DeltaCell baseline={item.baseline.adSpend} impact={item.impact.adSpend} format="currency" />
-                  </TableCell>
-                  <TableCell>
-                    <DeltaCell baseline={item.baseline.adSales} impact={item.impact.adSales} format="currency" />
-                  </TableCell>
-                  <TableCell>
-                    <DeltaCell baseline={item.baseline.roas} impact={item.impact.roas} format="decimal" />
-                  </TableCell>
-                  <TableCell>
-                    <DeltaCell baseline={item.baseline.acos} impact={item.impact.acos} format="percent" />
-                  </TableCell>
+                  <TableCell><DeltaCell baseline={item.baseline.impressions} impact={item.impact.impressions} /></TableCell>
+                  <TableCell><DeltaCell baseline={item.baseline.clicks} impact={item.impact.clicks} /></TableCell>
+                  <TableCell><DeltaCell baseline={item.baseline.ctr} impact={item.impact.ctr} format="percent" /></TableCell>
+                  <TableCell><DeltaCell baseline={item.baseline.adSpend} impact={item.impact.adSpend} format="currency" /></TableCell>
+                  <TableCell><DeltaCell baseline={item.baseline.adSales} impact={item.impact.adSales} format="currency" /></TableCell>
+                  <TableCell><DeltaCell baseline={item.baseline.roas} impact={item.impact.roas} format="decimal" /></TableCell>
+                  <TableCell><DeltaCell baseline={item.baseline.acos} impact={item.impact.acos} format="percent" /></TableCell>
                 </TableRow>
               );
             })}

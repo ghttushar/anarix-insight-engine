@@ -1,7 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Edit, Pause, Play, Trash2 } from "lucide-react";
 import { DayPartingSchedule } from "@/types/dayparting";
 import { format } from "date-fns";
@@ -10,8 +9,6 @@ import { useNavigate } from "react-router-dom";
 
 interface ScheduledJobsTableProps {
   schedules: DayPartingSchedule[];
-  selectedIds?: string[];
-  onSelectionChange?: (ids: string[]) => void;
   onPauseResume?: (id: string) => void;
   onDelete?: (id: string) => void;
 }
@@ -31,28 +28,10 @@ const STATUS_STYLES: Record<string, string> = {
 
 export function ScheduledJobsTable({
   schedules,
-  selectedIds = [],
-  onSelectionChange,
   onPauseResume,
   onDelete,
 }: ScheduledJobsTableProps) {
   const navigate = useNavigate();
-
-  const toggleSelection = (id: string) => {
-    if (selectedIds.includes(id)) {
-      onSelectionChange?.(selectedIds.filter((i) => i !== id));
-    } else {
-      onSelectionChange?.([...selectedIds, id]);
-    }
-  };
-
-  const toggleAll = () => {
-    if (selectedIds.length === schedules.length) {
-      onSelectionChange?.([]);
-    } else {
-      onSelectionChange?.(schedules.map((s) => s.id));
-    }
-  };
 
   const formatNextRun = (nextRun?: string) => {
     if (!nextRun) return "-";
@@ -73,12 +52,6 @@ export function ScheduledJobsTable({
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">
-            <TableHead className="w-[40px]">
-              <Checkbox
-                checked={selectedIds.length === schedules.length && schedules.length > 0}
-                onCheckedChange={toggleAll}
-              />
-            </TableHead>
             <TableHead>Schedule Name</TableHead>
             <TableHead>Campaign(s)</TableHead>
             <TableHead>Action Type</TableHead>
@@ -91,12 +64,6 @@ export function ScheduledJobsTable({
         <TableBody>
           {schedules.map((schedule) => (
             <TableRow key={schedule.id} className="hover:bg-muted/30">
-              <TableCell>
-                <Checkbox
-                  checked={selectedIds.includes(schedule.id)}
-                  onCheckedChange={() => toggleSelection(schedule.id)}
-                />
-              </TableCell>
               <TableCell className="font-medium">{schedule.name}</TableCell>
               <TableCell>
                 <div className="max-w-[200px]">

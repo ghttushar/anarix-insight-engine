@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -22,25 +20,11 @@ const matchTypeColors: Record<string, string> = {
 };
 
 export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTableProps) {
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-
   const filteredKeywords = mockKeywords.filter((kw) =>
     kw.keyword.toLowerCase().includes(searchQuery.toLowerCase()) ||
     kw.adGroupName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     kw.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const toggleRow = (id: string) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) newSelected.delete(id);
-    else newSelected.add(id);
-    setSelectedRows(newSelected);
-  };
-
-  const toggleAll = () => {
-    if (selectedRows.size === filteredKeywords.length) setSelectedRows(new Set());
-    else setSelectedRows(new Set(filteredKeywords.map((k) => k.id)));
-  };
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
@@ -60,7 +44,6 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-10"><Checkbox checked={selectedRows.size === filteredKeywords.length && filteredKeywords.length > 0} onCheckedChange={toggleAll} /></TableHead>
               <TableHead className="w-24">Status</TableHead>
               <TableHead className="min-w-[200px]">Keyword</TableHead>
               <TableHead className="w-24">Match Type</TableHead>
@@ -81,8 +64,7 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
           </TableHeader>
           <TableBody>
             {filteredKeywords.map((keyword) => (
-              <TableRow key={keyword.id} className={cn("transition-colors", selectedRows.has(keyword.id) && "bg-primary/5")}>
-                <TableCell><Checkbox checked={selectedRows.has(keyword.id)} onCheckedChange={() => toggleRow(keyword.id)} /></TableCell>
+              <TableRow key={keyword.id}>
                 <TableCell><StatusBadge status={keyword.status} /></TableCell>
                 <TableCell className="font-medium text-foreground">{keyword.keyword}</TableCell>
                 <TableCell><Badge variant="outline" className={cn("text-xs uppercase", matchTypeColors[keyword.matchType])}>{keyword.matchType}</Badge></TableCell>
@@ -109,7 +91,7 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
               </TableRow>
             ))}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={10} className="font-semibold">Total ({filteredKeywords.length} keywords)</TableCell>
+              <TableCell colSpan={9} className="font-semibold">Total ({filteredKeywords.length} keywords)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.clicks)}</TableCell>
               <TableCell className="text-right text-foreground">{formatPercent(keywordsTotals.ctr)}</TableCell>
