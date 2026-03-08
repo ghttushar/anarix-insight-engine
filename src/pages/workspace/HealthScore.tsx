@@ -45,7 +45,7 @@ export default function HealthScore() {
 
         {/* Composite Score */}
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
-          <Card className="flex items-center justify-center">
+          <Card className="flex items-center justify-center h-full">
             <CardContent className="pt-6 pb-4 px-6 text-center">
               <CircularProgress progress={compositeScore} size={160} strokeWidth={12} className="mx-auto" />
               <p className="text-3xl font-heading font-semibold text-foreground mt-4">{compositeScore}</p>
