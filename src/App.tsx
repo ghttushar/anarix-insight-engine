@@ -233,6 +233,7 @@ const App = () => (
         </AccountProvider>
         </CurrencyProvider>
       </DensityProvider>
+      </ColorSchemeProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
