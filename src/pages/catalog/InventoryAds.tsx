@@ -46,19 +46,19 @@ export default function InventoryAds() {
 
         {/* Summary */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Products Tracked</p>
             <p className="text-xl font-semibold text-foreground">{mockInventoryProducts.length}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Critical Stock</p>
             <p className="text-xl font-semibold text-destructive">{criticalCount}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Overstock Items</p>
             <p className="text-xl font-semibold text-primary">{overstockCount}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Daily Savings Available</p>
             <p className="text-xl font-semibold text-success">{formatCurrency(totalSavings)}</p>
           </CardContent></Card>

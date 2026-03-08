@@ -58,20 +58,20 @@ export default function BudgetPacing() {
 
         {/* Summary KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Daily Budget</p>
             <p className="text-xl font-semibold text-foreground">{formatCurrency(totalDailyBudget)}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Spent Today</p>
             <p className="text-xl font-semibold text-foreground">{formatCurrency(totalSpentToday)}</p>
             <Progress value={(totalSpentToday / totalDailyBudget) * 100} className="mt-2 h-1.5" />
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Monthly Budget</p>
             <p className="text-xl font-semibold text-foreground">{formatCurrency(totalMonthlyBudget)}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Spent This Month</p>
             <p className="text-xl font-semibold text-foreground">{formatCurrency(totalSpentMonth)}</p>
             <Progress value={(totalSpentMonth / totalMonthlyBudget) * 100} className="mt-2 h-1.5" />

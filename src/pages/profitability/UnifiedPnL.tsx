@@ -45,7 +45,7 @@ export default function UnifiedPnL() {
             { label: "Combined Ad Spend", value: adSpend?.combined || 0 },
             { label: "Combined Net Profit", value: netProfit?.combined || 0 },
           ].map((kpi) => (
-            <Card key={kpi.label}><CardContent className="pt-4 pb-3 px-4">
+            <Card key={kpi.label} className="h-full"><CardContent className="pt-4 pb-3 px-4">
               <p className="text-xs text-muted-foreground mb-1">{kpi.label}</p>
               <p className="text-xl font-semibold text-foreground">{formatCurrency(kpi.value)}</p>
             </CardContent></Card>

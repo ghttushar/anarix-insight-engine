@@ -169,7 +169,7 @@ export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapPro
   const hoveredData = hoveredCountry ? activeCountryData[hoveredCountry] : null;
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="h-full rounded-lg border border-border bg-card p-4 flex flex-col">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-medium text-foreground">Sales by Region</h3>
         <div className="flex items-center gap-1">

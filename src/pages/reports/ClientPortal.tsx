@@ -37,19 +37,19 @@ export default function ClientPortal() {
 
         {/* Summary */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Total Reports</p>
             <p className="text-xl font-semibold text-foreground">{mockClientReports.length}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Clients</p>
             <p className="text-xl font-semibold text-foreground">{uniqueClients}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Sent This Month</p>
             <p className="text-xl font-semibold text-success">{sentCount}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Scheduled</p>
             <p className="text-xl font-semibold text-warning">{scheduledCount}</p>
           </CardContent></Card>

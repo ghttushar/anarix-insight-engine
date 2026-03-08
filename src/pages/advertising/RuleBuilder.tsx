@@ -44,19 +44,19 @@ export default function RuleBuilder() {
 
         {/* Summary */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Total Rules</p>
             <p className="text-xl font-semibold text-foreground">{mockRules.length}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Active Rules</p>
             <p className="text-xl font-semibold text-foreground">{mockRules.filter((r) => r.status === "active").length}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Total Projected Savings</p>
             <p className="text-xl font-semibold text-success">{formatCurrency(mockRules.reduce((s, r) => s + (r.backtestResult?.projectedSavings || 0), 0))}</p>
           </CardContent></Card>
-          <Card><CardContent className="pt-4 pb-3 px-4">
+          <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Net Impact</p>
             <p className="text-xl font-semibold text-foreground">{formatCurrency(mockRules.reduce((s, r) => s + (r.backtestResult?.netImpact || 0), 0))}</p>
           </CardContent></Card>

@@ -43,7 +43,7 @@ export function ProfitabilityTrendChart({ data }: ProfitabilityTrendChartProps) 
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="h-full rounded-lg border border-border bg-card p-4 flex flex-colard p-4 flex flex-col">
       {/* Controls */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export function ProfitabilityTrendChart({ data }: ProfitabilityTrendChartProps) 
       </div>
 
       {/* Chart */}
-      <div className="h-[240px]">
+ flex-1 min-h-[20<div className="h-[240px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
