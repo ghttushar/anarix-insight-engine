@@ -22,10 +22,67 @@ const statusStyles: Record<string, string> = {
   scheduled: "bg-warning/10 text-warning border-warning/20",
 };
 
+const AVAILABLE_SECTIONS = [
+  "Campaign Performance",
+  "Ad Spend Analysis",
+  "ROAS & Conversions",
+  "Top Products",
+  "Search Terms",
+  "Recommendations"
+];
+
 export default function ClientPortal() {
-  const sentCount = mockClientReports.filter((r) => r.status === "sent").length;
-  const scheduledCount = mockClientReports.filter((r) => r.status === "scheduled").length;
-  const uniqueClients = new Set(mockClientReports.map((r) => r.clientName)).size;
+  const [reports, setReports] = useState(mockClientReports);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [reportName, setReportName] = useState("");
+  const [clientName, setClientName] = useState("");
+  const [period, setPeriod] = useState("");
+  const [selectedSections, setSelectedSections] = useState<string[]>(["Campaign Performance", "ROAS & Conversions"]);
+
+  const sentCount = reports.filter((r) => r.status === "sent").length;
+  const scheduledCount = reports.filter((r) => r.status === "scheduled").length;
+  const uniqueClients = new Set(reports.map((r) => r.clientName)).size;
+
+  const handleToggleSection = (section: string) => {
+    setSelectedSections(prev =>
+      prev.includes(section)
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
+
+  const handleCreateReport = () => {
+    if (!reportName.trim() || !clientName.trim() || !period.trim()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    if (selectedSections.length === 0) {
+      toast.error("Please select at least one section");
+      return;
+    }
+
+    const newReport = {
+      id: `report-${Date.now()}`,
+      name: reportName,
+      clientName: clientName,
+      period: period,
+      status: "draft" as const,
+      sections: selectedSections,
+      scheduleCron: null,
+      lastGenerated: new Date().toISOString(),
+    };
+
+    setReports(prev => [newReport, ...prev]);
+    toast.success("Report created successfully");
+    
+    // Reset form
+    setReportName("");
+    setClientName("");
+    setPeriod("");
+    setSelectedSections(["Campaign Performance", "ROAS & Conversions"]);
+    setCreateModalOpen(false);
+  };
 
   return (
     <AppLayout>
