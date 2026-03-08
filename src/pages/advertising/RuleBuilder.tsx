@@ -20,7 +20,7 @@ const statusStyles: Record<string, string> = {
 };
 
 function BacktestChart({ selectedRule, backtestData }: { selectedRule: AutomationRule | null; backtestData: { date: string; savings: number; revenueLoss: number }[] }) {
-  const [chartType, setChartType] = useState<ChartType>("bar");
+  const { formatCurrency } = useCurrency();
   const [activeMetrics, setActiveMetrics] = useState<string[]>(["savings", "revenueLoss"]);
 
   const metrics: ChartMetric[] = [
