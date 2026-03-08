@@ -36,7 +36,6 @@ function formatPercent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
-const STATUS_OPTIONS: CampaignStatus[] = ["live", "paused", "archived", "scheduled", "out_of_budget", "completed"];
 const BIDDING_OPTIONS: BiddingStrategy[] = ["Dynamic Down", "Dynamic Up/Down", "Fixed"];
 
 export function CampaignTable({
@@ -137,14 +136,7 @@ export function CampaignTable({
                     <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
                   </TableCell>
                 )}
-                <TableCell>
-                  {isEdit ? (
-                    <Select value={campaign.status} onValueChange={(v) => onCampaignUpdate?.(campaign.id, { status: v as CampaignStatus })}>
-                      <SelectTrigger className="h-8 w-[120px] text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>{STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>)}</SelectContent>
-                    </Select>
-                  ) : <StatusBadge status={campaign.status} />}
-                </TableCell>
+                <TableCell><StatusBadge status={campaign.status} /></TableCell>
                 <TableCell className="font-medium text-foreground">
                   {isEdit ? (
                     <Input defaultValue={campaign.name} className="h-8 text-sm" onBlur={(e) => onCampaignUpdate?.(campaign.id, { name: e.target.value })} />
