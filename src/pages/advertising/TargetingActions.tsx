@@ -5,11 +5,11 @@ import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronDown, Plus, Archive } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, Archive } from "lucide-react";
 import { mockTargetingActions, mockTargetCampaigns, mockTargetAdGroups } from "@/data/mockTargetingActions";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -31,24 +31,12 @@ const termTypeColors: Record<string, string> = {
 export default function TargetingActions() {
   const [activeTab, setActiveTab] = useState<ActionTab>("keyword-action");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
   const filteredActions = mockTargetingActions.filter((action) => {
     const matchesSearch = action.searchTerm.toLowerCase().includes(searchQuery.toLowerCase()) || action.normalizedTerm.toLowerCase().includes(searchQuery.toLowerCase());
     if (activeTab === "archive") return matchesSearch && action.archived;
     return matchesSearch && !action.archived;
   });
-
-  const toggleRow = (id: string) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) newSelected.delete(id); else newSelected.add(id);
-    setSelectedRows(newSelected);
-  };
-
-  const toggleAll = () => {
-    if (selectedRows.size === filteredActions.length) setSelectedRows(new Set());
-    else setSelectedRows(new Set(filteredActions.map((a) => a.id)));
-  };
 
   const formatCurrency = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
@@ -112,7 +100,6 @@ export default function TargetingActions() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30 hover:bg-muted/30">
-                  <TableHead className="w-10"><Checkbox checked={selectedRows.size === filteredActions.length && filteredActions.length > 0} onCheckedChange={toggleAll} /></TableHead>
                   <TableHead className="min-w-[200px]">Search Term</TableHead>
                   <TableHead className="min-w-[180px]">Normalized Term</TableHead>
                   <TableHead className="min-w-[150px]">Source Campaign</TableHead>
@@ -131,8 +118,7 @@ export default function TargetingActions() {
               </TableHeader>
               <TableBody>
                 {filteredActions.map((action) => (
-                  <TableRow key={action.id} className={cn("transition-colors", selectedRows.has(action.id) && "bg-primary/5")}>
-                    <TableCell><Checkbox checked={selectedRows.has(action.id)} onCheckedChange={() => toggleRow(action.id)} /></TableCell>
+                  <TableRow key={action.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className={cn("text-xs capitalize", termTypeColors[action.termType])}>{action.termType}</Badge>
@@ -173,7 +159,7 @@ export default function TargetingActions() {
                 ))}
                 {filteredActions.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={15} className="h-32 text-center text-muted-foreground">
+                    <TableCell colSpan={14} className="h-32 text-center text-muted-foreground">
                       {activeTab === "archive" ? "No archived items found" : activeTab === "history" ? "No history available" : "No targeting actions found. Try fetching keywords."}
                     </TableCell>
                   </TableRow>

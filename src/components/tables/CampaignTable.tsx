@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -51,7 +50,6 @@ export function CampaignTable({
   const filteredCampaigns = campaigns.filter((c) =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [page, setPage] = useState(1);
@@ -59,14 +57,6 @@ export function CampaignTable({
 
   const isEdit = viewMode === "edit";
 
-  const handleSelectAll = (checked: boolean) => {
-    setSelectedIds(checked ? new Set(filteredCampaigns.map((c) => c.id)) : new Set());
-  };
-  const handleSelectOne = (id: string, checked: boolean) => {
-    const n = new Set(selectedIds);
-    checked ? n.add(id) : n.delete(id);
-    setSelectedIds(n);
-  };
   const handleSort = (field: SortField) => {
     if (sortField === field) setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     else { setSortField(field); setSortDirection("asc"); }
@@ -88,19 +78,13 @@ export function CampaignTable({
     return sortDirection === "asc" ? <ArrowUp className="h-4 w-4 text-primary" /> : <ArrowDown className="h-4 w-4 text-primary" />;
   };
 
-  const allSelected = filteredCampaigns.length > 0 && selectedIds.size === filteredCampaigns.length;
-  const someSelected = selectedIds.size > 0 && selectedIds.size < filteredCampaigns.length;
-
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-border">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-12">
-                <Checkbox checked={allSelected} onCheckedChange={handleSelectAll} aria-label="Select all" className={someSelected ? "data-[state=checked]:bg-primary/50" : ""} />
-              </TableHead>
-              <TableHead className="w-16">Active</TableHead>
+              {isEdit && <TableHead className="w-16">Active</TableHead>}
               <TableHead className="w-28">Status</TableHead>
               <TableHead className="min-w-[200px] cursor-pointer" onClick={() => handleSort("name")}>
                 <div className="flex items-center gap-1">Campaign Name <SortIcon field="name" /></div>
@@ -147,13 +131,12 @@ export function CampaignTable({
           </TableHeader>
           <TableBody>
             {paginatedCampaigns.map((campaign) => (
-              <TableRow key={campaign.id} className={cn(selectedIds.has(campaign.id) && "bg-primary/5")}>
-                <TableCell>
-                  <Checkbox checked={selectedIds.has(campaign.id)} onCheckedChange={(checked) => handleSelectOne(campaign.id, checked as boolean)} aria-label={`Select ${campaign.name}`} />
-                </TableCell>
-                <TableCell>
-                  <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
-                </TableCell>
+              <TableRow key={campaign.id}>
+                {isEdit && (
+                  <TableCell>
+                    <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
+                  </TableCell>
+                )}
                 <TableCell>
                   {isEdit ? (
                     <Select value={campaign.status} onValueChange={(v) => onCampaignUpdate?.(campaign.id, { status: v as CampaignStatus })}>

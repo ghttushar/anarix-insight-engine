@@ -4,7 +4,6 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Sparkles, Plus, X, Search, Download } from "lucide-react";
 import { mockHarvestCandidates, type HarvestCandidate } from "@/data/mockSearchHarvesting";
@@ -22,15 +21,8 @@ const formatCurrency = (v: number) => `$${v.toFixed(2)}`;
 export default function SearchHarvesting() {
   const [candidates, setCandidates] = useState(mockHarvestCandidates);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const pending = candidates.filter((c) => c.status === "pending" && c.searchTerm.toLowerCase().includes(searchQuery.toLowerCase()));
-
-  const toggleSelect = (id: string) => {
-    const next = new Set(selectedIds);
-    if (next.has(id)) next.delete(id); else next.add(id);
-    setSelectedIds(next);
-  };
 
   const addAsKeyword = (id: string) => {
     setCandidates((prev) => prev.map((c) => (c.id === id ? { ...c, status: "added" as const } : c)));
@@ -40,14 +32,6 @@ export default function SearchHarvesting() {
   const dismiss = (id: string) => {
     setCandidates((prev) => prev.map((c) => (c.id === id ? { ...c, status: "dismissed" as const } : c)));
     toast.info("Term dismissed");
-  };
-
-  const bulkAdd = () => {
-    setCandidates((prev) =>
-      prev.map((c) => (selectedIds.has(c.id) ? { ...c, status: "added" as const } : c))
-    );
-    toast.success(`${selectedIds.size} keywords added`);
-    setSelectedIds(new Set());
   };
 
   const addedCount = candidates.filter((c) => c.status === "added").length;
@@ -60,14 +44,7 @@ export default function SearchHarvesting() {
           title="Search Term Harvesting"
           subtitle="High-performing search terms surfaced for keyword targeting with Aan AI recommendations"
           actions={
-            <div className="flex gap-2">
-              {selectedIds.size > 0 && (
-                <Button size="sm" onClick={bulkAdd}>
-                  <Plus className="mr-2 h-4 w-4" />Add {selectedIds.size} Keywords
-                </Button>
-              )}
-              <Button variant="outline" size="sm" onClick={() => toast.success("Exporting harvest data...")}><Download className="mr-2 h-4 w-4" />Export</Button>
-            </div>
+            <Button variant="outline" size="sm" onClick={() => toast.success("Exporting harvest data...")}><Download className="mr-2 h-4 w-4" />Export</Button>
           }
         />
 
@@ -102,13 +79,10 @@ export default function SearchHarvesting() {
         {/* Candidate Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {pending.map((c) => (
-            <Card key={c.id} className={cn("transition-all", selectedIds.has(c.id) && "ring-2 ring-primary")}>
+            <Card key={c.id}>
               <CardContent className="pt-4 pb-3 px-4 space-y-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <Checkbox checked={selectedIds.has(c.id)} onCheckedChange={() => toggleSelect(c.id)} />
-                    <span className="font-medium text-foreground">{c.searchTerm}</span>
-                  </div>
+                  <span className="font-medium text-foreground">{c.searchTerm}</span>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className={matchColors[c.suggestedMatchType]}>
                       {c.suggestedMatchType}

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -7,14 +6,12 @@ import {
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockPageTypes, pageTypesTotals } from "@/data/mockPageTypePlatform";
-import { cn } from "@/lib/utils";
 
 interface PageTypeTableProps {
   searchQuery?: string;
 }
 
 export function PageTypeTable({ searchQuery = "" }: PageTypeTableProps) {
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [bidModifiers, setBidModifiers] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
     mockPageTypes.forEach((pt) => { initial[pt.id] = pt.bidModifier; });
@@ -24,18 +21,6 @@ export function PageTypeTable({ searchQuery = "" }: PageTypeTableProps) {
   const filteredTypes = mockPageTypes.filter((pt) =>
     pt.pageType.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const toggleRow = (id: string) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) newSelected.delete(id);
-    else newSelected.add(id);
-    setSelectedRows(newSelected);
-  };
-
-  const toggleAll = () => {
-    if (selectedRows.size === filteredTypes.length) setSelectedRows(new Set());
-    else setSelectedRows(new Set(filteredTypes.map((pt) => pt.id)));
-  };
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
@@ -55,7 +40,6 @@ export function PageTypeTable({ searchQuery = "" }: PageTypeTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-10"><Checkbox checked={selectedRows.size === filteredTypes.length && filteredTypes.length > 0} onCheckedChange={toggleAll} /></TableHead>
               <TableHead className="min-w-[180px]">Page Type</TableHead>
               <TableHead className="w-32 text-right">Bid Modifier %</TableHead>
               <TableHead className="text-right">Impressions</TableHead>
@@ -70,8 +54,7 @@ export function PageTypeTable({ searchQuery = "" }: PageTypeTableProps) {
           </TableHeader>
           <TableBody>
             {filteredTypes.map((pageType) => (
-              <TableRow key={pageType.id} className={cn("transition-colors", selectedRows.has(pageType.id) && "bg-primary/5")}>
-                <TableCell><Checkbox checked={selectedRows.has(pageType.id)} onCheckedChange={() => toggleRow(pageType.id)} /></TableCell>
+              <TableRow key={pageType.id}>
                 <TableCell className="font-medium text-foreground">{pageType.pageType}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
@@ -90,7 +73,7 @@ export function PageTypeTable({ searchQuery = "" }: PageTypeTableProps) {
               </TableRow>
             ))}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={3} className="font-semibold">Total ({filteredTypes.length} page types)</TableCell>
+              <TableCell colSpan={2} className="font-semibold">Total ({filteredTypes.length} page types)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(pageTypesTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(pageTypesTotals.clicks)}</TableCell>
               <TableCell className="text-right text-foreground">{formatPercent(pageTypesTotals.ctr)}</TableCell>

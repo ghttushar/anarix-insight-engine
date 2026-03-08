@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { ScheduledJobsTable } from "@/components/dayparting/ScheduledJobsTable";
 import { Button } from "@/components/ui/button";
-import { Plus, Pause, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { schedules as initialSchedules } from "@/data/mockDayParting";
 import { DayPartingSchedule } from "@/types/dayparting";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +14,6 @@ export default function ScheduledJobs() {
   const navigate = useNavigate();
   const [schedules, setSchedules] = useState<DayPartingSchedule[]>(initialSchedules);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const filteredSchedules = schedules.filter((s) =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -30,21 +29,6 @@ export default function ScheduledJobs() {
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this schedule?")) {
       setSchedules((prev) => prev.filter((s) => s.id !== id));
-      setSelectedIds((prev) => prev.filter((i) => i !== id));
-    }
-  };
-
-  const handleBulkPause = () => {
-    setSchedules((prev) => prev.map((s) => selectedIds.includes(s.id) && s.status === "active" ? { ...s, status: "paused", updatedAt: new Date().toISOString() } : s));
-    setSelectedIds([]);
-    toast.info("Selected schedules paused.");
-  };
-
-  const handleBulkDelete = () => {
-    if (confirm(`Are you sure you want to delete ${selectedIds.length} schedule(s)?`)) {
-      setSchedules((prev) => prev.filter((s) => !selectedIds.includes(s.id)));
-      setSelectedIds([]);
-      toast.success("Schedules deleted.");
     }
   };
 
@@ -61,29 +45,16 @@ export default function ScheduledJobs() {
           }
         />
 
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1">
-            <DataTableToolbar
-              searchValue={searchQuery}
-              onSearchChange={setSearchQuery}
-              searchPlaceholder="Search schedules..."
-              onDownload={() => toast.success("Exporting schedules...")}
-            />
-          </div>
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-sm text-muted-foreground">{selectedIds.length} selected</span>
-              <Button variant="outline" size="sm" onClick={handleBulkPause}><Pause className="mr-2 h-4 w-4" />Pause</Button>
-              <Button variant="outline" size="sm" onClick={handleBulkDelete} className="text-destructive hover:text-destructive"><Trash2 className="mr-2 h-4 w-4" />Delete</Button>
-            </div>
-          )}
-        </div>
+        <DataTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search schedules..."
+          onDownload={() => toast.success("Exporting schedules...")}
+        />
 
         {filteredSchedules.length > 0 ? (
           <ScheduledJobsTable
             schedules={filteredSchedules}
-            selectedIds={selectedIds}
-            onSelectionChange={setSelectedIds}
             onPauseResume={handlePauseResume}
             onDelete={handleDelete}
           />

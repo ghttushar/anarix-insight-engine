@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -20,25 +18,11 @@ const matchTypeColors: Record<string, string> = {
 };
 
 export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-
   const filteredTerms = mockSearchTerms.filter((term) =>
     term.searchTerm.toLowerCase().includes(searchQuery.toLowerCase()) ||
     term.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     term.keyword.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const toggleRow = (id: string) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) newSelected.delete(id);
-    else newSelected.add(id);
-    setSelectedRows(newSelected);
-  };
-
-  const toggleAll = () => {
-    if (selectedRows.size === filteredTerms.length) setSelectedRows(new Set());
-    else setSelectedRows(new Set(filteredTerms.map((t) => t.id)));
-  };
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
@@ -58,7 +42,6 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-10"><Checkbox checked={selectedRows.size === filteredTerms.length && filteredTerms.length > 0} onCheckedChange={toggleAll} /></TableHead>
               <TableHead className="min-w-[200px]">Search Term</TableHead>
               <TableHead className="min-w-[250px]">Product Ad</TableHead>
               <TableHead className="min-w-[150px]">Keyword</TableHead>
@@ -76,8 +59,7 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredTerms.map((term) => (
-              <TableRow key={term.id} className={cn("transition-colors", selectedRows.has(term.id) && "bg-primary/5")}>
-                <TableCell><Checkbox checked={selectedRows.has(term.id)} onCheckedChange={() => toggleRow(term.id)} /></TableCell>
+              <TableRow key={term.id}>
                 <TableCell className="font-medium text-foreground">{term.searchTerm}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -102,7 +84,7 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
               </TableRow>
             ))}
             <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
-              <TableCell colSpan={7} className="font-semibold">Total ({filteredTerms.length} search terms)</TableCell>
+              <TableCell colSpan={6} className="font-semibold">Total ({filteredTerms.length} search terms)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.clicks)}</TableCell>
               <TableCell className="text-right text-foreground">{formatPercent(searchTermsTotals.ctr)}</TableCell>
