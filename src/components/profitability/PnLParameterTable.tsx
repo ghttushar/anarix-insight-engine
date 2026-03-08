@@ -106,8 +106,8 @@ export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
     <div className="rounded-lg border border-border bg-card overflow-x-auto">
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/50">
-            <TableHead className="sticky left-0 z-10 bg-muted/50 min-w-[200px]">
+          <TableRow className="bg-muted">
+            <TableHead className="sticky left-0 z-10 bg-muted min-w-[200px]">
               Parameter / Date
             </TableHead>
             {weeks.map((week) => (
