@@ -199,6 +199,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <DensityProvider>
+        <CurrencyProvider>
         <AccountProvider>
           <MarketplaceProvider defaultMarketplace="walmart">
             <FilterProvider>
