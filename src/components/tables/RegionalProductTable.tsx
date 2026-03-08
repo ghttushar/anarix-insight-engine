@@ -3,13 +3,12 @@ import {
 } from "@/components/ui/table";
 import { profitabilityProducts } from "@/data/mockProfitability";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface RegionalProductTableProps {
   searchValue?: string;
 }
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(value);
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
 
 // Assign products to regions for the product-level geo view
@@ -20,6 +19,7 @@ const regionAssignments = [
 ];
 
 export function RegionalProductTable({ searchValue = "" }: RegionalProductTableProps) {
+  const { formatCurrency } = useCurrency();
   const filtered = regionAssignments.map((ra) => ({
     ...ra,
     products: ra.products.filter((p) =>

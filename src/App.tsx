@@ -8,6 +8,7 @@ import { MarketplaceProvider } from "@/contexts/MarketplaceContext";
 import { FilterProvider } from "@/contexts/FilterContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { DensityProvider } from "@/contexts/DensityContext";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { AccountProvider, useAccounts } from "@/contexts/AccountContext";
 import { VisualEffectsProvider } from "@/contexts/VisualEffectsContext";
 import { FeatureToggleProvider } from "@/contexts/FeatureToggleContext";
@@ -198,6 +199,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <DensityProvider>
+        <CurrencyProvider>
         <AccountProvider>
           <MarketplaceProvider defaultMarketplace="walmart">
             <FilterProvider>
@@ -225,6 +227,7 @@ const App = () => (
             </FilterProvider>
           </MarketplaceProvider>
         </AccountProvider>
+        </CurrencyProvider>
       </DensityProvider>
     </ThemeProvider>
   </QueryClientProvider>

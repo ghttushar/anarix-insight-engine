@@ -1,18 +1,11 @@
 import { GeographicalData } from "@/types/profitability";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface RegionStatsPanelProps {
   region: GeographicalData;
   dateRange: string;
 }
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(value);
-};
 
 const formatNumber = (value: number) => {
   return new Intl.NumberFormat("en-US").format(value);
@@ -21,6 +14,7 @@ const formatNumber = (value: number) => {
 const formatPercent = (value: number) => `${value.toFixed(1)}%`;
 
 export function RegionStatsPanel({ region, dateRange }: RegionStatsPanelProps) {
+  const { formatCurrency } = useCurrency();
   const refundRate = (region.refunds / region.orders) * 100;
   const margin = ((region.sales - region.amazonFees) / region.sales) * 100;
   const roi = (region.sales / region.amazonFees) * 100;

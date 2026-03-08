@@ -13,18 +13,11 @@ import {
 } from "@/components/ui/table";
 import { CatalogProduct, ColumnGroup } from "@/types/catalog";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface CatalogProductsTableProps {
   products: CatalogProduct[];
 }
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(value);
-};
 
 const formatNumber = (value: number) => {
   return new Intl.NumberFormat("en-US").format(value);
@@ -38,6 +31,7 @@ const initialColumnGroups: ColumnGroup[] = [
 ];
 
 export function CatalogProductsTable({ products }: CatalogProductsTableProps) {
+  const { formatCurrency } = useCurrency();
   const [columnGroups, setColumnGroups] = useState<ColumnGroup[]>(initialColumnGroups);
   const [filters, setFilters] = useState<{ field: string; value: string }[]>([
     { field: "Status", value: "PUBLISHED" },

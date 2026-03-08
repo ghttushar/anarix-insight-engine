@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const statusStyles: Record<string, string> = {
   active: "bg-success/10 text-success border-success/20",
@@ -18,12 +19,8 @@ const statusStyles: Record<string, string> = {
   paused: "bg-warning/10 text-warning border-warning/20",
 };
 
-const formatCurrency = (v: number) => {
-  const abs = Math.abs(v);
-  return `${v < 0 ? "-" : ""}$${abs.toLocaleString()}`;
-};
-
 function BacktestChart({ selectedRule, backtestData }: { selectedRule: AutomationRule | null; backtestData: { date: string; savings: number; revenueLoss: number }[] }) {
+  const { formatCurrency } = useCurrency();
   const [chartType, setChartType] = useState<ChartType>("bar");
   const [activeMetrics, setActiveMetrics] = useState<string[]>(["savings", "revenueLoss"]);
 
@@ -99,6 +96,7 @@ function BacktestChart({ selectedRule, backtestData }: { selectedRule: Automatio
 }
 
 export default function RuleBuilder() {
+  const { formatCurrency } = useCurrency();
   const [selectedRule, setSelectedRule] = useState<AutomationRule | null>(mockRules[0]);
 
   const backtestData = selectedRule?.backtestResult?.dailyResults.slice(-14).map((d) => ({

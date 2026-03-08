@@ -1,3 +1,4 @@
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -24,8 +25,7 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
     term.keyword.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+  const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 

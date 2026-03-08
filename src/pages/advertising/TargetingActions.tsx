@@ -13,6 +13,7 @@ import { Plus, Archive } from "lucide-react";
 import { mockTargetingActions, mockTargetCampaigns, mockTargetAdGroups } from "@/data/mockTargetingActions";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 type ActionTab = "keyword-action" | "history" | "archive";
 
@@ -38,7 +39,7 @@ export default function TargetingActions() {
     return matchesSearch && !action.archived;
   });
 
-  const formatCurrency = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+  const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 

@@ -9,6 +9,7 @@ import { Sparkles, Plus, X, Search, Download } from "lucide-react";
 import { mockHarvestCandidates, type HarvestCandidate } from "@/data/mockSearchHarvesting";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const matchColors: Record<string, string> = {
   exact: "bg-primary/10 text-primary border-primary/20",
@@ -16,9 +17,8 @@ const matchColors: Record<string, string> = {
   broad: "bg-muted text-muted-foreground border-muted",
 };
 
-const formatCurrency = (v: number) => `$${v.toFixed(2)}`;
-
 export default function SearchHarvesting() {
+  const { formatCurrency } = useCurrency();
   const [candidates, setCandidates] = useState(mockHarvestCandidates);
   const [searchQuery, setSearchQuery] = useState("");
 

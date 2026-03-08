@@ -10,25 +10,20 @@ import {
 } from "@/components/ui/table";
 import { PnLRow } from "@/types/profitability";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface PnLParameterTableProps {
   data: PnLRow[];
   weeks: string[];
 }
 
-const formatValue = (value: number | null, isCurrency: boolean = true): string => {
-  if (value === null) return "-";
-  if (isCurrency) {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(value);
-  }
-  return new Intl.NumberFormat("en-US").format(value);
-};
-
 export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
+  const { formatCurrency } = useCurrency();
+  const formatValue = (value: number | null, isCurrency: boolean = true): string => {
+    if (value === null) return "-";
+    if (isCurrency) return formatCurrency(value);
+    return new Intl.NumberFormat("en-US").format(value);
+  };
   const [expandedRows, setExpandedRows] = useState<Set<string>>(() => {
     const initial = new Set<string>();
     data.forEach((row) => {
