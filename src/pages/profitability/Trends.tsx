@@ -168,8 +168,8 @@ export default function ProfitabilityTrends() {
               </TableBody>
             </Table>
           </div>
+          </div>
         </div>
-      </div>
 
       <ProductTrendsModal product={trendsProduct} isOpen={!!trendsProduct} onClose={() => setTrendsProduct(null)} />
     </AppLayout>
