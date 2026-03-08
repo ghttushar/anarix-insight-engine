@@ -105,7 +105,7 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
               </span>
               <div
                 className={cn(
-                  "flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-medium",
+                  "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
                   isNeutral
                     ? "bg-muted text-muted-foreground"
                     : isPositive
