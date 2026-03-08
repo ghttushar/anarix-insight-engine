@@ -31,6 +31,7 @@ const initialColumnGroups: ColumnGroup[] = [
 ];
 
 export function CatalogProductsTable({ products }: CatalogProductsTableProps) {
+  const { formatCurrency } = useCurrency();
   const [columnGroups, setColumnGroups] = useState<ColumnGroup[]>(initialColumnGroups);
   const [filters, setFilters] = useState<{ field: string; value: string }[]>([
     { field: "Status", value: "PUBLISHED" },
