@@ -96,22 +96,21 @@ export default function ProfitabilityTrends() {
 
         <ScatterPlotChart data={scatterData} />
 
-        <div className="rounded-lg border border-border bg-card">
-          <div className="border-b border-border p-4">
-            <DataTableToolbar
-              searchValue={searchValue}
-              onSearchChange={setSearchValue}
-              searchPlaceholder="Search by Item ID / Product Name / SKU..."
-              columns={columns}
-              onColumnToggle={(id) => setColumns((prev) => prev.map((c) => c.id === id ? { ...c, visible: !c.visible } : c))}
-              onSelectAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: true })))}
-              onClearAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: false })))}
-              activeFilters={activeFilters}
-              onFiltersChange={setActiveFilters}
-              filterFields={FILTER_FIELDS}
-              onDownload={handleDownload}
-            />
-          </div>
+        <div className="space-y-3">
+          <DataTableToolbar
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            searchPlaceholder="Search by Item ID / Product Name / SKU..."
+            columns={columns}
+            onColumnToggle={(id) => setColumns((prev) => prev.map((c) => c.id === id ? { ...c, visible: !c.visible } : c))}
+            onSelectAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: true })))}
+            onClearAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: false })))}
+            activeFilters={activeFilters}
+            onFiltersChange={setActiveFilters}
+            filterFields={FILTER_FIELDS}
+            onDownload={handleDownload}
+          />
+          <div className="rounded-lg border border-border">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
