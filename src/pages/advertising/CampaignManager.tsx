@@ -39,6 +39,7 @@ const tabs = [
   { value: "ad-groups", label: "Ad Groups", count: mockAdGroups.length },
   { value: "product-ads", label: "Product Ads", count: mockProductAds.length },
   { value: "keywords", label: "Keyword Targeting", count: mockKeywords.length },
+  { value: "product-targeting", label: "Product Targeting", count: mockProductTargets.length },
   { value: "search-terms", label: "Search Terms", count: mockSearchTerms.length },
   { value: "page-type", label: "Page Type", count: mockPageTypes.length },
   { value: "platform", label: "Platform", count: mockPlatforms.length },
