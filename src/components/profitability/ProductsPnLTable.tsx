@@ -26,8 +26,8 @@ const formatNumber = (value: number) =>
 
 const ALL_COLUMNS = [
   { id: "units", label: "Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.units) },
-  { id: "refundUnits", label: "Refund Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.refundUnits), className: "text-red-500" },
-  { id: "cancelledUnits", label: "Cancelled Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.cancelledUnits), className: "text-orange-500" },
+  { id: "refundUnits", label: "Refund Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.refundUnits) },
+  { id: "cancelledUnits", label: "Cancelled Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.cancelledUnits) },
   { id: "gmv", label: "GMV", getValue: (p: ProfitabilityProduct) => formatCurrency(p.gmv) },
   { id: "authSales", label: "Auth Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.authSales) },
   { id: "refundSales", label: "Refund Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.refundSales), className: "text-red-500" },
