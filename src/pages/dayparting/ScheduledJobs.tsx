@@ -15,6 +15,8 @@ export default function ScheduledJobs() {
   const navigate = useNavigate();
   const [schedules, setSchedules] = useState<DayPartingSchedule[]>(initialSchedules);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null);
 
   const filteredSchedules = schedules.filter((s) =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
