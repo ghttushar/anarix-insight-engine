@@ -18,6 +18,12 @@ interface PnLParameterTableProps {
 }
 
 export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
+  const { formatCurrency } = useCurrency();
+  const formatValue = (value: number | null, isCurrency: boolean = true): string => {
+    if (value === null) return "-";
+    if (isCurrency) return formatCurrency(value);
+    return new Intl.NumberFormat("en-US").format(value);
+  };
   const [expandedRows, setExpandedRows] = useState<Set<string>>(() => {
     const initial = new Set<string>();
     data.forEach((row) => {
