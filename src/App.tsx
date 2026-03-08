@@ -31,7 +31,9 @@ import BudgetPacing from "./pages/advertising/BudgetPacing";
 import SearchHarvesting from "./pages/advertising/SearchHarvesting";
 import AnomalyAlerts from "./pages/advertising/AnomalyAlerts";
 import CreativeAnalyzer from "./pages/advertising/CreativeAnalyzer";
-import RuleBuilder from "./pages/advertising/RuleBuilder";
+import RuleAgents from "./pages/advertising/RuleAgents";
+import RuleCreation from "./pages/advertising/RuleCreation";
+import AppliedRules from "./pages/advertising/AppliedRules";
 
 // Profitability
 import ProfitabilityDashboard from "./pages/profitability/Dashboard";
