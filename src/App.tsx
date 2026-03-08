@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MarketplaceProvider } from "@/contexts/MarketplaceContext";
 import { FilterProvider } from "@/contexts/FilterContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ColorSchemeProvider } from "@/contexts/ColorSchemeContext";
 import { DensityProvider } from "@/contexts/DensityContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { AccountProvider, useAccounts } from "@/contexts/AccountContext";
