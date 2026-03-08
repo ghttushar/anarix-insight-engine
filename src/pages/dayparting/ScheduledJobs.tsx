@@ -67,7 +67,7 @@ export default function ScheduledJobs() {
           <ScheduledJobsTable
             schedules={filteredSchedules}
             onPauseResume={handlePauseResume}
-            onDelete={handleDelete}
+            onDelete={handleDeleteClick}
           />
         ) : (
           <div className="text-center py-12 border border-border rounded-lg bg-card">
