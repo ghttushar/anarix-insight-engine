@@ -4,11 +4,13 @@ import { ThemeSwitcher } from "@/components/settings/ThemeSwitcher";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDensity } from "@/contexts/DensityContext";
+import { useCurrency, CURRENCIES } from "@/contexts/CurrencyContext";
 import { useVisualEffects } from "@/contexts/VisualEffectsContext";
 import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
 import { cn } from "@/lib/utils";
-import { Pencil, RotateCcw } from "lucide-react";
+import { Pencil, RotateCcw, Globe } from "lucide-react";
 import { toast } from "sonner";
 
 const CUSTOM_SHORTCUTS_KEY = "anarix-custom-shortcuts";
