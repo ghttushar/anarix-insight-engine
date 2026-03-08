@@ -155,9 +155,18 @@ export default function Accounts() {
     }, 2000);
   };
 
-  const handleRemove = (id: string) => {
-    removeAccount(id);
-    toast.success("Account disconnected");
+  const handleRemoveClick = (id: string) => {
+    setAccountToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmRemove = () => {
+    if (accountToDelete) {
+      removeAccount(accountToDelete);
+      toast.success("Account disconnected");
+      setAccountToDelete(null);
+    }
+    setDeleteDialogOpen(false);
   };
 
   return (
