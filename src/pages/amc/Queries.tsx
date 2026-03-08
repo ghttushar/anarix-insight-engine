@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { mockQueries } from "@/data/mockAMC";
 import { Plus, Play, MoreHorizontal, Calendar, Clock } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
