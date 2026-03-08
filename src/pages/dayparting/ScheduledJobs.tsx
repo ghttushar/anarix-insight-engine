@@ -29,10 +29,18 @@ export default function ScheduledJobs() {
     );
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this schedule?")) {
-      setSchedules((prev) => prev.filter((s) => s.id !== id));
+  const handleDeleteClick = (id: string) => {
+    setScheduleToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (scheduleToDelete) {
+      setSchedules((prev) => prev.filter((s) => s.id !== scheduleToDelete));
+      toast.success("Schedule deleted successfully");
+      setScheduleToDelete(null);
     }
+    setDeleteDialogOpen(false);
   };
 
   return (
