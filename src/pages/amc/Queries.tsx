@@ -30,6 +30,8 @@ export default function AMCQueries() {
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [selectedTime, setSelectedTime] = useState(format(new Date(), "HH:mm"));
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [queryToDelete, setQueryToDelete] = useState<string | null>(null);
 
   const filteredQueries = mockQueries.filter((q) =>
     q.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
