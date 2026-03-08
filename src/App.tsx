@@ -31,7 +31,9 @@ import BudgetPacing from "./pages/advertising/BudgetPacing";
 import SearchHarvesting from "./pages/advertising/SearchHarvesting";
 import AnomalyAlerts from "./pages/advertising/AnomalyAlerts";
 import CreativeAnalyzer from "./pages/advertising/CreativeAnalyzer";
-import RuleBuilder from "./pages/advertising/RuleBuilder";
+import RuleAgents from "./pages/advertising/RuleAgents";
+import RuleCreation from "./pages/advertising/RuleCreation";
+import AppliedRules from "./pages/advertising/AppliedRules";
 
 // Profitability
 import ProfitabilityDashboard from "./pages/profitability/Dashboard";
@@ -145,7 +147,11 @@ function AppRoutes() {
       <Route path="/advertising/search-harvesting" element={<SearchHarvesting />} />
       <Route path="/advertising/anomaly-alerts" element={<AnomalyAlerts />} />
       <Route path="/advertising/creative-analyzer" element={<CreativeAnalyzer />} />
-      <Route path="/advertising/rules" element={<RuleBuilder />} />
+      <Route path="/advertising/rules/agents" element={<RuleAgents />} />
+      <Route path="/advertising/rules/applied" element={<AppliedRules />} />
+      <Route path="/advertising/rules/create" element={<RuleCreation />} />
+      <Route path="/advertising/rules/create/:templateId" element={<RuleCreation />} />
+      <Route path="/advertising/rules/edit/:ruleId" element={<RuleCreation />} />
 
       {/* Catalog */}
       <Route path="/catalog/products" element={<CatalogProducts />} />

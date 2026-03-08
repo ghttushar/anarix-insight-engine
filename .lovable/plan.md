@@ -1,101 +1,180 @@
 
 
-# Rules Module — Complete Rebuild
+# Phased Implementation Plan: Full App Polish, Fixes, and New Features
 
-## Current State
-The existing `RuleBuilder.tsx` is a simple backtesting dashboard with 4 hardcoded mock rules. The reference images reveal a **significantly more complex** system with 3 distinct views and a dedicated sidebar section.
+This is a massive scope. To be transparent: implementing everything in a single pass will exceed credit limits. I am breaking this into **6 sequential phases**. You approve and I execute one phase at a time.
 
-## What the Reference Images Show
+---
 
-### Image 1 — Rule Agents (Landing Page)
-- Header: "Create Rules with AI" with AI prompt input + "Create Rule" button
-- Scrollable suggestion chips carousel (e.g. "Find underperforming products to optimize")
-- **Campaign Rules** grid (3×3): Inventory Rule, Platform Rule, Placement Rule, Share of Voice Rule, State Change Rule, Budget Rule, Bidding Strategy Rule, Bidder Rule, Keyword Harvesting Rule
-- **Targeting Rules** grid (1×2): Keyword Rule, Target Rule
-- Each template card shows name + subtitle description
+## Phase 1: Core Layout, Panel, and Table Fixes (Foundation)
 
-### Image 2 — Rule Creation Form
-- **Basic Information**: Rule Name input, Status toggle, Lookback Window dropdown, Date Range picker, Frequency dropdown
-- **Advanced Settings**: Collapsible section
-- **Criteria Information**: Info banner explaining criteria usage
-  - Priority numbered criteria blocks (1, 2, ...) with name input
-  - Each criteria has N conditions: Metric dropdown, Operator dropdown, Value type (Absolute) + number input
-  - Action section per criteria: Action dropdown (Set bid to) + value input
-  - Buttons: Duplicate Criteria, Delete Criteria, + Add Condition
-- Footer: + Add Criteria, Save & Draft, Home, Select Campaigns →
+These are the broken fundamentals that affect every page.
 
-### Image 3 — Applied Rules Table
-- Columns: Rule Name, Rule Type, Entities Count (# of campaigns/targets attached), Frequency, Last Run, Status, Actions (Edit button)
-- Sortable columns, pagination (Rows per page selector)
+### 1a. Insights Panel — Remove backdrop blur
+**File: `src/components/insights/InsightsPanel.tsx`** line 27
+- Remove `bg-black/4 backdrop-blur-[1px]` from backdrop div
+- Replace with `bg-transparent`
 
-### Image 4 — Sidebar Navigation
-- "Rules" group with sub-items: "Agents" and "Applied Rules"
+### 1b. All right panels — open on same layer, not on top of app
+Right panels (PeriodBreakdownPanel, ProductDetailPanel, InsightsPanel) currently use `fixed` positioning with `z-50`, which covers the entire app. Change to inline flex layout within AppLayout, same pattern as AanCopilotPanel (which is already inline).
 
-## Plan
+**Files:**
+- `src/components/layout/AppLayout.tsx` — Add slots for right panels inline (not fixed overlay)
+- `src/components/profitability/PeriodBreakdownPanel.tsx` — Convert from `fixed` to inline flex panel
+- `src/components/profitability/ProductDetailPanel.tsx` — Same conversion
+- `src/components/insights/InsightsPanel.tsx` — Same conversion
 
-### 1. Update Sidebar Navigation
+### 1c. Independent scroll on all right panels
+All panels already use `ScrollArea` but some have containment issues. Ensure each panel has `h-full flex flex-col` with `overflow-hidden` outer and `overflow-y-auto` inner.
+
+### 1d. Table hover overlap fix
+The `overflow-auto` wrapper on `Table` causes hover states to visually overlap when scrolling horizontally. Fix by adding `relative` to `TableRow` and ensuring the hover bg doesn't bleed.
+
+**File: `src/components/ui/table.tsx`** — Add `relative` to `TableRow`
+
+### 1e. Unified table styling
+All tables must use the same `Table` component from `src/components/ui/table.tsx`. Audit all table pages to ensure consistent row height (44px), padding (px-3 py-2), and header styling.
+
+### 1f. Taskbar redesign — proper grouping and labels
+**File: `src/components/layout/AppTaskbar.tsx`**
+- Replace "All" with "Ad Type: All" or use full-form labels so users know what each dropdown is
+- Increase height from `h-10` to `h-12`
+- Use `bg-muted/30 rounded-md px-2 py-1` container around the left-side filter group
+- Proper alignment with consistent spacing
+
+### 1g. Sidebar — remove collapse button from footer, fix nav collapse behavior
 **File: `src/components/layout/AppSidebar.tsx`**
-- Replace single "Rule Builder" item with a "Rules" group containing:
-  - "Agents" → `/advertising/rules/agents`
-  - "Applied Rules" → `/advertising/rules/applied`
+- Remove the Collapse button from the footer entirely (sidebar already has the nook arrow on its edge)
+- Fix navigation: clicking a nav item (e.g., "Campaign Manager") should NOT collapse the parent section ("Advertising"). The active section should stay open. Only manually clicking the section header should toggle it.
+- Keep Profile + Theme toggle in footer, give them more breathing room
 
-### 2. Create Mock Data
-**File: `src/data/mockRules.ts`** (replace `mockRuleBuilder.ts`)
-- `RuleTemplate` interface: id, name, description, category ("campaign" | "targeting")
-- `ruleTemplates[]`: 11 templates matching the grid (Inventory, Platform, Placement, SOV, State Change, Budget, Bidding Strategy, Bidder, Keyword Harvesting, Keyword, Target)
-- `AppliedRule` interface: id, name, ruleType, entitiesCount, entityLabel, frequency, lastRun, status
-- `appliedRules[]`: mock data for the Applied Rules table
-- `RuleCriteria` interface: priority, name, conditions[] (metric, operator, valueType, value), action (type, value)
-- Metric/operator/action option lists
+### 1h. Remove duplicate controls
+Several pages have their own date range / frequency selectors that duplicate the universal taskbar. Remove page-level duplicates from:
+- `src/pages/dayparting/HourlyData.tsx` (has its own Date Range selector)
+- `src/pages/advertising/TargetingActions.tsx` (has its own Date Range selector)
+- Any other page with redundant controls
 
-### 3. Rule Agents Page
-**File: `src/pages/advertising/RuleAgents.tsx`**
-- AI prompt section: text input + "Create Rule" button
-- Suggestion chips carousel with left/right arrows and dot indicators
-- Campaign Rules section: 3-column grid of template cards
-- Targeting Rules section: 2-column grid of template cards
-- Clicking a template → navigates to Rule Creation with template pre-selected
+---
 
-### 4. Rule Creation Page
-**File: `src/pages/advertising/RuleCreation.tsx`**
-- **Basic Information** card: Rule Name input, Status toggle, Lookback Window select, Date Range picker, Frequency select
-- **Advanced Settings**: Collapsible section (empty placeholder)
-- **Criteria Information** card: Info banner + dynamic criteria blocks
-  - Each criteria: priority number select, name input, Duplicate/Delete/Add Condition buttons
-  - Each condition: Metric select, Operator select, Value Type select + number input, delete button
-  - Action row: action type select + value input
-- **+ Add Criteria** button at bottom left
-- **Footer bar**: Save & Draft, Home, Select Campaigns buttons
-- All state managed locally with `useState` — add/remove criteria, add/remove conditions
+## Phase 2: Unified DataTableToolbar Everywhere + Toolbar Position Consistency
 
-### 5. Applied Rules Page
-**File: `src/pages/advertising/AppliedRules.tsx`**
-- Table with columns: Rule Name, Rule Type, Entities Count, Frequency, Last Run, Status, Actions
-- Rule Name as clickable link (brand.primary color)
-- Entities Count as clickable link
-- Edit button per row → navigates to Rule Creation with data pre-filled
-- Pagination with rows-per-page selector
-- Sortable column headers
+### 2a. Toolbar layout consistency
+In Profitability Dashboard, the search bar is part of DataTableToolbar (right-aligned). In the reference images (image-67, image-68), the search is on the LEFT and action buttons (Upload COGS, Export, Columns, Filter, Download) are on the RIGHT.
 
-### 6. Update Routes
-**File: `src/App.tsx`**
-- Replace `/advertising/rules` route with:
-  - `/advertising/rules/agents` → `RuleAgents`
-  - `/advertising/rules/applied` → `AppliedRules`
-  - `/advertising/rules/create` → `RuleCreation`
-  - `/advertising/rules/create/:templateId` → `RuleCreation` (with template)
-  - `/advertising/rules/edit/:ruleId` → `RuleCreation` (edit mode)
+**File: `src/components/advertising/DataTableToolbar.tsx`**
+- Restructure: Search on LEFT, Columns + Filter + Download on RIGHT
+- This makes all pages consistent
 
-### 7. Clean Up
-- Delete or repurpose `src/pages/advertising/RuleBuilder.tsx` (replace with redirect or remove)
-- Keep `src/data/mockRuleBuilder.ts` for backtest data if needed, or merge into new mock file
+### 2b. Apply DataTableToolbar to ALL table pages
+Every page with a table must use the same `DataTableToolbar` with appropriate `COLUMN_DEFS` and `FILTER_FIELDS`:
+- Catalog Products table
+- BI Keyword Tracker
+- Day Parting tables
+- AMC tables
+- All advertising sub-tables that don't already have it
 
-### Files Modified/Created
-- **Modify**: `src/components/layout/AppSidebar.tsx` — sidebar nav update
-- **Modify**: `src/App.tsx` — route updates
-- **Create**: `src/data/mockRules.ts` — new comprehensive mock data
-- **Create**: `src/pages/advertising/RuleAgents.tsx` — agents/templates landing
-- **Create**: `src/pages/advertising/RuleCreation.tsx` — full rule builder form
-- **Create**: `src/pages/advertising/AppliedRules.tsx` — applied rules table
-- **Delete**: `src/pages/advertising/RuleBuilder.tsx` — replaced by new pages
+---
+
+## Phase 3: Page-Specific Fixes
+
+### 3a. Targeting Actions — fix Broad/Exact/Phrase layout
+The checkbox + bid input stack is cramped. Restructure to horizontal layout with proper spacing. Checkbox above, bid input below, centered in cell.
+
+### 3b. Day Parting Heatmap — use brand color tints
+**File: `src/components/dayparting/HourlyHeatmap.tsx`**
+- Replace generic `bg-destructive/20`, `bg-warning/30`, `bg-success/50` with brand periwinkle tints:
+  - Lowest: `bg-primary/5`
+  - Low: `bg-primary/15`
+  - Medium: `bg-primary/30`
+  - High: `bg-primary/50`
+  - Highest: `bg-primary/70`
+- Remove the days checkbox row from HourlyData page
+
+### 3c. Schedule Editor redesign
+**File: `src/pages/dayparting/ScheduleEditor.tsx`**
+- Currently `max-w-4xl` which wastes right side. Use full width with two-column layout:
+  - Left: Form fields (schedule name, action type, campaigns)
+  - Right: Time grid + day selector + preview
+- Remove Card wrappers, use section headers instead
+
+### 3d. PeriodBreakdownPanel — "View More" opens inline, not overlay
+Already addressed in Phase 1b.
+
+---
+
+## Phase 4: New Feature Pages (Part 1)
+
+Create the first 5 competitive features as new pages with routes:
+
+### 4a. Budget Pacing Dashboard
+- New route: `/advertising/budget-pacing`
+- New file: `src/pages/advertising/BudgetPacing.tsx`
+- Visual timeline showing daily budget burn rate vs target
+- Projected overspend/underspend alerts
+- Campaign-level pacing cards
+
+### 4b. Search Term Harvesting
+- New route: `/advertising/search-harvesting`
+- New file: `src/pages/advertising/SearchHarvesting.tsx`
+- Cards showing high-performing search terms
+- "Add as Keyword" action with match type + bid suggestion
+- Aan AI explanation per term
+
+### 4c. Marketplace Health Score
+- New route: `/workspace/health-score`
+- New file: `src/pages/workspace/HealthScore.tsx`
+- Single composite score (0-100) with circular progress
+- Breakdown: profitability, ad efficiency, inventory health, keyword coverage
+
+### 4d. Cross-Marketplace Unified P&L
+- New route: `/profitability/unified-pnl`
+- New file: `src/pages/profitability/UnifiedPnL.tsx`
+- Side-by-side Amazon + Walmart P&L with Combined column
+
+### 4e. Aan Anomaly Alerts
+- New route: part of existing Insights system
+- Enhance `src/components/insights/InsightsContext.tsx` with anomaly detection alerts
+- In-app notification bell in sidebar
+
+---
+
+## Phase 5: New Feature Pages (Part 2)
+
+### 5a. Creative Performance Analyzer
+- New route: `/advertising/creative-analyzer`
+- Upload creatives, correlation analysis with CTR/CVR
+
+### 5b. Competitor Price Tracking
+- New route: `/bi/competitor-pricing`
+- Price timeline chart, correlation with own sales
+
+### 5c. Rule Builder with Backtesting
+- New route: `/advertising/rules`
+- Rule definition form + historical simulation chart
+
+### 5d. Inventory-Aware Ad Optimization
+- New route: `/catalog/inventory-ads`
+- Stock level + ad spend correlation dashboard
+
+### 5e. Client Reporting Portal
+- New route: `/reports/client-portal`
+- Report builder, PDF preview, schedule configuration
+
+---
+
+## Phase 6: Final Polish Pass
+
+- Verify every button works (toast feedback minimum)
+- Verify all panels have independent scroll
+- Verify all tables are visually identical
+- Verify no duplicate controls
+- Verify sidebar navigation behavior
+
+---
+
+## Recommended Execution
+
+Each phase is one approval cycle. Phase 1 is the most critical — it fixes the broken foundation. Phases 4-5 add new pages. Phase 6 is the final audit.
+
+**I recommend starting with Phase 1 now.** It addresses the most user-visible issues: panel blur, overlay behavior, table styling, taskbar design, sidebar behavior, and duplicate controls.
 
