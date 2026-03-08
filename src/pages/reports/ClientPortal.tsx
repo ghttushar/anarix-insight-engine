@@ -101,7 +101,7 @@ export default function ClientPortal() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Total Reports</p>
-            <p className="text-xl font-semibold text-foreground">{mockClientReports.length}</p>
+            <p className="text-xl font-semibold text-foreground">{reports.length}</p>
           </CardContent></Card>
           <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Clients</p>
