@@ -219,9 +219,9 @@ export function CatalogProductsTable({ products }: CatalogProductsTableProps) {
 
           <TableBody>
             {products.map((product) => (
-              <TableRow key={product.id} className="hover:bg-muted/30">
+              <TableRow key={product.id} className="hover:bg-muted/30 group">
                 {/* Product Details - Sticky */}
-                <TableCell className="sticky left-0 z-10 bg-card min-w-[350px]">
+                <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted min-w-[350px] transition-colors">
                   <div className="flex items-center gap-3">
                     <img
                       src={product.image}
