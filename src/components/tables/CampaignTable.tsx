@@ -36,7 +36,6 @@ function formatPercent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
-const STATUS_OPTIONS: CampaignStatus[] = ["live", "paused", "archived", "scheduled", "out_of_budget", "completed"];
 const BIDDING_OPTIONS: BiddingStrategy[] = ["Dynamic Down", "Dynamic Up/Down", "Fixed"];
 
 export function CampaignTable({
