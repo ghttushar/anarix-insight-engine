@@ -18,6 +18,8 @@ import { mockProductAds } from "@/data/mockProductAds";
 import { mockKeywords } from "@/data/mockKeywords";
 import { mockSearchTerms } from "@/data/mockSearchTerms";
 import { mockPageTypes, mockPlatforms } from "@/data/mockPageTypePlatform";
+import { mockProductTargets } from "@/data/mockProductTargeting";
+import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable";
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Campaign } from "@/types/campaign";
 import { Button } from "@/components/ui/button";
