@@ -1,180 +1,109 @@
 
 
-# Phased Implementation Plan: Full App Polish, Fixes, and New Features
+# Fix Total Row, Add Calendar Date Pickers, Add Currency Display Settings
 
-This is a massive scope. To be transparent: implementing everything in a single pass will exceed credit limits. I am breaking this into **6 sequential phases**. You approve and I execute one phase at a time.
+## 1. Fix Campaign Table Total Row Error
 
----
+**Problem**: `CampaignTableTotalRow` uses `colSpan={4}` for the "Total" label but doesn't account for the conditional "Active" column in edit mode, nor does it know about edit mode at all. The empty cells for Start Date, End Date, Bidding Strategy (3 cells) plus the colSpan(4) = 7 columns, but the header has Status + Campaign Name + Active(conditional) before those — mismatch causes misaligned cells.
 
-## Phase 1: Core Layout, Panel, and Table Fixes (Foundation)
+**Fix**: Pass `viewMode` prop to `CampaignTableTotalRow`. When `viewMode === "edit"`, add 1 to colSpan to account for the Active column. Also verify the colSpan math: Status(1) + CampaignName(1) = 2 base, then StartDate, EndDate, BiddingStrategy as empty cells. Current colSpan={4} covers Status + Name + 2 extra — should be colSpan={2} with 3 separate empty cells. Will correct.
 
-These are the broken fundamentals that affect every page.
+**Files**: `CampaignTableTotalRow.tsx`, `CampaignTable.tsx`
 
-### 1a. Insights Panel — Remove backdrop blur
-**File: `src/components/insights/InsightsPanel.tsx`** line 27
-- Remove `bg-black/4 backdrop-blur-[1px]` from backdrop div
-- Replace with `bg-transparent`
+## 2. Replace `<Input type="date">` with Calendar Popover in Edit Mode
 
-### 1b. All right panels — open on same layer, not on top of app
-Right panels (PeriodBreakdownPanel, ProductDetailPanel, InsightsPanel) currently use `fixed` positioning with `z-50`, which covers the entire app. Change to inline flex layout within AppLayout, same pattern as AanCopilotPanel (which is already inline).
+**Problem**: Edit mode uses native `<Input type="date">` for Start Date and End Date — looks inconsistent and lacks the app's calendar styling.
 
-**Files:**
-- `src/components/layout/AppLayout.tsx` — Add slots for right panels inline (not fixed overlay)
-- `src/components/profitability/PeriodBreakdownPanel.tsx` — Convert from `fixed` to inline flex panel
-- `src/components/profitability/ProductDetailPanel.tsx` — Same conversion
-- `src/components/insights/InsightsPanel.tsx` — Same conversion
+**Fix**: Replace with a `Popover` + `Calendar` component (same pattern used in `AppTaskbar.tsx`). Single date mode. Format display as `MMM dd, yyyy`. On select, call `onCampaignUpdate`.
 
-### 1c. Independent scroll on all right panels
-All panels already use `ScrollArea` but some have containment issues. Ensure each panel has `h-full flex flex-col` with `overflow-hidden` outer and `overflow-y-auto` inner.
+**File**: `CampaignTable.tsx`
 
-### 1d. Table hover overlap fix
-The `overflow-auto` wrapper on `Table` causes hover states to visually overlap when scrolling horizontally. Fix by adding `relative` to `TableRow` and ensuring the hover bg doesn't bleed.
+## 3. Create Currency Context + Settings Section
 
-**File: `src/components/ui/table.tsx`** — Add `relative` to `TableRow`
+This is the core feature. Here is how it would work in production:
 
-### 1e. Unified table styling
-All tables must use the same `Table` component from `src/components/ui/table.tsx`. Audit all table pages to ensure consistent row height (44px), padding (px-3 py-2), and header styling.
+### Production Architecture (for your notes)
 
-### 1f. Taskbar redesign — proper grouping and labels
-**File: `src/components/layout/AppTaskbar.tsx`**
-- Replace "All" with "Ad Type: All" or use full-form labels so users know what each dropdown is
-- Increase height from `h-10` to `h-12`
-- Use `bg-muted/30 rounded-md px-2 py-1` container around the left-side filter group
-- Proper alignment with consistent spacing
+```text
+┌─────────────────────────────────────────────────┐
+│  User selects "Display Currency: INR"           │
+│  in Settings > Configuration                    │
+└──────────────────┬──────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────────┐
+│  CurrencyContext stores:                        │
+│  - baseCurrency: "USD" (from marketplace)       │
+│  - displayCurrency: "INR" (user preference)     │
+│  - exchangeRate: fetched from API               │
+│  - lastUpdated: timestamp                       │
+│  - formatCurrency(value): formats with symbol   │
+└──────────────────┬──────────────────────────────┘
+                   │
+      ┌────────────┴────────────┐
+      ▼                         ▼
+┌──────────────┐    ┌───────────────────────┐
+│ Edge Function│    │  All UI components    │
+│ /get-rates   │    │  call useCurrency()   │
+│              │    │  .formatCurrency(val) │
+│ Fetches from │    │  instead of local     │
+│ exchangerate │    │  Intl.NumberFormat    │
+│ -api.com     │    │                       │
+│ Caches 1hr   │    │  Value = raw * rate   │
+│ in Supabase  │    │  Symbol = from config │
+└──────────────┘    └───────────────────────┘
+```
 
-### 1g. Sidebar — remove collapse button from footer, fix nav collapse behavior
-**File: `src/components/layout/AppSidebar.tsx`**
-- Remove the Collapse button from the footer entirely (sidebar already has the nook arrow on its edge)
-- Fix navigation: clicking a nav item (e.g., "Campaign Manager") should NOT collapse the parent section ("Advertising"). The active section should stay open. Only manually clicking the section header should toggle it.
-- Keep Profile + Theme toggle in footer, give them more breathing room
+**How it works in production:**
+1. An Edge Function (`get-exchange-rates`) calls a free exchange rate API (e.g., `exchangerate-api.com` or `open.er-api.com`) every hour, caches rates in a Supabase table `exchange_rates` with columns: `base_currency`, `target_currency`, `rate`, `updated_at`.
+2. The frontend `CurrencyContext` fetches the rate for the user's selected display currency on load and every 60 minutes.
+3. Every `formatCurrency()` call multiplies the raw USD value by the exchange rate and formats with the target currency's symbol/locale.
+4. The original USD value is always stored — conversion is display-only.
+5. A tooltip or small label shows "Rate: 1 USD = 83.42 INR · Updated 5 min ago" so users know the rate is live.
 
-### 1h. Remove duplicate controls
-Several pages have their own date range / frequency selectors that duplicate the universal taskbar. Remove page-level duplicates from:
-- `src/pages/dayparting/HourlyData.tsx` (has its own Date Range selector)
-- `src/pages/advertising/TargetingActions.tsx` (has its own Date Range selector)
-- Any other page with redundant controls
+**For the current mock implementation** (no Supabase connected): We store a static rate map with common currencies and a `CurrencyContext` that provides `formatCurrency()` globally. The settings page will note "rates calculated according to international market in realtime" and show the mock rate.
 
----
+### Implementation
 
-## Phase 2: Unified DataTableToolbar Everywhere + Toolbar Position Consistency
+**New file: `src/contexts/CurrencyContext.tsx`**
+- Stores `displayCurrency` (default "USD"), persisted to localStorage
+- Contains a static exchange rate map (USD base): USD, EUR, GBP, INR, CAD, AUD, JPY, BRL, MXN
+- Exposes `formatCurrency(value: number): string` that converts and formats
+- Exposes `exchangeRate`, `lastUpdated`, `currencySymbol`
 
-### 2a. Toolbar layout consistency
-In Profitability Dashboard, the search bar is part of DataTableToolbar (right-aligned). In the reference images (image-67, image-68), the search is on the LEFT and action buttons (Upload COGS, Export, Columns, Filter, Download) are on the RIGHT.
+**Supported currencies (initial set):**
+| Code | Name | Mock Rate |
+|------|------|-----------|
+| USD | US Dollar | 1.00 |
+| EUR | Euro | 0.92 |
+| GBP | British Pound | 0.79 |
+| INR | Indian Rupee | 83.42 |
+| CAD | Canadian Dollar | 1.36 |
+| AUD | Australian Dollar | 1.53 |
+| JPY | Japanese Yen | 149.50 |
+| BRL | Brazilian Real | 4.97 |
+| MXN | Mexican Peso | 17.15 |
 
-**File: `src/components/advertising/DataTableToolbar.tsx`**
-- Restructure: Search on LEFT, Columns + Filter + Download on RIGHT
-- This makes all pages consistent
+**Update `src/pages/settings/Configuration.tsx`**
+- Add "Currency Display" section between Defaults and Notifications
+- Dropdown to select display currency
+- Show current rate: "1 USD = 83.42 INR"
+- Note: "Exchange rates are calculated according to international market rates in realtime"
 
-### 2b. Apply DataTableToolbar to ALL table pages
-Every page with a table must use the same `DataTableToolbar` with appropriate `COLUMN_DEFS` and `FILTER_FIELDS`:
-- Catalog Products table
-- BI Keyword Tracker
-- Day Parting tables
-- AMC tables
-- All advertising sub-tables that don't already have it
+**Update all `formatCurrency` usages across ~29 files**
+- Replace local `formatCurrency` functions with `useCurrency().formatCurrency`
+- Files include: all table components, KPI strips, profitability components, dashboard pages, etc.
 
----
+**Update `src/App.tsx`**
+- Wrap with `CurrencyProvider`
 
-## Phase 3: Page-Specific Fixes
+### Files to create/modify:
+1. **Create** `src/contexts/CurrencyContext.tsx`
+2. **Edit** `src/App.tsx` — add CurrencyProvider
+3. **Edit** `src/pages/settings/Configuration.tsx` — add currency section
+4. **Edit** `src/components/tables/CampaignTable.tsx` — calendar + useCurrency
+5. **Edit** `src/components/tables/CampaignTableTotalRow.tsx` — fix colSpan + useCurrency
+6. **Edit** all 29 files with `formatCurrency` — replace with context hook
 
-### 3a. Targeting Actions — fix Broad/Exact/Phrase layout
-The checkbox + bid input stack is cramped. Restructure to horizontal layout with proper spacing. Checkbox above, bid input below, centered in cell.
-
-### 3b. Day Parting Heatmap — use brand color tints
-**File: `src/components/dayparting/HourlyHeatmap.tsx`**
-- Replace generic `bg-destructive/20`, `bg-warning/30`, `bg-success/50` with brand periwinkle tints:
-  - Lowest: `bg-primary/5`
-  - Low: `bg-primary/15`
-  - Medium: `bg-primary/30`
-  - High: `bg-primary/50`
-  - Highest: `bg-primary/70`
-- Remove the days checkbox row from HourlyData page
-
-### 3c. Schedule Editor redesign
-**File: `src/pages/dayparting/ScheduleEditor.tsx`**
-- Currently `max-w-4xl` which wastes right side. Use full width with two-column layout:
-  - Left: Form fields (schedule name, action type, campaigns)
-  - Right: Time grid + day selector + preview
-- Remove Card wrappers, use section headers instead
-
-### 3d. PeriodBreakdownPanel — "View More" opens inline, not overlay
-Already addressed in Phase 1b.
-
----
-
-## Phase 4: New Feature Pages (Part 1)
-
-Create the first 5 competitive features as new pages with routes:
-
-### 4a. Budget Pacing Dashboard
-- New route: `/advertising/budget-pacing`
-- New file: `src/pages/advertising/BudgetPacing.tsx`
-- Visual timeline showing daily budget burn rate vs target
-- Projected overspend/underspend alerts
-- Campaign-level pacing cards
-
-### 4b. Search Term Harvesting
-- New route: `/advertising/search-harvesting`
-- New file: `src/pages/advertising/SearchHarvesting.tsx`
-- Cards showing high-performing search terms
-- "Add as Keyword" action with match type + bid suggestion
-- Aan AI explanation per term
-
-### 4c. Marketplace Health Score
-- New route: `/workspace/health-score`
-- New file: `src/pages/workspace/HealthScore.tsx`
-- Single composite score (0-100) with circular progress
-- Breakdown: profitability, ad efficiency, inventory health, keyword coverage
-
-### 4d. Cross-Marketplace Unified P&L
-- New route: `/profitability/unified-pnl`
-- New file: `src/pages/profitability/UnifiedPnL.tsx`
-- Side-by-side Amazon + Walmart P&L with Combined column
-
-### 4e. Aan Anomaly Alerts
-- New route: part of existing Insights system
-- Enhance `src/components/insights/InsightsContext.tsx` with anomaly detection alerts
-- In-app notification bell in sidebar
-
----
-
-## Phase 5: New Feature Pages (Part 2)
-
-### 5a. Creative Performance Analyzer
-- New route: `/advertising/creative-analyzer`
-- Upload creatives, correlation analysis with CTR/CVR
-
-### 5b. Competitor Price Tracking
-- New route: `/bi/competitor-pricing`
-- Price timeline chart, correlation with own sales
-
-### 5c. Rule Builder with Backtesting
-- New route: `/advertising/rules`
-- Rule definition form + historical simulation chart
-
-### 5d. Inventory-Aware Ad Optimization
-- New route: `/catalog/inventory-ads`
-- Stock level + ad spend correlation dashboard
-
-### 5e. Client Reporting Portal
-- New route: `/reports/client-portal`
-- Report builder, PDF preview, schedule configuration
-
----
-
-## Phase 6: Final Polish Pass
-
-- Verify every button works (toast feedback minimum)
-- Verify all panels have independent scroll
-- Verify all tables are visually identical
-- Verify no duplicate controls
-- Verify sidebar navigation behavior
-
----
-
-## Recommended Execution
-
-Each phase is one approval cycle. Phase 1 is the most critical — it fixes the broken foundation. Phases 4-5 add new pages. Phase 6 is the final audit.
-
-**I recommend starting with Phase 1 now.** It addresses the most user-visible issues: panel blur, overlay behavior, table styling, taskbar design, sidebar behavior, and duplicate controls.
+**~32 files total.**
 
