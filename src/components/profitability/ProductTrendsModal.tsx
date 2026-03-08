@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -15,16 +14,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+  LineChart, Line, BarChart, Bar, AreaChart, Area,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import { ProfitabilityProduct } from "@/types/profitability";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ChartType } from "@/components/charts/ChartContainer";
 
 interface ProductTrendsModalProps {
   product: ProfitabilityProduct | null;
@@ -44,6 +39,7 @@ const formatCurrency = (v: number) =>
 export function ProductTrendsModal({ product, isOpen, onClose }: ProductTrendsModalProps) {
   const [frequency, setFrequency] = useState("weekly");
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>(["orderSales", "totalSales"]);
+  const [chartType, setChartType] = useState<ChartType>("line");
 
   if (!product) return null;
 
@@ -61,6 +57,51 @@ export function ProductTrendsModal({ product, isOpen, onClose }: ProductTrendsMo
     );
   };
 
+  const activeOptions = METRICS_OPTIONS.filter((m) => selectedMetrics.includes(m.key));
+
+  const tooltipStyle = {
+    backgroundColor: "hsl(var(--card))",
+    border: "1px solid hsl(var(--border))",
+    borderRadius: "8px",
+    fontSize: "12px",
+  };
+
+  const renderChart = () => (
+    <ResponsiveContainer width="100%" height="100%">
+      {chartType === "bar" ? (
+        <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="week" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+          <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+          <Tooltip contentStyle={tooltipStyle} />
+          {activeOptions.map((m) => (
+            <Bar key={m.key} dataKey={m.key} fill={m.color} name={m.label} radius={[3, 3, 0, 0]} />
+          ))}
+        </BarChart>
+      ) : chartType === "area" ? (
+        <AreaChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="week" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+          <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+          <Tooltip contentStyle={tooltipStyle} />
+          {activeOptions.map((m) => (
+            <Area key={m.key} type="monotone" dataKey={m.key} stroke={m.color} fill={m.color} fillOpacity={0.15} strokeWidth={2} />
+          ))}
+        </AreaChart>
+      ) : (
+        <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="week" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+          <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+          <Tooltip contentStyle={tooltipStyle} />
+          {activeOptions.map((m) => (
+            <Line key={m.key} type="monotone" dataKey={m.key} stroke={m.color} strokeWidth={2} dot={{ fill: m.color, strokeWidth: 0, r: 3 }} />
+          ))}
+        </LineChart>
+      )}
+    </ResponsiveContainer>
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-[700px]">
@@ -71,29 +112,19 @@ export function ProductTrendsModal({ product, isOpen, onClose }: ProductTrendsMo
         <div className="space-y-4">
           {/* Product info */}
           <div className="flex items-center gap-3">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="h-10 w-10 rounded-md border border-border object-cover flex-shrink-0"
-            />
+            <img src={product.image} alt={product.name} className="h-10 w-10 rounded-md border border-border object-cover flex-shrink-0" />
             <div className="min-w-0">
               <p className="font-medium text-foreground text-sm line-clamp-1">{product.name}</p>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span>{product.itemId}</span>
-                <span>•</span>
-                <span>{product.sku}</span>
-                <span>•</span>
-                <span>{formatCurrency(product.price)}</span>
+                <span>{product.itemId}</span><span>•</span><span>{product.sku}</span><span>•</span><span>{formatCurrency(product.price)}</span>
               </div>
             </div>
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <Select value={frequency} onValueChange={setFrequency}>
-              <SelectTrigger className="h-8 w-[120px] text-xs">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="h-8 w-[120px] text-xs"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"].map((f) => (
                   <SelectItem key={f.toLowerCase()} value={f.toLowerCase()} className="text-xs">{f}</SelectItem>
@@ -101,13 +132,18 @@ export function ProductTrendsModal({ product, isOpen, onClose }: ProductTrendsMo
               </SelectContent>
             </Select>
 
+            <Select value={chartType} onValueChange={(v) => setChartType(v as ChartType)}>
+              <SelectTrigger className="h-8 w-[90px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="line" className="text-xs">Line</SelectItem>
+                <SelectItem value="bar" className="text-xs">Bar</SelectItem>
+                <SelectItem value="area" className="text-xs">Area</SelectItem>
+              </SelectContent>
+            </Select>
+
             <div className="flex items-center gap-3">
               {METRICS_OPTIONS.map((m) => (
-                <button
-                  key={m.key}
-                  onClick={() => toggleMetric(m.key)}
-                  className="flex items-center gap-1.5 text-xs"
-                >
+                <button key={m.key} onClick={() => toggleMetric(m.key)} className="flex items-center gap-1.5 text-xs">
                   <Checkbox checked={selectedMetrics.includes(m.key)} className="pointer-events-none h-3.5 w-3.5" />
                   <span className="h-2 w-2 rounded-full" style={{ backgroundColor: m.color }} />
                   <span className="text-muted-foreground">{m.label}</span>
@@ -118,31 +154,7 @@ export function ProductTrendsModal({ product, isOpen, onClose }: ProductTrendsMo
 
           {/* Chart */}
           <div className="h-[260px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="week" tick={{ fontSize: 11 }} className="text-muted-foreground" />
-                <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                    fontSize: "12px",
-                  }}
-                />
-                {METRICS_OPTIONS.filter((m) => selectedMetrics.includes(m.key)).map((m) => (
-                  <Line
-                    key={m.key}
-                    type="monotone"
-                    dataKey={m.key}
-                    stroke={m.color}
-                    strokeWidth={2}
-                    dot={{ fill: m.color, strokeWidth: 0, r: 3 }}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
+            {renderChart()}
           </div>
         </div>
       </DialogContent>

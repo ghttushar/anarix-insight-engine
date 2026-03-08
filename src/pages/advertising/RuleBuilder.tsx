@@ -5,11 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Play, Pause, FlaskConical, TrendingUp, TrendingDown } from "lucide-react";
+import { Plus, Play, Pause, FlaskConical } from "lucide-react";
 import { mockRules, type AutomationRule } from "@/data/mockRuleBuilder";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
 
 const statusStyles: Record<string, string> = {
   active: "bg-success/10 text-success border-success/20",
@@ -21,6 +22,81 @@ const formatCurrency = (v: number) => {
   const abs = Math.abs(v);
   return `${v < 0 ? "-" : ""}$${abs.toLocaleString()}`;
 };
+
+function BacktestChart({ selectedRule, backtestData }: { selectedRule: AutomationRule | null; backtestData: { date: string; savings: number; revenueLoss: number }[] }) {
+  const [chartType, setChartType] = useState<ChartType>("bar");
+  const [activeMetrics, setActiveMetrics] = useState<string[]>(["savings", "revenueLoss"]);
+
+  const metrics: ChartMetric[] = [
+    { key: "savings", label: "Savings", color: "hsl(var(--success))", active: activeMetrics.includes("savings") },
+    { key: "revenueLoss", label: "Revenue Loss", color: "hsl(var(--destructive))", active: activeMetrics.includes("revenueLoss") },
+  ];
+
+  const toggleMetric = (key: string) => {
+    setActiveMetrics((prev) => prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]);
+  };
+
+  const renderChart = (height: number) => (
+    <ResponsiveContainer width="100%" height={height}>
+      {chartType === "line" ? (
+        <LineChart data={backtestData}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
+          <RechartsTooltip contentStyle={{ fontSize: 12 }} />
+          {activeMetrics.includes("savings") && <Line type="monotone" dataKey="savings" stroke="hsl(var(--success))" strokeWidth={2} name="Savings" />}
+          {activeMetrics.includes("revenueLoss") && <Line type="monotone" dataKey="revenueLoss" stroke="hsl(var(--destructive))" strokeWidth={2} name="Revenue Loss" />}
+        </LineChart>
+      ) : chartType === "area" ? (
+        <AreaChart data={backtestData}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
+          <RechartsTooltip contentStyle={{ fontSize: 12 }} />
+          {activeMetrics.includes("savings") && <Area type="monotone" dataKey="savings" stroke="hsl(var(--success))" fill="hsl(var(--success))" fillOpacity={0.15} name="Savings" />}
+          {activeMetrics.includes("revenueLoss") && <Area type="monotone" dataKey="revenueLoss" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive))" fillOpacity={0.15} name="Revenue Loss" />}
+        </AreaChart>
+      ) : (
+        <BarChart data={backtestData}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
+          <RechartsTooltip contentStyle={{ fontSize: 12 }} />
+          {activeMetrics.includes("savings") && <Bar dataKey="savings" fill="hsl(var(--success))" name="Savings" radius={[2, 2, 0, 0]} />}
+          {activeMetrics.includes("revenueLoss") && <Bar dataKey="revenueLoss" fill="hsl(var(--destructive))" fillOpacity={0.4} name="Revenue Loss" radius={[2, 2, 0, 0]} />}
+        </BarChart>
+      )}
+    </ResponsiveContainer>
+  );
+
+  return (
+    <div className="lg:col-span-2">
+      <ChartContainer
+        title={`Backtest: ${selectedRule?.name || "Select a rule"}`}
+        subtitle={selectedRule?.backtestResult?.period}
+        metrics={metrics}
+        onMetricToggle={toggleMetric}
+        chartType={chartType}
+        onChartTypeChange={setChartType}
+        expandedChildren={renderChart(400)}
+      >
+        {selectedRule?.backtestResult ? (
+          <>
+            {renderChart(200)}
+            <div className="grid grid-cols-4 gap-3 mt-3 text-xs">
+              <div><span className="text-muted-foreground block">Triggered</span><span className="font-medium text-foreground">{selectedRule.backtestResult.triggeredCount} times</span></div>
+              <div><span className="text-muted-foreground block">Campaigns Affected</span><span className="font-medium text-foreground">{selectedRule.backtestResult.affectedCampaigns}</span></div>
+              <div><span className="text-muted-foreground block">Projected Savings</span><span className="font-medium text-success">{formatCurrency(selectedRule.backtestResult.projectedSavings)}</span></div>
+              <div><span className="text-muted-foreground block">Net Impact</span><span className="font-medium text-foreground">{formatCurrency(selectedRule.backtestResult.netImpact)}</span></div>
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground py-8 text-center">Select a rule to view backtest results</p>
+        )}
+      </ChartContainer>
+    </div>
+  );
+}
 
 export default function RuleBuilder() {
   const [selectedRule, setSelectedRule] = useState<AutomationRule | null>(mockRules[0]);
@@ -63,38 +139,7 @@ export default function RuleBuilder() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Backtest Chart */}
-          <div className="lg:col-span-2 rounded-lg border border-border bg-card p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-heading text-sm font-semibold text-foreground flex items-center gap-2">
-                <FlaskConical className="h-4 w-4 text-primary" />
-                Backtest: {selectedRule?.name || "Select a rule"}
-              </h3>
-              {selectedRule?.backtestResult && (
-                <Badge variant="outline" className="text-xs">{selectedRule.backtestResult.period}</Badge>
-              )}
-            </div>
-            {selectedRule?.backtestResult && (
-              <>
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={backtestData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                    <XAxis dataKey="date" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
-                    <RechartsTooltip contentStyle={{ fontSize: 12 }} />
-                    <Bar dataKey="savings" fill="hsl(var(--success))" name="Savings" radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="revenueLoss" fill="hsl(var(--destructive))" fillOpacity={0.4} name="Revenue Loss" radius={[2, 2, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-                <div className="grid grid-cols-4 gap-3 mt-3 text-xs">
-                  <div><span className="text-muted-foreground block">Triggered</span><span className="font-medium text-foreground">{selectedRule.backtestResult.triggeredCount} times</span></div>
-                  <div><span className="text-muted-foreground block">Campaigns Affected</span><span className="font-medium text-foreground">{selectedRule.backtestResult.affectedCampaigns}</span></div>
-                  <div><span className="text-muted-foreground block">Projected Savings</span><span className="font-medium text-success">{formatCurrency(selectedRule.backtestResult.projectedSavings)}</span></div>
-                  <div><span className="text-muted-foreground block">Net Impact</span><span className="font-medium text-foreground">{formatCurrency(selectedRule.backtestResult.netImpact)}</span></div>
-                </div>
-              </>
-            )}
-          </div>
+          <BacktestChart selectedRule={selectedRule} backtestData={backtestData} />
 
           {/* Rule Details */}
           <div className="space-y-3">

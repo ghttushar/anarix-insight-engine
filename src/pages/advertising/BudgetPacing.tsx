@@ -9,7 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertTriangle, TrendingUp, TrendingDown, Minus, Download, RefreshCw } from "lucide-react";
 import { mockPacingCampaigns, mockPacingAlerts, type PacingCampaign } from "@/data/mockBudgetPacing";
 import { toast } from "sonner";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
+import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
 
 const statusConfig: Record<string, { label: string; class: string }> = {
   on_track: { label: "On Track", class: "bg-success/10 text-success border-success/20" },
@@ -25,6 +26,66 @@ const severityConfig: Record<string, string> = {
 };
 
 const formatCurrency = (v: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(v);
+
+function HourlySpendChart({ selectedCampaign, chartData }: { selectedCampaign: PacingCampaign; chartData: { hour: string; spend: number; target: number }[] }) {
+  const [chartType, setChartType] = useState<ChartType>("area");
+  const [activeMetrics, setActiveMetrics] = useState<string[]>(["spend", "target"]);
+
+  const metrics: ChartMetric[] = [
+    { key: "spend", label: "Actual Spend", color: "hsl(var(--primary))", active: activeMetrics.includes("spend") },
+    { key: "target", label: "Target", color: "hsl(var(--muted-foreground))", active: activeMetrics.includes("target") },
+  ];
+
+  const toggleMetric = (key: string) => {
+    setActiveMetrics((prev) => prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]);
+  };
+
+  const renderChart = (height: number) => (
+    <ResponsiveContainer width="100%" height={height}>
+      {chartType === "line" ? (
+        <LineChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="hour" tick={{ fontSize: 10 }} className="text-muted-foreground" interval={2} />
+          <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickFormatter={(v) => `$${v}`} />
+          <RechartsTooltip contentStyle={{ fontSize: 12 }} />
+          {activeMetrics.includes("target") && <Line type="monotone" dataKey="target" stroke="hsl(var(--muted-foreground))" strokeDasharray="4 4" name="Target" />}
+          {activeMetrics.includes("spend") && <Line type="monotone" dataKey="spend" stroke="hsl(var(--primary))" strokeWidth={2} name="Actual Spend" />}
+        </LineChart>
+      ) : chartType === "bar" ? (
+        <BarChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="hour" tick={{ fontSize: 10 }} className="text-muted-foreground" interval={2} />
+          <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickFormatter={(v) => `$${v}`} />
+          <RechartsTooltip contentStyle={{ fontSize: 12 }} />
+          {activeMetrics.includes("target") && <Bar dataKey="target" fill="hsl(var(--muted-foreground))" fillOpacity={0.3} name="Target" />}
+          {activeMetrics.includes("spend") && <Bar dataKey="spend" fill="hsl(var(--primary))" name="Actual Spend" />}
+        </BarChart>
+      ) : (
+        <AreaChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+          <XAxis dataKey="hour" tick={{ fontSize: 10 }} className="text-muted-foreground" interval={2} />
+          <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickFormatter={(v) => `$${v}`} />
+          <RechartsTooltip contentStyle={{ fontSize: 12 }} />
+          {activeMetrics.includes("target") && <Area type="monotone" dataKey="target" stroke="hsl(var(--muted-foreground))" strokeDasharray="4 4" fill="none" name="Target" />}
+          {activeMetrics.includes("spend") && <Area type="monotone" dataKey="spend" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.15} name="Actual Spend" />}
+        </AreaChart>
+      )}
+    </ResponsiveContainer>
+  );
+
+  return (
+    <ChartContainer
+      title={`Hourly Spend — ${selectedCampaign.name}`}
+      metrics={metrics}
+      onMetricToggle={toggleMetric}
+      chartType={chartType}
+      onChartTypeChange={setChartType}
+      expandedChildren={renderChart(400)}
+    >
+      {renderChart(220)}
+    </ChartContainer>
+  );
+}
 
 export default function BudgetPacing() {
   const [selectedCampaign, setSelectedCampaign] = useState<PacingCampaign | null>(mockPacingCampaigns[0]);
@@ -96,21 +157,13 @@ export default function BudgetPacing() {
           </div>
 
           {/* Hourly Chart */}
-          <div className="lg:col-span-2 rounded-lg border border-border bg-card p-4">
-            <h3 className="font-heading text-sm font-semibold text-foreground mb-4">
-              Hourly Spend — {selectedCampaign?.name || "Select a campaign"}
-            </h3>
-            {selectedCampaign && (
-              <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="hour" tick={{ fontSize: 10 }} className="text-muted-foreground" interval={2} />
-                  <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickFormatter={(v) => `$${v}`} />
-                  <RechartsTooltip contentStyle={{ fontSize: 12 }} />
-                  <Area type="monotone" dataKey="target" stroke="hsl(var(--muted-foreground))" strokeDasharray="4 4" fill="none" name="Target" />
-                  <Area type="monotone" dataKey="spend" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.15} name="Actual Spend" />
-                </AreaChart>
-              </ResponsiveContainer>
+          <div className="lg:col-span-2">
+            {selectedCampaign ? (
+              <HourlySpendChart selectedCampaign={selectedCampaign} chartData={chartData} />
+            ) : (
+              <div className="rounded-lg border border-border bg-card p-4 text-center text-sm text-muted-foreground py-12">
+                Select a campaign to view hourly spend
+              </div>
             )}
           </div>
         </div>
