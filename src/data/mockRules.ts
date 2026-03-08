@@ -116,4 +116,6 @@ export const appliedRules: AppliedRule[] = [
   { id: "ar-6", name: "Winner Bid Booster", ruleType: "Bidder Rule", entitiesCount: 67, entityLabel: "keywords", frequency: "Daily", lastRun: "2026-03-08 14:30", status: "draft" },
   { id: "ar-7", name: "Placement Bid Modifier", ruleType: "Placement Rule", entitiesCount: 5, entityLabel: "campaigns", frequency: "Weekly", lastRun: "2026-03-04 08:00", status: "active" },
   { id: "ar-8", name: "Inventory Sync Rule", ruleType: "Inventory Rule", entitiesCount: 189, entityLabel: "products", frequency: "Daily", lastRun: "2026-03-08 06:00", status: "active" },
+  { id: "ar-9", name: "SOV Threshold Alert", ruleType: "Share of Voice Rule", entitiesCount: 12, entityLabel: "brands", frequency: "Daily", lastRun: "", status: "draft" },
+  { id: "ar-10", name: "Auto-Pause Low CTR", ruleType: "Campaign Rule", entitiesCount: 22, entityLabel: "campaigns", frequency: "Daily", lastRun: "", status: "draft" },
 ];
