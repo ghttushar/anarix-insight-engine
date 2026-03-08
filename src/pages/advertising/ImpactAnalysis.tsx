@@ -5,7 +5,7 @@ import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { ImpactTable } from "@/components/tables/ImpactTable";
 import { Button } from "@/components/ui/button";
-import { Calendar, ChevronDown, BarChart3, Download, Maximize2, EyeOff } from "lucide-react";
+import { Calendar, ChevronDown, BarChart3, Download, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   mockImpactCampaigns,
