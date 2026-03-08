@@ -201,6 +201,7 @@ function AppRoutes() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
+      <ColorSchemeProvider>
       <DensityProvider>
         <CurrencyProvider>
         <AccountProvider>
