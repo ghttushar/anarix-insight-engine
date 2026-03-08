@@ -71,6 +71,8 @@ export function DataTableToolbar({
   onViewModeChange,
   showViewToggle = false,
   filterFields = [],
+  leftContent,
+  rightContent,
 }: DataTableToolbarProps) {
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState<FilterRule[]>(activeFilters);
