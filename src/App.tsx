@@ -8,6 +8,7 @@ import { MarketplaceProvider } from "@/contexts/MarketplaceContext";
 import { FilterProvider } from "@/contexts/FilterContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { DensityProvider } from "@/contexts/DensityContext";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { AccountProvider, useAccounts } from "@/contexts/AccountContext";
 import { VisualEffectsProvider } from "@/contexts/VisualEffectsContext";
 import { FeatureToggleProvider } from "@/contexts/FeatureToggleContext";
