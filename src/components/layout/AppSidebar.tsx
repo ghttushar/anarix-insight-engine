@@ -186,19 +186,7 @@ export function AppSidebar() {
   }).filter(group => group.items.length > 0);
 
   return (
-    <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-300 relative overflow-visible", collapsed ? "w-14" : "w-60")} collapsible="icon">
-      {/* Collapse notch — inner right edge, vertically centered */}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            onClick={toggleSidebar}
-            className="absolute top-1/2 -translate-y-1/2 -right-3 z-10 flex items-center justify-center h-6 w-6 rounded-full bg-sidebar border border-border/60 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors shadow-sm"
-          >
-            {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="right">{collapsed ? "Expand" : "Collapse"}</TooltipContent>
-      </Tooltip>
+    <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-300", collapsed ? "w-14" : "w-60")} collapsible="icon">
       <SidebarContent className="py-3 flex flex-col h-full">
         {/* Logo */}
         <div className={cn("flex items-center", collapsed ? "justify-center px-2 mb-3" : "px-4 mb-3")}>
