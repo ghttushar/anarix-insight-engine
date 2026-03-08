@@ -48,6 +48,8 @@ interface DataTableToolbarProps {
   onViewModeChange?: (mode: "view" | "edit") => void;
   showViewToggle?: boolean;
   filterFields?: string[];
+  leftContent?: React.ReactNode;
+  rightContent?: React.ReactNode;
 }
 
 const OPERATORS = ["is", "is not", "contains", "starts with", "greater than", "less than"];
