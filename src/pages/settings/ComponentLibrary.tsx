@@ -37,10 +37,15 @@ import { KPICardsRow } from "@/components/cards/KPICardsRow";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { TableSkeleton, CardSkeleton, ChartSkeleton, MetricSkeleton } from "@/components/ui/loading-skeletons";
+import { AanLogo } from "@/components/aan/AanLogo";
+import { ArtifactCard } from "@/components/aan/ArtifactCard";
 import { 
-  AlertCircle, Info, CheckCircle, XCircle, Home, 
-  Plus, Edit, Trash2, Download, Bold, Italic, Underline,
-  Calendar as CalendarIcon, User, Mail, X, Settings, Search
+  AlertCircle, AlertTriangle, Info, CheckCircle, CheckCircle2, XCircle, Home, 
+  Plus, Edit, Trash2, Download, Bold, Italic, Underline, Filter, Columns,
+  Calendar as CalendarIcon, User, Mail, X, Settings, Search, Send, Loader2,
+  Sparkles, RefreshCw, Camera, Lightbulb, Maximize2, SlidersHorizontal,
+  ChevronDown, Eye, EyeOff, BarChart3, FileText, Zap, Store, ArrowRight,
+  Check, ArrowUpDown
 } from "lucide-react";
 
 export default function ComponentLibrary() {
