@@ -58,6 +58,16 @@ export default function DesignSystem() {
           <TabsContent value="components" className="space-y-6 mt-6">
             <ComponentsSection />
           </TabsContent>
+
+          {/* ICONS TAB */}
+          <TabsContent value="icons" className="space-y-6 mt-6">
+            <IconsSection />
+          </TabsContent>
+
+          {/* STATES TAB */}
+          <TabsContent value="states" className="space-y-6 mt-6">
+            <StatesSection />
+          </TabsContent>
         </Tabs>
       </div>
     </AppLayout>
