@@ -28,7 +28,6 @@ const tabs = [
 export default function ImpactAnalysis() {
   const [activeTab, setActiveTab] = useState<ImpactTab>("campaigns");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showChart, setShowChart] = useState(true);
 
   const getTabData = () => {
     switch (activeTab) {
