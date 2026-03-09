@@ -44,6 +44,7 @@ export default function TargetingActions() {
   const handleFetchKeywords = () => { toast.info("Fetching keywords..."); };
   const handleAddKeywords = () => { toast.info("Opening keyword builder..."); };
   const handleDownload = () => { toast.success("Exporting targeting data..."); };
+  const handleFilter = () => { toast.info("Opening advanced filters..."); };
   const handleApplyBid = () => {
     if (!bidValue) return;
     toast.success(`Bid adjustment applied: ${bidAction === "set_to" ? "Set to" : bidAction === "increase_pct" ? "Increase by" : "Decrease by"} ${bidValue}${bidAction !== "set_to" ? "%" : ""}`);
@@ -104,7 +105,7 @@ export default function TargetingActions() {
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             searchPlaceholder="Search terms..."
-            onFilter={() => {}}
+            onFilter={handleFilter}
             onDownload={handleDownload}
           />
           <div className="flex items-center gap-2">
