@@ -178,6 +178,80 @@ export default function ClientPortal() {
           </Table>
         </div>
       </div>
+
+      {/* Create Report Modal */}
+      <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Create New Report</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="reportName">Report Name <span className="text-destructive">*</span></Label>
+              <Input
+                id="reportName"
+                placeholder="e.g., Q1 2026 Performance Report"
+                value={reportName}
+                onChange={(e) => setReportName(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="clientName">Client Name <span className="text-destructive">*</span></Label>
+              <Input
+                id="clientName"
+                placeholder="e.g., Acme Corp"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="period">Reporting Period <span className="text-destructive">*</span></Label>
+              <Input
+                id="period"
+                placeholder="e.g., Jan 1 - Mar 31, 2026"
+                value={period}
+                onChange={(e) => setPeriod(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label>Report Sections <span className="text-destructive">*</span></Label>
+              <div className="space-y-2 border border-border rounded-lg p-4">
+                {AVAILABLE_SECTIONS.map((section) => (
+                  <div key={section} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={section}
+                      checked={selectedSections.includes(section)}
+                      onCheckedChange={() => handleToggleSection(section)}
+                    />
+                    <label
+                      htmlFor={section}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {section}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {selectedSections.length} section{selectedSections.length !== 1 ? 's' : ''} selected
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateReport}>
+              Create Report
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
