@@ -23,7 +23,8 @@ import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Campaign } from "@/types/campaign";
 import { Button } from "@/components/ui/button";
-import { Download, EyeOff, Maximize2 } from "lucide-react";
+import { Download, Maximize2 } from "lucide-react";
+import { toast } from "sonner";
 
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
@@ -119,7 +120,6 @@ export default function CampaignManager() {
   const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
   const [activeTab, setActiveTab] = useState<TabValue>("campaigns");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showChart, setShowChart] = useState(true);
   const [viewMode, setViewMode] = useState<"view" | "edit">("view");
   const [activeFilters, setActiveFilters] = useState<FilterRule[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
@@ -198,23 +198,18 @@ export default function CampaignManager() {
           onMetricChange={handleKPISwap}
         />
 
-        {showChart && (
-          <div className="rounded-lg border border-border bg-card">
-            <div className="flex items-center justify-between border-b border-border px-4 py-3">
-              <h3 className="font-heading text-sm font-medium text-foreground">Performance Trends</h3>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="sm" onClick={() => setShowChart(false)}><EyeOff className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="sm"><Maximize2 className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="sm"><Download className="h-4 w-4" /></Button>
-              </div>
-            </div>
-            <div className="p-4"><PerformanceChart data={mockChartData} /></div>
-          </div>
-        )}
 
-        {!showChart && (
-          <Button variant="outline" size="sm" onClick={() => setShowChart(true)}>Show Chart</Button>
-        )}
+        <div className="rounded-lg border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <h3 className="font-heading text-sm font-medium text-foreground">Performance Trends</h3>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm"><Maximize2 className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="sm" onClick={() => toast.success("Downloading chart...")}><Download className="h-4 w-4" /></Button>
+            </div>
+          </div>
+          <div className="p-4"><PerformanceChart data={mockChartData} /></div>
+        </div>
+
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
 

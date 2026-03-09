@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -132,6 +133,8 @@ export default function Accounts() {
   const navigate = useNavigate();
   const { accounts, removeAccount, updateAccount } = useAccounts();
   const [showMarketplaceModal, setShowMarketplaceModal] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [accountToDelete, setAccountToDelete] = useState<string | null>(null);
 
   const handleSelectMarketplace = (marketplace: "amazon" | "walmart") => {
     setShowMarketplaceModal(false);
@@ -152,9 +155,18 @@ export default function Accounts() {
     }, 2000);
   };
 
-  const handleRemove = (id: string) => {
-    removeAccount(id);
-    toast.success("Account disconnected");
+  const handleRemoveClick = (id: string) => {
+    setAccountToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmRemove = () => {
+    if (accountToDelete) {
+      removeAccount(accountToDelete);
+      toast.success("Account disconnected");
+      setAccountToDelete(null);
+    }
+    setDeleteDialogOpen(false);
   };
 
   return (
@@ -186,7 +198,7 @@ export default function Accounts() {
               key={account.id}
               account={account}
               onSync={() => handleSync(account.id)}
-              onRemove={() => handleRemove(account.id)}
+              onRemove={() => handleRemoveClick(account.id)}
             />
           ))}
 
@@ -244,6 +256,24 @@ export default function Accounts() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Disconnect Account</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to disconnect this account? All associated data sync settings will be removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRemove} className="bg-destructive hover:bg-destructive/90">
+              Disconnect
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 }

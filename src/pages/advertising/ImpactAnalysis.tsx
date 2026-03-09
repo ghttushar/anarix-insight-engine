@@ -5,7 +5,7 @@ import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { ImpactTable } from "@/components/tables/ImpactTable";
 import { Button } from "@/components/ui/button";
-import { Calendar, ChevronDown, BarChart3, Download, Maximize2, EyeOff } from "lucide-react";
+import { Calendar, ChevronDown, BarChart3, Download, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   mockImpactCampaigns,
@@ -28,7 +28,6 @@ const tabs = [
 export default function ImpactAnalysis() {
   const [activeTab, setActiveTab] = useState<ImpactTab>("campaigns");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showChart, setShowChart] = useState(true);
 
   const getTabData = () => {
     switch (activeTab) {
@@ -78,33 +77,26 @@ export default function ImpactAnalysis() {
           </div>
         </div>
 
-        {showChart && (
-          <div className="rounded-lg border border-border bg-card p-6">
-            <div className="flex items-center justify-between">
-              <h3 className="font-heading text-lg font-medium">Performance Comparison</h3>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => setShowChart(false)}><EyeOff className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="sm"><Maximize2 className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="sm" onClick={handleDownload}><Download className="h-4 w-4" /></Button>
-              </div>
-            </div>
-            <div className="mt-4 flex h-48 items-center justify-center rounded-lg bg-muted/30">
-              <p className="text-sm text-muted-foreground">Impact comparison chart — Baseline vs Impact period metrics</p>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-4">
-              {["Ad Spend", "Ad Sales", "ROAS", "Impressions"].map((metric) => (
-                <div key={metric} className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-primary" />
-                  <span className="text-sm text-muted-foreground">{metric}</span>
-                </div>
-              ))}
+        <div className="rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center justify-between">
+            <h3 className="font-heading text-lg font-medium">Performance Comparison</h3>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm"><Maximize2 className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="sm" onClick={handleDownload}><Download className="h-4 w-4" /></Button>
             </div>
           </div>
-        )}
-
-        {!showChart && (
-          <Button variant="outline" size="sm" onClick={() => setShowChart(true)}>Show Chart</Button>
-        )}
+          <div className="mt-4 flex h-48 items-center justify-center rounded-lg bg-muted/30">
+            <p className="text-sm text-muted-foreground">Impact comparison chart — Baseline vs Impact period metrics</p>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-4">
+            {["Ad Spend", "Ad Sales", "ROAS", "Impressions"].map((metric) => (
+              <div key={metric} className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-primary" />
+                <span className="text-sm text-muted-foreground">{metric}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as ImpactTab)} />
 

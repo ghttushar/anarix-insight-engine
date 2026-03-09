@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { mockQueries } from "@/data/mockAMC";
 import { Plus, Play, MoreHorizontal, Calendar, Clock } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -29,6 +30,8 @@ export default function AMCQueries() {
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [selectedTime, setSelectedTime] = useState(format(new Date(), "HH:mm"));
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [queryToDelete, setQueryToDelete] = useState<string | null>(null);
 
   const filteredQueries = mockQueries.filter((q) =>
     q.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -45,6 +48,27 @@ export default function AMCQueries() {
     setDescription("");
     setSelectedDate(format(new Date(), "yyyy-MM-dd"));
     setSelectedTime(format(new Date(), "HH:mm"));
+  };
+
+  const handleEdit = (queryId: string) => {
+    toast.info("Opening query editor...");
+  };
+
+  const handleDuplicate = (queryId: string) => {
+    toast.success("Query duplicated successfully");
+  };
+
+  const handleDeleteClick = (queryId: string) => {
+    setQueryToDelete(queryId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (queryToDelete) {
+      toast.success("Query deleted successfully");
+      setQueryToDelete(null);
+    }
+    setDeleteDialogOpen(false);
   };
 
   return (
@@ -132,9 +156,9 @@ export default function AMCQueries() {
                         <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => toast.info("Running query...")}><Play className="h-4 w-4 mr-2" />Run</DropdownMenuItem>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>Duplicate</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(q.id)}>Edit</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDuplicate(q.id)}>Duplicate</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteClick(q.id)} className="text-destructive">Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -229,6 +253,24 @@ export default function AMCQueries() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Query</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this query? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 }
