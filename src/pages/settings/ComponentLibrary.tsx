@@ -1,3 +1,4 @@
+import { useSearchParams, Link } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,10 +46,13 @@ import {
   Calendar as CalendarIcon, User, Mail, X, Settings, Search, Send, Loader2,
   Sparkles, RefreshCw, Camera, Lightbulb, Maximize2, SlidersHorizontal,
   ChevronDown, Eye, EyeOff, BarChart3, FileText, Zap, Store, ArrowRight,
-  Check, ArrowUpDown
+  Check, ArrowUpDown, Sun, Moon
 } from "lucide-react";
 
 export default function ComponentLibrary() {
+  const [searchParams] = useSearchParams();
+  const theme = searchParams.get('theme') || 'light';
+
   return (
     <AppLayout>
       <PageHeader
@@ -57,8 +61,36 @@ export default function ComponentLibrary() {
       />
 
       <div className="p-6">
-        {/* Force light theme for entire showcase */}
-        <div className="light bg-background text-foreground rounded-lg border p-6">
+        {/* Theme URL Switcher */}
+        <div className="flex items-center gap-4 mb-6 p-4 bg-muted/50 rounded-lg border">
+          <span className="text-sm font-medium text-muted-foreground">Screenshot Mode:</span>
+          <Link to="/settings/component-library?theme=light">
+            <Button 
+              variant={theme === 'light' ? 'default' : 'outline'} 
+              size="sm"
+              className="gap-2"
+            >
+              <Sun className="h-4 w-4" />
+              Light Mode
+            </Button>
+          </Link>
+          <Link to="/settings/component-library?theme=dark">
+            <Button 
+              variant={theme === 'dark' ? 'default' : 'outline'} 
+              size="sm"
+              className="gap-2"
+            >
+              <Moon className="h-4 w-4" />
+              Dark Mode
+            </Button>
+          </Link>
+          <span className="text-xs text-muted-foreground ml-auto">
+            Current: <code className="bg-muted px-1.5 py-0.5 rounded">?theme={theme}</code>
+          </span>
+        </div>
+
+        {/* Theme wrapper based on URL param */}
+        <div className={`${theme === 'dark' ? 'dark' : 'light'} bg-background text-foreground rounded-lg border p-6`}>
           <ComponentShowcase />
         </div>
       </div>
