@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Copy, Loader2, Search, ChevronDown, ArrowUp, ArrowDown, Info } from "lucide-react";
+import { Check, Copy, Loader2, Search, ChevronDown, ArrowUp, ArrowDown, Info, Home, Settings, User, LogOut, Plus, Download, Upload, Trash2, Edit, Eye, EyeOff, Lock, Unlock, Mail, Phone, Calendar, Clock, AlertCircle, AlertTriangle, CheckCircle, XCircle, HelpCircle, Star, Heart, Share2, MessageSquare, Send, Filter, SortAsc, SortDesc, MoreHorizontal, ChevronLeft, ChevronRight, Menu, X, Save, RotateCw, ZoomIn, ZoomOut } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
