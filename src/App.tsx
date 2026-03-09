@@ -193,6 +193,7 @@ function AppRoutes() {
       <Route path="/settings/accounts/connect/walmart" element={<ConnectWalmart />} />
       <Route path="/settings/team" element={<SettingsTeam />} />
       <Route path="/settings/system" element={<SettingsSystem />} />
+      <Route path="/settings/design-system" element={<DesignSystem />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
