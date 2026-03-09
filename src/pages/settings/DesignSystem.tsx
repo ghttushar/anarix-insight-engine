@@ -1150,6 +1150,41 @@ export default function MyPage() {
   );
 }
 
+// ==================== HELPER COMPONENT: Props Table ====================
+
+interface PropsTableProps {
+  rows: Array<{
+    prop: string;
+    type: string;
+    default: string;
+  }>;
+}
+
+function PropsTable({ rows }: PropsTableProps) {
+  return (
+    <div className="border rounded-lg overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[140px]">Prop</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead className="w-[120px]">Default</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((row, i) => (
+            <TableRow key={i}>
+              <TableCell className="font-mono text-xs">{row.prop}</TableCell>
+              <TableCell className="font-mono text-xs">{row.type}</TableCell>
+              <TableCell className="font-mono text-xs text-muted-foreground">{row.default}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
 // ==================== SPACING SECTION ====================
 
 function SpacingSection() {
