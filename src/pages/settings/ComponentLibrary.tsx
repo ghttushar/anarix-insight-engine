@@ -1666,6 +1666,349 @@ function ComponentShowcase() {
         </div>
       </section>
 
+      {/* ==================== CHART COMPONENTS (STATIC ANATOMY) ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Chart Components — Static Anatomy</h2>
+        
+        {/* Performance Chart mockup */}
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Performance Chart (Line/Area/Bar)</Label>
+          <div className="rounded-lg border border-border bg-card overflow-hidden">
+            {/* Chart header */}
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div>
+                <h3 className="font-semibold text-foreground text-sm">Performance Overview</h3>
+                <p className="text-xs text-muted-foreground">Last 30 days • Updated 2 min ago</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Chart type buttons */}
+                <div className="flex items-center rounded-md border border-border bg-muted/30 p-0.5">
+                  <button className="h-7 px-2.5 rounded text-xs font-medium bg-background text-foreground shadow-sm">Line</button>
+                  <button className="h-7 px-2.5 rounded text-xs font-medium text-muted-foreground">Area</button>
+                  <button className="h-7 px-2.5 rounded text-xs font-medium text-muted-foreground">Bar</button>
+                </div>
+                <button className="h-7 w-7 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground">
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </button>
+                <button className="h-7 w-7 rounded-md border border-border flex items-center justify-center text-muted-foreground hover:text-foreground">
+                  <Download className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+            {/* Metric toggles */}
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/20">
+              {[
+                { label: "Spend", color: "bg-primary", active: true },
+                { label: "Revenue", color: "bg-success", active: true },
+                { label: "ROAS", color: "bg-warning", active: false },
+                { label: "Impressions", color: "bg-accent", active: false },
+              ].map(({ label, color, active }) => (
+                <button key={label} className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded-full border ${active ? "border-border bg-background" : "border-transparent text-muted-foreground"}`}>
+                  <span className={`h-2.5 w-2.5 rounded-full ${color} ${!active ? "opacity-40" : ""}`} />
+                  {label}
+                </button>
+              ))}
+            </div>
+            {/* Chart area (static SVG representation) */}
+            <div className="p-4 h-[280px] relative">
+              {/* Y-axis labels */}
+              <div className="absolute left-0 top-4 bottom-8 w-12 flex flex-col justify-between text-[10px] text-muted-foreground">
+                <span>$50k</span>
+                <span>$40k</span>
+                <span>$30k</span>
+                <span>$20k</span>
+                <span>$10k</span>
+                <span>$0</span>
+              </div>
+              {/* Chart grid and lines */}
+              <div className="ml-12 mr-8 h-full flex flex-col">
+                <div className="flex-1 relative border-l border-b border-border">
+                  {/* Grid lines */}
+                  {[1,2,3,4,5].map((i) => (
+                    <div key={i} className="absolute left-0 right-0 border-t border-border/50" style={{ top: `${i * 16.67}%` }} />
+                  ))}
+                  {/* Spend line (primary) */}
+                  <svg className="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none">
+                    <polyline
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="2"
+                      points="0,180 50,160 100,170 150,140 200,120 250,130 300,100 350,80 400,90 450,70 500,50 550,60 600,40"
+                    />
+                    {/* Dots */}
+                    {[180,160,170,140,120,130,100,80,90,70,50,60,40].map((y, i) => (
+                      <circle key={i} cx={i * 50} cy={y} r="3" fill="hsl(var(--primary))" />
+                    ))}
+                  </svg>
+                  {/* Revenue line (success) */}
+                  <svg className="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none">
+                    <polyline
+                      fill="none"
+                      stroke="hsl(var(--success))"
+                      strokeWidth="2"
+                      points="0,160 50,140 100,150 150,120 200,100 250,110 300,80 350,60 400,70 450,50 500,30 550,40 600,20"
+                    />
+                    {[160,140,150,120,100,110,80,60,70,50,30,40,20].map((y, i) => (
+                      <circle key={i} cx={i * 50} cy={y} r="3" fill="hsl(var(--success))" />
+                    ))}
+                  </svg>
+                </div>
+                {/* X-axis labels */}
+                <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
+                  {["Jan 1", "Jan 5", "Jan 9", "Jan 13", "Jan 17", "Jan 21", "Jan 25", "Jan 30"].map((d) => (
+                    <span key={d}>{d}</span>
+                  ))}
+                </div>
+              </div>
+              {/* Right Y-axis for ROAS */}
+              <div className="absolute right-0 top-4 bottom-8 w-8 flex flex-col justify-between text-[10px] text-muted-foreground text-right">
+                <span>5x</span>
+                <span>4x</span>
+                <span>3x</span>
+                <span>2x</span>
+                <span>1x</span>
+                <span>0</span>
+              </div>
+            </div>
+            {/* Legend */}
+            <div className="flex items-center justify-center gap-6 px-4 py-3 border-t border-border bg-muted/10 text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-full bg-primary" />
+                <span className="text-foreground">Spend</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-full bg-success" />
+                <span className="text-foreground">Revenue</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SOV Stacked Area Chart mockup */}
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Share of Voice Chart (Stacked Area)</Label>
+          <div className="rounded-lg border border-border bg-card overflow-hidden">
+            {/* Chart header */}
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div>
+                <h3 className="font-semibold text-foreground text-sm">Share of Voice Trend</h3>
+                <p className="text-xs text-muted-foreground">Keyword: "bamboo pillow" • Last 7 days</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center rounded-md border border-border bg-muted/30 p-0.5">
+                  <button className="h-7 px-2.5 rounded text-xs font-medium text-muted-foreground">Line</button>
+                  <button className="h-7 px-2.5 rounded text-xs font-medium bg-background text-foreground shadow-sm">Area</button>
+                  <button className="h-7 px-2.5 rounded text-xs font-medium text-muted-foreground">Bar</button>
+                </div>
+              </div>
+            </div>
+            {/* Brand toggles */}
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-muted/20">
+              {[
+                { label: "Your Brand", color: "bg-primary", active: true },
+                { label: "Competitor A", color: "bg-success", active: true },
+                { label: "Competitor B", color: "bg-warning", active: true },
+                { label: "Others", color: "bg-muted-foreground", active: true },
+              ].map(({ label, color, active }) => (
+                <button key={label} className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded-full border ${active ? "border-border bg-background" : "border-transparent text-muted-foreground"}`}>
+                  <span className={`h-2.5 w-2.5 rounded-full ${color}`} />
+                  {label}
+                </button>
+              ))}
+            </div>
+            {/* Stacked area chart (static SVG) */}
+            <div className="p-4 h-[280px] relative">
+              <div className="absolute left-0 top-4 bottom-8 w-10 flex flex-col justify-between text-[10px] text-muted-foreground">
+                <span>100%</span>
+                <span>75%</span>
+                <span>50%</span>
+                <span>25%</span>
+                <span>0%</span>
+              </div>
+              <div className="ml-10 h-full flex flex-col">
+                <div className="flex-1 relative border-l border-b border-border overflow-hidden">
+                  {/* Static stacked area representation */}
+                  <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                    {/* Others (bottom layer) */}
+                    <polygon fill="hsl(var(--muted-foreground))" fillOpacity="0.3" points="0,100 10,100 20,100 30,100 40,100 50,100 60,100 70,100 80,100 90,100 100,100 100,85 90,82 80,80 70,83 60,85 50,82 40,80 30,83 20,85 10,82 0,80" />
+                    {/* Competitor B */}
+                    <polygon fill="hsl(38, 92%, 50%)" fillOpacity="0.6" points="0,80 10,82 20,85 30,83 40,80 50,82 60,85 70,83 80,80 90,82 100,85 100,60 90,58 80,55 70,58 60,62 50,58 40,55 30,60 20,62 10,58 0,55" />
+                    {/* Competitor A */}
+                    <polygon fill="hsl(142, 71%, 45%)" fillOpacity="0.6" points="0,55 10,58 20,62 30,60 40,55 50,58 60,62 70,58 80,55 90,58 100,60 100,35 90,32 80,30 70,33 60,38 50,32 40,30 30,35 20,38 10,32 0,30" />
+                    {/* Your Brand (top layer) */}
+                    <polygon fill="hsl(var(--primary))" fillOpacity="0.7" points="0,30 10,32 20,38 30,35 40,30 50,32 60,38 70,33 80,30 90,32 100,35 100,10 90,12 80,8 70,15 60,18 50,12 40,8 30,15 20,18 10,12 0,10" />
+                  </svg>
+                </div>
+                <div className="flex justify-between mt-2 text-[10px] text-muted-foreground">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                    <span key={d}>{d}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {/* Legend */}
+            <div className="flex items-center justify-center gap-6 px-4 py-3 border-t border-border bg-muted/10 text-xs">
+              <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-primary" /><span>Your Brand</span></div>
+              <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-success" /><span>Competitor A</span></div>
+              <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-warning" /><span>Competitor B</span></div>
+              <div className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-muted-foreground" /><span>Others</span></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Hourly Heatmap mockup */}
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Hourly Heatmap (Day Parting)</Label>
+          <div className="rounded-lg border border-border bg-card p-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-semibold text-foreground text-sm">Hourly Performance</h3>
+                <p className="text-xs text-muted-foreground">Metric: ROAS • Last 14 days</p>
+              </div>
+              <Select defaultValue="roas">
+                <SelectTrigger className="h-8 w-32 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="roas">ROAS</SelectItem>
+                  <SelectItem value="spend">Spend</SelectItem>
+                  <SelectItem value="revenue">Revenue</SelectItem>
+                  <SelectItem value="acos">ACoS</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Heatmap grid */}
+            <div className="overflow-x-auto">
+              <div className="min-w-[700px]">
+                {/* Hour header */}
+                <div className="grid grid-cols-[50px_repeat(24,1fr)] gap-0.5 mb-0.5">
+                  <div></div>
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <div key={i} className="text-[9px] text-muted-foreground text-center">{String(i).padStart(2, "0")}</div>
+                  ))}
+                </div>
+                {/* Day rows */}
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, dayIdx) => (
+                  <div key={day} className="grid grid-cols-[50px_repeat(24,1fr)] gap-0.5 mb-0.5">
+                    <div className="text-xs text-muted-foreground flex items-center">{day}</div>
+                    {Array.from({ length: 24 }, (_, hour) => {
+                      // Generate pseudo-random intensity based on day/hour
+                      const seed = (dayIdx * 24 + hour) % 5;
+                      const intensityClasses = ["bg-primary/5", "bg-primary/15", "bg-primary/30", "bg-primary/50", "bg-primary/70"];
+                      // Business hours (9-17) on weekdays get higher intensity
+                      const isBusinessHour = hour >= 9 && hour <= 17 && dayIdx >= 1 && dayIdx <= 5;
+                      const intensity = isBusinessHour ? Math.min(seed + 2, 4) : seed;
+                      return (
+                        <div key={hour} className={`h-6 rounded ${intensityClasses[intensity]}`} />
+                      );
+                    })}
+                  </div>
+                ))}
+                {/* Legend */}
+                <div className="mt-4 flex items-center justify-center gap-2">
+                  <span className="text-xs text-muted-foreground">Low</span>
+                  <div className="flex rounded overflow-hidden">
+                    <div className="h-4 w-6 bg-primary/5" />
+                    <div className="h-4 w-6 bg-primary/15" />
+                    <div className="h-4 w-6 bg-primary/30" />
+                    <div className="h-4 w-6 bg-primary/50" />
+                    <div className="h-4 w-6 bg-primary/70" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">High</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bar chart variant */}
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Bar Chart (Category Comparison)</Label>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-foreground text-sm">Campaign Performance Comparison</h3>
+            </div>
+            <div className="space-y-3">
+              {[
+                { name: "SP | Bamboo | Queen", value: 85, color: "bg-primary" },
+                { name: "SB | Mattress Bundle", value: 72, color: "bg-primary/80" },
+                { name: "SP | Memory Foam", value: 58, color: "bg-primary/60" },
+                { name: "SD | Retargeting", value: 45, color: "bg-primary/40" },
+                { name: "SP | Pillow | King", value: 32, color: "bg-primary/30" },
+              ].map(({ name, value, color }) => (
+                <div key={name} className="flex items-center gap-3">
+                  <span className="text-xs text-foreground w-40 truncate">{name}</span>
+                  <div className="flex-1 h-6 bg-muted/30 rounded overflow-hidden">
+                    <div className={`h-full ${color} rounded`} style={{ width: `${value}%` }} />
+                  </div>
+                  <span className="text-xs font-medium text-foreground w-12 text-right">{(value / 20).toFixed(2)}x</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Scatter plot placeholder */}
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Scatter Plot (Profitability)</Label>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-semibold text-foreground text-sm">Revenue vs Profit Margin</h3>
+                <p className="text-xs text-muted-foreground">Product-level analysis</p>
+              </div>
+            </div>
+            <div className="h-[200px] relative border-l border-b border-border ml-8 mb-6">
+              {/* Y-axis */}
+              <div className="absolute -left-8 top-0 bottom-0 w-8 flex flex-col justify-between text-[10px] text-muted-foreground text-right pr-1">
+                <span>40%</span>
+                <span>30%</span>
+                <span>20%</span>
+                <span>10%</span>
+                <span>0%</span>
+              </div>
+              {/* X-axis */}
+              <div className="absolute left-0 right-0 -bottom-5 flex justify-between text-[10px] text-muted-foreground">
+                <span>$0</span>
+                <span>$25k</span>
+                <span>$50k</span>
+                <span>$75k</span>
+                <span>$100k</span>
+              </div>
+              {/* Scatter points */}
+              <div className="absolute inset-0">
+                {[
+                  { x: 15, y: 70, size: 12, color: "bg-success" },
+                  { x: 30, y: 55, size: 18, color: "bg-success" },
+                  { x: 45, y: 40, size: 10, color: "bg-warning" },
+                  { x: 55, y: 65, size: 14, color: "bg-success" },
+                  { x: 25, y: 30, size: 8, color: "bg-destructive" },
+                  { x: 70, y: 50, size: 20, color: "bg-success" },
+                  { x: 80, y: 35, size: 16, color: "bg-warning" },
+                  { x: 40, y: 80, size: 11, color: "bg-success" },
+                  { x: 60, y: 25, size: 9, color: "bg-destructive" },
+                  { x: 85, y: 60, size: 22, color: "bg-success" },
+                ].map(({ x, y, size, color }, i) => (
+                  <div
+                    key={i}
+                    className={`absolute rounded-full ${color} opacity-60`}
+                    style={{
+                      left: `${x}%`,
+                      bottom: `${y}%`,
+                      width: size,
+                      height: size,
+                      transform: "translate(-50%, 50%)",
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">Bubble size = Units Sold • Color = Profit Status</p>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
