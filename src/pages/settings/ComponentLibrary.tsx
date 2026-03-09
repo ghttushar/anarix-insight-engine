@@ -137,7 +137,7 @@ function ComponentShowcase() {
           <div className="flex flex-wrap gap-2">
             <StatusBadge status="live" />
             <StatusBadge status="paused" />
-            <StatusBadge status="pending" />
+            <StatusBadge status="scheduled" />
             <StatusBadge status="archived" />
           </div>
           <div className="flex flex-wrap gap-2">
