@@ -383,6 +383,9 @@ export function AppSidebar() {
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/design-system")}>
                   <Palette className="h-4 w-4" /><span>Design System</span>
                 </DropdownMenuItem>
+                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/component-library")}>
+                  <Layers className="h-4 w-4" /><span>Component Library</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
                   <User className="h-4 w-4" /><span>Profile</span>

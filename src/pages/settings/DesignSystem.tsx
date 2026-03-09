@@ -1510,3 +1510,467 @@ function CodeBlock({ code, className }: CodeBlockProps) {
     </div>
   );
 }
+
+// ==================== ICONS SECTION ====================
+
+function IconsSection() {
+  const iconCategories = [
+    {
+      name: "Navigation",
+      icons: [
+        { name: "Home", component: Home },
+        { name: "Settings", component: Settings },
+        { name: "ChevronLeft", component: ChevronLeft },
+        { name: "ChevronRight", component: ChevronRight },
+        { name: "ChevronDown", component: ChevronDown },
+        { name: "Menu", component: Menu },
+        { name: "X", component: X },
+      ]
+    },
+    {
+      name: "Actions",
+      icons: [
+        { name: "Plus", component: Plus },
+        { name: "Edit", component: Edit },
+        { name: "Trash2", component: Trash2 },
+        { name: "Save", component: Save },
+        { name: "Download", component: Download },
+        { name: "Upload", component: Upload },
+        { name: "Send", component: Send },
+        { name: "Share2", component: Share2 },
+        { name: "Copy", component: Copy },
+        { name: "Search", component: Search },
+        { name: "Filter", component: Filter },
+        { name: "RotateCw", component: RotateCw },
+      ]
+    },
+    {
+      name: "Status",
+      icons: [
+        { name: "CheckCircle", component: CheckCircle },
+        { name: "XCircle", component: XCircle },
+        { name: "AlertCircle", component: AlertCircle },
+        { name: "AlertTriangle", component: AlertTriangle },
+        { name: "HelpCircle", component: HelpCircle },
+        { name: "Info", component: Info },
+        { name: "Loader2", component: Loader2 },
+      ]
+    },
+    {
+      name: "Data",
+      icons: [
+        { name: "ArrowUp", component: ArrowUp },
+        { name: "ArrowDown", component: ArrowDown },
+        { name: "SortAsc", component: SortAsc },
+        { name: "SortDesc", component: SortDesc },
+        { name: "MoreHorizontal", component: MoreHorizontal },
+        { name: "Eye", component: Eye },
+        { name: "EyeOff", component: EyeOff },
+        { name: "ZoomIn", component: ZoomIn },
+        { name: "ZoomOut", component: ZoomOut },
+      ]
+    },
+    {
+      name: "System",
+      icons: [
+        { name: "User", component: User },
+        { name: "Lock", component: Lock },
+        { name: "Unlock", component: Unlock },
+        { name: "Mail", component: Mail },
+        { name: "Phone", component: Phone },
+        { name: "Calendar", component: Calendar },
+        { name: "Clock", component: Clock },
+        { name: "Star", component: Star },
+        { name: "Heart", component: Heart },
+        { name: "MessageSquare", component: MessageSquare },
+        { name: "LogOut", component: LogOut },
+      ]
+    },
+  ];
+
+  return (
+    <>
+      {/* Icon Sizing Rules */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Icon Sizing Rules</CardTitle>
+          <CardDescription>Consistent icon sizing across the application</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4">
+            <div className="flex items-center gap-4 p-4 border rounded-lg">
+              <Home className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="font-medium text-sm">16px — Inline & Table Icons</p>
+                <p className="text-xs text-muted-foreground">Used within text, tables, and compact UI elements</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 p-4 border rounded-lg">
+              <Settings className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="font-medium text-sm">20px — Button Icons</p>
+                <p className="text-xs text-muted-foreground">Standard size for buttons and interactive elements</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 p-4 border rounded-lg">
+              <AlertCircle className="h-6 w-6 text-muted-foreground" />
+              <div>
+                <p className="font-medium text-sm">24px — Header Icons</p>
+                <p className="text-xs text-muted-foreground">Used in page headers and prominent UI sections</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Color Rules */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Icon Color Rules</CardTitle>
+          <CardDescription>How icons inherit and use colors</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              Icons use <code className="text-xs bg-muted px-1 py-0.5 rounded">currentColor</code> by default, 
+              inheriting the text color from their parent. Secondary icons use <code className="text-xs bg-muted px-1 py-0.5 rounded">text-muted-foreground</code>.
+            </AlertDescription>
+          </Alert>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 border rounded-lg">
+              <p className="text-sm font-medium mb-2">Primary Icon</p>
+              <Home className="h-5 w-5 text-foreground" />
+              <p className="text-xs text-muted-foreground mt-2">Uses text-foreground</p>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <p className="text-sm font-medium mb-2">Secondary Icon</p>
+              <Home className="h-5 w-5 text-muted-foreground" />
+              <p className="text-xs text-muted-foreground mt-2">Uses text-muted-foreground</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Icon Grid by Category */}
+      {iconCategories.map(category => (
+        <Card key={category.name}>
+          <CardHeader>
+            <CardTitle>{category.name} Icons</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+              {category.icons.map(icon => (
+                <div key={icon.name} className="flex flex-col items-center gap-2 p-3 border rounded-lg hover:bg-accent transition-colors">
+                  <icon.component className="h-5 w-5 text-foreground" />
+                  <span className="text-[10px] text-muted-foreground text-center">{icon.name}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+
+      {/* Usage Guidelines */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Usage Guidelines</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 border border-success/50 bg-success/5 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="h-4 w-4 text-success" />
+                <p className="text-sm font-medium">Do</p>
+              </div>
+              <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                <li>Use consistent sizes throughout</li>
+                <li>Use currentColor for inheritance</li>
+                <li>Align icons with text baseline</li>
+                <li>Use semantic icon choices</li>
+              </ul>
+            </div>
+            <div className="p-4 border border-destructive/50 bg-destructive/5 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <XCircle className="h-4 w-4 text-destructive" />
+                <p className="text-sm font-medium">Don't</p>
+              </div>
+              <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                <li>Mix icon sizes randomly</li>
+                <li>Use brand colors for data icons</li>
+                <li>Use decorative icons in analytics</li>
+                <li>Override icon stroke width</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
+// ==================== STATES SECTION ====================
+
+function StatesSection() {
+  const [loading, setLoading] = useState(false);
+
+  const handleLoadingDemo = () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 2000);
+  };
+
+  return (
+    <>
+      {/* Button States */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Button States</CardTitle>
+          <CardDescription>All interactive states for buttons</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-5 gap-4">
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Default</p>
+              <Button>Primary</Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Hover</p>
+              <Button className="hover:bg-primary/90">Primary</Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Active</p>
+              <Button className="active:scale-95">Primary</Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Disabled</p>
+              <Button disabled>Primary</Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Loading</p>
+              <Button disabled={loading} onClick={handleLoadingDemo}>
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading
+                  </>
+                ) : (
+                  "Click to Load"
+                )}
+              </Button>
+            </div>
+          </div>
+          <Separator />
+          <div className="grid grid-cols-5 gap-4">
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Default</p>
+              <Button variant="secondary">Secondary</Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Hover</p>
+              <Button variant="secondary" className="hover:bg-secondary/80">Secondary</Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Active</p>
+              <Button variant="secondary" className="active:scale-95">Secondary</Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Disabled</p>
+              <Button variant="secondary" disabled>Secondary</Button>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Loading</p>
+              <Button variant="secondary" disabled>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Input States */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Input States</CardTitle>
+          <CardDescription>Form input interaction states</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label>Default State</Label>
+              <Input placeholder="Enter text..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Focus State</Label>
+              <Input placeholder="Focused input" className="ring-2 ring-ring ring-offset-2" />
+            </div>
+            <div className="space-y-2">
+              <Label>Error State</Label>
+              <Input placeholder="Invalid input" className="border-destructive" />
+              <p className="text-xs text-destructive">This field is required</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Disabled State</Label>
+              <Input placeholder="Disabled" disabled />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Select/Dropdown States */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Select States</CardTitle>
+          <CardDescription>Dropdown selection states</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label>Default (Closed)</Label>
+              <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Option 1</SelectItem>
+                  <SelectItem value="2">Option 2</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Disabled</Label>
+              <Select disabled>
+                <SelectTrigger>
+                  <SelectValue placeholder="Disabled" />
+                </SelectTrigger>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Checkbox/Toggle States */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Checkbox & Toggle States</CardTitle>
+          <CardDescription>Boolean input states</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-6">
+            <div className="space-y-4">
+              <p className="text-sm font-medium">Checkbox</p>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="unchecked" />
+                <Label htmlFor="unchecked">Unchecked</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="checked" checked />
+                <Label htmlFor="checked">Checked</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="disabled" disabled />
+                <Label htmlFor="disabled">Disabled</Label>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <p className="text-sm font-medium">Switch</p>
+              <div className="flex items-center space-x-2">
+                <Switch id="switch-off" />
+                <Label htmlFor="switch-off">Off</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch id="switch-on" checked />
+                <Label htmlFor="switch-on">On</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch id="switch-disabled" disabled />
+                <Label htmlFor="switch-disabled">Disabled</Label>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Table Row States */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Table Row States</CardTitle>
+          <CardDescription>Data table interaction states</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>State</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="font-medium">Default</TableCell>
+                <TableCell>Regular Row</TableCell>
+                <TableCell>
+                  <StatusBadge status="live" />
+                </TableCell>
+              </TableRow>
+              <TableRow className="bg-accent/50">
+                <TableCell className="font-medium">Hover</TableCell>
+                <TableCell>Hovered Row</TableCell>
+                <TableCell>
+                  <StatusBadge status="live" />
+                </TableCell>
+              </TableRow>
+              <TableRow className="bg-primary/10 border-l-2 border-primary">
+                <TableCell className="font-medium">Selected</TableCell>
+                <TableCell>Selected Row</TableCell>
+                <TableCell>
+                  <StatusBadge status="live" />
+                </TableCell>
+              </TableRow>
+              <TableRow className="opacity-50">
+                <TableCell className="font-medium">Disabled</TableCell>
+                <TableCell>Disabled Row</TableCell>
+                <TableCell>
+                  <StatusBadge status="paused" />
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Toast States */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Toast Notifications</CardTitle>
+          <CardDescription>System feedback messages</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-3">
+            <Button 
+              size="sm" 
+              onClick={() => toast.success("Operation completed successfully")}
+            >
+              Success Toast
+            </Button>
+            <Button 
+              size="sm" 
+              variant="secondary"
+              onClick={() => toast.info("Informational message")}
+            >
+              Info Toast
+            </Button>
+            <Button 
+              size="sm" 
+              variant="destructive"
+              onClick={() => toast.error("An error occurred")}
+            >
+              Error Toast
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+}
