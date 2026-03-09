@@ -80,6 +80,7 @@ import ConnectAmazon from "./pages/settings/ConnectAmazon";
 import ConnectWalmart from "./pages/settings/ConnectWalmart";
 import SettingsTeam from "./pages/settings/Team";
 import SettingsSystem from "./pages/settings/System";
+import DesignSystem from "./pages/settings/DesignSystem";
 
 const queryClient = new QueryClient();
 
