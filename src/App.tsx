@@ -81,6 +81,7 @@ import ConnectWalmart from "./pages/settings/ConnectWalmart";
 import SettingsTeam from "./pages/settings/Team";
 import SettingsSystem from "./pages/settings/System";
 import DesignSystem from "./pages/settings/DesignSystem";
+import ComponentLibrary from "./pages/settings/ComponentLibrary";
 
 const queryClient = new QueryClient();
 
@@ -194,6 +195,7 @@ function AppRoutes() {
       <Route path="/settings/team" element={<SettingsTeam />} />
       <Route path="/settings/system" element={<SettingsSystem />} />
       <Route path="/settings/design-system" element={<DesignSystem />} />
+      <Route path="/settings/component-library" element={<ComponentLibrary />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
