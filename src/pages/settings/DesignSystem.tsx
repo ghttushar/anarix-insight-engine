@@ -430,6 +430,726 @@ font-size: 2rem; /* 32px - readable size */`} />
   );
 }
 
+// ==================== COMPONENTS SECTION ====================
+
+function ComponentsSection() {
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [switchChecked, setSwitchChecked] = useState(false);
+  const [checkboxChecked, setCheckboxChecked] = useState(false);
+  const [selectValue, setSelectValue] = useState("");
+  
+  return (
+    <>
+      {/* Introduction */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Component Library</CardTitle>
+          <CardDescription>
+            Complete documentation of all UI components with live interactive examples,
+            code snippets, and usage guidelines. Every component follows the locked design system.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      {/* ========== BUTTONS ========== */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Buttons</CardTitle>
+          <CardDescription>All button variants with states and sizes</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          
+          {/* Primary Button */}
+          <div className="space-y-4">
+            <div className="flex items-baseline justify-between">
+              <h4 className="font-heading text-lg font-semibold">Primary Button</h4>
+              <Badge>Default Variant</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Used for main irreversible actions, confirmations, and primary CTAs.
+              Background uses <code className="text-xs bg-muted px-1 py-0.5 rounded">bg-primary</code>.
+            </p>
+            
+            {/* Live Examples */}
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-4 items-center">
+                  <Button variant="default">Default</Button>
+                  <Button variant="default" disabled>Disabled</Button>
+                  <Button 
+                    variant="default" 
+                    onClick={() => {
+                      setButtonLoading(true);
+                      setTimeout(() => setButtonLoading(false), 2000);
+                    }}
+                    disabled={buttonLoading}
+                  >
+                    {buttonLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {buttonLoading ? "Loading..." : "Click to Load"}
+                  </Button>
+                </div>
+                <Separator />
+                <div className="flex flex-wrap gap-4 items-center">
+                  <Button variant="default" size="sm">Small</Button>
+                  <Button variant="default" size="default">Default</Button>
+                  <Button variant="default" size="lg">Large</Button>
+                  <Button variant="default" size="icon">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <CodeBlock code={`import { Button } from "@/components/ui/button";
+
+// Basic usage
+<Button variant="default">Primary Action</Button>
+
+// With loading state
+<Button disabled={isLoading}>
+  {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+  {isLoading ? "Saving..." : "Save Changes"}
+</Button>
+
+// Size variants
+<Button size="sm">Small</Button>
+<Button size="default">Default</Button>
+<Button size="lg">Large</Button>
+<Button size="icon"><SearchIcon /></Button>`} />
+
+            <PropsTable rows={[
+              { prop: "variant", type: '"default" | "destructive" | "outline" | "secondary" | "ghost" | "link"', default: '"default"' },
+              { prop: "size", type: '"default" | "sm" | "lg" | "icon"', default: '"default"' },
+              { prop: "disabled", type: "boolean", default: "false" },
+              { prop: "asChild", type: "boolean", default: "false" },
+            ]} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Secondary Button */}
+          <div className="space-y-4">
+            <div className="flex items-baseline justify-between">
+              <h4 className="font-heading text-lg font-semibold">Secondary Button (Outline)</h4>
+              <Badge variant="outline">Outline Variant</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Safe actions, navigation, cancel operations. Uses transparent background with border.
+            </p>
+            
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="flex flex-wrap gap-4 items-center">
+                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" disabled>Disabled</Button>
+                <Button variant="outline" size="sm">Small</Button>
+                <Button variant="outline" size="lg">Large</Button>
+              </div>
+            </div>
+
+            <CodeBlock code={`<Button variant="outline">Cancel</Button>
+<Button variant="outline" size="sm">Back</Button>`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Destructive Button */}
+          <div className="space-y-4">
+            <div className="flex items-baseline justify-between">
+              <h4 className="font-heading text-lg font-semibold">Destructive Button</h4>
+              <Badge variant="destructive">RESERVED Color</Badge>
+            </div>
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Uses data visualization red. Requires confirmation modal for all destructive actions.
+              </AlertDescription>
+            </Alert>
+            
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="flex flex-wrap gap-4 items-center">
+                <Button variant="destructive">Delete Campaign</Button>
+                <Button variant="destructive" disabled>Disabled</Button>
+                <Button variant="destructive" size="sm">Remove</Button>
+              </div>
+            </div>
+
+            <CodeBlock code={`// Destructive actions MUST have confirmation
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive">Delete</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    {/* Confirmation dialog */}
+  </AlertDialogContent>
+</AlertDialog>`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Ghost & Link Buttons */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Ghost & Link Buttons</h4>
+            
+            <div className="p-6 border rounded-lg bg-muted/30 space-y-4">
+              <div className="flex flex-wrap gap-4 items-center">
+                <Button variant="ghost">Ghost Button</Button>
+                <Button variant="ghost" disabled>Disabled</Button>
+                <Button variant="ghost" size="sm">Small</Button>
+              </div>
+              <Separator />
+              <div className="flex flex-wrap gap-4 items-center">
+                <Button variant="link">Link Button</Button>
+                <Button variant="link" disabled>Disabled</Button>
+                <Button variant="link" size="sm">Small</Button>
+              </div>
+            </div>
+
+            <CodeBlock code={`<Button variant="ghost">Ghost (subtle hover)</Button>
+<Button variant="link">Link (underline on hover)</Button>`} />
+          </div>
+
+        </CardContent>
+      </Card>
+
+      {/* ========== FORM ELEMENTS ========== */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Form Elements</CardTitle>
+          <CardDescription>Inputs, selects, checkboxes, switches, and labels</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8">
+
+          {/* Input */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Input</h4>
+            <p className="text-sm text-muted-foreground">
+              Text input with focus ring, error states, and disabled styling.
+              Height: <code className="text-xs bg-muted px-1 py-0.5 rounded">40px</code> (comfortable mode).
+            </p>
+
+            <div className="p-6 border rounded-lg bg-muted/30 space-y-4">
+              <div className="grid gap-4 max-w-md">
+                <div className="space-y-2">
+                  <Label>Default Input</Label>
+                  <Input type="text" placeholder="Enter campaign name..." />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>With Error</Label>
+                  <Input 
+                    type="text" 
+                    placeholder="Required field" 
+                    className="border-destructive focus-visible:ring-destructive"
+                  />
+                  <p className="text-xs text-destructive">This field is required</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Disabled</Label>
+                  <Input type="text" placeholder="Disabled input" disabled />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>With Icon</Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input type="text" placeholder="Search..." className="pl-9" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <CodeBlock code={`import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+// Basic input
+<div className="space-y-2">
+  <Label>Campaign Name</Label>
+  <Input type="text" placeholder="Enter name..." />
+</div>
+
+// Error state
+<Input 
+  className="border-destructive focus-visible:ring-destructive"
+/>
+<p className="text-xs text-destructive">Error message</p>
+
+// With icon
+<div className="relative">
+  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+  <Input placeholder="Search..." className="pl-9" />
+</div>`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Textarea */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Textarea</h4>
+            
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="grid gap-4 max-w-md">
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea placeholder="Enter detailed description..." rows={4} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Disabled</Label>
+                  <Textarea placeholder="Disabled textarea" disabled rows={3} />
+                </div>
+              </div>
+            </div>
+
+            <CodeBlock code={`import { Textarea } from "@/components/ui/textarea";
+
+<Textarea placeholder="Enter description..." rows={4} />`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Select */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Select / Dropdown</h4>
+            <p className="text-sm text-muted-foreground">
+              Searchable if &gt;5 options. Max height: 240px (scrollable).
+            </p>
+
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="grid gap-4 max-w-md">
+                <div className="space-y-2">
+                  <Label>Marketplace</Label>
+                  <Select value={selectValue} onValueChange={setSelectValue}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select marketplace..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="amazon">Amazon</SelectItem>
+                      <SelectItem value="walmart">Walmart</SelectItem>
+                      <SelectItem value="target">Target</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Disabled</Label>
+                  <Select disabled>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Disabled select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">Option 1</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            <CodeBlock code={`import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+<Select value={value} onValueChange={setValue}>
+  <SelectTrigger>
+    <SelectValue placeholder="Select..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="option1">Option 1</SelectItem>
+    <SelectItem value="option2">Option 2</SelectItem>
+  </SelectContent>
+</Select>`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Checkbox */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Checkbox</h4>
+
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="terms" 
+                    checked={checkboxChecked}
+                    onCheckedChange={(checked) => setCheckboxChecked(checked as boolean)}
+                  />
+                  <Label htmlFor="terms" className="cursor-pointer">
+                    Accept terms and conditions
+                  </Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="disabled" disabled />
+                  <Label htmlFor="disabled" className="opacity-50">
+                    Disabled checkbox
+                  </Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="checked-disabled" checked disabled />
+                  <Label htmlFor="checked-disabled" className="opacity-50">
+                    Checked and disabled
+                  </Label>
+                </div>
+              </div>
+            </div>
+
+            <CodeBlock code={`import { Checkbox } from "@/components/ui/checkbox";
+
+<div className="flex items-center space-x-2">
+  <Checkbox 
+    id="terms" 
+    checked={checked}
+    onCheckedChange={setChecked}
+  />
+  <Label htmlFor="terms">Accept terms</Label>
+</div>`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Switch */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Switch / Toggle</h4>
+            <p className="text-sm text-muted-foreground">
+              Enable/disable binary options. Instant UI feedback. Backend execution after Save.
+            </p>
+
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between max-w-md">
+                  <div>
+                    <Label>Enable notifications</Label>
+                    <p className="text-xs text-muted-foreground">Receive email alerts</p>
+                  </div>
+                  <Switch 
+                    checked={switchChecked}
+                    onCheckedChange={setSwitchChecked}
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between max-w-md opacity-50">
+                  <div>
+                    <Label>Disabled switch</Label>
+                    <p className="text-xs text-muted-foreground">Cannot be toggled</p>
+                  </div>
+                  <Switch disabled />
+                </div>
+              </div>
+            </div>
+
+            <CodeBlock code={`import { Switch } from "@/components/ui/switch";
+
+<div className="flex items-center justify-between">
+  <Label>Enable notifications</Label>
+  <Switch 
+    checked={enabled}
+    onCheckedChange={setEnabled}
+  />
+</div>`} />
+          </div>
+
+        </CardContent>
+      </Card>
+
+      {/* ========== DATA DISPLAY ========== */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Data Display Components</CardTitle>
+          <CardDescription>Cards, badges, tables, and delta indicators</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-8">
+
+          {/* Card */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Card</h4>
+            <p className="text-sm text-muted-foreground">
+              Primary container for grouped content. Background: <code className="text-xs bg-muted px-1 py-0.5 rounded">bg-card</code>.
+              Padding: 16px (comfortable) / 12px (compact).
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Basic Card</CardTitle>
+                  <CardDescription>Card with header only</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    This is the card content area. Use for displaying grouped information.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Card with Footer</CardTitle>
+                  <CardDescription>Includes action buttons</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Content goes here.
+                  </p>
+                </CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                  <Button variant="outline" size="sm">Cancel</Button>
+                  <Button size="sm">Save</Button>
+                </CardFooter>
+              </Card>
+            </div>
+
+            <CodeBlock code={`import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+
+<Card>
+  <CardHeader>
+    <CardTitle>Title</CardTitle>
+    <CardDescription>Description</CardDescription>
+  </CardHeader>
+  <CardContent>
+    {/* Content */}
+  </CardContent>
+  <CardFooter>
+    {/* Actions */}
+  </CardFooter>
+</Card>`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Badge */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Badge</h4>
+            
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="flex flex-wrap gap-3 items-center">
+                <Badge>Default</Badge>
+                <Badge variant="secondary">Secondary</Badge>
+                <Badge variant="destructive">Destructive</Badge>
+                <Badge variant="outline">Outline</Badge>
+              </div>
+            </div>
+
+            <CodeBlock code={`import { Badge } from "@/components/ui/badge";
+
+<Badge>Default</Badge>
+<Badge variant="secondary">Secondary</Badge>
+<Badge variant="destructive">Error</Badge>
+<Badge variant="outline">Outline</Badge>`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Status Badge */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Status Badge</h4>
+            <p className="text-sm text-muted-foreground">
+              Campaign and entity status indicators with tooltips. Colors are locked per status type.
+            </p>
+
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="flex flex-wrap gap-3 items-center">
+                <StatusBadge status="live" />
+                <StatusBadge status="paused" />
+                <StatusBadge status="archived" />
+                <StatusBadge status="scheduled" />
+                <StatusBadge status="out_of_budget" />
+                <StatusBadge status="completed" />
+              </div>
+            </div>
+
+            <CodeBlock code={`import { StatusBadge } from "@/components/status/StatusBadge";
+
+<StatusBadge status="live" />
+<StatusBadge status="paused" />
+<StatusBadge status="out_of_budget" />
+
+// Available statuses:
+// "live" | "paused" | "archived" | "scheduled" | "out_of_budget" | "completed"`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Delta Badge */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Delta Badge</h4>
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Uses RESERVED data viz colors (green=positive, red=negative). Never use for non-metric purposes.
+              </AlertDescription>
+            </Alert>
+
+            <div className="p-6 border rounded-lg bg-muted/30">
+              <div className="flex flex-wrap gap-6 items-center">
+                <div className="text-center">
+                  <div className="text-2xl font-semibold font-heading mb-1">$12,450</div>
+                  <DeltaBadge value={15.3} />
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-semibold font-heading mb-1">$8,230</div>
+                  <DeltaBadge value={-8.7} />
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-semibold font-heading mb-1">$10,000</div>
+                  <DeltaBadge value={0} />
+                </div>
+              </div>
+            </div>
+
+            <CodeBlock code={`import { DeltaBadge } from "@/components/ui/delta-badge";
+
+// Shows percentage change with up/down arrow
+<DeltaBadge value={15.3} />  // Green, +15.3%
+<DeltaBadge value={-8.7} />  // Red, -8.7%
+<DeltaBadge value={0} />     // Hidden (returns null)`} />
+          </div>
+
+          <Separator className="my-8" />
+
+          {/* Table */}
+          <div className="space-y-4">
+            <h4 className="font-heading text-lg font-semibold">Table</h4>
+            <p className="text-sm text-muted-foreground">
+              Primary data surface. Row height: 44px (comfortable) / 32px (compact).
+              Fixed header, scrollable body, sticky first column.
+            </p>
+
+            <div className="border rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[200px]">Campaign</TableHead>
+                    <TableHead className="text-right">Impressions</TableHead>
+                    <TableHead className="text-right">Spend</TableHead>
+                    <TableHead className="text-right">ROAS</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="font-medium">Brand Campaign A</TableCell>
+                    <TableCell className="text-right">124,532</TableCell>
+                    <TableCell className="text-right">$2,450.00</TableCell>
+                    <TableCell className="text-right">4.2x</TableCell>
+                    <TableCell><StatusBadge status="live" /></TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Product Launch B</TableCell>
+                    <TableCell className="text-right">89,230</TableCell>
+                    <TableCell className="text-right">$1,850.00</TableCell>
+                    <TableCell className="text-right">3.8x</TableCell>
+                    <TableCell><StatusBadge status="paused" /></TableCell>
+                  </TableRow>
+                  <TableRow className="hover:bg-muted/50">
+                    <TableCell className="font-medium">Retargeting C (Hover)</TableCell>
+                    <TableCell className="text-right">45,120</TableCell>
+                    <TableCell className="text-right">$980.00</TableCell>
+                    <TableCell className="text-right">5.1x</TableCell>
+                    <TableCell><StatusBadge status="out_of_budget" /></TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
+
+            <CodeBlock code={`import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Campaign</TableHead>
+      <TableHead className="text-right">Spend</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell className="font-medium">Campaign A</TableCell>
+      <TableCell className="text-right">$2,450</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+
+// Rules:
+// - Numeric values: text-right alignment
+// - Black text for all numbers (never colored)
+// - Performance changes via DeltaBadge only`} />
+          </div>
+
+        </CardContent>
+      </Card>
+
+      {/* ========== LAYOUT COMPONENTS ========== */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Layout Components</CardTitle>
+          <CardDescription>Structural components for page layout and navigation</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              Layout components are structural and not meant to be directly copied.
+              Refer to existing pages for implementation patterns.
+            </AlertDescription>
+          </Alert>
+
+          <div className="space-y-3 text-sm">
+            <div className="p-4 border rounded-lg">
+              <div className="font-medium mb-1">AppLayout</div>
+              <p className="text-muted-foreground">
+                Main layout wrapper with sidebar. All pages must wrap content in <code className="text-xs bg-muted px-1 py-0.5 rounded">&lt;AppLayout&gt;</code>.
+              </p>
+            </div>
+
+            <div className="p-4 border rounded-lg">
+              <div className="font-medium mb-1">PageHeader</div>
+              <p className="text-muted-foreground">
+                Standard page header with title, subtitle, and optional breadcrumbs.
+                Positioned at top of page content.
+              </p>
+            </div>
+
+            <div className="p-4 border rounded-lg">
+              <div className="font-medium mb-1">Sidebar</div>
+              <p className="text-muted-foreground">
+                Collapsible navigation sidebar. Expanded/collapsed states. Auto-collapses when right panels open.
+              </p>
+            </div>
+
+            <div className="p-4 border rounded-lg">
+              <div className="font-medium mb-1">AppTaskbar</div>
+              <p className="text-muted-foreground">
+                Universal controls (Ad Type, Frequency, Date Range, Marketplace) below page heading.
+                Consistent positioning across all data pages.
+              </p>
+            </div>
+          </div>
+
+          <CodeBlock code={`// Typical page structure
+import { AppLayout } from "@/components/layout/AppLayout";
+import { PageHeader } from "@/components/layout/PageHeader";
+
+export default function MyPage() {
+  return (
+    <AppLayout>
+      <PageHeader
+        title="Page Title"
+        subtitle="Page description"
+      />
+      
+      <div className="p-6 space-y-6">
+        {/* Page content */}
+      </div>
+    </AppLayout>
+  );
+}`} />
+
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
 // ==================== SPACING SECTION ====================
 
 function SpacingSection() {
