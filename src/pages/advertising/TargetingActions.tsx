@@ -80,19 +80,6 @@ export default function TargetingActions() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">Date Range:</span>
-            <Select defaultValue="30">
-              <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="3">Last 3 days</SelectItem>
-                <SelectItem value="7">Last 7 days</SelectItem>
-                <SelectItem value="14">Last 14 days</SelectItem>
-                <SelectItem value="30">Last 30 days</SelectItem>
-                <SelectItem value="60">Last 60 days</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
           <div className="ml-auto">
             <Button size="sm" onClick={handleFetchKeywords}>Fetch Keywords</Button>
           </div>
