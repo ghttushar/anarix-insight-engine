@@ -37,32 +37,32 @@ export default function HourlyData() {
           }
         />
 
-        <div className="rounded-lg border border-border bg-card p-4">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 min-w-[200px] max-w-sm">
-              <Label className="text-xs text-muted-foreground mb-1 block">Campaign</Label>
-              <Select value={selectedCampaigns[0]} onValueChange={(v) => setSelectedCampaigns([v])}>
-                <SelectTrigger><SelectValue placeholder="Select campaign" /></SelectTrigger>
-                <SelectContent>{dayPartingCampaigns.map((camp) => (<SelectItem key={camp.id} value={camp.id}>{camp.name}</SelectItem>))}</SelectContent>
-              </Select>
-            </div>
-            <div className="w-[120px]">
-              <Label className="text-xs text-muted-foreground mb-1 block">Metric</Label>
-              <Select value={metric} onValueChange={(v) => setMetric(v as MetricType)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="spend">Spend</SelectItem>
-                  <SelectItem value="revenue">Revenue</SelectItem>
-                  <SelectItem value="roas">ROAS</SelectItem>
-                  <SelectItem value="acos">ACOS</SelectItem>
-                  <SelectItem value="orders">Orders</SelectItem>
-                  <SelectItem value="ctr">CTR</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-end">
-              <Button onClick={handleRun}><Play className="mr-2 h-4 w-4" />Run</Button>
-            </div>
+        <div className="flex items-center gap-4 rounded-lg border border-border p-4">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-muted-foreground">Campaign:</label>
+            <Select value={selectedCampaigns[0]} onValueChange={(v) => setSelectedCampaigns([v])}>
+              <SelectTrigger className="w-64"><SelectValue placeholder="Select campaign" /></SelectTrigger>
+              <SelectContent>{dayPartingCampaigns.map((camp) => (<SelectItem key={camp.id} value={camp.id}>{camp.name}</SelectItem>))}</SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-muted-foreground">Metric:</label>
+            <Select value={metric} onValueChange={(v) => setMetric(v as MetricType)}>
+              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="spend">Spend</SelectItem>
+                <SelectItem value="revenue">Revenue</SelectItem>
+                <SelectItem value="roas">ROAS</SelectItem>
+                <SelectItem value="acos">ACOS</SelectItem>
+                <SelectItem value="orders">Orders</SelectItem>
+                <SelectItem value="ctr">CTR</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="ml-auto">
+            <Button onClick={handleRun}><Play className="mr-2 h-4 w-4" />Run</Button>
           </div>
         </div>
 
