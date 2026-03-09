@@ -35,8 +35,8 @@ export default function DesignSystem() {
             <TabsTrigger value="typography">Typography</TabsTrigger>
             <TabsTrigger value="spacing">Spacing</TabsTrigger>
             <TabsTrigger value="components">Components</TabsTrigger>
-            <TabsTrigger value="icons" disabled>Icons</TabsTrigger>
-            <TabsTrigger value="states" disabled>States</TabsTrigger>
+            <TabsTrigger value="icons">Icons</TabsTrigger>
+            <TabsTrigger value="states">States</TabsTrigger>
           </TabsList>
 
           {/* COLORS TAB */}
