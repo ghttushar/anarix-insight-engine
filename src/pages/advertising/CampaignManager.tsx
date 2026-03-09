@@ -23,7 +23,7 @@ import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Campaign } from "@/types/campaign";
 import { Button } from "@/components/ui/button";
-import { Download, EyeOff, Maximize2 } from "lucide-react";
+import { Download, Maximize2 } from "lucide-react";
 
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
