@@ -352,10 +352,10 @@ function ComponentShowcase() {
         <div className="space-y-3">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">KPI Cards Row</Label>
           <KPICardsRow data={[
-            { label: "Revenue", value: 125000, previousValue: 100000, format: "currency" },
-            { label: "Orders", value: 4523, previousValue: 4200, format: "number" },
-            { label: "Conversion Rate", value: 3.25, previousValue: 2.89, format: "percentage" },
-            { label: "AOV", value: 27.64, previousValue: 28.10, format: "currency" },
+            { label: "Revenue", value: 125000, previousValue: 100000, format: "currency", trend: "up" },
+            { label: "Orders", value: 4523, previousValue: 4200, format: "number", trend: "up" },
+            { label: "Conversion Rate", value: 3.25, previousValue: 2.89, format: "percentage", trend: "up" },
+            { label: "AOV", value: 27.64, previousValue: 28.10, format: "currency", trend: "down" },
           ]} />
         </div>
       </section>
