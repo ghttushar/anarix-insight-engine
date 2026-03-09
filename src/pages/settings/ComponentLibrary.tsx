@@ -215,7 +215,7 @@ function ComponentShowcase() {
               </TableRow>
               <TableRow>
                 <TableCell className="font-medium">Item 3</TableCell>
-                <TableCell><StatusBadge status="pending" /></TableCell>
+                <TableCell><StatusBadge status="scheduled" /></TableCell>
                 <TableCell className="text-right">$350</TableCell>
               </TableRow>
             </TableBody>
