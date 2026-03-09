@@ -53,6 +53,11 @@ export default function DesignSystem() {
           <TabsContent value="spacing" className="space-y-6 mt-6">
             <SpacingSection />
           </TabsContent>
+
+          {/* COMPONENTS TAB */}
+          <TabsContent value="components" className="space-y-6 mt-6">
+            <ComponentsSection />
+          </TabsContent>
         </Tabs>
       </div>
     </AppLayout>
