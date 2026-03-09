@@ -214,7 +214,7 @@ export default function TargetingActions() {
                       {(["broad", "exact", "phrase"] as const).map((matchType) => (
                         <TableCell key={matchType} className="px-2">
                           <div className={cn(
-                            "flex items-center gap-2 rounded-md border px-2 py-1",
+                            "flex flex-col items-center gap-1.5 rounded-md border px-3 py-2",
                             action.matchTypes[matchType].selected
                               ? "border-primary/30 bg-primary/5"
                               : "border-border bg-muted/20"
@@ -226,7 +226,7 @@ export default function TargetingActions() {
                             <Input
                               type="number"
                               value={action.matchTypes[matchType].bid}
-                              className="h-6 w-14 border-0 bg-transparent p-0 text-center text-xs shadow-none focus-visible:ring-0"
+                              className="h-6 w-16 border border-border bg-background px-1 text-center text-xs shadow-none focus-visible:ring-1 focus-visible:ring-primary/30 rounded"
                               step={0.01}
                             />
                           </div>
