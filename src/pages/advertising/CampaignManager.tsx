@@ -119,7 +119,6 @@ export default function CampaignManager() {
   const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
   const [activeTab, setActiveTab] = useState<TabValue>("campaigns");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showChart, setShowChart] = useState(true);
   const [viewMode, setViewMode] = useState<"view" | "edit">("view");
   const [activeFilters, setActiveFilters] = useState<FilterRule[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
