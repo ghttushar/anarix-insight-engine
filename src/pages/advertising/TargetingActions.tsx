@@ -105,7 +105,7 @@ export default function TargetingActions() {
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             searchPlaceholder="Search terms..."
-            onFilter={() => {}}
+            onFilter={handleFilter}
             onDownload={handleDownload}
           />
           <div className="flex items-center gap-2">
