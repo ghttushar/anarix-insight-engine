@@ -197,23 +197,18 @@ export default function CampaignManager() {
           onMetricChange={handleKPISwap}
         />
 
-        {showChart && (
-          <div className="rounded-lg border border-border bg-card">
-            <div className="flex items-center justify-between border-b border-border px-4 py-3">
-              <h3 className="font-heading text-sm font-medium text-foreground">Performance Trends</h3>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="sm" onClick={() => setShowChart(false)}><EyeOff className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="sm"><Maximize2 className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="sm"><Download className="h-4 w-4" /></Button>
-              </div>
-            </div>
-            <div className="p-4"><PerformanceChart data={mockChartData} /></div>
-          </div>
-        )}
 
-        {!showChart && (
-          <Button variant="outline" size="sm" onClick={() => setShowChart(true)}>Show Chart</Button>
-        )}
+        <div className="rounded-lg border border-border bg-card">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <h3 className="font-heading text-sm font-medium text-foreground">Performance Trends</h3>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm"><Maximize2 className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="sm" onClick={() => toast.success("Downloading chart...")}><Download className="h-4 w-4" /></Button>
+            </div>
+          </div>
+          <div className="p-4"><PerformanceChart data={mockChartData} /></div>
+        </div>
+
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
 
