@@ -81,6 +81,7 @@ import ConnectWalmart from "./pages/settings/ConnectWalmart";
 import SettingsTeam from "./pages/settings/Team";
 import SettingsSystem from "./pages/settings/System";
 import DesignSystem from "./pages/settings/DesignSystem";
+import ComponentLibrary from "./pages/settings/ComponentLibrary";
 
 const queryClient = new QueryClient();
 
