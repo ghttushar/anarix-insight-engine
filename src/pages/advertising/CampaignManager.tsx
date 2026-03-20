@@ -194,6 +194,7 @@ export default function CampaignManager() {
       status: "live",
       isActive: true,
       biddingStrategy: data.biddingStrategy as any,
+      type: data.type as any,
       dailyBudget: data.dailyBudget,
       totalBudget: data.dailyBudget * 30,
       spend: 0,
@@ -204,6 +205,10 @@ export default function CampaignManager() {
       ctr: 0,
       acos: 0,
       orders: 0,
+      cpc: 0,
+      units: 0,
+      startDate: data.startDate,
+      endDate: data.endDate,
       startDate: data.startDate,
       endDate: data.endDate,
     };
