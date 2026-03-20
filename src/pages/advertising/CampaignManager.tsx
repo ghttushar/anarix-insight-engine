@@ -209,8 +209,6 @@ export default function CampaignManager() {
       units: 0,
       startDate: data.startDate,
       endDate: data.endDate,
-      startDate: data.startDate,
-      endDate: data.endDate,
     };
     setCampaigns((prev) => [newCampaign, ...prev]);
   };
