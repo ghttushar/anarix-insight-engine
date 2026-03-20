@@ -1,115 +1,143 @@
+## Phase 3: Restructure Universal Bar, Fix Sticky Columns, Wire Show Impact, Remove Duplication
 
-
-## Phase 1: Foundation — Fix Broken Interactions & Layout Consistency
-
-This phase fixes the things that are fundamentally broken right now.
-
-### 1A. Column Dropdown Not Working
-**File: `src/components/advertising/DataTableToolbar.tsx`**
-
-The `Tooltip` wrapping `DropdownMenuTrigger` creates a conflict between two Radix portal-based components. The Tooltip intercepts the click and the dropdown never opens.
-
-**Fix**: Remove the `Tooltip`/`TooltipTrigger`/`TooltipContent` wrapper from the Columns button. Use `title` attribute instead for a lightweight tooltip, or restructure so the Tooltip doesn't wrap the DropdownMenuTrigger directly.
-
-### 1B. Table Sticky Columns (Name + Status)
-**Files**: `src/components/tables/CampaignTable.tsx`, all other table components that have a "Name" or "Status" column.
-
-Add `sticky left-0 z-10 bg-background` to the first 1–2 columns (Status, Name) in both `<TableHead>` and `<TableCell>` so they stay fixed during horizontal scroll. The second sticky column needs `left-[<width>]` offset.
-
-### 1C. Nothing Above Universal Metric Selector
-**File: `src/pages/dayparting/HourlyData.tsx`**
-
-The schedule creation panel renders ABOVE the `<PageHeader>` (which contains AppTaskbar). Move the campaign/metric selectors (lines 239-261) to render AFTER the `<UnderlineTabs>`, not before it. The schedule creation panel (lines 108-231) is fine since it's toggled by a button — but move it below the tabs too.
-
-### 1D. Consistent Table Backgrounds
-Apply `bg-background` (not `bg-card`) to all table containers for consistency. Audit all table wrappers to use `rounded-lg border border-border` without extra card wrappers.
+Based on your screenshots, the current `AppTaskbar` is wrong. Each screen needs a different control layout in the header area. This plan restructures the header system to match your reference images exactly.
 
 ---
 
-## Phase 2: UX Affordances — Clickability, Tooltips, Cursor States
+### Part A: Restructure PageHeader + AppTaskbar System
 
-This phase makes every interactive element clearly communicate that it's interactive.
+**Current problem**: `AppTaskbar` renders the same controls (Ad Type, Frequency, Date Range, Marketplace/Store) on every page. Screenshots show different controls per screen.
 
-### 2A. Global Cursor & Hover States
-**Files to update** (all interactive elements):
-- `src/components/advertising/UnderlineTabs.tsx` — already has `cursor-pointer` ✓
-- `src/components/advertising/InlineKPIStrip.tsx` — already has `cursor-pointer` and tooltip ✓
-- `src/components/tables/CampaignTable.tsx` — already has `cursor-pointer hover:bg-muted/50` and tooltip on rows ✓
-- `src/components/charts/ChartContainer.tsx` — already has tooltips ✓
-- `src/components/layout/AppTaskbar.tsx` — already has tooltips ✓
+**New architecture**:
 
-**Still missing:**
-- `src/components/tables/AdGroupsTable.tsx` — needs `cursor-pointer hover:bg-muted/50` on rows
-- `src/components/tables/ProductAdsTable.tsx` — same
-- `src/components/tables/KeywordTargetingTable.tsx` — same
-- `src/components/tables/SearchTermsTable.tsx` — same
-- `src/components/tables/ProductTargetingTable.tsx` — same
-- `src/components/tables/ImpactTable.tsx` — same
-- `src/components/tables/RegionalTable.tsx` — same
-- All `<Button>` and `<button>` elements across the app — add `cursor-pointer` where missing
-- All `<Select>` triggers — add `cursor-pointer`
+1. `**PageHeader**` gets a new `topRight` prop for the marketplace/account cluster + J icon + avatar
+2. `**AppTaskbar**` is removed from `PageHeader`. Instead, each page renders its own control bar below the title.
+3. A new reusable `PageControls` component provides the marketplace cluster + J icon that sits in `topRight`.
 
-### 2B. Tooltip on All Icon-Only Buttons
-Scan every `Button` that has no text label (icon-only) and ensure it has a wrapping `Tooltip`. Key files:
-- `src/pages/advertising/ImpactAnalysis.tsx` — Maximize2 and Download buttons (lines 97-98)
-- Any remaining icon buttons without tooltips
+**Screenshot-derived control map**:
 
----
 
-## Phase 3: Feature Completion & Polish
+| Screen (there is no left right top or below the buttons will appere when required, market place is on every page so it'll have a fixed olace on the far right side of the bar, and if there is create campaigne, rule, schedule it'll all come after the universal bar | &nbsp;                               | &nbsp;                       | &nbsp;                           |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ---------------------------- | -------------------------------- |
+| Campaign Manager (image-110)                                                                                                                                                                                                                                           | Marketplace + Ad Type                | --                           | Frequency + Date Range           |
+| Impact Analysis (image-111)                                                                                                                                                                                                                                            | Marketplace + Ad Type                | Time Period vs Impact Period | Metrics                          |
+| Targeting Actions (image-112)                                                                                                                                                                                                                                          | Marketplace                          | (none)                       | (none)                           |
+| Day Parting (image-113)                                                                                                                                                                                                                                                | Marketplace                          | (none)                       | (none)                           |
+| History (image-114)                                                                                                                                                                                                                                                    | Marketplace                          | (none)                       | (none)                           |
+| Profit Dashboard (image-107)                                                                                                                                                                                                                                           | marketplace                          | --                           | Date Range + Frequency + Metrics |
+| Trends (image-108)                                                                                                                                                                                                                                                     | marketplace                          | &nbsp;                       | Date Range + Metrics             |
+| Profit & Loss (image-109)                                                                                                                                                                                                                                              | marketplace                          | &nbsp;                       | Date Range                       |
+| Day Parting hourly (image-105)                                                                                                                                                                                                                                         | (use current pattern but simplified) | --                           | &nbsp;                           |
 
-### 3A. Fix Tooltip-Dropdown Conflicts Throughout
-The pattern of `<Tooltip><TooltipTrigger asChild><DropdownMenuTrigger>` is broken in Radix. Fix ALL instances:
-- DataTableToolbar Columns button
-- Any other places this pattern exists (check ChartContainer Metrics button — same pattern at line 70-78)
 
-**Fix pattern**: Use a wrapper `<div>` between Tooltip and Dropdown triggers, or remove Tooltip and use `title` attr.
+**Files modified**:
 
-### 3B. Verified Working Features
-After audit, these features ARE implemented and working:
-- **Create Campaign Modal** ✓ (exists in `CreateCampaignModal.tsx`, wired in `CampaignManager.tsx`)
-- **Add Keyword Modal** ✓ (exists in `AddKeywordModal.tsx`, wired in `KeywordTracker.tsx`)
-- **Show Impact / View Changes / Hide Chart toggles** ✓ (in `CampaignManager.tsx` lines 137-139, 251-270)
-- **Day Parting full schedule settings** ✓ (in `HourlyData.tsx` lines 108-231)
-- **Heatmap numbers in cells** ✓ (in `HourlyHeatmap.tsx` lines 169-175)
-- **Heatmap totals row/column** ✓ (in `HourlyHeatmap.tsx` lines 200-213)
-- **Impact Analysis chart** ✓ (in `ImpactAnalysis.tsx` lines 101-120)
-- **PnL expand/collapse all** ✓ (in `PnLParameterTable.tsx` lines 54-55)
-- **Date range presets + Apply button** ✓ (in `AppTaskbar.tsx` lines 37-71, 104-116)
-- **Sidebar redesign with Rules group** ✓ (in `AppSidebar.tsx` lines 73-78)
-- **Pencil edit icon** ✓ (in `DataTableToolbar.tsx` lines 222-240)
+- `src/components/layout/PageHeader.tsx` -- add `topRight` prop, remove `<AppTaskbar />` call, render topRight on the title row
+- `src/components/layout/PageControls.tsx` -- **NEW** reusable marketplace/J/avatar cluster
+- `src/components/layout/AppTaskbar.tsx` -- keep as standalone component but remove from PageHeader; pages that need it import it directly
+- All 39 page files that use `<PageHeader>` -- add `topRight={<PageControls />}` and render page-specific controls below
 
-### 3C. Add Verification Mandate to Project Knowledge
-Add a project knowledge entry requiring post-implementation verification scans and change reports in chat after every prompt.
+**Implementation approach**: Since modifying all 39 pages is too large for one pass, we'll:
+
+1. Create `PageControls` component
+2. Update `PageHeader` to support `topRight` and add `hideTaskbar` as default true
+3. Update the 10 key screens (Campaign Manager, Impact Analysis, Targeting Actions, Day Parting, History, Profit Dashboard, Trends, P&L, Geographical, Catalog) with correct per-screen controls
+4. Other pages get `hideTaskbar={false}` temporarily to keep working
 
 ---
 
-## Summary of Changes Per Phase
+### Part B: Fix Sticky Column Transparency
 
-### Phase 1 (Foundation)
-| File | Change |
-|------|--------|
-| `DataTableToolbar.tsx` | Fix Tooltip-Dropdown conflict on Columns button |
-| `CampaignTable.tsx` | Add sticky Status + Name columns |
-| `HourlyData.tsx` | Move campaign/metric selectors below tabs |
-| All table wrapper pages | Standardize `bg-background` on table containers |
+**Problem**: Sticky columns use `bg-background` but this is not opaque when scrolling horizontally -- data shows through.
 
-### Phase 2 (Affordances)
-| File | Change |
-|------|--------|
-| `AdGroupsTable.tsx` | cursor-pointer + hover on rows |
-| `ProductAdsTable.tsx` | cursor-pointer + hover on rows |
-| `KeywordTargetingTable.tsx` | cursor-pointer + hover on rows |
-| `SearchTermsTable.tsx` | cursor-pointer + hover on rows |
-| `ProductTargetingTable.tsx` | cursor-pointer + hover on rows |
-| `ImpactTable.tsx` | cursor-pointer + hover on rows |
-| `RegionalTable.tsx` | cursor-pointer + hover on rows |
-| `ImpactAnalysis.tsx` | Tooltips on icon buttons |
+**Fix**: Change all sticky `<TableCell>` and `<TableHead>` backgrounds from `bg-background` and `bg-muted/50` to fully opaque values. Use CSS variable directly:
 
-### Phase 3 (Polish)
-| File | Change |
-|------|--------|
-| `ChartContainer.tsx` | Fix Tooltip-Dropdown conflict on Metrics button |
-| `DataTableToolbar.tsx` | Final Tooltip-Dropdown fix verification |
-| Project Knowledge | Add verification mandate |
+```
+// Header sticky cells
+className="sticky left-0 z-10 bg-[hsl(var(--muted)/0.5)]" 
+// becomes
+className="sticky left-0 z-10 bg-muted"
 
+// Body sticky cells  
+className="sticky left-0 z-10 bg-background"
+// stays but we need to ensure bg-background is not transparent
+```
+
+The real issue: `bg-muted/30` and `bg-muted/50` are semi-transparent. Change to `bg-muted` (fully opaque) for header rows, and `bg-background` for body rows (which should already be opaque). The hover state `group-hover:bg-muted` handles the hover case.
+
+**Files**: `CampaignTable.tsx`, `AdGroupsTable.tsx`, `ProductAdsTable.tsx`, `KeywordTargetingTable.tsx`, `SearchTermsTable.tsx`, `ProductTargetingTable.tsx`, `ImpactTable.tsx`, `RegionalTable.tsx`
+
+---
+
+### Part C: Wire Show Impact Toggle to Chart
+
+**Problem**: Show Impact toggle exists but doesn't change the chart.
+
+**Fix in `CampaignManager.tsx**`:
+
+- Pass `showImpact` to `PerformanceChart` as a new prop
+- When `showImpact` is true, overlay impact tooltip data on the chart (showing top 5 campaign contributors with % change, matching image-106)
+- Add impact data lines to the chart from mock data
+- Remove `viewChanges` toggle (user asked to remove it)
+
+**Fix in `PerformanceChart.tsx**`:
+
+- Accept optional `showImpact` prop
+- When true, add a custom tooltip that shows top 5 campaign contributors with their % impact (matching the reference screenshot)
+- Add additional data series for impact overlay
+
+---
+
+### Part D: Remove Duplicate Buttons in Table Toolbar
+
+**Problem**: Pages like `ProfitabilityDashboard` pass `onDownload` to `DataTableToolbar` AND also put Export/Download buttons in `rightContent`, creating duplicates.
+
+**Fix**: Audit each page's `DataTableToolbar` usage:
+
+- `ProfitabilityDashboard.tsx` -- remove `onDownload` prop since Export is already in `rightContent`
+- `TargetingActions.tsx` -- the toolbar and bid controls are on separate rows with different widths; unify into single toolbar row
+- `ImpactAnalysis.tsx` -- remove `onFilter` prop (no filter fields provided, button does nothing)
+
+---
+
+### Part E: Column Visibility Actually Hides Columns
+
+**Problem**: Column toggle dropdown works now (Radix fix done), but toggling columns doesn't actually hide them in the table because the table components don't receive `hiddenColumns`.
+
+**Fix in `CampaignManager.tsx**`: Pass `hiddenColumns` set to `CampaignTable` and each sub-table. Each table component needs to conditionally render columns based on visibility.
+
+**Fix in `CampaignTable.tsx**`: Accept `hiddenColumns?: Set<string>` prop and skip rendering `<TableHead>` and `<TableCell>` for hidden column IDs.
+
+Same pattern for all sub-tables.
+
+---
+
+### Summary of Files
+
+
+| File                            | Change                                                                                                                |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `PageHeader.tsx`                | Add `topRight` prop, stop auto-rendering AppTaskbar                                                                   |
+| `PageControls.tsx`              | **NEW** -- Marketplace + J icon + Avatar cluster                                                                      |
+| `CampaignManager.tsx`           | Add PageControls, per-screen controls bar, pass showImpact to chart, pass hiddenColumns to tables, remove viewChanges |
+| `ImpactAnalysis.tsx`            | Add PageControls, per-screen period selectors, remove onFilter                                                        |
+| `TargetingActions.tsx`          | Add PageControls, clean toolbar                                                                                       |
+| `HourlyData.tsx`                | Add PageControls, move controls below title                                                                           |
+| `History.tsx`                   | Add PageControls                                                                                                      |
+| `Dashboard.tsx` (profitability) | Add PageControls with "Catalog" label variant                                                                         |
+| `Trends.tsx`                    | Add PageControls, move search to table toolbar                                                                        |
+| `ProfitLoss.tsx`                | Add PageControls, move search to table toolbar, remove duplicate download                                             |
+| `PerformanceChart.tsx`          | Accept showImpact prop, render impact tooltip overlay                                                                 |
+| `CampaignTable.tsx`             | Accept hiddenColumns, fix sticky bg opacity                                                                           |
+| `AdGroupsTable.tsx`             | Fix sticky bg opacity                                                                                                 |
+| `ProductAdsTable.tsx`           | Fix sticky bg opacity                                                                                                 |
+| `KeywordTargetingTable.tsx`     | Fix sticky bg opacity                                                                                                 |
+| `SearchTermsTable.tsx`          | Fix sticky bg opacity                                                                                                 |
+| `ProductTargetingTable.tsx`     | Fix sticky bg opacity                                                                                                 |
+| `ImpactTable.tsx`               | Fix sticky bg opacity                                                                                                 |
+
+
+This is the largest single phase. I recommend splitting implementation into two passes if needed:
+
+- **Pass 1**: Parts B + C + D (sticky fix, impact toggle, dedup) -- 12 files
+- **Pass 2**: Parts A + E (header restructure, column visibility) -- 15 files
