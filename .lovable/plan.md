@@ -1,147 +1,115 @@
-## Comprehensive Fix & Feature Completion Plan
 
-This plan addresses all the gaps identified: missing features, broken UX affordances, and incomplete implementations from the previous round.
 
----
+## Phase 1: Foundation — Fix Broken Interactions & Layout Consistency
 
-### Phase 1: Show Impact Toggle on Campaign Manager
+This phase fixes the things that are fundamentally broken right now.
 
-**File: `src/pages/advertising/CampaignManager.tsx**`
+### 1A. Column Dropdown Not Working
+**File: `src/components/advertising/DataTableToolbar.tsx`**
 
-- Add `showImpact` and `viewChanges` state toggles
-- Render a row above the PerformanceChart with "Show Impact" and "View Changes" toggle switches (matching reference image layout)
-- Add "Hide Chart" link and fullscreen icon on the right side of that row
-- When Show Impact is on, overlay impact data on the chart tooltip (show top 5 campaign contributors with % change)
+The `Tooltip` wrapping `DropdownMenuTrigger` creates a conflict between two Radix portal-based components. The Tooltip intercepts the click and the dropdown never opens.
 
----
+**Fix**: Remove the `Tooltip`/`TooltipTrigger`/`TooltipContent` wrapper from the Columns button. Use `title` attribute instead for a lightweight tooltip, or restructure so the Tooltip doesn't wrap the DropdownMenuTrigger directly.
 
-### Phase 2: Day Parting Schedule — Full Settings Inline
+### 1B. Table Sticky Columns (Name + Status)
+**Files**: `src/components/tables/CampaignTable.tsx`, all other table components that have a "Name" or "Status" column.
 
-**File: `src/pages/dayparting/HourlyData.tsx**`
+Add `sticky left-0 z-10 bg-background` to the first 1–2 columns (Status, Name) in both `<TableHead>` and `<TableCell>` so they stay fixed during horizontal scroll. The second sticky column needs `left-[<width>]` offset.
 
-- Replace the minimal collapsible schedule form with the full settings from the reference image:
-  - **Campaigns**: Horizontal scrolling chip/tag bar for selecting campaigns (matching reference: `SP | Catch all | Auto`, etc.)
-  - **Rule Name** input field
-  - **Date Range**: Start Date / End Date with "No End Date" checkbox
-  - **Recurrence**: Radio group (Daily / Weekly) with day-of-week checkboxes
-  - **Bid Adjustment**: Select (Increase by % / Decrease by %) + numeric input
-  - **Hour of Day**: Radio (All Day / Time Range) with start/end time pickers and "+ Add Time Range"
-  - **Cancel** and **Apply Day Parting Rule** buttons at bottom right
-- The "Hourly Trends" / "Day Parting Campaigns" tabs at the top (matching reference) to toggle between heatmap view and campaign list view
-- Move "Create Day Parting Rule" button to the top right of the page header
+### 1C. Nothing Above Universal Metric Selector
+**File: `src/pages/dayparting/HourlyData.tsx`**
+
+The schedule creation panel renders ABOVE the `<PageHeader>` (which contains AppTaskbar). Move the campaign/metric selectors (lines 239-261) to render AFTER the `<UnderlineTabs>`, not before it. The schedule creation panel (lines 108-231) is fine since it's toggled by a button — but move it below the tabs too.
+
+### 1D. Consistent Table Backgrounds
+Apply `bg-background` (not `bg-card`) to all table containers for consistency. Audit all table wrappers to use `rounded-lg border border-border` without extra card wrappers.
 
 ---
 
-### Phase 3: Create Campaign Modal
+## Phase 2: UX Affordances — Clickability, Tooltips, Cursor States
 
-**File: `src/components/advertising/CreateCampaignModal.tsx**` (new)
+This phase makes every interactive element clearly communicate that it's interactive.
 
-- Modal dialog with fields: Campaign Name, Campaign Type (SP/SB/SD/SV), Bidding Strategy, Daily Budget, Start Date, End Date, Status
-- Validation: name required, budget > 0
+### 2A. Global Cursor & Hover States
+**Files to update** (all interactive elements):
+- `src/components/advertising/UnderlineTabs.tsx` — already has `cursor-pointer` ✓
+- `src/components/advertising/InlineKPIStrip.tsx` — already has `cursor-pointer` and tooltip ✓
+- `src/components/tables/CampaignTable.tsx` — already has `cursor-pointer hover:bg-muted/50` and tooltip on rows ✓
+- `src/components/charts/ChartContainer.tsx` — already has tooltips ✓
+- `src/components/layout/AppTaskbar.tsx` — already has tooltips ✓
 
-**File: `src/pages/advertising/CampaignManager.tsx**`
+**Still missing:**
+- `src/components/tables/AdGroupsTable.tsx` — needs `cursor-pointer hover:bg-muted/50` on rows
+- `src/components/tables/ProductAdsTable.tsx` — same
+- `src/components/tables/KeywordTargetingTable.tsx` — same
+- `src/components/tables/SearchTermsTable.tsx` — same
+- `src/components/tables/ProductTargetingTable.tsx` — same
+- `src/components/tables/ImpactTable.tsx` — same
+- `src/components/tables/RegionalTable.tsx` — same
+- All `<Button>` and `<button>` elements across the app — add `cursor-pointer` where missing
+- All `<Select>` triggers — add `cursor-pointer`
 
-- Add "Create Campaign" button in PageHeader actions
-- Wire modal open/close and add new campaign to state
-
----
-
-### Phase 4: Add Keyword Modal Fix
-
-**File: `src/pages/bi/KeywordTracker.tsx**`
-
-- The AddKeywordModal exists and is wired. Verify it opens. The `isAddModalOpen` state and `setIsAddModalOpen(true)` on the button click look correct. Check if the modal component renders properly — it does exist at `src/components/bi/AddKeywordModal.tsx`. This appears functional already; may just need testing.
-
----
-
-### Phase 5: Filter Space Optimization
-
-**File: `src/components/advertising/DataTableToolbar.tsx**`
-
-- Make filter builder even more compact:
-  - Reduce the panel padding from `p-3` to `p-2`
-  - Make all filter selects narrower: field `w-[120px]`, operator `w-[90px]`, value `w-[100px]`
-  - Use `gap-1` instead of `gap-1.5` between elements
-  - Remove the border wrapper; use a subtle `bg-muted/30` background instead
-  - Active filter badges: reduce to `h-5` with `text-[10px]`
+### 2B. Tooltip on All Icon-Only Buttons
+Scan every `Button` that has no text label (icon-only) and ensure it has a wrapping `Tooltip`. Key files:
+- `src/pages/advertising/ImpactAnalysis.tsx` — Maximize2 and Download buttons (lines 97-98)
+- Any remaining icon buttons without tooltips
 
 ---
 
-### Phase 6: Clickable/Selectable Affordances Across the App
+## Phase 3: Feature Completion & Polish
 
-Multiple files need hover/cursor/tooltip improvements:
+### 3A. Fix Tooltip-Dropdown Conflicts Throughout
+The pattern of `<Tooltip><TooltipTrigger asChild><DropdownMenuTrigger>` is broken in Radix. Fix ALL instances:
+- DataTableToolbar Columns button
+- Any other places this pattern exists (check ChartContainer Metrics button — same pattern at line 70-78)
 
-`**src/components/advertising/UnderlineTabs.tsx**`
+**Fix pattern**: Use a wrapper `<div>` between Tooltip and Dropdown triggers, or remove Tooltip and use `title` attr.
 
-- Add `cursor-pointer` explicitly to tab buttons
-- Add subtle hover background `hover:bg-muted/50 rounded-t-md px-3` for better click target visibility
+### 3B. Verified Working Features
+After audit, these features ARE implemented and working:
+- **Create Campaign Modal** ✓ (exists in `CreateCampaignModal.tsx`, wired in `CampaignManager.tsx`)
+- **Add Keyword Modal** ✓ (exists in `AddKeywordModal.tsx`, wired in `KeywordTracker.tsx`)
+- **Show Impact / View Changes / Hide Chart toggles** ✓ (in `CampaignManager.tsx` lines 137-139, 251-270)
+- **Day Parting full schedule settings** ✓ (in `HourlyData.tsx` lines 108-231)
+- **Heatmap numbers in cells** ✓ (in `HourlyHeatmap.tsx` lines 169-175)
+- **Heatmap totals row/column** ✓ (in `HourlyHeatmap.tsx` lines 200-213)
+- **Impact Analysis chart** ✓ (in `ImpactAnalysis.tsx` lines 101-120)
+- **PnL expand/collapse all** ✓ (in `PnLParameterTable.tsx` lines 54-55)
+- **Date range presets + Apply button** ✓ (in `AppTaskbar.tsx` lines 37-71, 104-116)
+- **Sidebar redesign with Rules group** ✓ (in `AppSidebar.tsx` lines 73-78)
+- **Pencil edit icon** ✓ (in `DataTableToolbar.tsx` lines 222-240)
 
-`**src/components/advertising/InlineKPIStrip.tsx**`
-
-- When `availableMetrics` is provided, add `cursor-pointer` and `hover:bg-muted/50` to the KPI card container
-- Add tooltip: "Click to change metric"
-
-`**src/components/tables/CampaignTable.tsx**`
-
-- Add `cursor-pointer hover:bg-muted/50` to clickable table rows
-- Add tooltip on row hover: "Click to view details"
-
-`**src/components/charts/ChartContainer.tsx**`
-
-- Add tooltips to the expand button, metrics button, and chart type selector
-- Ensure all buttons have `cursor-pointer`
-
-`**src/components/dayparting/HourlyHeatmap.tsx**`
-
-- When `onCellClick` is provided, add tooltip "Click to select" on each cell
-
-`**src/components/layout/AppTaskbar.tsx**`
-
-- Add tooltips to Ad Type, Frequency, Date Range controls: "Change ad type", "Change frequency", "Select date range"
-
-`**src/components/layout/AppSidebar.tsx**`
-
-- Ensure all nav items show `cursor-pointer` (already done via NavLink, but verify collapsed state buttons)
+### 3C. Add Verification Mandate to Project Knowledge
+Add a project knowledge entry requiring post-implementation verification scans and change reports in chat after every prompt.
 
 ---
 
-### Phase 7: Heatmap — Add "Hourly Total" Row and "Daily Total" Column
+## Summary of Changes Per Phase
 
-**File: `src/components/dayparting/HourlyHeatmap.tsx**`
+### Phase 1 (Foundation)
+| File | Change |
+|------|--------|
+| `DataTableToolbar.tsx` | Fix Tooltip-Dropdown conflict on Columns button |
+| `CampaignTable.tsx` | Add sticky Status + Name columns |
+| `HourlyData.tsx` | Move campaign/metric selectors below tabs |
+| All table wrapper pages | Standardize `bg-background` on table containers |
 
-- Add a summary "Hourly Total" row at the bottom (matching reference image)
-- Add a "Daily Total" column at the right end
-- Style totals row/column with slightly different background
+### Phase 2 (Affordances)
+| File | Change |
+|------|--------|
+| `AdGroupsTable.tsx` | cursor-pointer + hover on rows |
+| `ProductAdsTable.tsx` | cursor-pointer + hover on rows |
+| `KeywordTargetingTable.tsx` | cursor-pointer + hover on rows |
+| `SearchTermsTable.tsx` | cursor-pointer + hover on rows |
+| `ProductTargetingTable.tsx` | cursor-pointer + hover on rows |
+| `ImpactTable.tsx` | cursor-pointer + hover on rows |
+| `RegionalTable.tsx` | cursor-pointer + hover on rows |
+| `ImpactAnalysis.tsx` | Tooltips on icon buttons |
 
----
+### Phase 3 (Polish)
+| File | Change |
+|------|--------|
+| `ChartContainer.tsx` | Fix Tooltip-Dropdown conflict on Metrics button |
+| `DataTableToolbar.tsx` | Final Tooltip-Dropdown fix verification |
+| Project Knowledge | Add verification mandate |
 
-### Phase 8: Day Parting Tabs — Hourly Trends vs Day Parting Campaigns
-
-**File: `src/pages/dayparting/HourlyData.tsx**`
-
-- Add UnderlineTabs at the top: "Hourly Trends" | "Day Parting Campaigns"
-- "Hourly Trends" shows heatmap + chart toggle
-- "Day Parting Campaigns" shows the campaigns table with schedule status
-- This matches the reference image showing two top-level tabs
-
-&nbsp;
-
-### Phase 9 : redesign profitablity PnL table,  also where there are many expadable arows like in pnl table and anywhere else give universal expand and colaps arrow in the head of the table3
-
----
-
-### Summary of Files Modified/Created
-
-
-| File                                                 | Change                                                            |
-| ---------------------------------------------------- | ----------------------------------------------------------------- |
-| `src/pages/advertising/CampaignManager.tsx`          | Show Impact/View Changes toggles, Create Campaign button          |
-| `src/components/advertising/CreateCampaignModal.tsx` | **New** — Create Campaign dialog                                  |
-| `src/pages/dayparting/HourlyData.tsx`                | Full inline schedule settings, tabs for Hourly Trends / Campaigns |
-| `src/components/dayparting/HourlyHeatmap.tsx`        | Hourly Total row, Daily Total column                              |
-| `src/components/advertising/DataTableToolbar.tsx`    | Tighter filter layout                                             |
-| `src/components/advertising/UnderlineTabs.tsx`       | Hover affordance, cursor                                          |
-| `src/components/advertising/InlineKPIStrip.tsx`      | Cursor + tooltip for swappable metrics                            |
-| `src/components/tables/CampaignTable.tsx`            | Row hover + cursor for clickable rows                             |
-| `src/components/charts/ChartContainer.tsx`           | Tooltips on all action buttons                                    |
-| `src/components/layout/AppTaskbar.tsx`               | Tooltips on filter controls                                       |
