@@ -232,13 +232,14 @@ export default function CampaignManager() {
         <PageHeader
           title="Campaign Manager"
           subtitle="Manage and optimize your advertising campaigns"
-          actions={
-            <Button size="sm" className="gap-1.5" onClick={() => setCreateModalOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Create Campaign
-            </Button>
-          }
         />
+
+        <div className="flex items-center justify-end">
+          <Button size="sm" className="gap-1.5" onClick={() => setCreateModalOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Create Campaign
+          </Button>
+        </div>
 
         <InlineKPIStrip
           items={kpiItems}
