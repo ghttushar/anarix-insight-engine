@@ -95,6 +95,7 @@ export default function HourlyData() {
         <PageHeader
           title="Day Parting"
           subtitle="Analyze hourly performance and manage campaign schedules"
+          hideTaskbar
         />
 
         <AppTaskbar />
