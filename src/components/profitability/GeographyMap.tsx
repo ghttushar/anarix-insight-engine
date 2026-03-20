@@ -173,13 +173,13 @@ export function GeographyMap({ selectedRegion, onRegionSelect }: GeographyMapPro
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-medium text-foreground">Sales by Region</h3>
         <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon" onClick={handleZoomIn} className="h-7 w-7">
+          <Button variant="outline" size="icon" onClick={handleZoomIn} className="h-7 w-7" title="Zoom in">
             <ZoomIn className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="outline" size="icon" onClick={handleZoomOut} className="h-7 w-7">
+          <Button variant="outline" size="icon" onClick={handleZoomOut} className="h-7 w-7" title="Zoom out">
             <ZoomOut className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="outline" size="icon" onClick={handleReset} className="h-7 w-7">
+          <Button variant="outline" size="icon" onClick={handleReset} className="h-7 w-7" title="Reset view">
             <RotateCcw className="h-3.5 w-3.5" />
           </Button>
         </div>

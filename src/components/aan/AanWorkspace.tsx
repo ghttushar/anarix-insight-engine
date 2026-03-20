@@ -75,7 +75,7 @@ export function AanWorkspace() {
             )}
           </button>
 
-          <Button variant="ghost" size="icon" onClick={closeAan} className="h-8 w-8 hover:bg-muted">
+          <Button variant="ghost" size="icon" onClick={closeAan} className="h-8 w-8 hover:bg-muted" title="Close Aan">
             <X className="h-4 w-4" />
           </Button>
         </div>

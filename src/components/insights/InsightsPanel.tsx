@@ -44,6 +44,7 @@ export function InsightsPanel() {
             size="icon"
             onClick={closePanel}
             className="h-8 w-8"
+            title="Close insights"
           >
             <X className="h-4 w-4" />
           </Button>
