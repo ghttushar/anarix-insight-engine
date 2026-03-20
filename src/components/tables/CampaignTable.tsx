@@ -28,6 +28,7 @@ interface CampaignTableProps {
   searchQuery?: string;
   viewMode?: "view" | "edit";
   onRowClick?: (id: string) => void;
+  hiddenColumns?: Set<string>;
 }
 
 type SortField = keyof Campaign | null;
