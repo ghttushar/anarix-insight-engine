@@ -67,16 +67,11 @@ export function ChartContainer({
 
       {metrics && metrics.length > 0 && onMetricToggle && (
         <Popover>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 text-xs gap-1 cursor-pointer">
-                  Metrics ({activeMetricCount}/{totalMetricCount})
-                </Button>
-              </PopoverTrigger>
-            </TooltipTrigger>
-            <TooltipContent>Toggle chart metrics</TooltipContent>
-          </Tooltip>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1 cursor-pointer" title="Toggle chart metrics">
+              Metrics ({activeMetricCount}/{totalMetricCount})
+            </Button>
+          </PopoverTrigger>
           <PopoverContent align="end" className="w-48 p-2">
             <div className="space-y-1">
               {metrics.map((m) => (
