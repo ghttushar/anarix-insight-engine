@@ -36,9 +36,9 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-24 sticky left-0 z-10 bg-muted/30">Status</TableHead>
-              <TableHead className="min-w-[200px] sticky left-[96px] z-10 bg-muted/30">Ad Group</TableHead>
+            <TableRow className="bg-muted hover:bg-muted">
+              <TableHead className="w-24 sticky left-0 z-10 bg-muted">Status</TableHead>
+              <TableHead className="min-w-[200px] sticky left-[96px] z-10 bg-muted">Ad Group</TableHead>
               <TableHead className="min-w-[200px]">Campaign</TableHead>
               <TableHead className="text-center">Bid Auto</TableHead>
               <TableHead className="text-right">Min Bid</TableHead>
