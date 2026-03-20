@@ -183,7 +183,7 @@ export function CampaignTable({
           </TableHeader>
           <TableBody>
             {paginatedCampaigns.map((campaign) => (
-              <TableRow key={campaign.id}>
+              <TableRow key={campaign.id} className={cn(onRowClick && "cursor-pointer")} onClick={() => onRowClick?.(campaign.id)}>
                 {isEdit && (
                   <TableCell>
                     <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
