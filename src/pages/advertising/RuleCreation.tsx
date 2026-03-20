@@ -318,7 +318,7 @@ function CriteriaBlock({
               className="h-8 w-20 text-xs"
             />
             {criteria.conditions.length > 1 && (
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => onRemoveCondition(cond.id)}>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => onRemoveCondition(cond.id)} title="Remove condition">
                 <X className="h-3.5 w-3.5" />
               </Button>
             )}

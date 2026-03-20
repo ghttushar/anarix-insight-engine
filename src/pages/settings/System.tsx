@@ -117,10 +117,10 @@ export default function System() {
             <p className="text-sm text-muted-foreground">Use this key to access the Anarix API programmatically.</p>
             <div className="flex gap-2">
               <Input readOnly value={showApiKey ? apiKey : "ak_live_••••••••••••••••••••••••••••"} className="font-mono text-sm" />
-              <Button variant="outline" size="icon" onClick={() => setShowApiKey(!showApiKey)}>
+              <Button variant="outline" size="icon" onClick={() => setShowApiKey(!showApiKey)} title={showApiKey ? "Hide API key" : "Show API key"}>
                 {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
-              <Button variant="outline" size="icon" onClick={() => { navigator.clipboard.writeText(apiKey); toast.success("API key copied"); }}>
+              <Button variant="outline" size="icon" onClick={() => { navigator.clipboard.writeText(apiKey); toast.success("API key copied"); }} title="Copy API key">
                 <Copy className="h-4 w-4" />
               </Button>
             </div>

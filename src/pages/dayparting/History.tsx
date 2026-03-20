@@ -38,7 +38,7 @@ export default function DayPartingHistory() {
           subtitle="View past day parting schedule executions"
           actions={
             <>
-              <Button variant="outline" size="icon" onClick={() => toast.info("Refreshing...")}><RefreshCw className="h-4 w-4" /></Button>
+              <Button variant="outline" size="icon" onClick={() => toast.info("Refreshing...")} title="Refresh"><RefreshCw className="h-4 w-4" /></Button>
               <Button variant="outline" onClick={() => toast.success("Exporting history...")}><Download className="mr-2 h-4 w-4" />Export</Button>
             </>
           }

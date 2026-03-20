@@ -153,7 +153,7 @@ export default function AMCQueries() {
                     <TableCell className="text-muted-foreground text-xs font-mono max-w-[200px] truncate">{q.sqlPreview}</TableCell>
                     <TableCell>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" title="Actions"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => toast.info("Running query...")}><Play className="h-4 w-4 mr-2" />Run</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEdit(q.id)}>Edit</DropdownMenuItem>

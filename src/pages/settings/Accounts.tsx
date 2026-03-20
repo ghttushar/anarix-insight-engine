@@ -66,7 +66,7 @@ function AccountCard({ account, onSync, onRemove }: {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="shrink-0">
+              <Button variant="ghost" size="icon" className="shrink-0" title="More options">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

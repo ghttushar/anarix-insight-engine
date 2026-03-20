@@ -67,7 +67,7 @@ export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdo
             </h2>
             <p className="text-xs text-muted-foreground">{summary.dateRange}</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8" title="Close panel">
             <X className="h-4 w-4" />
           </Button>
         </div>

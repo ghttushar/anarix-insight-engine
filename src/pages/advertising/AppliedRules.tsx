@@ -177,10 +177,10 @@ export default function AppliedRules() {
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>Page {page + 1} of {Math.max(totalPages, 1)}</span>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
+            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={page === 0} onClick={() => setPage((p) => p - 1)} title="Previous page">
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>
+            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)} title="Next page">
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
