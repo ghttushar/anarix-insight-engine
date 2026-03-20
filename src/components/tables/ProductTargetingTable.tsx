@@ -67,9 +67,9 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
           </TableHeader>
           <TableBody>
             {filteredTargets.map((target) => (
-              <TableRow key={target.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={target.status} /></TableCell>
-                <TableCell className="sticky left-[96px] z-10 bg-background">
+              <TableRow key={target.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={target.status} /></TableCell>
+                <TableCell className="sticky left-[96px] z-10 bg-background group-hover:bg-muted transition-colors">
                   <div className="flex flex-col">
                     <span className="font-medium text-foreground">{target.targetLabel}</span>
                     <span className="text-xs text-muted-foreground">{target.targetValue}</span>
