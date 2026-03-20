@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
@@ -22,8 +23,6 @@ import { mockProductTargets } from "@/data/mockProductTargeting";
 import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable";
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Campaign } from "@/types/campaign";
-import { Button } from "@/components/ui/button";
-import { Download, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
@@ -36,14 +35,14 @@ interface FilterRule {
 }
 
 const tabs = [
-  { value: "campaigns", label: "Campaigns", count: mockCampaigns.length },
-  { value: "ad-groups", label: "Ad Groups", count: mockAdGroups.length },
-  { value: "product-ads", label: "Product Ads", count: mockProductAds.length },
-  { value: "keywords", label: "Keyword Targeting", count: mockKeywords.length },
-  { value: "product-targeting", label: "Product Targeting", count: mockProductTargets.length },
-  { value: "search-terms", label: "Search Terms", count: mockSearchTerms.length },
-  { value: "page-type", label: "Page Type", count: mockPageTypes.length },
-  { value: "platform", label: "Platform", count: mockPlatforms.length },
+  { value: "campaigns", label: "Campaigns" },
+  { value: "ad-groups", label: "Ad Groups" },
+  { value: "product-ads", label: "Product Ads" },
+  { value: "keywords", label: "Keyword Targeting" },
+  { value: "product-targeting", label: "Product Targeting" },
+  { value: "search-terms", label: "Search Terms" },
+  { value: "page-type", label: "Page Type" },
+  { value: "platform", label: "Platform" },
 ];
 
 const COLUMN_DEFS: Record<string, { id: string; label: string }[]> = {
@@ -116,6 +115,7 @@ const AVAILABLE_METRICS = [
 ];
 
 export default function CampaignManager() {
+  const navigate = useNavigate();
   const { isWalmart } = useMarketplace();
   const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
   const [activeTab, setActiveTab] = useState<TabValue>("campaigns");
@@ -175,7 +175,7 @@ export default function CampaignManager() {
 
   const renderTable = () => {
     switch (activeTab) {
-      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} />;
+      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} onRowClick={(id) => navigate(`/advertising/campaigns/${id}`)} />;
       case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} />;
       case "product-ads": return <ProductAdsTable searchQuery={searchQuery} />;
       case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} />;
@@ -199,16 +199,7 @@ export default function CampaignManager() {
         />
 
 
-        <div className="rounded-lg border border-border bg-card">
-          <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <h3 className="font-heading text-sm font-medium text-foreground">Performance Trends</h3>
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="sm"><Maximize2 className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="sm" onClick={() => toast.success("Downloading chart...")}><Download className="h-4 w-4" /></Button>
-            </div>
-          </div>
-          <div className="p-4"><PerformanceChart data={mockChartData} /></div>
-        </div>
+        <PerformanceChart data={mockChartData} />
 
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />

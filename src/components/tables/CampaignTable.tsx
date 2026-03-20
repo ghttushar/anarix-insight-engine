@@ -26,6 +26,7 @@ interface CampaignTableProps {
   showTotalBudget?: boolean;
   searchQuery?: string;
   viewMode?: "view" | "edit";
+  onRowClick?: (id: string) => void;
 }
 
 type SortField = keyof Campaign | null;
@@ -95,6 +96,7 @@ export function CampaignTable({
   showTotalBudget = true,
   searchQuery = "",
   viewMode = "view",
+  onRowClick,
 }: CampaignTableProps) {
   const { formatCurrency } = useCurrency();
   const filteredCampaigns = campaigns.filter((c) =>
@@ -181,7 +183,7 @@ export function CampaignTable({
           </TableHeader>
           <TableBody>
             {paginatedCampaigns.map((campaign) => (
-              <TableRow key={campaign.id}>
+              <TableRow key={campaign.id} className={cn(onRowClick && "cursor-pointer")} onClick={() => onRowClick?.(campaign.id)}>
                 {isEdit && (
                   <TableCell>
                     <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />

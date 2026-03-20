@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, Download, Columns, X, Eye, Edit, Plus, Check } from "lucide-react";
+import { Search, Filter, Download, Columns, X, Pencil, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface FilterRule {
@@ -117,85 +118,59 @@ export function DataTableToolbar({
   );
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Main Toolbar Row */}
-      <div className="flex items-center justify-between gap-4">
-        {/* Left Side: leftContent + View Toggle + Search */}
+      <div className="flex items-center justify-between gap-3">
+        {/* Left Side: leftContent + Search */}
         <div className="flex items-center gap-2">
           {leftContent}
-          {showViewToggle && onViewModeChange && (
-            <div className="flex rounded-lg border border-border bg-background p-0.5">
-              <button
-                onClick={() => onViewModeChange("view")}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                  viewMode === "view" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Eye className="h-3.5 w-3.5" />
-                View
-              </button>
-              <button
-                onClick={() => onViewModeChange("edit")}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                  viewMode === "edit" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Edit className="h-3.5 w-3.5" />
-                Edit
-              </button>
-            </div>
-          )}
-
-          {/* Search — always on left */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={searchPlaceholder}
-              className="h-9 w-64 pl-9"
+              className="h-8 w-56 pl-8 text-sm"
             />
           </div>
         </div>
 
-        {/* Right Side: Columns + Filter + Download */}
-        <div className="flex items-center gap-2">
+        {/* Right Side: Columns + Filter + Download + Edit toggle */}
+        <div className="flex items-center gap-1.5">
           {/* Columns Dropdown */}
           {columns.length > 0 && onColumnToggle && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-9 gap-1.5">
-                  <Columns className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
+                  <Columns className="h-3.5 w-3.5" />
                   Columns
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 p-0">
+              <DropdownMenuContent align="end" className="w-52 p-0">
                 <div className="p-2 border-b border-border">
                   <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                     <Input
                       value={columnSearch}
                       onChange={(e) => setColumnSearch(e.target.value)}
                       placeholder="Search columns..."
-                      className="h-8 pl-8 text-xs"
+                      className="h-7 pl-7 text-xs"
                       onKeyDown={(e) => e.stopPropagation()}
                     />
                   </div>
                 </div>
-                <div className="flex items-center justify-between px-3 py-1.5 border-b border-border">
+                <div className="flex items-center justify-between px-3 py-1 border-b border-border">
                   <button onClick={onSelectAllColumns} className="text-xs text-primary hover:underline">Select All</button>
                   <button onClick={onClearAllColumns} className="text-xs text-muted-foreground hover:text-foreground">Clear All</button>
                 </div>
-                <div className="max-h-[240px] overflow-auto p-1">
+                <div className="max-h-[200px] overflow-auto p-1">
                   {filteredColumns.map((column) => (
                     <button
                       key={column.id}
                       onClick={() => onColumnToggle(column.id)}
-                      className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-muted transition-colors"
+                      className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors"
                     >
-                      <Checkbox checked={column.visible} className="pointer-events-none" />
+                      <Checkbox checked={column.visible} className="pointer-events-none h-3.5 w-3.5" />
                       <span className="text-foreground">{column.label}</span>
                     </button>
                   ))}
@@ -206,15 +181,15 @@ export function DataTableToolbar({
 
           {/* Filter Button */}
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="h-9 gap-1.5"
+            className="h-8 gap-1 text-xs"
             onClick={handleOpenFilter}
           >
-            <Filter className="h-4 w-4" />
+            <Filter className="h-3.5 w-3.5" />
             Filter
             {activeFilters.length > 0 && (
-              <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+              <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
                 {activeFilters.length}
               </span>
             )}
@@ -222,27 +197,47 @@ export function DataTableToolbar({
 
           {/* Download Button */}
           {onDownload && (
-            <Button variant="outline" size="sm" className="h-9" onClick={onDownload}>
-              <Download className="h-4 w-4" />
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onDownload}>
+              <Download className="h-3.5 w-3.5" />
             </Button>
           )}
 
           {rightContent}
+
+          {/* Edit Mode Toggle — Pencil icon, far right */}
+          {showViewToggle && onViewModeChange && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-8 w-8 p-0 ml-1",
+                    viewMode === "edit" && "bg-primary/10 text-primary"
+                  )}
+                  onClick={() => onViewModeChange(viewMode === "view" ? "edit" : "view")}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{viewMode === "edit" ? "Switch to View mode" : "Switch to Edit mode"}</TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </div>
 
       {/* Active Filters Display */}
       {activeFilters.length > 0 && !filterPanelOpen && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-xs text-muted-foreground">Filters:</span>
           {activeFilters.map((filter) => (
-            <Badge key={filter.id} variant="secondary" className="gap-1.5 pr-1">
+            <Badge key={filter.id} variant="secondary" className="gap-1 pr-1 text-xs h-6">
               <span>{filter.field} {filter.operator} {filter.value}</span>
               <button
                 onClick={() => onFiltersChange?.(activeFilters.filter((f) => f.id !== filter.id))}
                 className="rounded-full p-0.5 hover:bg-muted"
               >
-                <X className="h-3 w-3" />
+                <X className="h-2.5 w-2.5" />
               </button>
             </Badge>
           ))}
@@ -252,54 +247,42 @@ export function DataTableToolbar({
         </div>
       )}
 
-      {/* Inline Filter Builder Panel */}
+      {/* Compact Inline Filter Builder */}
       {filterPanelOpen && (
-        <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-foreground">Filter Rules</span>
-          </div>
+        <div className="rounded-md border border-border p-3 space-y-2">
           {draftFilters.map((rule, idx) => (
-            <div key={rule.id} className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground w-12">{idx === 0 ? "Where" : "And"}</span>
+            <div key={rule.id} className="flex items-center gap-1.5">
+              <span className="text-[11px] text-muted-foreground w-10 shrink-0">{idx === 0 ? "Where" : "And"}</span>
               <Select value={rule.field} onValueChange={(v) => updateFilterRule(rule.id, "field", v)}>
-                <SelectTrigger className="h-8 w-[160px] text-xs">
-                  <SelectValue placeholder="Select field" />
-                </SelectTrigger>
+                <SelectTrigger className="h-7 w-[130px] text-xs"><SelectValue placeholder="Field" /></SelectTrigger>
                 <SelectContent>
-                  {filterFields.map((f) => (
-                    <SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>
-                  ))}
+                  {filterFields.map((f) => (<SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>))}
                 </SelectContent>
               </Select>
               <Select value={rule.operator} onValueChange={(v) => updateFilterRule(rule.id, "operator", v)}>
-                <SelectTrigger className="h-8 w-[120px] text-xs">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger className="h-7 w-[100px] text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {OPERATORS.map((op) => (
-                    <SelectItem key={op} value={op} className="text-xs">{op}</SelectItem>
-                  ))}
+                  {OPERATORS.map((op) => (<SelectItem key={op} value={op} className="text-xs">{op}</SelectItem>))}
                 </SelectContent>
               </Select>
               <Input
                 value={rule.value}
                 onChange={(e) => updateFilterRule(rule.id, "value", e.target.value)}
                 placeholder="Value..."
-                className="h-8 w-[140px] text-xs"
+                className="h-7 w-[110px] text-xs"
               />
-              <button onClick={() => removeFilterRule(rule.id)} className="p-1 hover:bg-muted rounded">
-                <X className="h-3.5 w-3.5 text-muted-foreground" />
+              <button onClick={() => removeFilterRule(rule.id)} className="p-0.5 hover:bg-muted rounded">
+                <X className="h-3 w-3 text-muted-foreground" />
               </button>
             </div>
           ))}
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center justify-between">
             <button onClick={addFilterRule} className="flex items-center gap-1 text-xs text-primary hover:underline">
-              <Plus className="h-3.5 w-3.5" />
-              Add Filter
+              <Plus className="h-3 w-3" />Add
             </button>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={cancelFilters} className="h-8 text-xs">Cancel</Button>
-              <Button size="sm" onClick={applyFilters} className="h-8 text-xs">Apply</Button>
+            <div className="flex items-center gap-1.5">
+              <Button variant="ghost" size="sm" onClick={cancelFilters} className="h-7 text-xs px-2">Cancel</Button>
+              <Button size="sm" onClick={applyFilters} className="h-7 text-xs px-3">Apply</Button>
             </div>
           </div>
         </div>
