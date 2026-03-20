@@ -180,25 +180,21 @@ export function DataTableToolbar({
           )}
 
           {/* Filter Button */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-1 text-xs cursor-pointer"
-                onClick={handleOpenFilter}
-              >
-                <Filter className="h-3.5 w-3.5" />
-                Filter
-                {activeFilters.length > 0 && (
-                  <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                    {activeFilters.length}
-                  </span>
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Add or manage filters</TooltipContent>
-          </Tooltip>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 gap-1 text-xs cursor-pointer"
+            onClick={handleOpenFilter}
+            title="Add or manage filters"
+          >
+            <Filter className="h-3.5 w-3.5" />
+            Filter
+            {activeFilters.length > 0 && (
+              <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                {activeFilters.length}
+              </span>
+            )}
+          </Button>
 
           {/* Download Button */}
           {onDownload && (
