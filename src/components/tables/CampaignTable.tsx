@@ -96,6 +96,7 @@ export function CampaignTable({
   showTotalBudget = true,
   searchQuery = "",
   viewMode = "view",
+  onRowClick,
 }: CampaignTableProps) {
   const { formatCurrency } = useCurrency();
   const filteredCampaigns = campaigns.filter((c) =>
