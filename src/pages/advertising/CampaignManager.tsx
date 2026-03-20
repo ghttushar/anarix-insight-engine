@@ -115,6 +115,7 @@ const AVAILABLE_METRICS = [
 ];
 
 export default function CampaignManager() {
+  const navigate = useNavigate();
   const { isWalmart } = useMarketplace();
   const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
   const [activeTab, setActiveTab] = useState<TabValue>("campaigns");
