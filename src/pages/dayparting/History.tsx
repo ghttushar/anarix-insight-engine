@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { HistoryTable } from "@/components/dayparting/HistoryTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
