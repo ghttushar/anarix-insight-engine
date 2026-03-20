@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -229,10 +230,8 @@ export default function CampaignManager() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Campaign Manager"
-          subtitle="Manage and optimize your advertising campaigns"
-        />
+        <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
+        <AppTaskbar showAdType showFrequency showDateRange />
 
         <div className="flex items-center justify-end">
           <Button size="sm" className="gap-1.5" onClick={() => setCreateModalOpen(true)}>

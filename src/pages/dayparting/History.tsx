@@ -34,12 +34,8 @@ export default function DayPartingHistory() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Execution History"
-          subtitle="View past day parting schedule executions"
-          hideTaskbar
-        />
-        <AppTaskbar showAdType={false} showFrequency={false} showDateRange={false} />
+        <PageHeader title="Execution History" subtitle="View past day parting schedule executions" />
+        <AppTaskbar />
 
         <div className="flex items-center justify-end gap-2">
           <Button variant="outline" size="icon" onClick={() => toast.info("Refreshing...")} title="Refresh"><RefreshCw className="h-4 w-4" /></Button>

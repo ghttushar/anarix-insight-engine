@@ -12,6 +12,9 @@ import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from "recharts";
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
   mockImpactCampaigns,
   mockImpactAdGroups,
   mockImpactProducts,
@@ -29,7 +32,6 @@ const tabs = [
   { value: "search-terms", label: "Search Terms" },
 ];
 
-// Build chart data from campaigns comparing baseline vs impact
 const impactChartData = mockImpactCampaigns.map((c) => ({
   name: c.name.length > 20 ? c.name.slice(0, 20) + "…" : c.name,
   "Baseline Spend": c.baseline.adSpend,
@@ -41,6 +43,7 @@ const impactChartData = mockImpactCampaigns.map((c) => ({
 export default function ImpactAnalysis() {
   const [activeTab, setActiveTab] = useState<ImpactTab>("campaigns");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMetric, setSelectedMetric] = useState("adSpend");
 
   const getTabData = () => {
     switch (activeTab) {
@@ -66,30 +69,39 @@ export default function ImpactAnalysis() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Impact Analysis" subtitle="Compare performance across time periods to measure campaign impact" hideTaskbar />
-        <AppTaskbar showFrequency={false} showDateRange={false} />
-
-        {/* Period Selectors */}
-        <div className="flex items-center gap-4 rounded-lg border border-border p-3">
+        <PageHeader title="Impact Analysis" subtitle="Compare performance across time periods to measure campaign impact" />
+        <AppTaskbar showAdType>
+          {/* Period selectors inside taskbar */}
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">Baseline:</span>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Calendar className="h-4 w-4" />Jan 1 - Jan 7, 2026<ChevronDown className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Baseline</span>
+              <Button variant="ghost" size="sm" className="h-8 gap-1 text-sm font-normal px-1.5 cursor-pointer">
+                <Calendar className="h-3 w-3" />Jan 1 – Jan 7<ChevronDown className="h-3 w-3" />
+              </Button>
+            </div>
+            <span className="text-xs font-medium text-muted-foreground">vs</span>
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Impact</span>
+              <Button variant="ghost" size="sm" className="h-8 gap-1 text-sm font-normal px-1.5 cursor-pointer">
+                <Calendar className="h-3 w-3" />Jan 15 – Jan 22<ChevronDown className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
-          <span className="text-sm font-medium text-muted-foreground">vs</span>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">Impact:</span>
-            <Button variant="outline" size="sm" className="gap-2">
-              <Calendar className="h-4 w-4" />Jan 15 - Jan 22, 2026<ChevronDown className="h-4 w-4" />
-            </Button>
+          <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Metrics</span>
+            <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+              <SelectTrigger className="h-8 w-[120px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="adSpend" className="text-xs cursor-pointer">Ad Spend</SelectItem>
+                <SelectItem value="adSales" className="text-xs cursor-pointer">Ad Sales</SelectItem>
+                <SelectItem value="acos" className="text-xs cursor-pointer">ACOS</SelectItem>
+                <SelectItem value="roas" className="text-xs cursor-pointer">ROAS</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="ml-auto">
-            <Button size="sm" className="gap-2" onClick={handleAnalyze}>
-              <BarChart3 className="h-4 w-4" />Analyze
-            </Button>
-          </div>
-        </div>
+        </AppTaskbar>
 
         {/* Performance Comparison Chart */}
         <div className="rounded-lg border border-border p-4">
@@ -128,7 +140,6 @@ export default function ImpactAnalysis() {
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
-          
           onDownload={handleDownload}
         />
 
