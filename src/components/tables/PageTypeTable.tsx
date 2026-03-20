@@ -39,7 +39,7 @@ export function PageTypeTable({ searchQuery = "" }: PageTypeTableProps) {
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
+            <TableRow className="bg-muted hover:bg-muted">
               <TableHead className="min-w-[180px]">Page Type</TableHead>
               <TableHead className="w-32 text-right">Bid Modifier %</TableHead>
               <TableHead className="text-right">Impressions</TableHead>
