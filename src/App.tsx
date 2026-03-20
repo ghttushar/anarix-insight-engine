@@ -146,6 +146,8 @@ function AppRoutes() {
 
       {/* Advertising */}
       <Route path="/advertising/campaigns" element={<CampaignManager />} />
+      <Route path="/advertising/campaigns/:campaignId" element={<AdvCampaignDetail />} />
+      <Route path="/advertising/campaigns/:campaignId/:adGroupId" element={<AdGroupDetail />} />
       <Route path="/advertising/impact" element={<ImpactAnalysis />} />
       <Route path="/advertising/targeting" element={<TargetingActions />} />
       <Route path="/advertising/budget-pacing" element={<BudgetPacing />} />
