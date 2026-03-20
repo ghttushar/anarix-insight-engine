@@ -9,12 +9,8 @@ import { ProductsOrdersToggle } from "@/components/profitability/ProductsOrdersT
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { pnlData, profitabilityProducts } from "@/data/mockProfitability";
 import { ProfitabilityProduct } from "@/types/profitability";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import { Download, Play } from "lucide-react";
+import { Download } from "lucide-react";
+import { toast } from "sonner";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 
