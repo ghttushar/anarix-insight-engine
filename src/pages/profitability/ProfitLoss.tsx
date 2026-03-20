@@ -31,13 +31,12 @@ export default function ProfitLoss() {
   const { activePanel, setActivePanel, closePanel } = useActivePanel();
   const weeks = ["Week-05", "Week-04", "Week-02", "Week-01"];
   const [dateRange, setDateRange] = useState("quarter");
-  const [selectedCount] = useState(5);
+  const [dateRange, setDateRange] = useState("quarter");
   const [tableTab, setTableTab] = useState<"products" | "orders">("products");
   const [searchValue, setSearchValue] = useState("");
   const [columns, setColumns] = useState(COLUMN_DEFS);
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -53,12 +52,6 @@ export default function ProfitLoss() {
   const handleCloseDetail = () => {
     setDetailProduct(null);
     closePanel();
-  };
-
-  const handleRun = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 800);
-    toast.info("Refreshing data...");
   };
 
   const handleDownload = () => {
