@@ -67,16 +67,11 @@ export function ChartContainer({
 
       {metrics && metrics.length > 0 && onMetricToggle && (
         <Popover>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 text-xs gap-1 cursor-pointer">
-                  Metrics ({activeMetricCount}/{totalMetricCount})
-                </Button>
-              </PopoverTrigger>
-            </TooltipTrigger>
-            <TooltipContent>Toggle chart metrics</TooltipContent>
-          </Tooltip>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1 cursor-pointer" title="Toggle chart metrics">
+              Metrics ({activeMetricCount}/{totalMetricCount})
+            </Button>
+          </PopoverTrigger>
           <PopoverContent align="end" className="w-48 p-2">
             <div className="space-y-1">
               {metrics.map((m) => (
@@ -100,23 +95,18 @@ export function ChartContainer({
         </Popover>
       )}
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Select value={chartType} onValueChange={(v) => onChartTypeChange(v as ChartType)}>
-            <SelectTrigger className="h-7 w-[80px] text-xs cursor-pointer">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {availableChartTypes.map((t) => (
-                <SelectItem key={t} value={t} className="text-xs cursor-pointer">
-                  {CHART_TYPE_LABELS[t]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </TooltipTrigger>
-        <TooltipContent>Change chart type</TooltipContent>
-      </Tooltip>
+      <Select value={chartType} onValueChange={(v) => onChartTypeChange(v as ChartType)}>
+        <SelectTrigger className="h-7 w-[80px] text-xs cursor-pointer" title="Change chart type">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {availableChartTypes.map((t) => (
+            <SelectItem key={t} value={t} className="text-xs cursor-pointer">
+              {CHART_TYPE_LABELS[t]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </>
   );
 

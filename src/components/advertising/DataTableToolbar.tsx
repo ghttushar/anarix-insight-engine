@@ -16,7 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface FilterRule {
@@ -140,17 +139,12 @@ export function DataTableToolbar({
           {/* Columns Dropdown */}
           {columns.length > 0 && onColumnToggle && (
             <DropdownMenu>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer">
-                      <Columns className="h-3.5 w-3.5" />
-                      Columns
-                    </Button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>Toggle column visibility</TooltipContent>
-              </Tooltip>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" title="Toggle column visibility">
+                  <Columns className="h-3.5 w-3.5" />
+                  Columns
+                </Button>
+              </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52 p-0">
                 <div className="p-2 border-b border-border">
                   <div className="relative">
@@ -185,58 +179,45 @@ export function DataTableToolbar({
           )}
 
           {/* Filter Button */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-1 text-xs cursor-pointer"
-                onClick={handleOpenFilter}
-              >
-                <Filter className="h-3.5 w-3.5" />
-                Filter
-                {activeFilters.length > 0 && (
-                  <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                    {activeFilters.length}
-                  </span>
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Add or manage filters</TooltipContent>
-          </Tooltip>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 gap-1 text-xs cursor-pointer"
+            onClick={handleOpenFilter}
+            title="Add or manage filters"
+          >
+            <Filter className="h-3.5 w-3.5" />
+            Filter
+            {activeFilters.length > 0 && (
+              <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                {activeFilters.length}
+              </span>
+            )}
+          </Button>
 
           {/* Download Button */}
           {onDownload && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer" onClick={onDownload}>
-                  <Download className="h-3.5 w-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Download data</TooltipContent>
-            </Tooltip>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer" onClick={onDownload} title="Download data">
+              <Download className="h-3.5 w-3.5" />
+            </Button>
           )}
 
           {rightContent}
 
           {/* Edit Mode Toggle — Pencil icon, far right */}
           {showViewToggle && onViewModeChange && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-8 w-8 p-0 ml-1 cursor-pointer",
-                    viewMode === "edit" && "bg-primary/10 text-primary"
-                  )}
-                  onClick={() => onViewModeChange(viewMode === "view" ? "edit" : "view")}
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{viewMode === "edit" ? "Switch to View mode" : "Switch to Edit mode"}</TooltipContent>
-            </Tooltip>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-8 w-8 p-0 ml-1 cursor-pointer",
+                viewMode === "edit" && "bg-primary/10 text-primary"
+              )}
+              onClick={() => onViewModeChange(viewMode === "view" ? "edit" : "view")}
+              title={viewMode === "edit" ? "Switch to View mode" : "Switch to Edit mode"}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
           )}
         </div>
       </div>

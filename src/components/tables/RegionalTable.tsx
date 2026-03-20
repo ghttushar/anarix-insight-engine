@@ -46,7 +46,7 @@ export function RegionalTable({ data, searchValue = "" }: RegionalTableProps) {
 
     return (
       <>
-        <TableRow key={region.id} className={cn("hover:bg-muted/30 group", isChild && "bg-muted/10")}>
+        <TableRow key={region.id} className={cn("hover:bg-muted/30 group cursor-pointer transition-colors", isChild && "bg-muted/10")}>
           <TableCell className={cn("sticky left-0 z-10 border-r border-border transition-colors", isChild ? "bg-muted group-hover:bg-muted" : "bg-background group-hover:bg-muted")}>
             <div className={cn("flex items-center gap-2", isChild && "pl-8")}>
               {hasChildren ? (

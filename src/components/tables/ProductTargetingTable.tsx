@@ -39,13 +39,13 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
   );
 
   return (
-    <div className="rounded-lg border border-border bg-card">
+    <div className="rounded-lg border border-border">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-24">Status</TableHead>
-              <TableHead className="min-w-[220px]">Target</TableHead>
+              <TableHead className="w-24 sticky left-0 z-10 bg-muted/30">Status</TableHead>
+              <TableHead className="min-w-[220px] sticky left-[96px] z-10 bg-muted/30">Target</TableHead>
               <TableHead className="w-24">Type</TableHead>
               <TableHead className="min-w-[150px]">Ad Group</TableHead>
               <TableHead className="min-w-[180px]">Campaign</TableHead>
@@ -67,9 +67,9 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
           </TableHeader>
           <TableBody>
             {filteredTargets.map((target) => (
-              <TableRow key={target.id}>
-                <TableCell><StatusBadge status={target.status} /></TableCell>
-                <TableCell>
+              <TableRow key={target.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={target.status} /></TableCell>
+                <TableCell className="sticky left-[96px] z-10 bg-background">
                   <div className="flex flex-col">
                     <span className="font-medium text-foreground">{target.targetLabel}</span>
                     <span className="text-xs text-muted-foreground">{target.targetValue}</span>

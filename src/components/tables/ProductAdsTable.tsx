@@ -31,13 +31,13 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
   );
 
   return (
-    <div className="rounded-lg border border-border bg-card">
+    <div className="rounded-lg border border-border">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-24">Status</TableHead>
-              <TableHead className="min-w-[300px]">Product Ad</TableHead>
+              <TableHead className="w-24 sticky left-0 z-10 bg-muted/30">Status</TableHead>
+              <TableHead className="min-w-[300px] sticky left-[96px] z-10 bg-muted/30">Product Ad</TableHead>
               <TableHead className="min-w-[150px]">Ad Group</TableHead>
               <TableHead className="min-w-[150px]">Campaign</TableHead>
               <TableHead className="text-center">Bid Auto</TableHead>
@@ -55,9 +55,9 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredAds.map((ad) => (
-              <TableRow key={ad.id}>
-                <TableCell><StatusBadge status={ad.status} /></TableCell>
-                <TableCell>
+              <TableRow key={ad.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={ad.status} /></TableCell>
+                <TableCell className="sticky left-[96px] z-10 bg-background">
                   <div className="flex items-center gap-3">
                     <img src={ad.productImage} alt={ad.productName} className="h-10 w-10 rounded-md object-cover" />
                     <div className="flex flex-col">

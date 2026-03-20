@@ -138,8 +138,8 @@ export function CampaignTable({
           <TableHeader>
             <TableRow className="bg-muted/50">
               {isEdit && <TableHead className="w-16">Active</TableHead>}
-              <TableHead className="w-28">Status</TableHead>
-              <TableHead className="min-w-[200px] cursor-pointer" onClick={() => handleSort("name")}>
+              <TableHead className="w-28 sticky left-0 z-10 bg-muted/50">Status</TableHead>
+              <TableHead className={cn("min-w-[200px] cursor-pointer sticky z-10 bg-muted/50", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
                 <div className="flex items-center gap-1">Campaign Name <SortIcon field="name" /></div>
               </TableHead>
               <TableHead className="cursor-pointer" onClick={() => handleSort("startDate")}>
@@ -198,8 +198,8 @@ export function CampaignTable({
                         <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
                       </TableCell>
                     )}
-                    <TableCell><StatusBadge status={campaign.status} /></TableCell>
-                    <TableCell className="font-medium text-foreground">
+                    <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={campaign.status} /></TableCell>
+                    <TableCell className={cn("font-medium text-foreground sticky z-10 bg-background", isEdit ? "left-[64px]" : "left-[112px]")}>
                       {isEdit ? (
                         <Input defaultValue={campaign.name} className="h-8 text-sm" onBlur={(e) => onCampaignUpdate?.(campaign.id, { name: e.target.value })} onClick={(e) => e.stopPropagation()} />
                       ) : campaign.name}

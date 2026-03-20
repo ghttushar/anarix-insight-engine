@@ -56,12 +56,12 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
   };
 
   return (
-    <div className="rounded-lg border border-border bg-card">
+    <div className="rounded-lg border border-border">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="min-w-[250px]">Name</TableHead>
+              <TableHead className="min-w-[250px] sticky left-0 z-10 bg-muted/30">Name</TableHead>
               <TableHead className="w-28 text-center">Impact</TableHead>
               <TableHead className="min-w-[180px] text-right">Impressions</TableHead>
               <TableHead className="min-w-[150px] text-right">Clicks</TableHead>
@@ -78,8 +78,8 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
               const isNeutral = item.impactPercentage === 0;
 
               return (
-                <TableRow key={item.id}>
-                  <TableCell>
+                <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                  <TableCell className="sticky left-0 z-10 bg-background">
                     <div className="flex items-center gap-2">
                       {showType && item.type && (
                         <Badge
