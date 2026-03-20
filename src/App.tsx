@@ -28,6 +28,8 @@ import ConnectAccounts from "./pages/onboarding/ConnectAccounts";
 import CampaignManager from "./pages/advertising/CampaignManager";
 import ImpactAnalysis from "./pages/advertising/ImpactAnalysis";
 import TargetingActions from "./pages/advertising/TargetingActions";
+import AdvCampaignDetail from "./pages/advertising/CampaignDetail";
+import AdGroupDetail from "./pages/advertising/AdGroupDetail";
 import BudgetPacing from "./pages/advertising/BudgetPacing";
 import SearchHarvesting from "./pages/advertising/SearchHarvesting";
 import AnomalyAlerts from "./pages/advertising/AnomalyAlerts";
