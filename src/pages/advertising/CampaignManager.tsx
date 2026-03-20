@@ -229,10 +229,8 @@ export default function CampaignManager() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Campaign Manager"
-          subtitle="Manage and optimize your advertising campaigns"
-        />
+        <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
+        <AppTaskbar showAdType showFrequency showDateRange />
 
         <div className="flex items-center justify-end">
           <Button size="sm" className="gap-1.5" onClick={() => setCreateModalOpen(true)}>

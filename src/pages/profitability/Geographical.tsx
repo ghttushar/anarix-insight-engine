@@ -50,8 +50,8 @@ export default function Geographical() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Geographical Data" subtitle="Regional performance breakdown across markets" hideTaskbar />
-        <AppTaskbar showAdType={false} showFrequency={false} />
+        <PageHeader title="Geographical Data" subtitle="Regional performance breakdown across markets" />
+        <AppTaskbar showDateRange />
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 h-full">

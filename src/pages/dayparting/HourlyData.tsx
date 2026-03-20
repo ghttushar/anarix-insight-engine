@@ -92,13 +92,8 @@ export default function HourlyData() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Day Parting"
-          subtitle="Analyze hourly performance and manage campaign schedules"
-          hideTaskbar
-        />
-
-        <AppTaskbar showAdType={false} showFrequency={false} showDateRange={false} />
+        <PageHeader title="Day Parting" subtitle="Analyze hourly performance and manage campaign schedules" />
+        <AppTaskbar />
 
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleExport}><Download className="mr-2 h-4 w-4" />Export</Button>
