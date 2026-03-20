@@ -72,7 +72,7 @@ export function PageTypeTable({ searchQuery = "" }: PageTypeTableProps) {
                 <TableCell className="text-right"><NumCell formatted={formatPercent(pageType.acos)} id={pageType.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={2} className="font-semibold">Total ({filteredTypes.length} page types)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(pageTypesTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(pageTypesTotals.clicks)}</TableCell>

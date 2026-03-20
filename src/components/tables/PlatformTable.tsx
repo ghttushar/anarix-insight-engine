@@ -72,7 +72,7 @@ export function PlatformTable({ searchQuery = "" }: PlatformTableProps) {
                 <TableCell className="text-right"><NumCell formatted={formatPercent(platform.acos)} id={platform.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={2} className="font-semibold">Total ({filteredPlatforms.length} platforms)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(platformsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(platformsTotals.clicks)}</TableCell>
