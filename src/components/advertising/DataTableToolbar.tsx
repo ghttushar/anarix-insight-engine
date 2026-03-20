@@ -118,9 +118,9 @@ export function DataTableToolbar({
   );
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       {/* Main Toolbar Row */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2">
         {/* Left Side: leftContent + Search */}
         <div className="flex items-center gap-2">
           {leftContent}
@@ -136,16 +136,21 @@ export function DataTableToolbar({
         </div>
 
         {/* Right Side: Columns + Filter + Download + Edit toggle */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           {/* Columns Dropdown */}
           {columns.length > 0 && onColumnToggle && (
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
-                  <Columns className="h-3.5 w-3.5" />
-                  Columns
-                </Button>
-              </DropdownMenuTrigger>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer">
+                      <Columns className="h-3.5 w-3.5" />
+                      Columns
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent>Toggle column visibility</TooltipContent>
+              </Tooltip>
               <DropdownMenuContent align="end" className="w-52 p-0">
                 <div className="p-2 border-b border-border">
                   <div className="relative">
@@ -160,15 +165,15 @@ export function DataTableToolbar({
                   </div>
                 </div>
                 <div className="flex items-center justify-between px-3 py-1 border-b border-border">
-                  <button onClick={onSelectAllColumns} className="text-xs text-primary hover:underline">Select All</button>
-                  <button onClick={onClearAllColumns} className="text-xs text-muted-foreground hover:text-foreground">Clear All</button>
+                  <button onClick={onSelectAllColumns} className="text-xs text-primary hover:underline cursor-pointer">Select All</button>
+                  <button onClick={onClearAllColumns} className="text-xs text-muted-foreground hover:text-foreground cursor-pointer">Clear All</button>
                 </div>
                 <div className="max-h-[200px] overflow-auto p-1">
                   {filteredColumns.map((column) => (
                     <button
                       key={column.id}
                       onClick={() => onColumnToggle(column.id)}
-                      className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors"
+                      className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors cursor-pointer"
                     >
                       <Checkbox checked={column.visible} className="pointer-events-none h-3.5 w-3.5" />
                       <span className="text-foreground">{column.label}</span>
@@ -180,26 +185,36 @@ export function DataTableToolbar({
           )}
 
           {/* Filter Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 gap-1 text-xs"
-            onClick={handleOpenFilter}
-          >
-            <Filter className="h-3.5 w-3.5" />
-            Filter
-            {activeFilters.length > 0 && (
-              <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                {activeFilters.length}
-              </span>
-            )}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1 text-xs cursor-pointer"
+                onClick={handleOpenFilter}
+              >
+                <Filter className="h-3.5 w-3.5" />
+                Filter
+                {activeFilters.length > 0 && (
+                  <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                    {activeFilters.length}
+                  </span>
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Add or manage filters</TooltipContent>
+          </Tooltip>
 
           {/* Download Button */}
           {onDownload && (
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onDownload}>
-              <Download className="h-3.5 w-3.5" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer" onClick={onDownload}>
+                  <Download className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Download data</TooltipContent>
+            </Tooltip>
           )}
 
           {rightContent}
@@ -212,7 +227,7 @@ export function DataTableToolbar({
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "h-8 w-8 p-0 ml-1",
+                    "h-8 w-8 p-0 ml-1 cursor-pointer",
                     viewMode === "edit" && "bg-primary/10 text-primary"
                   )}
                   onClick={() => onViewModeChange(viewMode === "view" ? "edit" : "view")}
@@ -226,22 +241,22 @@ export function DataTableToolbar({
         </div>
       </div>
 
-      {/* Active Filters Display */}
+      {/* Active Filters Display — compact */}
       {activeFilters.length > 0 && !filterPanelOpen && (
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">Filters:</span>
+        <div className="flex flex-wrap items-center gap-1">
+          <span className="text-[10px] text-muted-foreground">Filters:</span>
           {activeFilters.map((filter) => (
-            <Badge key={filter.id} variant="secondary" className="gap-1 pr-1 text-xs h-6">
+            <Badge key={filter.id} variant="secondary" className="gap-0.5 pr-0.5 text-[10px] h-5">
               <span>{filter.field} {filter.operator} {filter.value}</span>
               <button
                 onClick={() => onFiltersChange?.(activeFilters.filter((f) => f.id !== filter.id))}
-                className="rounded-full p-0.5 hover:bg-muted"
+                className="rounded-full p-0.5 hover:bg-muted cursor-pointer"
               >
                 <X className="h-2.5 w-2.5" />
               </button>
             </Badge>
           ))}
-          <button onClick={clearAllFilters} className="text-xs text-muted-foreground hover:text-foreground">
+          <button onClick={clearAllFilters} className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer">
             Clear all
           </button>
         </div>
@@ -249,18 +264,18 @@ export function DataTableToolbar({
 
       {/* Compact Inline Filter Builder */}
       {filterPanelOpen && (
-        <div className="rounded-md border border-border p-3 space-y-2">
+        <div className="rounded-md bg-muted/30 p-2 space-y-1.5">
           {draftFilters.map((rule, idx) => (
-            <div key={rule.id} className="flex items-center gap-1.5">
-              <span className="text-[11px] text-muted-foreground w-10 shrink-0">{idx === 0 ? "Where" : "And"}</span>
+            <div key={rule.id} className="flex items-center gap-1">
+              <span className="text-[10px] text-muted-foreground w-8 shrink-0">{idx === 0 ? "Where" : "And"}</span>
               <Select value={rule.field} onValueChange={(v) => updateFilterRule(rule.id, "field", v)}>
-                <SelectTrigger className="h-7 w-[130px] text-xs"><SelectValue placeholder="Field" /></SelectTrigger>
+                <SelectTrigger className="h-6 w-[120px] text-[11px]"><SelectValue placeholder="Field" /></SelectTrigger>
                 <SelectContent>
                   {filterFields.map((f) => (<SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>))}
                 </SelectContent>
               </Select>
               <Select value={rule.operator} onValueChange={(v) => updateFilterRule(rule.id, "operator", v)}>
-                <SelectTrigger className="h-7 w-[100px] text-xs"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-6 w-[90px] text-[11px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {OPERATORS.map((op) => (<SelectItem key={op} value={op} className="text-xs">{op}</SelectItem>))}
                 </SelectContent>
@@ -269,20 +284,20 @@ export function DataTableToolbar({
                 value={rule.value}
                 onChange={(e) => updateFilterRule(rule.id, "value", e.target.value)}
                 placeholder="Value..."
-                className="h-7 w-[110px] text-xs"
+                className="h-6 w-[100px] text-[11px]"
               />
-              <button onClick={() => removeFilterRule(rule.id)} className="p-0.5 hover:bg-muted rounded">
+              <button onClick={() => removeFilterRule(rule.id)} className="p-0.5 hover:bg-muted rounded cursor-pointer">
                 <X className="h-3 w-3 text-muted-foreground" />
               </button>
             </div>
           ))}
           <div className="flex items-center justify-between">
-            <button onClick={addFilterRule} className="flex items-center gap-1 text-xs text-primary hover:underline">
+            <button onClick={addFilterRule} className="flex items-center gap-1 text-[11px] text-primary hover:underline cursor-pointer">
               <Plus className="h-3 w-3" />Add
             </button>
-            <div className="flex items-center gap-1.5">
-              <Button variant="ghost" size="sm" onClick={cancelFilters} className="h-7 text-xs px-2">Cancel</Button>
-              <Button size="sm" onClick={applyFilters} className="h-7 text-xs px-3">Apply</Button>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" onClick={cancelFilters} className="h-6 text-[11px] px-2">Cancel</Button>
+              <Button size="sm" onClick={applyFilters} className="h-6 text-[11px] px-2">Apply</Button>
             </div>
           </div>
         </div>

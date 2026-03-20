@@ -14,16 +14,16 @@ interface UnderlineTabsProps {
 
 export function UnderlineTabs({ tabs, value, onChange }: UnderlineTabsProps) {
   return (
-    <div className="flex gap-6 border-b border-border">
+    <div className="flex gap-1 border-b border-border">
       {tabs.map((tab) => (
         <button
           key={tab.value}
           onClick={() => onChange(tab.value)}
           className={cn(
-            "relative pb-3 text-sm font-medium transition-colors",
+            "relative pb-2.5 px-3 text-sm font-medium transition-colors cursor-pointer rounded-t-md",
             value === tab.value
               ? "text-foreground"
-              : "text-muted-foreground hover:text-foreground"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
           )}
         >
           <span>{tab.label}</span>

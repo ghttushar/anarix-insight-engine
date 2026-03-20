@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ArrowDown, ArrowUp, Minus, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -7,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface KPIItem {
   label: string;
@@ -56,6 +56,8 @@ const accentColors: Record<string, string> = {
 };
 
 export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: InlineKPIStripProps) {
+  const isSwappable = !!(availableMetrics && onMetricChange);
+
   return (
     <div className="flex gap-1 rounded-lg bg-card p-1">
       {items.map((item, index) => {
@@ -64,28 +66,28 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
         const isNeutral = delta === 0;
         const colorClass = accentColors[item.accentColor || "primary"] || "border-l-primary";
 
-        return (
+        const cardContent = (
           <div
-            key={`${item.label}-${index}`}
             className={cn(
               "flex flex-1 flex-col gap-1 border-l-4 bg-background/50 px-4 py-3 first:rounded-l-md last:rounded-r-md",
-              colorClass
+              colorClass,
+              isSwappable && "cursor-pointer hover:bg-muted/50 transition-colors"
             )}
           >
             <div className="flex items-center justify-between">
-              {availableMetrics && onMetricChange ? (
+              {isSwappable ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors">
+                    <button className="flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                       {item.label}
                       <ChevronDown className="h-3 w-3" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="max-h-[240px] overflow-auto">
-                    {availableMetrics.map((metric) => (
+                    {availableMetrics!.map((metric) => (
                       <DropdownMenuItem
                         key={metric.key}
-                        onClick={() => onMetricChange(index, metric.key)}
+                        onClick={() => onMetricChange!(index, metric.key)}
                         className="text-xs cursor-pointer"
                       >
                         {metric.label}
@@ -125,6 +127,17 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
             </div>
           </div>
         );
+
+        if (isSwappable) {
+          return (
+            <Tooltip key={`${item.label}-${index}`}>
+              <TooltipTrigger asChild>{cardContent}</TooltipTrigger>
+              <TooltipContent>Click to change metric</TooltipContent>
+            </Tooltip>
+          );
+        }
+
+        return <div key={`${item.label}-${index}`}>{cardContent}</div>;
       })}
     </div>
   );

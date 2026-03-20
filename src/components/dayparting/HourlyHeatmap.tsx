@@ -105,22 +105,45 @@ export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: Hour
 
   const isHigherBetter = ["revenue", "roas", "orders", "units", "clicks", "ctr", "cvr"].includes(metric);
 
+  // Compute daily totals (sum per day across all hours)
+  const dayTotals: Record<number, number> = {};
+  DAYS.forEach((_, dayIndex) => {
+    let total = 0;
+    HOURS.forEach((hour) => {
+      const point = grid[`${dayIndex}-${hour}`];
+      if (point) total += getMetricValue(point, metric);
+    });
+    dayTotals[dayIndex] = total;
+  });
+
+  // Compute hourly totals (sum per hour across all days)
+  const hourTotals: Record<number, number> = {};
+  HOURS.forEach((hour) => {
+    let total = 0;
+    DAYS.forEach((_, dayIndex) => {
+      const point = grid[`${dayIndex}-${hour}`];
+      if (point) total += getMetricValue(point, metric);
+    });
+    hourTotals[hour] = total;
+  });
+
   return (
     <div className="rounded-lg border border-border p-4 overflow-x-auto">
-      <div className="min-w-[800px]">
-        {/* Header row with hours */}
-        <div className="grid grid-cols-[60px_repeat(24,1fr)] gap-1 mb-1">
+      <div className="min-w-[850px]">
+        {/* Header row with hours + Daily Total */}
+        <div className="grid grid-cols-[60px_repeat(24,1fr)_60px] gap-1 mb-1">
           <div className="text-xs font-medium text-muted-foreground"></div>
           {HOURS.map((hour) => (
             <div key={hour} className="text-[10px] font-medium text-muted-foreground text-center py-1">
               {hour.toString().padStart(2, "0")}
             </div>
           ))}
+          <div className="text-[10px] font-medium text-muted-foreground text-center py-1">Total</div>
         </div>
 
         {/* Data rows */}
         {DAYS.map((day, dayIndex) => (
-          <div key={day} className="grid grid-cols-[60px_repeat(24,1fr)] gap-1 mb-1">
+          <div key={day} className="grid grid-cols-[60px_repeat(24,1fr)_60px] gap-1 mb-1">
             <div className="text-xs font-medium text-muted-foreground flex items-center">
               {day}
             </div>
@@ -139,7 +162,7 @@ export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: Hour
                         "h-8 rounded transition-all duration-150 flex items-center justify-center",
                         point ? getColor(intensity, isHigherBetter) : "bg-muted/30",
                         isSelected && "ring-2 ring-primary ring-offset-1",
-                        onCellClick && "cursor-pointer hover:opacity-80"
+                        onCellClick ? "cursor-pointer hover:opacity-80" : "cursor-default"
                       )}
                       onClick={() => onCellClick?.(hour, dayIndex)}
                     >
@@ -162,12 +185,32 @@ export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: Hour
                     ) : (
                       <div className="text-muted-foreground">No data</div>
                     )}
+                    {onCellClick && <div className="text-muted-foreground mt-0.5">Click to select</div>}
                   </TooltipContent>
                 </Tooltip>
               );
             })}
+            {/* Daily Total */}
+            <div className="h-8 rounded bg-muted/50 flex items-center justify-center">
+              <span className="text-[7px] font-semibold text-foreground">{formatCellValue(dayTotals[dayIndex], metric)}</span>
+            </div>
           </div>
         ))}
+
+        {/* Hourly Total Row */}
+        <div className="grid grid-cols-[60px_repeat(24,1fr)_60px] gap-1 mt-1">
+          <div className="text-xs font-medium text-muted-foreground flex items-center">Total</div>
+          {HOURS.map((hour) => (
+            <div key={hour} className="h-8 rounded bg-muted/50 flex items-center justify-center">
+              <span className="text-[7px] font-semibold text-foreground">{formatCellValue(hourTotals[hour], metric)}</span>
+            </div>
+          ))}
+          <div className="h-8 rounded bg-muted flex items-center justify-center">
+            <span className="text-[7px] font-bold text-foreground">
+              {formatCellValue(Object.values(hourTotals).reduce((a, b) => a + b, 0), metric)}
+            </span>
+          </div>
+        </div>
 
         {/* Legend */}
         <div className="mt-4 flex items-center justify-center gap-2">

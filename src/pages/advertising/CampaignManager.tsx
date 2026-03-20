@@ -13,6 +13,8 @@ import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
 import { PageTypeTable } from "@/components/tables/PageTypeTable";
 import { PlatformTable } from "@/components/tables/PlatformTable";
+import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable";
+import { CreateCampaignModal } from "@/components/advertising/CreateCampaignModal";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { mockAdGroups } from "@/data/mockAdGroups";
 import { mockProductAds } from "@/data/mockProductAds";
@@ -20,10 +22,14 @@ import { mockKeywords } from "@/data/mockKeywords";
 import { mockSearchTerms } from "@/data/mockSearchTerms";
 import { mockPageTypes, mockPlatforms } from "@/data/mockPageTypePlatform";
 import { mockProductTargets } from "@/data/mockProductTargeting";
-import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable";
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Campaign } from "@/types/campaign";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Maximize2, Minimize2, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
@@ -127,6 +133,14 @@ export default function CampaignManager() {
     mockKPIData.slice(0, 4).map((k) => k.label)
   );
 
+  // Show Impact & Chart visibility
+  const [showImpact, setShowImpact] = useState(false);
+  const [viewChanges, setViewChanges] = useState(false);
+  const [chartVisible, setChartVisible] = useState(true);
+
+  // Create Campaign Modal
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
   const kpiItems = mockKPIData
     .filter((kpi) => selectedKPIs.includes(kpi.label))
     .map((kpi, index) => ({
@@ -173,6 +187,32 @@ export default function CampaignManager() {
     });
   };
 
+  const handleCreateCampaign = (data: { name: string; type: string; biddingStrategy: string; dailyBudget: number; startDate: string; endDate?: string }) => {
+    const newCampaign: Campaign = {
+      id: `camp-new-${Date.now()}`,
+      name: data.name,
+      status: "live",
+      isActive: true,
+      biddingStrategy: data.biddingStrategy as any,
+      type: data.type as any,
+      dailyBudget: data.dailyBudget,
+      totalBudget: data.dailyBudget * 30,
+      spend: 0,
+      sales: 0,
+      roas: 0,
+      impressions: 0,
+      clicks: 0,
+      ctr: 0,
+      acos: 0,
+      orders: 0,
+      cpc: 0,
+      units: 0,
+      startDate: data.startDate,
+      endDate: data.endDate,
+    };
+    setCampaigns((prev) => [newCampaign, ...prev]);
+  };
+
   const renderTable = () => {
     switch (activeTab) {
       case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} onRowClick={(id) => navigate(`/advertising/campaigns/${id}`)} />;
@@ -190,7 +230,16 @@ export default function CampaignManager() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
+        <PageHeader
+          title="Campaign Manager"
+          subtitle="Manage and optimize your advertising campaigns"
+          actions={
+            <Button size="sm" className="gap-1.5" onClick={() => setCreateModalOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Create Campaign
+            </Button>
+          }
+        />
 
         <InlineKPIStrip
           items={kpiItems}
@@ -198,9 +247,29 @@ export default function CampaignManager() {
           onMetricChange={handleKPISwap}
         />
 
+        {/* Chart Controls Row */}
+        <div className="flex items-center justify-between rounded-md border border-border px-3 py-2">
+          <div className="flex items-center gap-5">
+            <div className="flex items-center gap-2">
+              <Switch id="show-impact" checked={showImpact} onCheckedChange={setShowImpact} className="h-5 w-9 [&>span]:h-4 [&>span]:w-4" />
+              <Label htmlFor="show-impact" className="text-xs font-medium text-muted-foreground cursor-pointer">Show Impact</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch id="view-changes" checked={viewChanges} onCheckedChange={setViewChanges} className="h-5 w-9 [&>span]:h-4 [&>span]:w-4" />
+              <Label htmlFor="view-changes" className="text-xs font-medium text-muted-foreground cursor-pointer">View Changes</Label>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setChartVisible(!chartVisible)} className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+              {chartVisible ? "Hide Chart" : "Show Chart"}
+            </button>
+            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+              {chartVisible ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+            </Button>
+          </div>
+        </div>
 
-        <PerformanceChart data={mockChartData} />
-
+        {chartVisible && <PerformanceChart data={mockChartData} />}
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
 
@@ -223,6 +292,12 @@ export default function CampaignManager() {
 
         {renderTable()}
       </div>
+
+      <CreateCampaignModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSubmit={handleCreateCampaign}
+      />
     </AppLayout>
   );
 }
