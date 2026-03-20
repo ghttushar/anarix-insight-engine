@@ -8,7 +8,7 @@ interface PageHeaderProps {
   hideTaskbar?: boolean;
 }
 
-export function PageHeader({ title, subtitle, actions, hideTaskbar = true }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, actions, hideTaskbar = false }: PageHeaderProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
