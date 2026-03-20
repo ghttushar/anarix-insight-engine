@@ -43,9 +43,9 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-24 sticky left-0 z-10 bg-muted/30">Status</TableHead>
-              <TableHead className="min-w-[220px] sticky left-[96px] z-10 bg-muted/30">Target</TableHead>
+            <TableRow className="bg-muted hover:bg-muted">
+              <TableHead className="w-24 sticky left-0 z-10 bg-muted">Status</TableHead>
+              <TableHead className="min-w-[220px] sticky left-[96px] z-10 bg-muted">Target</TableHead>
               <TableHead className="w-24">Type</TableHead>
               <TableHead className="min-w-[150px]">Ad Group</TableHead>
               <TableHead className="min-w-[180px]">Campaign</TableHead>
