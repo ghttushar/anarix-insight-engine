@@ -30,8 +30,6 @@ const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Net Profit", "Units"];
 export default function ProfitLoss() {
   const { activePanel, setActivePanel, closePanel } = useActivePanel();
   const weeks = ["Week-05", "Week-04", "Week-02", "Week-01"];
-  const [dateRange, setDateRange] = useState("quarter");
-  const [dateRange, setDateRange] = useState("quarter");
   const [tableTab, setTableTab] = useState<"products" | "orders">("products");
   const [searchValue, setSearchValue] = useState("");
   const [columns, setColumns] = useState(COLUMN_DEFS);
