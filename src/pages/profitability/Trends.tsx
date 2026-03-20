@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { ScatterPlotChart } from "@/components/profitability/ScatterPlotChart";
 import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModal";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
