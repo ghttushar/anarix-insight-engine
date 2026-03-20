@@ -62,37 +62,38 @@ export default function ProfitabilityTrends() {
         <PageHeader
           title="Profitability Trends"
           subtitle="Analyze product performance quadrants"
-          actions={
-            <>
-              {selectedProducts.length > 0 && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  {selectedProducts.length} Product(s) Selected
-                </Badge>
-              )}
-              <Select value={dateRange} onValueChange={setDateRange}>
-                <SelectTrigger className="w-[180px] h-9 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="week">Week (by days)</SelectItem>
-                  <SelectItem value="month">Month (by days)</SelectItem>
-                  <SelectItem value="quarter">A Quarter / 3 months</SelectItem>
-                  <SelectItem value="year">This Year</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={selectedMetric} onValueChange={setSelectedMetric}>
-                <SelectTrigger className="w-[180px] h-9 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {profitabilityMetrics.map((m) => (
-                    <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button size="sm" onClick={handleRun} disabled={isLoading}>
-                <Play className="mr-2 h-4 w-4" />{isLoading ? "Running..." : "Run"}
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleDownload}><Download className="h-4 w-4" /></Button>
-            </>
-          }
+          hideTaskbar
         />
+        <AppTaskbar showAdType={false} showFrequency={false} />
+
+        <div className="flex items-center justify-end gap-2">
+          {selectedProducts.length > 0 && (
+            <Badge variant="secondary" className="px-3 py-1">
+              {selectedProducts.length} Product(s) Selected
+            </Badge>
+          )}
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger className="w-[180px] h-9 text-xs"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="week">Week (by days)</SelectItem>
+              <SelectItem value="month">Month (by days)</SelectItem>
+              <SelectItem value="quarter">A Quarter / 3 months</SelectItem>
+              <SelectItem value="year">This Year</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+            <SelectTrigger className="w-[180px] h-9 text-xs"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {profitabilityMetrics.map((m) => (
+                <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button size="sm" onClick={handleRun} disabled={isLoading}>
+            <Play className="mr-2 h-4 w-4" />{isLoading ? "Running..." : "Run"}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleDownload}><Download className="h-4 w-4" /></Button>
+        </div>
 
         <ScatterPlotChart data={scatterData} />
 

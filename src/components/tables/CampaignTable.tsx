@@ -99,8 +99,10 @@ export function CampaignTable({
   searchQuery = "",
   viewMode = "view",
   onRowClick,
+  hiddenColumns,
 }: CampaignTableProps) {
   const { formatCurrency } = useCurrency();
+  const show = (col: string) => !hiddenColumns?.has(col);
   const filteredCampaigns = campaigns.filter((c) =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );

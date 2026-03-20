@@ -37,13 +37,14 @@ export default function DayPartingHistory() {
         <PageHeader
           title="Execution History"
           subtitle="View past day parting schedule executions"
-          actions={
-            <>
-              <Button variant="outline" size="icon" onClick={() => toast.info("Refreshing...")} title="Refresh"><RefreshCw className="h-4 w-4" /></Button>
-              <Button variant="outline" onClick={() => toast.success("Exporting history...")}><Download className="mr-2 h-4 w-4" />Export</Button>
-            </>
-          }
+          hideTaskbar
         />
+        <AppTaskbar showAdType={false} showFrequency={false} showDateRange={false} />
+
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="outline" size="icon" onClick={() => toast.info("Refreshing...")} title="Refresh"><RefreshCw className="h-4 w-4" /></Button>
+          <Button variant="outline" onClick={() => toast.success("Exporting history...")}><Download className="mr-2 h-4 w-4" />Export</Button>
+        </div>
 
         <DataTableToolbar
           searchValue={searchQuery}
