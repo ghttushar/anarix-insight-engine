@@ -151,8 +151,8 @@ export default function ProfitabilityDashboard() {
                   <Button variant="outline" size="sm" onClick={handleUploadCOGS}>
                     <Upload className="mr-2 h-4 w-4" />Upload COGS
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleDownload}>
-                    Export
+                  <Button variant="outline" size="icon" className="h-8 w-8" onClick={handleDownload} title="Export CSV">
+                    <Upload className="h-4 w-4" />
                   </Button>
                 </div>
               }
