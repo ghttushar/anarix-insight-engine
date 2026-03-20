@@ -198,14 +198,9 @@ export function DataTableToolbar({
 
           {/* Download Button */}
           {onDownload && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer" onClick={onDownload}>
-                  <Download className="h-3.5 w-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Download data</TooltipContent>
-            </Tooltip>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer" onClick={onDownload} title="Download data">
+              <Download className="h-3.5 w-3.5" />
+            </Button>
           )}
 
           {rightContent}
