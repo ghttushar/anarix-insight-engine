@@ -37,12 +37,12 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
   );
 
   return (
-    <div className="rounded-lg border border-border bg-card">
+    <div className="rounded-lg border border-border">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="min-w-[200px]">Search Term</TableHead>
+              <TableHead className="min-w-[200px] sticky left-0 z-10 bg-muted/30">Search Term</TableHead>
               <TableHead className="min-w-[250px]">Product Ad</TableHead>
               <TableHead className="min-w-[150px]">Keyword</TableHead>
               <TableHead className="w-24">Match Type</TableHead>
