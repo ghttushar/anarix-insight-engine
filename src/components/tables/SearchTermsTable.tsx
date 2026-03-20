@@ -83,7 +83,7 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
                 <TableCell className="text-right"><NumCell formatted={formatCurrency(term.adSpend)} id={term.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={6} className="font-semibold">Total ({filteredTerms.length} search terms)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.clicks)}</TableCell>

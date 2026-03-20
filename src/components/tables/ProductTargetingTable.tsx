@@ -105,7 +105,7 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
                 <TableCell className="text-right"><NumCell formatted={formatPercent(target.acos)} id={target.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={9} className="font-semibold">Total ({filteredTargets.length} targets)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productTargetsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productTargetsTotals.clicks)}</TableCell>

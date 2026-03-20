@@ -253,10 +253,6 @@ export default function CampaignManager() {
               <Switch id="show-impact" checked={showImpact} onCheckedChange={setShowImpact} className="h-5 w-9 [&>span]:h-4 [&>span]:w-4" />
               <Label htmlFor="show-impact" className="text-xs font-medium text-muted-foreground cursor-pointer">Show Impact</Label>
             </div>
-            <div className="flex items-center gap-2">
-              <Switch id="view-changes" checked={viewChanges} onCheckedChange={setViewChanges} className="h-5 w-9 [&>span]:h-4 [&>span]:w-4" />
-              <Label htmlFor="view-changes" className="text-xs font-medium text-muted-foreground cursor-pointer">View Changes</Label>
-            </div>
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => setChartVisible(!chartVisible)} className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
@@ -268,7 +264,7 @@ export default function CampaignManager() {
           </div>
         </div>
 
-        {chartVisible && <PerformanceChart data={mockChartData} />}
+        {chartVisible && <PerformanceChart data={mockChartData} showImpact={showImpact} />}
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
 

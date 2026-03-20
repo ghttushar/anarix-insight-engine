@@ -126,7 +126,7 @@ export default function ImpactAnalysis() {
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
-          onFilter={() => {}}
+          
           onDownload={handleDownload}
         />
 

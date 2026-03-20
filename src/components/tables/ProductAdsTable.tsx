@@ -81,7 +81,7 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
                 <TableCell className="text-right"><NumCell formatted={formatCurrency(ad.adSpend)} id={ad.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={8} className="font-semibold">Total ({filteredAds.length} product ads)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.clicks)}</TableCell>

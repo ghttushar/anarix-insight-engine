@@ -166,7 +166,7 @@ export default function ProfitabilityDashboard() {
               activeFilters={activeFilters}
               onFiltersChange={setActiveFilters}
               filterFields={FILTER_FIELDS}
-              onDownload={handleDownload}
+              
             />
             <div className="rounded-lg border border-border">
               <ProductsPnLTable

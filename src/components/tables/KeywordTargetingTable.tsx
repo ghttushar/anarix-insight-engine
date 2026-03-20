@@ -90,7 +90,7 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
                 <TableCell className="text-right"><NumCell formatted={formatCurrency(keyword.adSpend)} id={keyword.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={9} className="font-semibold">Total ({filteredKeywords.length} keywords)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.clicks)}</TableCell>
