@@ -10,7 +10,20 @@ import { ChartContainer, ChartType, ChartMetric } from "./ChartContainer";
 interface PerformanceChartProps {
   data: ChartDataPoint[];
   title?: string;
+  showImpact?: boolean;
 }
+
+const IMPACT_MULTIPLIERS: Record<string, number> = {
+  spend: 0.85,
+  sales: 1.12,
+  impressions: 0.92,
+  clicks: 1.08,
+  roas: 1.15,
+  acos: 0.88,
+  cpc: 0.95,
+  orders: 1.05,
+  ctr: 1.03,
+};
 
 function formatTooltipValue(value: number, format: string): string {
   switch (format) {
