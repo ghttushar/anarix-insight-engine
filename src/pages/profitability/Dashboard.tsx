@@ -12,7 +12,7 @@ import { PeriodBreakdownPanel } from "@/components/profitability/PeriodBreakdown
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { profitabilitySummaries, profitabilityProducts, trendDataByPeriod } from "@/data/mockProfitability";
 import { ProfitabilityProduct, ProfitabilitySummary } from "@/types/profitability";
-import { Upload, Download } from "lucide-react";
+import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -21,22 +21,22 @@ import { useActivePanel } from "@/contexts/ActivePanelContext";
 const accentColors = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
 const COLUMN_DEFS = [
-  { id: "units", label: "Units", visible: true },
-  { id: "refundUnits", label: "Refund Units", visible: true },
-  { id: "cancelledUnits", label: "Cancelled Units", visible: true },
-  { id: "gmv", label: "GMV", visible: true },
-  { id: "authSales", label: "Auth Sales", visible: true },
-  { id: "refundSales", label: "Refund Sales", visible: true },
-  { id: "cancelledSales", label: "Cancelled Sales", visible: true },
-  { id: "adSpend", label: "Ad Spend", visible: true },
-  { id: "commissionProduct", label: "Comm. Product", visible: true },
-  { id: "commissionShipping", label: "Comm. Shipping", visible: true },
-  { id: "wfsFulfillmentFee", label: "WFS Fee", visible: true },
-  { id: "shippingFees", label: "Shipping Fees", visible: true },
-  { id: "cogs", label: "COGS", visible: true },
-  { id: "netProfit", label: "Net Profit", visible: true },
-  { id: "additionalFee", label: "Additional Fee", visible: true },
-];
+{ id: "units", label: "Units", visible: true },
+{ id: "refundUnits", label: "Refund Units", visible: true },
+{ id: "cancelledUnits", label: "Cancelled Units", visible: true },
+{ id: "gmv", label: "GMV", visible: true },
+{ id: "authSales", label: "Auth Sales", visible: true },
+{ id: "refundSales", label: "Refund Sales", visible: true },
+{ id: "cancelledSales", label: "Cancelled Sales", visible: true },
+{ id: "adSpend", label: "Ad Spend", visible: true },
+{ id: "commissionProduct", label: "Comm. Product", visible: true },
+{ id: "commissionShipping", label: "Comm. Shipping", visible: true },
+{ id: "wfsFulfillmentFee", label: "WFS Fee", visible: true },
+{ id: "shippingFees", label: "Shipping Fees", visible: true },
+{ id: "cogs", label: "COGS", visible: true },
+{ id: "netProfit", label: "Net Profit", visible: true },
+{ id: "additionalFee", label: "Additional Fee", visible: true }];
+
 
 const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Net Profit", "Ad Spend", "Units"];
 
@@ -102,9 +102,9 @@ export default function ProfitabilityDashboard() {
   };
 
   const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-    p.itemId.toLowerCase().includes(searchValue.toLowerCase()) ||
-    p.sku.toLowerCase().includes(searchValue.toLowerCase())
+  p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+  p.itemId.toLowerCase().includes(searchValue.toLowerCase()) ||
+  p.sku.toLowerCase().includes(searchValue.toLowerCase())
   );
 
   const showProductDetail = activePanel === "productDetail" && detailProduct;
@@ -118,28 +118,28 @@ export default function ProfitabilityDashboard() {
 
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-3">
-              {profitabilitySummaries.map((summary, index) => (
-                <div
-                  key={summary.period}
-                  onClick={() => setSelectedPeriod(summary.period)}
-                  className={cn(
-                    "cursor-pointer rounded-lg transition-all",
-                    selectedPeriod === summary.period && "ring-2 ring-primary/50"
-                  )}
-                >
+              {profitabilitySummaries.map((summary, index) =>
+              <div
+                key={summary.period}
+                onClick={() => setSelectedPeriod(summary.period)}
+                className={cn(
+                  "cursor-pointer rounded-lg transition-all",
+                  selectedPeriod === summary.period && "ring-2 ring-primary/50"
+                )}>
+                
                   <PeriodSummaryCard
-                    summary={summary}
-                    accentColor={accentColors[index % accentColors.length]}
-                    onViewMore={handleOpenBreakdown}
-                  />
+                  summary={summary}
+                  accentColor={accentColors[index % accentColors.length]}
+                  onViewMore={handleOpenBreakdown} />
+                
                 </div>
-              ))}
+              )}
             </div>
             <div className="h-full">
               <ProfitabilityTrendChart
                 data={trendDataByPeriod[selectedPeriod] || trendDataByPeriod.this_month}
-                periodLabel={profitabilitySummaries.find((s) => s.period === selectedPeriod)?.dateLabel || ""}
-              />
+                periodLabel={profitabilitySummaries.find((s) => s.period === selectedPeriod)?.dateLabel || ""} />
+              
             </div>
           </div>
 
@@ -147,12 +147,12 @@ export default function ProfitabilityDashboard() {
             <DataTableToolbar
               leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />}
               rightContent={
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" onClick={handleUploadCOGS}>
                     <Upload className="mr-2 h-4 w-4" />Upload COGS
                   </Button>
                   <Button variant="outline" size="sm" onClick={handleDownload}>
-                    <Download className="mr-2 h-4 w-4" />Export
+                    Export
                   </Button>
                 </div>
               }
@@ -166,40 +166,40 @@ export default function ProfitabilityDashboard() {
               activeFilters={activeFilters}
               onFiltersChange={setActiveFilters}
               filterFields={FILTER_FIELDS}
-              onDownload={handleDownload}
-            />
+              onDownload={handleDownload} />
+            
             <div className="rounded-lg border border-border">
               <ProductsPnLTable
                 products={filteredProducts}
                 visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
                 onCogsClick={(product) => setCogsProduct(product)}
                 onTrendsClick={(product) => setTrendsProduct(product)}
-                onMoreClick={handleOpenDetail}
-              />
+                onMoreClick={handleOpenDetail} />
+              
             </div>
           </div>
         </div>
 
         {/* Right-side panels — only one at a time */}
-        {showProductDetail && (
-          <ProductDetailPanel product={detailProduct} isOpen={true} onClose={handleCloseRightPanel} />
-        )}
-        {showBreakdown && (
-          <PeriodBreakdownPanel summary={breakdownSummary} isOpen={true} onClose={handleCloseRightPanel} />
-        )}
+        {showProductDetail &&
+        <ProductDetailPanel product={detailProduct} isOpen={true} onClose={handleCloseRightPanel} />
+        }
+        {showBreakdown &&
+        <PeriodBreakdownPanel summary={breakdownSummary} isOpen={true} onClose={handleCloseRightPanel} />
+        }
       </div>
 
       <COGSEditModal
         product={cogsProduct}
         isOpen={!!cogsProduct}
         onClose={() => setCogsProduct(null)}
-        onSave={handleCogsSave}
-      />
+        onSave={handleCogsSave} />
+      
       <ProductTrendsModal
         product={trendsProduct}
         isOpen={!!trendsProduct}
-        onClose={() => setTrendsProduct(null)}
-      />
-    </AppLayout>
-  );
+        onClose={() => setTrendsProduct(null)} />
+      
+    </AppLayout>);
+
 }
