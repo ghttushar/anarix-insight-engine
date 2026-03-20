@@ -207,22 +207,18 @@ export function DataTableToolbar({
 
           {/* Edit Mode Toggle — Pencil icon, far right */}
           {showViewToggle && onViewModeChange && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-8 w-8 p-0 ml-1 cursor-pointer",
-                    viewMode === "edit" && "bg-primary/10 text-primary"
-                  )}
-                  onClick={() => onViewModeChange(viewMode === "view" ? "edit" : "view")}
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{viewMode === "edit" ? "Switch to View mode" : "Switch to Edit mode"}</TooltipContent>
-            </Tooltip>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-8 w-8 p-0 ml-1 cursor-pointer",
+                viewMode === "edit" && "bg-primary/10 text-primary"
+              )}
+              onClick={() => onViewModeChange(viewMode === "view" ? "edit" : "view")}
+              title={viewMode === "edit" ? "Switch to View mode" : "Switch to Edit mode"}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
           )}
         </div>
       </div>

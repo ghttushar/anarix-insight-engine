@@ -64,9 +64,9 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
           </TableHeader>
           <TableBody>
             {filteredKeywords.map((keyword) => (
-              <TableRow key={keyword.id}>
-                <TableCell><StatusBadge status={keyword.status} /></TableCell>
-                <TableCell className="font-medium text-foreground">{keyword.keyword}</TableCell>
+              <TableRow key={keyword.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={keyword.status} /></TableCell>
+                <TableCell className="font-medium text-foreground sticky left-[96px] z-10 bg-background">{keyword.keyword}</TableCell>
                 <TableCell><Badge variant="outline" className={cn("text-xs uppercase", matchTypeColors[keyword.matchType])}>{keyword.matchType}</Badge></TableCell>
                 <TableCell className="text-foreground">{keyword.adGroupName}</TableCell>
                 <TableCell>

@@ -57,7 +57,7 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
             {filteredAds.map((ad) => (
               <TableRow key={ad.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
                 <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={ad.status} /></TableCell>
-                <TableCell>
+                <TableCell className="sticky left-[96px] z-10 bg-background">
                   <div className="flex items-center gap-3">
                     <img src={ad.productImage} alt={ad.productName} className="h-10 w-10 rounded-md object-cover" />
                     <div className="flex flex-col">

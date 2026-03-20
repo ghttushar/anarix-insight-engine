@@ -94,8 +94,8 @@ export default function ImpactAnalysis() {
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-heading text-sm font-medium text-foreground">Performance Comparison</h3>
             <div className="flex items-center gap-1">
-              <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Maximize2 className="h-3.5 w-3.5" /></Button>
-              <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleDownload}><Download className="h-3.5 w-3.5" /></Button>
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 cursor-pointer" title="Expand chart"><Maximize2 className="h-3.5 w-3.5" /></Button>
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 cursor-pointer" onClick={handleDownload} title="Download data"><Download className="h-3.5 w-3.5" /></Button>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={240}>

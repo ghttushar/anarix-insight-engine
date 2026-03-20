@@ -79,7 +79,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
 
               return (
                 <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                  <TableCell>
+                  <TableCell className="sticky left-0 z-10 bg-background">
                     <div className="flex items-center gap-2">
                       {showType && item.type && (
                         <Badge

@@ -59,8 +59,8 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredTerms.map((term) => (
-              <TableRow key={term.id}>
-                <TableCell className="font-medium text-foreground">{term.searchTerm}</TableCell>
+              <TableRow key={term.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="font-medium text-foreground sticky left-0 z-10 bg-background">{term.searchTerm}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <img src={term.productImage} alt={term.productName} className="h-8 w-8 rounded object-cover" />

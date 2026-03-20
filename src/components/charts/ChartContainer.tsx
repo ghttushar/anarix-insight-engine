@@ -95,23 +95,18 @@ export function ChartContainer({
         </Popover>
       )}
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Select value={chartType} onValueChange={(v) => onChartTypeChange(v as ChartType)}>
-            <SelectTrigger className="h-7 w-[80px] text-xs cursor-pointer">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {availableChartTypes.map((t) => (
-                <SelectItem key={t} value={t} className="text-xs cursor-pointer">
-                  {CHART_TYPE_LABELS[t]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </TooltipTrigger>
-        <TooltipContent>Change chart type</TooltipContent>
-      </Tooltip>
+      <Select value={chartType} onValueChange={(v) => onChartTypeChange(v as ChartType)}>
+        <SelectTrigger className="h-7 w-[80px] text-xs cursor-pointer" title="Change chart type">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {availableChartTypes.map((t) => (
+            <SelectItem key={t} value={t} className="text-xs cursor-pointer">
+              {CHART_TYPE_LABELS[t]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </>
   );
 

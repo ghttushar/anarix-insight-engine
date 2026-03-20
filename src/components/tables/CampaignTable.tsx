@@ -198,8 +198,8 @@ export function CampaignTable({
                         <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
                       </TableCell>
                     )}
-                    <TableCell><StatusBadge status={campaign.status} /></TableCell>
-                    <TableCell className="font-medium text-foreground">
+                    <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={campaign.status} /></TableCell>
+                    <TableCell className={cn("font-medium text-foreground sticky z-10 bg-background", isEdit ? "left-[64px]" : "left-[112px]")}>
                       {isEdit ? (
                         <Input defaultValue={campaign.name} className="h-8 text-sm" onBlur={(e) => onCampaignUpdate?.(campaign.id, { name: e.target.value })} onClick={(e) => e.stopPropagation()} />
                       ) : campaign.name}
