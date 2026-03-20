@@ -135,7 +135,6 @@ export default function CampaignManager() {
 
   // Show Impact & Chart visibility
   const [showImpact, setShowImpact] = useState(false);
-  const [viewChanges, setViewChanges] = useState(false);
   const [chartVisible, setChartVisible] = useState(true);
 
   // Create Campaign Modal
