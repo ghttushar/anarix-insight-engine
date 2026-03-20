@@ -40,9 +40,23 @@ function formatTooltipValue(value: number, format: string): string {
   }
 }
 
-export function PerformanceChart({ data, title = "Performance Overview" }: PerformanceChartProps) {
+export function PerformanceChart({ data, title = "Performance Overview", showImpact = false }: PerformanceChartProps) {
   const [selectedMetrics, setSelectedMetrics] = useState<MetricKey[]>(DEFAULT_SELECTED_METRICS);
   const [chartType, setChartType] = useState<ChartType>("line");
+
+  // Generate impact comparison data when showImpact is true
+  const chartData = showImpact
+    ? data.map((point) => {
+        const impactPoint: Record<string, any> = { ...point };
+        selectedMetrics.forEach((key) => {
+          const val = point[key as keyof typeof point];
+          if (typeof val === "number") {
+            impactPoint[`${key}_impact`] = +(val * (IMPACT_MULTIPLIERS[key] || 1)).toFixed(2);
+          }
+        });
+        return impactPoint;
+      })
+    : data;
 
   const handleMetricToggle = (metricKey: string) => {
     setSelectedMetrics((prev) => {
