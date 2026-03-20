@@ -70,7 +70,13 @@ const DATE_PRESET_GROUPS: { label: string; presets: DatePreset[] }[] = [
   },
 ];
 
-export function AppTaskbar() {
+interface AppTaskbarProps {
+  showAdType?: boolean;
+  showFrequency?: boolean;
+  showDateRange?: boolean;
+}
+
+export function AppTaskbar({ showAdType = true, showFrequency = true, showDateRange = true }: AppTaskbarProps) {
   const { marketplace, setMarketplace } = useMarketplace();
   const { accounts, currentAccount, setCurrentAccount } = useAccounts();
   const { adType, setAdType, frequency, setFrequency, dateRange, setDateRange } = useFilter();
