@@ -11,7 +11,6 @@ import { pnlData, profitabilityProducts } from "@/data/mockProfitability";
 import { ProfitabilityProduct } from "@/types/profitability";
 import { Download } from "lucide-react";
 import { toast } from "sonner";
-import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 
 const COLUMN_DEFS = [
