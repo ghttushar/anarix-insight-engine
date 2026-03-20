@@ -55,7 +55,8 @@ export default function TargetingActions() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Targeting Actions" subtitle="Convert search terms into keyword targets across your campaigns" />
+        <PageHeader title="Targeting Actions" subtitle="Convert search terms into keyword targets across your campaigns" hideTaskbar />
+        <AppTaskbar showAdType={false} showFrequency={false} showDateRange={false} />
 
         {/* Action Configuration */}
         <div className="flex items-center gap-4 rounded-lg border border-border p-4">
