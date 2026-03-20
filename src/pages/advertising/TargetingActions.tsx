@@ -140,7 +140,7 @@ export default function TargetingActions() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableRow className="bg-muted hover:bg-muted">
                   <TableHead className="min-w-[200px]">Search Term</TableHead>
                   <TableHead className="min-w-[160px]">Normalized Term</TableHead>
                   <TableHead className="min-w-[140px]">Source Campaign</TableHead>

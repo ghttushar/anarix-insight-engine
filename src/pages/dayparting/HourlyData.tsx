@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { HourlyHeatmap } from "@/components/dayparting/HourlyHeatmap";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -94,15 +95,17 @@ export default function HourlyData() {
         <PageHeader
           title="Day Parting"
           subtitle="Analyze hourly performance and manage campaign schedules"
-          actions={
-            <>
-              <Button variant="outline" size="sm" onClick={handleExport}><Download className="mr-2 h-4 w-4" />Export</Button>
-              <Button size="sm" onClick={() => setScheduleOpen(!scheduleOpen)}>
-                <Plus className="mr-2 h-4 w-4" />{scheduleOpen ? "Cancel" : "Create Day Parting Rule"}
-              </Button>
-            </>
-          }
+          hideTaskbar
         />
+
+        <AppTaskbar />
+
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport}><Download className="mr-2 h-4 w-4" />Export</Button>
+          <Button size="sm" onClick={() => setScheduleOpen(!scheduleOpen)}>
+            <Plus className="mr-2 h-4 w-4" />{scheduleOpen ? "Cancel" : "Create Day Parting Rule"}
+          </Button>
+        </div>
 
         {/* Inline Schedule Creation — Full Settings */}
         {scheduleOpen && (

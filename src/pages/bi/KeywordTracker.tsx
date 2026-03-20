@@ -39,8 +39,11 @@ export default function KeywordTracker() {
         <PageHeader
           title="Keyword Tracker"
           subtitle="Manage keywords for share of voice tracking"
-          actions={<Button onClick={() => setIsAddModalOpen(true)}><Plus className="mr-2 h-4 w-4" />Add Keyword</Button>}
         />
+
+        <div className="flex items-center justify-end">
+          <Button onClick={() => setIsAddModalOpen(true)}><Plus className="mr-2 h-4 w-4" />Add Keyword</Button>
+        </div>
 
         <DataTableToolbar
           searchValue={searchQuery}

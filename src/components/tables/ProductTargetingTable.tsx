@@ -43,9 +43,9 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-24 sticky left-0 z-10 bg-muted/30">Status</TableHead>
-              <TableHead className="min-w-[220px] sticky left-[96px] z-10 bg-muted/30">Target</TableHead>
+            <TableRow className="bg-muted hover:bg-muted">
+              <TableHead className="w-24 sticky left-0 z-10 bg-muted">Status</TableHead>
+              <TableHead className="min-w-[220px] sticky left-[96px] z-10 bg-muted">Target</TableHead>
               <TableHead className="w-24">Type</TableHead>
               <TableHead className="min-w-[150px]">Ad Group</TableHead>
               <TableHead className="min-w-[180px]">Campaign</TableHead>
@@ -67,9 +67,9 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
           </TableHeader>
           <TableBody>
             {filteredTargets.map((target) => (
-              <TableRow key={target.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={target.status} /></TableCell>
-                <TableCell className="sticky left-[96px] z-10 bg-background">
+              <TableRow key={target.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={target.status} /></TableCell>
+                <TableCell className="sticky left-[96px] z-10 bg-background group-hover:bg-muted transition-colors">
                   <div className="flex flex-col">
                     <span className="font-medium text-foreground">{target.targetLabel}</span>
                     <span className="text-xs text-muted-foreground">{target.targetValue}</span>
@@ -105,7 +105,7 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
                 <TableCell className="text-right"><NumCell formatted={formatPercent(target.acos)} id={target.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={9} className="font-semibold">Total ({filteredTargets.length} targets)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productTargetsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productTargetsTotals.clicks)}</TableCell>

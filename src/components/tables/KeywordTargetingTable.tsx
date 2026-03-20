@@ -43,9 +43,9 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-24 sticky left-0 z-10 bg-muted/30">Status</TableHead>
-              <TableHead className="min-w-[200px] sticky left-[96px] z-10 bg-muted/30">Keyword</TableHead>
+            <TableRow className="bg-muted hover:bg-muted">
+              <TableHead className="w-24 sticky left-0 z-10 bg-muted">Status</TableHead>
+              <TableHead className="min-w-[200px] sticky left-[96px] z-10 bg-muted">Keyword</TableHead>
               <TableHead className="w-24">Match Type</TableHead>
               <TableHead className="min-w-[150px]">Ad Group</TableHead>
               <TableHead className="min-w-[180px]">Campaign</TableHead>
@@ -64,9 +64,9 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
           </TableHeader>
           <TableBody>
             {filteredKeywords.map((keyword) => (
-              <TableRow key={keyword.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={keyword.status} /></TableCell>
-                <TableCell className="font-medium text-foreground sticky left-[96px] z-10 bg-background">{keyword.keyword}</TableCell>
+              <TableRow key={keyword.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={keyword.status} /></TableCell>
+                <TableCell className="font-medium text-foreground sticky left-[96px] z-10 bg-background group-hover:bg-muted transition-colors">{keyword.keyword}</TableCell>
                 <TableCell><Badge variant="outline" className={cn("text-xs uppercase", matchTypeColors[keyword.matchType])}>{keyword.matchType}</Badge></TableCell>
                 <TableCell className="text-foreground">{keyword.adGroupName}</TableCell>
                 <TableCell>
@@ -90,7 +90,7 @@ export function KeywordTargetingTable({ searchQuery = "" }: KeywordTargetingTabl
                 <TableCell className="text-right"><NumCell formatted={formatCurrency(keyword.adSpend)} id={keyword.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={9} className="font-semibold">Total ({filteredKeywords.length} keywords)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(keywordsTotals.clicks)}</TableCell>

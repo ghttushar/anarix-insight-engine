@@ -41,8 +41,8 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="min-w-[200px] sticky left-0 z-10 bg-muted/30">Search Term</TableHead>
+            <TableRow className="bg-muted hover:bg-muted">
+              <TableHead className="min-w-[200px] sticky left-0 z-10 bg-muted">Search Term</TableHead>
               <TableHead className="min-w-[250px]">Product Ad</TableHead>
               <TableHead className="min-w-[150px]">Keyword</TableHead>
               <TableHead className="w-24">Match Type</TableHead>
@@ -59,8 +59,8 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredTerms.map((term) => (
-              <TableRow key={term.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <TableCell className="font-medium text-foreground sticky left-0 z-10 bg-background">{term.searchTerm}</TableCell>
+              <TableRow key={term.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="font-medium text-foreground sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors">{term.searchTerm}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <img src={term.productImage} alt={term.productName} className="h-8 w-8 rounded object-cover" />
@@ -83,7 +83,7 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
                 <TableCell className="text-right"><NumCell formatted={formatCurrency(term.adSpend)} id={term.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={6} className="font-semibold">Total ({filteredTerms.length} search terms)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.clicks)}</TableCell>

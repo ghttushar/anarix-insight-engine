@@ -35,9 +35,9 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-24 sticky left-0 z-10 bg-muted/30">Status</TableHead>
-              <TableHead className="min-w-[300px] sticky left-[96px] z-10 bg-muted/30">Product Ad</TableHead>
+            <TableRow className="bg-muted hover:bg-muted">
+              <TableHead className="w-24 sticky left-0 z-10 bg-muted">Status</TableHead>
+              <TableHead className="min-w-[300px] sticky left-[96px] z-10 bg-muted">Product Ad</TableHead>
               <TableHead className="min-w-[150px]">Ad Group</TableHead>
               <TableHead className="min-w-[150px]">Campaign</TableHead>
               <TableHead className="text-center">Bid Auto</TableHead>
@@ -55,9 +55,9 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredAds.map((ad) => (
-              <TableRow key={ad.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={ad.status} /></TableCell>
-                <TableCell className="sticky left-[96px] z-10 bg-background">
+              <TableRow key={ad.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={ad.status} /></TableCell>
+                <TableCell className="sticky left-[96px] z-10 bg-background group-hover:bg-muted transition-colors">
                   <div className="flex items-center gap-3">
                     <img src={ad.productImage} alt={ad.productName} className="h-10 w-10 rounded-md object-cover" />
                     <div className="flex flex-col">
@@ -81,7 +81,7 @@ export function ProductAdsTable({ searchQuery = "" }: ProductAdsTableProps) {
                 <TableCell className="text-right"><NumCell formatted={formatCurrency(ad.adSpend)} id={ad.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={8} className="font-semibold">Total ({filteredAds.length} product ads)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.clicks)}</TableCell>

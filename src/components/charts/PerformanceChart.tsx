@@ -10,7 +10,20 @@ import { ChartContainer, ChartType, ChartMetric } from "./ChartContainer";
 interface PerformanceChartProps {
   data: ChartDataPoint[];
   title?: string;
+  showImpact?: boolean;
 }
+
+const IMPACT_MULTIPLIERS: Record<string, number> = {
+  spend: 0.85,
+  sales: 1.12,
+  impressions: 0.92,
+  clicks: 1.08,
+  roas: 1.15,
+  acos: 0.88,
+  cpc: 0.95,
+  orders: 1.05,
+  ctr: 1.03,
+};
 
 function formatTooltipValue(value: number, format: string): string {
   switch (format) {
@@ -27,9 +40,23 @@ function formatTooltipValue(value: number, format: string): string {
   }
 }
 
-export function PerformanceChart({ data, title = "Performance Overview" }: PerformanceChartProps) {
+export function PerformanceChart({ data, title = "Performance Overview", showImpact = false }: PerformanceChartProps) {
   const [selectedMetrics, setSelectedMetrics] = useState<MetricKey[]>(DEFAULT_SELECTED_METRICS);
   const [chartType, setChartType] = useState<ChartType>("line");
+
+  // Generate impact comparison data when showImpact is true
+  const chartData = showImpact
+    ? data.map((point) => {
+        const impactPoint: Record<string, any> = { ...point };
+        selectedMetrics.forEach((key) => {
+          const val = point[key as keyof typeof point];
+          if (typeof val === "number") {
+            impactPoint[`${key}_impact`] = +(val * (IMPACT_MULTIPLIERS[key] || 1)).toFixed(2);
+          }
+        });
+        return impactPoint;
+      })
+    : data;
 
   const handleMetricToggle = (metricKey: string) => {
     setSelectedMetrics((prev) => {
@@ -67,7 +94,7 @@ export function PerformanceChart({ data, title = "Performance Overview" }: Perfo
   const renderChart = (height: number) => (
     <ResponsiveContainer width="100%" height={height}>
       {chartType === "bar" ? (
-        <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
           <Tooltip {...tooltipConfig} />
@@ -75,9 +102,12 @@ export function PerformanceChart({ data, title = "Performance Overview" }: Perfo
           {selectedConfigs.map((config) => (
             <Bar key={config.key} dataKey={config.key} name={config.key} fill={config.color} radius={[3, 3, 0, 0]} />
           ))}
+          {showImpact && selectedConfigs.map((config) => (
+            <Bar key={`${config.key}_impact`} dataKey={`${config.key}_impact`} name={`${config.label} (Impact)`} fill={config.color} fillOpacity={0.4} radius={[3, 3, 0, 0]} />
+          ))}
         </BarChart>
       ) : chartType === "area" ? (
-        <AreaChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <AreaChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
           {hasLeftAxis && <YAxis yAxisId="left" orientation="left" tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />}
@@ -87,9 +117,12 @@ export function PerformanceChart({ data, title = "Performance Overview" }: Perfo
           {selectedConfigs.map((config) => (
             <Area key={config.key} type="monotone" dataKey={config.key} name={config.key} stroke={config.color} fill={config.color} fillOpacity={0.15} yAxisId={config.yAxisId || "left"} strokeWidth={2} />
           ))}
+          {showImpact && selectedConfigs.map((config) => (
+            <Area key={`${config.key}_impact`} type="monotone" dataKey={`${config.key}_impact`} name={`${config.label} (Impact)`} stroke={config.color} fill={config.color} fillOpacity={0.05} yAxisId={config.yAxisId || "left"} strokeWidth={1.5} strokeDasharray="5 3" />
+          ))}
         </AreaChart>
       ) : (
-        <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
           {hasLeftAxis && <YAxis yAxisId="left" orientation="left" tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />}
@@ -98,6 +131,9 @@ export function PerformanceChart({ data, title = "Performance Overview" }: Perfo
           <Legend />
           {selectedConfigs.map((config) => (
             <Line key={config.key} type="monotone" dataKey={config.key} name={config.key} stroke={config.color} yAxisId={config.yAxisId || "left"} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+          ))}
+          {showImpact && selectedConfigs.map((config) => (
+            <Line key={`${config.key}_impact`} type="monotone" dataKey={`${config.key}_impact`} name={`${config.label} (Impact)`} stroke={config.color} yAxisId={config.yAxisId || "left"} strokeWidth={1.5} strokeDasharray="5 3" dot={false} />
           ))}
         </LineChart>
       )}

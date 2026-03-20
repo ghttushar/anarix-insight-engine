@@ -92,13 +92,14 @@ export default function AppliedRules() {
         <PageHeader
           title="Applied Rules"
           subtitle="Manage and monitor all active automation rules"
-          actions={
-            <Button size="sm" onClick={() => navigate("/advertising/rules/agents")}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Rule
-            </Button>
-          }
         />
+
+        <div className="flex items-center justify-end">
+          <Button size="sm" onClick={() => navigate("/advertising/rules/agents")}>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Rule
+          </Button>
+        </div>
 
         {/* Status Filter Tabs */}
         <UnderlineTabs tabs={statusTabs} value={activeTab} onChange={handleTabChange} />

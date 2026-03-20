@@ -36,9 +36,9 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-24 sticky left-0 z-10 bg-muted/30">Status</TableHead>
-              <TableHead className="min-w-[200px] sticky left-[96px] z-10 bg-muted/30">Ad Group</TableHead>
+            <TableRow className="bg-muted hover:bg-muted">
+              <TableHead className="w-24 sticky left-0 z-10 bg-muted">Status</TableHead>
+              <TableHead className="min-w-[200px] sticky left-[96px] z-10 bg-muted">Ad Group</TableHead>
               <TableHead className="min-w-[200px]">Campaign</TableHead>
               <TableHead className="text-center">Bid Auto</TableHead>
               <TableHead className="text-right">Min Bid</TableHead>
@@ -58,9 +58,9 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
           </TableHeader>
           <TableBody>
             {filteredGroups.map((group) => (
-              <TableRow key={group.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                <TableCell className="sticky left-0 z-10 bg-background"><StatusBadge status={group.status} /></TableCell>
-                <TableCell className="font-medium text-foreground sticky left-[96px] z-10 bg-background">{group.name}</TableCell>
+              <TableRow key={group.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={group.status} /></TableCell>
+                <TableCell className="font-medium text-foreground sticky left-[96px] z-10 bg-background group-hover:bg-muted transition-colors">{group.name}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className={cn("text-xs", group.campaignType === "auto" ? "border-primary/30 bg-primary/5 text-primary" : "border-secondary/30 bg-secondary/5 text-secondary-foreground")}>
@@ -85,7 +85,7 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
                 <TableCell className="text-right"><NumCell formatted={formatPercent(group.acos)} id={group.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={7} className="font-semibold">Total ({filteredGroups.length} ad groups)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(adGroupsTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(adGroupsTotals.clicks)}</TableCell>
