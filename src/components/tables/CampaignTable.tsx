@@ -196,18 +196,18 @@ export function CampaignTable({
                     )}
                     onClick={() => onRowClick?.(campaign.id)}
                   >
-                    {isEdit && (
+                    {isEdit && show("active") && (
                       <TableCell onClick={(e) => e.stopPropagation()}>
                         <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
                       </TableCell>
                     )}
-                    <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={campaign.status} /></TableCell>
-                    <TableCell className={cn("font-medium text-foreground sticky z-10 bg-background group-hover:bg-muted transition-colors", isEdit ? "left-[64px]" : "left-[112px]")}>
+                    {show("status") && <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={campaign.status} /></TableCell>}
+                    {show("name") && <TableCell className={cn("font-medium text-foreground sticky z-10 bg-background group-hover:bg-muted transition-colors", isEdit ? "left-[64px]" : "left-[112px]")}>
                       {isEdit ? (
                         <Input defaultValue={campaign.name} className="h-8 text-sm" onBlur={(e) => onCampaignUpdate?.(campaign.id, { name: e.target.value })} onClick={(e) => e.stopPropagation()} />
                       ) : campaign.name}
-                    </TableCell>
-                    <TableCell>
+                    </TableCell>}
+                    {show("startDate") && <TableCell>
                       {isEdit ? (
                         <span onClick={(e) => e.stopPropagation()}>
                           <DatePickerCell
@@ -216,8 +216,8 @@ export function CampaignTable({
                           />
                         </span>
                       ) : <span className="text-sm text-foreground whitespace-nowrap">{campaign.startDate}</span>}
-                    </TableCell>
-                    <TableCell>
+                    </TableCell>}
+                    {show("endDate") && <TableCell>
                       {isEdit ? (
                         <span onClick={(e) => e.stopPropagation()}>
                           <DatePickerCell
@@ -227,8 +227,8 @@ export function CampaignTable({
                           />
                         </span>
                       ) : <span className="text-sm text-foreground whitespace-nowrap">{campaign.endDate || "—"}</span>}
-                    </TableCell>
-                    <TableCell>
+                    </TableCell>}
+                    {show("biddingStrategy") && <TableCell>
                       {isEdit ? (
                         <span onClick={(e) => e.stopPropagation()}>
                           <Select value={campaign.biddingStrategy} onValueChange={(v) => onCampaignUpdate?.(campaign.id, { biddingStrategy: v as BiddingStrategy })}>
@@ -237,8 +237,8 @@ export function CampaignTable({
                           </Select>
                         </span>
                       ) : <span className="text-sm text-foreground whitespace-nowrap">{campaign.biddingStrategy}</span>}
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("dailyBudget") && <TableCell className="text-right">
                       {isEdit ? (
                         <Input type="number" defaultValue={campaign.dailyBudget} className="h-8 text-xs w-[100px] text-right" onBlur={(e) => onCampaignUpdate?.(campaign.id, { dailyBudget: parseFloat(e.target.value) || 0 })} onClick={(e) => e.stopPropagation()} />
                       ) : (
@@ -247,56 +247,56 @@ export function CampaignTable({
                           <DeltaBadge value={getDelta(campaign.id, 'dailyBudget')} />
                         </div>
                       )}
-                    </TableCell>
-                    {showTotalBudget && (
+                    </TableCell>}
+                    {showTotalBudget && show("totalBudget") && (
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
                           <span className="text-foreground">{campaign.totalBudget ? formatCurrency(campaign.totalBudget) : "—"}</span>
                         </div>
                       </TableCell>
                     )}
-                    <TableCell className="text-right">
+                    {show("spend") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatCurrency(campaign.spend)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'spend')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("sales") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatCurrency(campaign.sales)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'sales')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("roas") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{campaign.roas.toFixed(2)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'roas')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("impressions") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatNumber(campaign.impressions)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'impressions')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("clicks") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatNumber(campaign.clicks)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'clicks')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("ctr") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatPercent(campaign.ctr)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'ctr')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("acos") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatPercent(campaign.acos)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'acos')} />
                       </div>
-                    </TableCell>
+                    </TableCell>}
                   </TableRow>
                 </TooltipTrigger>
                 {onRowClick && <TooltipContent side="top">Click to view campaign details</TooltipContent>}
