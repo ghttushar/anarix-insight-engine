@@ -138,8 +138,8 @@ export function CampaignTable({
           <TableHeader>
             <TableRow className="bg-muted/50">
               {isEdit && <TableHead className="w-16">Active</TableHead>}
-              <TableHead className="w-28">Status</TableHead>
-              <TableHead className="min-w-[200px] cursor-pointer" onClick={() => handleSort("name")}>
+              <TableHead className="w-28 sticky left-0 z-10 bg-muted/50">Status</TableHead>
+              <TableHead className={cn("min-w-[200px] cursor-pointer sticky z-10 bg-muted/50", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
                 <div className="flex items-center gap-1">Campaign Name <SortIcon field="name" /></div>
               </TableHead>
               <TableHead className="cursor-pointer" onClick={() => handleSort("startDate")}>
