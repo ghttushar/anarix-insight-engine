@@ -139,50 +139,50 @@ export function CampaignTable({
       <div className="rounded-lg border border-border">
         <Table>
           <TableHeader>
-             <TableRow className="bg-muted">
-              {isEdit && <TableHead className="w-16">Active</TableHead>}
-              <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>
-              <TableHead className={cn("min-w-[200px] cursor-pointer sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
+              <TableRow className="bg-muted">
+              {isEdit && show("active") && <TableHead className="w-16">Active</TableHead>}
+              {show("status") && <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>}
+              {show("name") && <TableHead className={cn("min-w-[200px] cursor-pointer sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
                 <div className="flex items-center gap-1">Campaign Name <SortIcon field="name" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("startDate")}>
+              </TableHead>}
+              {show("startDate") && <TableHead className="cursor-pointer" onClick={() => handleSort("startDate")}>
                 <div className="flex items-center gap-1">Start Date <SortIcon field="startDate" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("endDate")}>
+              </TableHead>}
+              {show("endDate") && <TableHead className="cursor-pointer" onClick={() => handleSort("endDate")}>
                 <div className="flex items-center gap-1">End Date <SortIcon field="endDate" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("biddingStrategy")}>
+              </TableHead>}
+              {show("biddingStrategy") && <TableHead className="cursor-pointer" onClick={() => handleSort("biddingStrategy")}>
                 <div className="flex items-center gap-1">Bidding Strategy <SortIcon field="biddingStrategy" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("dailyBudget")}>
+              </TableHead>}
+              {show("dailyBudget") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("dailyBudget")}>
                 <div className="flex items-center justify-end gap-1">Budget <SortIcon field="dailyBudget" /></div>
-              </TableHead>
-              {showTotalBudget && (
+              </TableHead>}
+              {showTotalBudget && show("totalBudget") && (
                 <TableHead className="cursor-pointer text-right" onClick={() => handleSort("totalBudget")}>
                   <div className="flex items-center justify-end gap-1">Total Budget <SortIcon field="totalBudget" /></div>
                 </TableHead>
               )}
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("spend")}>
+              {show("spend") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("spend")}>
                 <div className="flex items-center justify-end gap-1">Spend <SortIcon field="spend" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("sales")}>
+              </TableHead>}
+              {show("sales") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("sales")}>
                 <div className="flex items-center justify-end gap-1">Sales <SortIcon field="sales" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("roas")}>
+              </TableHead>}
+              {show("roas") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("roas")}>
                 <div className="flex items-center justify-end gap-1">ROAS <SortIcon field="roas" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("impressions")}>
+              </TableHead>}
+              {show("impressions") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("impressions")}>
                 <div className="flex items-center justify-end gap-1">Impressions <SortIcon field="impressions" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("clicks")}>
+              </TableHead>}
+              {show("clicks") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("clicks")}>
                 <div className="flex items-center justify-end gap-1">Clicks <SortIcon field="clicks" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("ctr")}>
+              </TableHead>}
+              {show("ctr") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("ctr")}>
                 <div className="flex items-center justify-end gap-1">CTR <SortIcon field="ctr" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("acos")}>
+              </TableHead>}
+              {show("acos") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("acos")}>
                 <div className="flex items-center justify-end gap-1">ACOS <SortIcon field="acos" /></div>
-              </TableHead>
+              </TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
