@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
@@ -22,8 +23,6 @@ import { mockProductTargets } from "@/data/mockProductTargeting";
 import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable";
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Campaign } from "@/types/campaign";
-import { Button } from "@/components/ui/button";
-import { Download, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
