@@ -26,6 +26,7 @@ interface CampaignTableProps {
   showTotalBudget?: boolean;
   searchQuery?: string;
   viewMode?: "view" | "edit";
+  onRowClick?: (id: string) => void;
 }
 
 type SortField = keyof Campaign | null;
