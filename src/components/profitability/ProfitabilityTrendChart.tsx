@@ -89,8 +89,8 @@ export function ProfitabilityTrendChart({ data, periodLabel }: ProfitabilityTren
 
   return (
     <ChartContainer
-      title="Performance Trend"
-      subtitle={periodLabel}
+      title={periodLabel || ""}
+      subtitle={undefined}
       metrics={metrics}
       onMetricToggle={toggleMetric}
       chartType={chartType}
