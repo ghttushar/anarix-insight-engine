@@ -60,7 +60,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 230 33% 97%;
-    --muted-foreground: 228 15% 46%; /* #646A86 */
+    --muted-foreground: 228 18% 40%; /* #555D78 — darker for better light mode contrast */
 
     --accent: 231 74% 81%; /* #A7AEF2 - Lilac */
     --accent-foreground: 240 53% 9%;
