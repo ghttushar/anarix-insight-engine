@@ -1,16 +1,12 @@
 import { useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronsUpDown } from "lucide-react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { PnLRow } from "@/types/profitability";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PnLParameterTableProps {
   data: PnLRow[];
@@ -24,6 +20,21 @@ export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
     if (isCurrency) return formatCurrency(value);
     return new Intl.NumberFormat("en-US").format(value);
   };
+
+  // Collect all expandable row IDs
+  const collectExpandableIds = (rows: PnLRow[]): string[] => {
+    const ids: string[] = [];
+    rows.forEach((row) => {
+      if (row.children && row.children.length > 0) {
+        ids.push(row.id);
+        ids.push(...collectExpandableIds(row.children));
+      }
+    });
+    return ids;
+  };
+
+  const allExpandableIds = collectExpandableIds(data);
+
   const [expandedRows, setExpandedRows] = useState<Set<string>>(() => {
     const initial = new Set<string>();
     data.forEach((row) => {
@@ -35,14 +46,15 @@ export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
   const toggleRow = (id: string) => {
     setExpandedRows((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
   };
+
+  const expandAll = () => setExpandedRows(new Set(allExpandableIds));
+  const collapseAll = () => setExpandedRows(new Set());
+
+  const allExpanded = allExpandableIds.length > 0 && allExpandableIds.every((id) => expandedRows.has(id));
 
   const renderRow = (row: PnLRow, isCurrency: boolean = true) => {
     const isExpanded = expandedRows.has(row.id);
@@ -54,10 +66,10 @@ export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
           key={row.id}
           className={cn(
             "hover:bg-muted/30 group",
-            row.isParent && "font-medium bg-muted"
+            row.isParent && "font-medium bg-muted/50"
           )}
         >
-          <TableCell className={cn("sticky left-0 z-10 group-hover:bg-muted transition-colors", row.isParent ? "bg-muted" : "bg-background")}>
+          <TableCell className={cn("sticky left-0 z-10 group-hover:bg-muted/30 transition-colors", row.isParent ? "bg-muted/50" : "bg-card")}>
             <div
               className="flex items-center gap-2"
               style={{ paddingLeft: `${row.indent * 20}px` }}
@@ -65,26 +77,26 @@ export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
               {hasChildren ? (
                 <button
                   onClick={() => toggleRow(row.id)}
-                  className="p-0.5 hover:bg-muted rounded"
+                  className="p-0.5 hover:bg-muted rounded cursor-pointer"
                 >
                   {isExpanded ? (
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown className="h-3.5 w-3.5" />
                   ) : (
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronRight className="h-3.5 w-3.5" />
                   )}
                 </button>
               ) : (
-                <span className="w-5" />
+                <span className="w-4" />
               )}
-              <span>{row.parameter}</span>
+              <span className="text-sm">{row.parameter}</span>
             </div>
           </TableCell>
           {weeks.map((week) => (
-            <TableCell key={week} className="text-right">
+            <TableCell key={week} className="text-right text-sm">
               {formatValue(row.weeklyValues[week], isCurrency)}
             </TableCell>
           ))}
-          <TableCell className="text-right font-medium">
+          <TableCell className="text-right font-medium text-sm">
             {formatValue(row.total, isCurrency)}
           </TableCell>
         </TableRow>
@@ -98,19 +110,32 @@ export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
   };
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-x-auto">
+    <div className="rounded-lg border border-border overflow-x-auto">
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted">
-            <TableHead className="sticky left-0 z-10 bg-muted min-w-[200px]">
-              Parameter / Date
+          <TableRow className="bg-muted/50">
+            <TableHead className="sticky left-0 z-10 bg-muted/50 min-w-[200px]">
+              <div className="flex items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={allExpanded ? collapseAll : expandAll}
+                      className="p-0.5 hover:bg-muted rounded cursor-pointer"
+                    >
+                      <ChevronsUpDown className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>{allExpanded ? "Collapse all" : "Expand all"}</TooltipContent>
+                </Tooltip>
+                <span>Parameter / Date</span>
+              </div>
             </TableHead>
             {weeks.map((week) => (
-              <TableHead key={week} className="text-right min-w-[100px]">
+              <TableHead key={week} className="text-right min-w-[100px] text-xs">
                 {week}
               </TableHead>
             ))}
-            <TableHead className="text-right min-w-[120px] font-semibold">Total</TableHead>
+            <TableHead className="text-right min-w-[120px] font-semibold text-xs">Total</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -2,24 +2,15 @@ import { useState, ReactNode } from "react";
 import { Maximize2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  Popover, PopoverContent, PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export type ChartType = "line" | "bar" | "area" | "pie";
@@ -47,9 +38,7 @@ interface ChartContainerProps {
   onChartTypeChange: (type: ChartType) => void;
   availableChartTypes?: ChartType[];
   children: ReactNode;
-  /** Content rendered at expanded size inside the dialog */
   expandedChildren?: ReactNode;
-  /** Extra controls to render left of viz type (e.g. frequency dropdown) */
   extraControls?: ReactNode;
   className?: string;
 }
@@ -78,11 +67,16 @@ export function ChartContainer({
 
       {metrics && metrics.length > 0 && onMetricToggle && (
         <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
-              Metrics ({activeMetricCount}/{totalMetricCount})
-            </Button>
-          </PopoverTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-7 text-xs gap-1 cursor-pointer">
+                  Metrics ({activeMetricCount}/{totalMetricCount})
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>Toggle chart metrics</TooltipContent>
+          </Tooltip>
           <PopoverContent align="end" className="w-48 p-2">
             <div className="space-y-1">
               {metrics.map((m) => (
@@ -90,7 +84,7 @@ export function ChartContainer({
                   key={m.key}
                   onClick={() => onMetricToggle(m.key)}
                   className={cn(
-                    "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors",
+                    "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors cursor-pointer",
                     m.active
                       ? "bg-primary/10 text-foreground"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -106,18 +100,23 @@ export function ChartContainer({
         </Popover>
       )}
 
-      <Select value={chartType} onValueChange={(v) => onChartTypeChange(v as ChartType)}>
-        <SelectTrigger className="h-7 w-[80px] text-xs">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {availableChartTypes.map((t) => (
-            <SelectItem key={t} value={t} className="text-xs">
-              {CHART_TYPE_LABELS[t]}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Select value={chartType} onValueChange={(v) => onChartTypeChange(v as ChartType)}>
+            <SelectTrigger className="h-7 w-[80px] text-xs cursor-pointer">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {availableChartTypes.map((t) => (
+                <SelectItem key={t} value={t} className="text-xs cursor-pointer">
+                  {CHART_TYPE_LABELS[t]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </TooltipTrigger>
+        <TooltipContent>Change chart type</TooltipContent>
+      </Tooltip>
     </>
   );
 
@@ -131,9 +130,14 @@ export function ChartContainer({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {controls}
-            <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setIsExpanded(true)}>
-              <Maximize2 className="h-3.5 w-3.5" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 cursor-pointer" onClick={() => setIsExpanded(true)}>
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Expand chart</TooltipContent>
+            </Tooltip>
           </div>
         </div>
         <div className="flex-1 min-h-0">{children}</div>
