@@ -140,17 +140,12 @@ export function DataTableToolbar({
           {/* Columns Dropdown */}
           {columns.length > 0 && onColumnToggle && (
             <DropdownMenu>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer">
-                      <Columns className="h-3.5 w-3.5" />
-                      Columns
-                    </Button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>Toggle column visibility</TooltipContent>
-              </Tooltip>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" title="Toggle column visibility">
+                  <Columns className="h-3.5 w-3.5" />
+                  Columns
+                </Button>
+              </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52 p-0">
                 <div className="p-2 border-b border-border">
                   <div className="relative">
