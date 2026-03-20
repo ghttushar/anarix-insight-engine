@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
