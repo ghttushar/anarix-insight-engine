@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { HistoryTable } from "@/components/dayparting/HistoryTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -36,13 +37,14 @@ export default function DayPartingHistory() {
         <PageHeader
           title="Execution History"
           subtitle="View past day parting schedule executions"
-          actions={
-            <>
-              <Button variant="outline" size="icon" onClick={() => toast.info("Refreshing...")} title="Refresh"><RefreshCw className="h-4 w-4" /></Button>
-              <Button variant="outline" onClick={() => toast.success("Exporting history...")}><Download className="mr-2 h-4 w-4" />Export</Button>
-            </>
-          }
+          hideTaskbar
         />
+        <AppTaskbar showAdType={false} showFrequency={false} showDateRange={false} />
+
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="outline" size="icon" onClick={() => toast.info("Refreshing...")} title="Refresh"><RefreshCw className="h-4 w-4" /></Button>
+          <Button variant="outline" onClick={() => toast.success("Exporting history...")}><Download className="mr-2 h-4 w-4" />Export</Button>
+        </div>
 
         <DataTableToolbar
           searchValue={searchQuery}

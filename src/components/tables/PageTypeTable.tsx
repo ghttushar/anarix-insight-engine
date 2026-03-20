@@ -35,11 +35,11 @@ export function PageTypeTable({ searchQuery = "" }: PageTypeTableProps) {
   );
 
   return (
-    <div className="rounded-lg border border-border bg-card">
+    <div className="rounded-lg border border-border">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
+            <TableRow className="bg-muted hover:bg-muted">
               <TableHead className="min-w-[180px]">Page Type</TableHead>
               <TableHead className="w-32 text-right">Bid Modifier %</TableHead>
               <TableHead className="text-right">Impressions</TableHead>
@@ -72,7 +72,7 @@ export function PageTypeTable({ searchQuery = "" }: PageTypeTableProps) {
                 <TableCell className="text-right"><NumCell formatted={formatPercent(pageType.acos)} id={pageType.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
-            <TableRow className="bg-muted/50 font-medium hover:bg-muted/50">
+            <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={2} className="font-semibold">Total ({filteredTypes.length} page types)</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(pageTypesTotals.impressions)}</TableCell>
               <TableCell className="text-right text-foreground">{formatNumber(pageTypesTotals.clicks)}</TableCell>

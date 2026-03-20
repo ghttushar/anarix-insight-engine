@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { GeographyMap } from "@/components/profitability/GeographyMap";
 import { RegionStatsPanel } from "@/components/profitability/RegionStatsPanel";
 import { RegionalTable } from "@/components/tables/RegionalTable";
@@ -49,7 +50,8 @@ export default function Geographical() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Geographical Data" subtitle="Regional performance breakdown across markets" />
+        <PageHeader title="Geographical Data" subtitle="Regional performance breakdown across markets" hideTaskbar />
+        <AppTaskbar showAdType={false} showFrequency={false} />
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 h-full">

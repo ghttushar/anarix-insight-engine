@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { PeriodSummaryCard } from "@/components/profitability/PeriodSummaryCard";
 import { ProfitabilityTrendChart } from "@/components/profitability/ProfitabilityTrendChart";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
@@ -114,7 +115,8 @@ export default function ProfitabilityDashboard() {
     <AppLayout>
       <div className="flex flex-1 min-h-0">
         <div className="flex-1 space-y-6 overflow-auto">
-          <PageHeader title="Profitability Dashboard" subtitle="Track your profit metrics and financial performance" />
+          <PageHeader title="Profitability Dashboard" subtitle="Track your profit metrics and financial performance" hideTaskbar />
+          <AppTaskbar showAdType={false} />
 
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-3">

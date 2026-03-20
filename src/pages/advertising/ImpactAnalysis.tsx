@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { ImpactTable } from "@/components/tables/ImpactTable";
@@ -65,7 +66,8 @@ export default function ImpactAnalysis() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Impact Analysis" subtitle="Compare performance across time periods to measure campaign impact" />
+        <PageHeader title="Impact Analysis" subtitle="Compare performance across time periods to measure campaign impact" hideTaskbar />
+        <AppTaskbar showFrequency={false} showDateRange={false} />
 
         {/* Period Selectors */}
         <div className="flex items-center gap-4 rounded-lg border border-border p-3">

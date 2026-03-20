@@ -98,7 +98,7 @@ export default function HourlyData() {
           hideTaskbar
         />
 
-        <AppTaskbar />
+        <AppTaskbar showAdType={false} showFrequency={false} showDateRange={false} />
 
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleExport}><Download className="mr-2 h-4 w-4" />Export</Button>

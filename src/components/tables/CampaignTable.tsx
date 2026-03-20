@@ -28,6 +28,7 @@ interface CampaignTableProps {
   searchQuery?: string;
   viewMode?: "view" | "edit";
   onRowClick?: (id: string) => void;
+  hiddenColumns?: Set<string>;
 }
 
 type SortField = keyof Campaign | null;
@@ -98,8 +99,10 @@ export function CampaignTable({
   searchQuery = "",
   viewMode = "view",
   onRowClick,
+  hiddenColumns,
 }: CampaignTableProps) {
   const { formatCurrency } = useCurrency();
+  const show = (col: string) => !hiddenColumns?.has(col);
   const filteredCampaigns = campaigns.filter((c) =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -136,50 +139,50 @@ export function CampaignTable({
       <div className="rounded-lg border border-border">
         <Table>
           <TableHeader>
-             <TableRow className="bg-muted">
-              {isEdit && <TableHead className="w-16">Active</TableHead>}
-              <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>
-              <TableHead className={cn("min-w-[200px] cursor-pointer sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
+              <TableRow className="bg-muted">
+              {isEdit && show("active") && <TableHead className="w-16">Active</TableHead>}
+              {show("status") && <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>}
+              {show("name") && <TableHead className={cn("min-w-[200px] cursor-pointer sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
                 <div className="flex items-center gap-1">Campaign Name <SortIcon field="name" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("startDate")}>
+              </TableHead>}
+              {show("startDate") && <TableHead className="cursor-pointer" onClick={() => handleSort("startDate")}>
                 <div className="flex items-center gap-1">Start Date <SortIcon field="startDate" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("endDate")}>
+              </TableHead>}
+              {show("endDate") && <TableHead className="cursor-pointer" onClick={() => handleSort("endDate")}>
                 <div className="flex items-center gap-1">End Date <SortIcon field="endDate" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => handleSort("biddingStrategy")}>
+              </TableHead>}
+              {show("biddingStrategy") && <TableHead className="cursor-pointer" onClick={() => handleSort("biddingStrategy")}>
                 <div className="flex items-center gap-1">Bidding Strategy <SortIcon field="biddingStrategy" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("dailyBudget")}>
+              </TableHead>}
+              {show("dailyBudget") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("dailyBudget")}>
                 <div className="flex items-center justify-end gap-1">Budget <SortIcon field="dailyBudget" /></div>
-              </TableHead>
-              {showTotalBudget && (
+              </TableHead>}
+              {showTotalBudget && show("totalBudget") && (
                 <TableHead className="cursor-pointer text-right" onClick={() => handleSort("totalBudget")}>
                   <div className="flex items-center justify-end gap-1">Total Budget <SortIcon field="totalBudget" /></div>
                 </TableHead>
               )}
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("spend")}>
+              {show("spend") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("spend")}>
                 <div className="flex items-center justify-end gap-1">Spend <SortIcon field="spend" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("sales")}>
+              </TableHead>}
+              {show("sales") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("sales")}>
                 <div className="flex items-center justify-end gap-1">Sales <SortIcon field="sales" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("roas")}>
+              </TableHead>}
+              {show("roas") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("roas")}>
                 <div className="flex items-center justify-end gap-1">ROAS <SortIcon field="roas" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("impressions")}>
+              </TableHead>}
+              {show("impressions") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("impressions")}>
                 <div className="flex items-center justify-end gap-1">Impressions <SortIcon field="impressions" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("clicks")}>
+              </TableHead>}
+              {show("clicks") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("clicks")}>
                 <div className="flex items-center justify-end gap-1">Clicks <SortIcon field="clicks" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("ctr")}>
+              </TableHead>}
+              {show("ctr") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("ctr")}>
                 <div className="flex items-center justify-end gap-1">CTR <SortIcon field="ctr" /></div>
-              </TableHead>
-              <TableHead className="cursor-pointer text-right" onClick={() => handleSort("acos")}>
+              </TableHead>}
+              {show("acos") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("acos")}>
                 <div className="flex items-center justify-end gap-1">ACOS <SortIcon field="acos" /></div>
-              </TableHead>
+              </TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -193,18 +196,18 @@ export function CampaignTable({
                     )}
                     onClick={() => onRowClick?.(campaign.id)}
                   >
-                    {isEdit && (
+                    {isEdit && show("active") && (
                       <TableCell onClick={(e) => e.stopPropagation()}>
                         <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
                       </TableCell>
                     )}
-                    <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={campaign.status} /></TableCell>
-                    <TableCell className={cn("font-medium text-foreground sticky z-10 bg-background group-hover:bg-muted transition-colors", isEdit ? "left-[64px]" : "left-[112px]")}>
+                    {show("status") && <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={campaign.status} /></TableCell>}
+                    {show("name") && <TableCell className={cn("font-medium text-foreground sticky z-10 bg-background group-hover:bg-muted transition-colors", isEdit ? "left-[64px]" : "left-[112px]")}>
                       {isEdit ? (
                         <Input defaultValue={campaign.name} className="h-8 text-sm" onBlur={(e) => onCampaignUpdate?.(campaign.id, { name: e.target.value })} onClick={(e) => e.stopPropagation()} />
                       ) : campaign.name}
-                    </TableCell>
-                    <TableCell>
+                    </TableCell>}
+                    {show("startDate") && <TableCell>
                       {isEdit ? (
                         <span onClick={(e) => e.stopPropagation()}>
                           <DatePickerCell
@@ -213,8 +216,8 @@ export function CampaignTable({
                           />
                         </span>
                       ) : <span className="text-sm text-foreground whitespace-nowrap">{campaign.startDate}</span>}
-                    </TableCell>
-                    <TableCell>
+                    </TableCell>}
+                    {show("endDate") && <TableCell>
                       {isEdit ? (
                         <span onClick={(e) => e.stopPropagation()}>
                           <DatePickerCell
@@ -224,8 +227,8 @@ export function CampaignTable({
                           />
                         </span>
                       ) : <span className="text-sm text-foreground whitespace-nowrap">{campaign.endDate || "—"}</span>}
-                    </TableCell>
-                    <TableCell>
+                    </TableCell>}
+                    {show("biddingStrategy") && <TableCell>
                       {isEdit ? (
                         <span onClick={(e) => e.stopPropagation()}>
                           <Select value={campaign.biddingStrategy} onValueChange={(v) => onCampaignUpdate?.(campaign.id, { biddingStrategy: v as BiddingStrategy })}>
@@ -234,8 +237,8 @@ export function CampaignTable({
                           </Select>
                         </span>
                       ) : <span className="text-sm text-foreground whitespace-nowrap">{campaign.biddingStrategy}</span>}
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("dailyBudget") && <TableCell className="text-right">
                       {isEdit ? (
                         <Input type="number" defaultValue={campaign.dailyBudget} className="h-8 text-xs w-[100px] text-right" onBlur={(e) => onCampaignUpdate?.(campaign.id, { dailyBudget: parseFloat(e.target.value) || 0 })} onClick={(e) => e.stopPropagation()} />
                       ) : (
@@ -244,56 +247,56 @@ export function CampaignTable({
                           <DeltaBadge value={getDelta(campaign.id, 'dailyBudget')} />
                         </div>
                       )}
-                    </TableCell>
-                    {showTotalBudget && (
+                    </TableCell>}
+                    {showTotalBudget && show("totalBudget") && (
                       <TableCell className="text-right">
                         <div className="flex flex-col items-end">
                           <span className="text-foreground">{campaign.totalBudget ? formatCurrency(campaign.totalBudget) : "—"}</span>
                         </div>
                       </TableCell>
                     )}
-                    <TableCell className="text-right">
+                    {show("spend") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatCurrency(campaign.spend)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'spend')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("sales") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatCurrency(campaign.sales)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'sales')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("roas") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{campaign.roas.toFixed(2)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'roas')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("impressions") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatNumber(campaign.impressions)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'impressions')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("clicks") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatNumber(campaign.clicks)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'clicks')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("ctr") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatPercent(campaign.ctr)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'ctr')} />
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
+                    </TableCell>}
+                    {show("acos") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatPercent(campaign.acos)}</span>
                         <DeltaBadge value={getDelta(campaign.id, 'acos')} />
                       </div>
-                    </TableCell>
+                    </TableCell>}
                   </TableRow>
                 </TooltipTrigger>
                 {onRowClick && <TooltipContent side="top">Click to view campaign details</TooltipContent>}
