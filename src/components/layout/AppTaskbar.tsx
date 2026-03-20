@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, ReactNode } from "react";
 import { ChevronDown, Search, Check, CalendarIcon } from "lucide-react";
 import { format, subDays, startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -74,9 +74,11 @@ interface AppTaskbarProps {
   showAdType?: boolean;
   showFrequency?: boolean;
   showDateRange?: boolean;
+  /** Extra controls rendered between the built-in filters and the marketplace selector */
+  children?: ReactNode;
 }
 
-export function AppTaskbar({ showAdType = true, showFrequency = true, showDateRange = true }: AppTaskbarProps) {
+export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, children }: AppTaskbarProps) {
   const { marketplace, setMarketplace } = useMarketplace();
   const { accounts, currentAccount, setCurrentAccount } = useAccounts();
   const { adType, setAdType, frequency, setFrequency, dateRange, setDateRange } = useFilter();
@@ -123,7 +125,7 @@ export function AppTaskbar({ showAdType = true, showFrequency = true, showDateRa
 
   return (
     <div className="flex h-14 items-center rounded-lg border border-border bg-card px-4 shrink-0">
-      {/* Left Zone: Labeled filter controls */}
+      {/* Left Zone: Built-in filter controls */}
       <div className="flex items-center gap-3">
         {showAdType && (
           <Tooltip>
@@ -183,7 +185,6 @@ export function AppTaskbar({ showAdType = true, showFrequency = true, showDateRa
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start" side="bottom">
                     <div className="flex">
-                      {/* Left: Presets */}
                       <div className="w-[180px] border-r border-border p-2 space-y-3 max-h-[380px] overflow-auto">
                         {DATE_PRESET_GROUPS.map((group) => (
                           <div key={group.label}>
@@ -200,7 +201,6 @@ export function AppTaskbar({ showAdType = true, showFrequency = true, showDateRa
                           </div>
                         ))}
                       </div>
-                      {/* Right: Calendar */}
                       <div className="flex flex-col">
                         <Calendar
                           mode="range"
@@ -215,7 +215,6 @@ export function AppTaskbar({ showAdType = true, showFrequency = true, showDateRa
                           numberOfMonths={2}
                           className="p-3 pointer-events-auto"
                         />
-                        {/* Apply / Cancel */}
                         <div className="flex items-center justify-end gap-2 px-3 pb-3">
                           <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={handleCancelDateRange}>Cancel</Button>
                           <Button size="sm" className="h-8 text-xs" onClick={handleApplyDateRange}>Apply</Button>
@@ -229,12 +228,15 @@ export function AppTaskbar({ showAdType = true, showFrequency = true, showDateRa
             <TooltipContent>Select date range</TooltipContent>
           </Tooltip>
         )}
+
+        {/* Page-specific controls injected via children */}
+        {children}
       </div>
 
       {/* Center Spacer */}
       <div className="flex-1" />
 
-      {/* Right Zone: Marketplace + Store */}
+      {/* Right Zone: Marketplace + Store (always visible) */}
       <div className="flex items-center">
         <DropdownMenu open={mergedDropdownOpen} onOpenChange={setMergedDropdownOpen}>
           <DropdownMenuTrigger asChild>
