@@ -78,7 +78,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
               const isNeutral = item.impactPercentage === 0;
 
               return (
-                <TableRow key={item.id}>
+                <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {showType && item.type && (
