@@ -18,18 +18,39 @@ const formatValue = (value: number, metric: MetricType): string => {
     case "revenue":
       return `$${value.toFixed(0)}`;
     case "roas":
-      return `${value.toFixed(2)}x`;
+      return `${value.toFixed(1)}x`;
     case "acos":
     case "ctr":
     case "cvr":
-      return `${value.toFixed(1)}%`;
+      return `${value.toFixed(0)}%`;
     case "orders":
     case "units":
     case "impressions":
     case "clicks":
       return value.toFixed(0);
     default:
-      return value.toFixed(2);
+      return value.toFixed(1);
+  }
+};
+
+const formatCellValue = (value: number, metric: MetricType): string => {
+  switch (metric) {
+    case "spend":
+    case "revenue":
+      return value >= 1000 ? `${(value / 1000).toFixed(0)}k` : `${value.toFixed(0)}`;
+    case "roas":
+      return value.toFixed(1);
+    case "acos":
+    case "ctr":
+    case "cvr":
+      return `${value.toFixed(0)}`;
+    case "orders":
+    case "units":
+    case "impressions":
+    case "clicks":
+      return value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value.toFixed(0);
+    default:
+      return value.toFixed(0);
   }
 };
 
@@ -38,14 +59,12 @@ const getMetricValue = (point: HourlyDataPoint, metric: MetricType): number => {
 };
 
 export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: HourlyHeatmapProps) {
-  // Create a grid structure from data
   const grid: Record<string, HourlyDataPoint> = {};
   data.forEach((point) => {
     const key = `${point.dayOfWeek}-${point.hour}`;
     if (!grid[key]) {
       grid[key] = point;
     } else {
-      // Average if multiple data points
       const existing = grid[key];
       grid[key] = {
         ...existing,
@@ -61,7 +80,6 @@ export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: Hour
     }
   });
 
-  // Calculate min/max for color scaling
   const values = Object.values(grid).map((p) => getMetricValue(p, metric));
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
@@ -73,7 +91,6 @@ export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: Hour
 
   const getColor = (intensity: number, isGoodHigher: boolean): string => {
     const effectiveIntensity = isGoodHigher ? intensity : 1 - intensity;
-    
     if (effectiveIntensity < 0.2) return "bg-primary/5";
     if (effectiveIntensity < 0.4) return "bg-primary/15";
     if (effectiveIntensity < 0.6) return "bg-primary/30";
@@ -81,19 +98,21 @@ export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: Hour
     return "bg-primary/70";
   };
 
+  const getTextColor = (intensity: number, isGoodHigher: boolean): string => {
+    const effectiveIntensity = isGoodHigher ? intensity : 1 - intensity;
+    return effectiveIntensity >= 0.6 ? "text-primary-foreground" : "text-foreground";
+  };
+
   const isHigherBetter = ["revenue", "roas", "orders", "units", "clicks", "ctr", "cvr"].includes(metric);
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 overflow-x-auto">
+    <div className="rounded-lg border border-border p-4 overflow-x-auto">
       <div className="min-w-[800px]">
         {/* Header row with hours */}
         <div className="grid grid-cols-[60px_repeat(24,1fr)] gap-1 mb-1">
           <div className="text-xs font-medium text-muted-foreground"></div>
           {HOURS.map((hour) => (
-            <div
-              key={hour}
-              className="text-xs font-medium text-muted-foreground text-center py-1"
-            >
+            <div key={hour} className="text-[10px] font-medium text-muted-foreground text-center py-1">
               {hour.toString().padStart(2, "0")}
             </div>
           ))}
@@ -117,13 +136,22 @@ export function HourlyHeatmap({ data, metric, onCellClick, selectedCells }: Hour
                   <TooltipTrigger asChild>
                     <button
                       className={cn(
-                        "h-8 rounded transition-all duration-150",
+                        "h-8 rounded transition-all duration-150 flex items-center justify-center",
                         point ? getColor(intensity, isHigherBetter) : "bg-muted/30",
                         isSelected && "ring-2 ring-primary ring-offset-1",
                         onCellClick && "cursor-pointer hover:opacity-80"
                       )}
                       onClick={() => onCellClick?.(hour, dayIndex)}
-                    />
+                    >
+                      {point && (
+                        <span className={cn(
+                          "text-[7px] font-medium leading-none select-none",
+                          getTextColor(intensity, isHigherBetter)
+                        )}>
+                          {formatCellValue(value, metric)}
+                        </span>
+                      )}
+                    </button>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-xs">
                     <div className="font-medium">{day} {hour.toString().padStart(2, "0")}:00</div>

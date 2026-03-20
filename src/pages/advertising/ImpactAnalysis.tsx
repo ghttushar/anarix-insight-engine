@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Calendar, ChevronDown, BarChart3, Download, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+} from "recharts";
+import {
   mockImpactCampaigns,
   mockImpactAdGroups,
   mockImpactProducts,
@@ -18,12 +21,21 @@ import {
 type ImpactTab = "campaigns" | "ad-groups" | "products" | "keywords" | "search-terms";
 
 const tabs = [
-  { value: "campaigns", label: "Campaigns", count: mockImpactCampaigns.length },
-  { value: "ad-groups", label: "Ad Groups", count: mockImpactAdGroups.length },
-  { value: "products", label: "Products", count: mockImpactProducts.length },
-  { value: "keywords", label: "Keywords", count: mockImpactKeywords.length },
-  { value: "search-terms", label: "Search Terms", count: mockImpactSearchTerms.length },
+  { value: "campaigns", label: "Campaigns" },
+  { value: "ad-groups", label: "Ad Groups" },
+  { value: "products", label: "Products" },
+  { value: "keywords", label: "Keywords" },
+  { value: "search-terms", label: "Search Terms" },
 ];
+
+// Build chart data from campaigns comparing baseline vs impact
+const impactChartData = mockImpactCampaigns.map((c) => ({
+  name: c.name.length > 20 ? c.name.slice(0, 20) + "…" : c.name,
+  "Baseline Spend": c.baseline.adSpend,
+  "Impact Spend": c.impact.adSpend,
+  "Baseline Sales": c.baseline.adSales,
+  "Impact Sales": c.impact.adSales,
+}));
 
 export default function ImpactAnalysis() {
   const [activeTab, setActiveTab] = useState<ImpactTab>("campaigns");
@@ -56,7 +68,7 @@ export default function ImpactAnalysis() {
         <PageHeader title="Impact Analysis" subtitle="Compare performance across time periods to measure campaign impact" />
 
         {/* Period Selectors */}
-        <div className="flex items-center gap-4 rounded-lg bg-card p-4">
+        <div className="flex items-center gap-4 rounded-lg border border-border p-3">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-muted-foreground">Baseline:</span>
             <Button variant="outline" size="sm" className="gap-2">
@@ -77,25 +89,35 @@ export default function ImpactAnalysis() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-6">
-          <div className="flex items-center justify-between">
-            <h3 className="font-heading text-lg font-medium">Performance Comparison</h3>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm"><Maximize2 className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="sm" onClick={handleDownload}><Download className="h-4 w-4" /></Button>
+        {/* Performance Comparison Chart */}
+        <div className="rounded-lg border border-border p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-heading text-sm font-medium text-foreground">Performance Comparison</h3>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Maximize2 className="h-3.5 w-3.5" /></Button>
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleDownload}><Download className="h-3.5 w-3.5" /></Button>
             </div>
           </div>
-          <div className="mt-4 flex h-48 items-center justify-center rounded-lg bg-muted/30">
-            <p className="text-sm text-muted-foreground">Impact comparison chart — Baseline vs Impact period metrics</p>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-4">
-            {["Ad Spend", "Ad Sales", "ROAS", "Impressions"].map((metric) => (
-              <div key={metric} className="flex items-center gap-2">
-                <div className="h-3 w-3 rounded-full bg-primary" />
-                <span className="text-sm text-muted-foreground">{metric}</span>
-              </div>
-            ))}
-          </div>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={impactChartData} barGap={2} barCategoryGap="20%">
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+              <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: "11px" }} />
+              <Bar dataKey="Baseline Spend" fill="hsl(var(--muted-foreground))" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="Impact Spend" fill="hsl(var(--primary))" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="Baseline Sales" fill="hsl(var(--muted-foreground) / 0.5)" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="Impact Sales" fill="hsl(var(--success))" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as ImpactTab)} />

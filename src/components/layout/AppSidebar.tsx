@@ -6,7 +6,7 @@ import {
   CalendarClock, History, ListTodo, Settings, Users, ChevronDown,
   ChevronRight, Sparkles, Layers, Image, FlaskConical, PackageCheck,
   Send, ChevronLeft, Sun, Moon, User, LogOut,
-  Gauge, Wheat, Bell, Activity, Link, Wrench, LayoutDashboard, Palette
+  Gauge, Wheat, Bell, Activity, Link, Wrench, LayoutDashboard, Palette, ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -68,8 +68,13 @@ const navigationGroups: NavGroup[] = [{
     { title: "Search Harvesting", url: "/advertising/search-harvesting", icon: Wheat, isNewFeature: true },
     { title: "Anomaly Alerts", url: "/advertising/anomaly-alerts", icon: Bell, isNewFeature: true },
     { title: "Creative Analyzer", url: "/advertising/creative-analyzer", icon: Image, isNewFeature: true },
+  ]
+}, {
+  label: "Rules",
+  icon: ShieldCheck,
+  items: [
     { title: "Rule Agents", url: "/advertising/rules/agents", icon: FlaskConical },
-    { title: "Applied Rules", url: "/advertising/rules/applied", icon: FlaskConical },
+    { title: "Applied Rules", url: "/advertising/rules/applied", icon: ShieldCheck },
   ]
 }, {
   label: "Catalog",
@@ -103,8 +108,7 @@ const navigationGroups: NavGroup[] = [{
   label: "Day Parting",
   icon: Clock,
   items: [
-    { title: "Hourly Data", url: "/dayparting/hourly", icon: Clock },
-    { title: "Campaigns", url: "/dayparting/campaigns", icon: CalendarClock },
+    { title: "Day Parting", url: "/dayparting/hourly", icon: Clock },
     { title: "History", url: "/dayparting/history", icon: History },
     { title: "Scheduled Jobs", url: "/dayparting/scheduled", icon: ListTodo },
   ]
@@ -187,34 +191,37 @@ export function AppSidebar() {
   }).filter(group => group.items.length > 0);
 
   return (
-    <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-300", collapsed ? "w-14" : "w-60")} collapsible="icon">
+    <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-300", collapsed ? "w-14" : "w-64")} collapsible="icon">
       <SidebarContent className="py-3 flex flex-col h-full">
         {/* Logo */}
-        <div className={cn("flex items-center", collapsed ? "justify-center px-2 mb-3" : "px-4 mb-3")}>
+        <div className={cn("flex items-center", collapsed ? "justify-center px-2 mb-4" : "px-4 mb-4")}>
           {!collapsed
-            ? <img src={logoSrc} alt="Anarix" className="h-7 w-auto" />
+            ? <img src={logoSrc} alt="Anarix" className="h-8 w-auto" />
             : <img src={logoSrc} alt="Anarix" className="h-6 w-6 object-contain" />
           }
         </div>
 
         <div className="mx-3 border-t border-border/50" />
 
-        {/* Aan AI Button — Gradient Background */}
-        <div className="px-3 py-3">
+        {/* Aan AI Button */}
+        <div className="px-3 py-4">
           {!collapsed ? (
-            <button
-              onClick={e => { e.stopPropagation(); e.preventDefault(); openWorkspace(); }}
-              className="group relative w-full rounded-lg text-sm font-medium transition-all overflow-hidden aan-gradient py-2.5 flex items-center justify-center gap-2.5 shadow-sm hover:shadow-md hover:brightness-110"
-            >
-              <Sparkles className="h-4 w-4 shrink-0 text-white" />
-              <span className="font-aan text-white" style={{ fontSize: "1.4rem", lineHeight: 1 }}>Aan</span>
-            </button>
+            <div className="space-y-1">
+              <button
+                onClick={e => { e.stopPropagation(); e.preventDefault(); openWorkspace(); }}
+                className="group relative w-full rounded-lg text-sm font-medium transition-all overflow-hidden aan-gradient py-3 flex items-center justify-center gap-2.5 shadow-sm hover:shadow-md hover:brightness-110"
+              >
+                <Sparkles className="h-4 w-4 shrink-0 text-white" />
+                <span className="font-aan text-white" style={{ fontSize: "1.4rem", lineHeight: 1 }}>Aan</span>
+              </button>
+              <p className="text-[10px] text-muted-foreground text-center">AI Assistant</p>
+            </div>
           ) : (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={e => { e.stopPropagation(); e.preventDefault(); openWorkspace(); }}
-                  className="group relative flex w-full items-center justify-center rounded-lg p-2 transition-all aan-gradient shadow-sm hover:shadow-md hover:brightness-110"
+                  className="group relative flex w-full items-center justify-center rounded-lg p-2.5 transition-all aan-gradient shadow-sm hover:shadow-md hover:brightness-110"
                 >
                   <Sparkles className="h-4 w-4 text-white" />
                 </button>
@@ -233,8 +240,8 @@ export function AppSidebar() {
               {!collapsed ? (
                 <Collapsible open={openSections.has(group.label)} onOpenChange={() => toggleSection(group.label)}>
                   <CollapsibleTrigger asChild>
-                    <SidebarGroupLabel className="flex cursor-pointer items-center justify-between px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.05em] text-muted-foreground hover:text-foreground transition-colors rounded-md mx-2">
-                      <div className="flex items-center gap-2">
+                    <SidebarGroupLabel className="flex cursor-pointer items-center justify-between px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground hover:text-foreground transition-colors rounded-md mx-2">
+                      <div className="flex items-center gap-2.5">
                         <group.icon className="h-4 w-4" />
                         <span>{group.label}</span>
                       </div>
@@ -250,13 +257,13 @@ export function AppSidebar() {
                               <NavLink
                                 to={item.url}
                                 className={cn(
-                                  "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors",
+                                  "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                                   isActive(item.url)
                                     ? "bg-primary/10 text-primary border-l-2 border-primary -ml-[1px] pl-[13px]"
                                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                 )}
                               >
-                                <item.icon className="h-3.5 w-3.5 shrink-0" />
+                                <item.icon className="h-4 w-4 shrink-0" />
                                 <span>{item.title}</span>
                               </NavLink>
                             </SidebarMenuButton>
@@ -300,9 +307,9 @@ export function AppSidebar() {
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-                  className="flex items-center justify-center h-7 w-7 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+                  className="flex items-center justify-center h-8 w-8 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
                 >
-                  {resolvedTheme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                  {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </button>
               </TooltipTrigger>
               <TooltipContent side={collapsed ? "right" : "top"}>{resolvedTheme === "dark" ? "Light mode" : "Dark mode"}</TooltipContent>
@@ -313,7 +320,7 @@ export function AppSidebar() {
           {!collapsed ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-sm hover:bg-sidebar-accent transition-colors">
+                <button className="flex w-full items-center gap-2.5 rounded-md px-2 py-2.5 text-sm hover:bg-sidebar-accent transition-colors">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">JD</AvatarFallback>
                   </Avatar>
