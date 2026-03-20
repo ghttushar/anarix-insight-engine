@@ -193,7 +193,6 @@ export default function CampaignManager() {
       name: data.name,
       status: "live",
       isActive: true,
-      campaignType: data.type as any,
       biddingStrategy: data.biddingStrategy as any,
       dailyBudget: data.dailyBudget,
       totalBudget: data.dailyBudget * 30,

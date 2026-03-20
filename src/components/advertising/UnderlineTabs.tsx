@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 interface Tab {
   value: string;
   label: string;
+  count?: number;
 }
 
 interface UnderlineTabsProps {
