@@ -1,180 +1,123 @@
 
 
-# Phased Implementation Plan: Full App Polish, Fixes, and New Features
+## Comprehensive UI/UX Overhaul Plan
 
-This is a massive scope. To be transparent: implementing everything in a single pass will exceed credit limits. I am breaking this into **6 sequential phases**. You approve and I execute one phase at a time.
-
----
-
-## Phase 1: Core Layout, Panel, and Table Fixes (Foundation)
-
-These are the broken fundamentals that affect every page.
-
-### 1a. Insights Panel — Remove backdrop blur
-**File: `src/components/insights/InsightsPanel.tsx`** line 27
-- Remove `bg-black/4 backdrop-blur-[1px]` from backdrop div
-- Replace with `bg-transparent`
-
-### 1b. All right panels — open on same layer, not on top of app
-Right panels (PeriodBreakdownPanel, ProductDetailPanel, InsightsPanel) currently use `fixed` positioning with `z-50`, which covers the entire app. Change to inline flex layout within AppLayout, same pattern as AanCopilotPanel (which is already inline).
-
-**Files:**
-- `src/components/layout/AppLayout.tsx` — Add slots for right panels inline (not fixed overlay)
-- `src/components/profitability/PeriodBreakdownPanel.tsx` — Convert from `fixed` to inline flex panel
-- `src/components/profitability/ProductDetailPanel.tsx` — Same conversion
-- `src/components/insights/InsightsPanel.tsx` — Same conversion
-
-### 1c. Independent scroll on all right panels
-All panels already use `ScrollArea` but some have containment issues. Ensure each panel has `h-full flex flex-col` with `overflow-hidden` outer and `overflow-y-auto` inner.
-
-### 1d. Table hover overlap fix
-The `overflow-auto` wrapper on `Table` causes hover states to visually overlap when scrolling horizontally. Fix by adding `relative` to `TableRow` and ensuring the hover bg doesn't bleed.
-
-**File: `src/components/ui/table.tsx`** — Add `relative` to `TableRow`
-
-### 1e. Unified table styling
-All tables must use the same `Table` component from `src/components/ui/table.tsx`. Audit all table pages to ensure consistent row height (44px), padding (px-3 py-2), and header styling.
-
-### 1f. Taskbar redesign — proper grouping and labels
-**File: `src/components/layout/AppTaskbar.tsx`**
-- Replace "All" with "Ad Type: All" or use full-form labels so users know what each dropdown is
-- Increase height from `h-10` to `h-12`
-- Use `bg-muted/30 rounded-md px-2 py-1` container around the left-side filter group
-- Proper alignment with consistent spacing
-
-### 1g. Sidebar — remove collapse button from footer, fix nav collapse behavior
-**File: `src/components/layout/AppSidebar.tsx`**
-- Remove the Collapse button from the footer entirely (sidebar already has the nook arrow on its edge)
-- Fix navigation: clicking a nav item (e.g., "Campaign Manager") should NOT collapse the parent section ("Advertising"). The active section should stay open. Only manually clicking the section header should toggle it.
-- Keep Profile + Theme toggle in footer, give them more breathing room
-
-### 1h. Remove duplicate controls
-Several pages have their own date range / frequency selectors that duplicate the universal taskbar. Remove page-level duplicates from:
-- `src/pages/dayparting/HourlyData.tsx` (has its own Date Range selector)
-- `src/pages/advertising/TargetingActions.tsx` (has its own Date Range selector)
-- Any other page with redundant controls
+This is a large set of changes spanning ~15 files. I'll group them into logical phases.
 
 ---
 
-## Phase 2: Unified DataTableToolbar Everywhere + Toolbar Position Consistency
+### 1. Day Parting: Merge Hourly Data + Campaigns into One Page
 
-### 2a. Toolbar layout consistency
-In Profitability Dashboard, the search bar is part of DataTableToolbar (right-aligned). In the reference images (image-67, image-68), the search is on the LEFT and action buttons (Upload COGS, Export, Columns, Filter, Download) are on the RIGHT.
+**Problem**: Hourly Data and Campaigns are separate pages, and scheduling opens a different screen.
 
-**File: `src/components/advertising/DataTableToolbar.tsx`**
-- Restructure: Search on LEFT, Columns + Filter + Download on RIGHT
-- This makes all pages consistent
+**Changes**:
+- **`src/pages/dayparting/HourlyData.tsx`** — Rewrite as the unified Day Parting page. Combine campaign table (from Campaigns.tsx) below the heatmap. Add inline schedule creation panel (collapsible) instead of navigating away. Remove the "Schedule Day Parting" button that navigates to `/dayparting/scheduled/new`. The campaign/metric selectors must appear BELOW the AppTaskbar (inside PageHeader), not above it.
+- **`src/pages/dayparting/Campaigns.tsx`** — Redirect to `/dayparting/hourly` or remove. Keep the route for backward compat.
+- **`src/components/layout/AppSidebar.tsx`** — Update Day Parting nav: merge "Hourly Data" and "Campaigns" into one "Day Parting" item. Keep History and Scheduled Jobs as separate items.
 
-### 2b. Apply DataTableToolbar to ALL table pages
-Every page with a table must use the same `DataTableToolbar` with appropriate `COLUMN_DEFS` and `FILTER_FIELDS`:
-- Catalog Products table
-- BI Keyword Tracker
-- Day Parting tables
-- AMC tables
-- All advertising sub-tables that don't already have it
+### 2. Heatmap: Show Numbers in Cells
 
----
+**`src/components/dayparting/HourlyHeatmap.tsx`** — Inside each cell button, render the formatted metric value as a small text element. Reduce font to ~7-8px so it fits within the `h-8` cell. Use contrasting text color (white on dark intensity cells, foreground on light intensity cells).
 
-## Phase 3: Page-Specific Fixes
+### 3. Nothing Above Universal Selector Bar (AppTaskbar)
 
-### 3a. Targeting Actions — fix Broad/Exact/Phrase layout
-The checkbox + bid input stack is cramped. Restructure to horizontal layout with proper spacing. Checkbox above, bid input below, centered in cell.
+**Problem**: Day Parting has campaign/metric selectors above the taskbar.
 
-### 3b. Day Parting Heatmap — use brand color tints
-**File: `src/components/dayparting/HourlyHeatmap.tsx`**
-- Replace generic `bg-destructive/20`, `bg-warning/30`, `bg-success/50` with brand periwinkle tints:
-  - Lowest: `bg-primary/5`
-  - Low: `bg-primary/15`
-  - Medium: `bg-primary/30`
-  - High: `bg-primary/50`
-  - Highest: `bg-primary/70`
-- Remove the days checkbox row from HourlyData page
+**Fix**: In the merged Day Parting page, move campaign/metric selectors into a toolbar row BELOW the PageHeader (which already contains AppTaskbar). This is a page-level fix — ensure no other pages put content above the taskbar.
 
-### 3c. Schedule Editor redesign
-**File: `src/pages/dayparting/ScheduleEditor.tsx`**
-- Currently `max-w-4xl` which wastes right side. Use full width with two-column layout:
-  - Left: Form fields (schedule name, action type, campaigns)
-  - Right: Time grid + day selector + preview
-- Remove Card wrappers, use section headers instead
+### 4. Date Range Selector: Add Preset Options + Apply Button
 
-### 3d. PeriodBreakdownPanel — "View More" opens inline, not overlay
-Already addressed in Phase 1b.
+**`src/components/layout/AppTaskbar.tsx`**:
+- Replace the bare Calendar popover with a two-panel layout: left side has preset options (matching the reference image: "Today/Yesterday/7 days/14 days", "This week/Last week/2 weeks ago/3 weeks ago", "This month/Last month/2 months/3 months", "Today/Yesterday/2 days/3 days", "Today/Yesterday/7 days/8 days", "This quarter/Last quarter/2 quarters ago/3 quarters ago", "Custom Range") and right side shows the dual calendar.
+- Add "Apply" and "Cancel" buttons at the bottom of the popover. Only commit the date range when Apply is clicked.
 
----
+### 5. Rules: Separate Sidebar Items
 
-## Phase 4: New Feature Pages (Part 1)
+**Problem**: Rule Agents and Applied Rules are currently under Advertising group. User wants them as separate top-level sidebar items.
 
-Create the first 5 competitive features as new pages with routes:
+**`src/components/layout/AppSidebar.tsx`**:
+- Move "Rule Agents" and "Applied Rules" out of Advertising group into their own "Rules" group in the sidebar, with separate nav items.
 
-### 4a. Budget Pacing Dashboard
-- New route: `/advertising/budget-pacing`
-- New file: `src/pages/advertising/BudgetPacing.tsx`
-- Visual timeline showing daily budget burn rate vs target
-- Projected overspend/underspend alerts
-- Campaign-level pacing cards
+### 6. Filter Panel Redesign: Less Space Wasted
 
-### 4b. Search Term Harvesting
-- New route: `/advertising/search-harvesting`
-- New file: `src/pages/advertising/SearchHarvesting.tsx`
-- Cards showing high-performing search terms
-- "Add as Keyword" action with match type + bid suggestion
-- Aan AI explanation per term
+**`src/components/advertising/DataTableToolbar.tsx`**:
+- Make the filter builder more compact: reduce padding, use inline-flex layout instead of stacked rows. Each filter rule on one line with tighter spacing. Use smaller select widths. Remove the large card wrapper — use a subtle bordered row instead.
 
-### 4c. Marketplace Health Score
-- New route: `/workspace/health-score`
-- New file: `src/pages/workspace/HealthScore.tsx`
-- Single composite score (0-100) with circular progress
-- Breakdown: profitability, ad efficiency, inventory health, keyword coverage
+### 7. Remove Count Notches from Tabs
 
-### 4d. Cross-Marketplace Unified P&L
-- New route: `/profitability/unified-pnl`
-- New file: `src/pages/profitability/UnifiedPnL.tsx`
-- Side-by-side Amazon + Walmart P&L with Combined column
+**`src/components/advertising/UnderlineTabs.tsx`**:
+- Remove the `tab.count` badge rendering entirely. Just show label text.
 
-### 4e. Aan Anomaly Alerts
-- New route: part of existing Insights system
-- Enhance `src/components/insights/InsightsContext.tsx` with anomaly detection alerts
-- In-app notification bell in sidebar
+### 8. Chart Card Double Border Issue
 
----
+**Problem**: Charts are wrapped in `border border-border bg-card` AND the ChartContainer also has `border border-border bg-card`, creating double borders.
 
-## Phase 5: New Feature Pages (Part 2)
+**`src/pages/advertising/CampaignManager.tsx`** — Remove the outer wrapper div's border/bg-card around the PerformanceChart (lines 202-211). Let ChartContainer handle its own border.
 
-### 5a. Creative Performance Analyzer
-- New route: `/advertising/creative-analyzer`
-- Upload creatives, correlation analysis with CTR/CVR
+**`src/components/charts/ChartContainer.tsx`** — Verify single border. No change needed here since it already has its own border.
 
-### 5b. Competitor Price Tracking
-- New route: `/bi/competitor-pricing`
-- Price timeline chart, correlation with own sales
+### 9. Table Background Consistency
 
-### 5c. Rule Builder with Backtesting
-- New route: `/advertising/rules`
-- Rule definition form + historical simulation chart
+Ensure all tables use consistent styling. Currently some tables have `bg-card` wrappers and some don't.
 
-### 5d. Inventory-Aware Ad Optimization
-- New route: `/catalog/inventory-ads`
-- Stock level + ad spend correlation dashboard
+**Convention**: Tables should use `rounded-lg border border-border` without `bg-card` wrapper (per existing architecture memory). Review and fix pages where tables are inconsistent.
 
-### 5e. Client Reporting Portal
-- New route: `/reports/client-portal`
-- Report builder, PDF preview, schedule configuration
+### 10. View/Edit Toggle: Subtle Pencil Icon on Far Right
 
----
+**`src/components/advertising/DataTableToolbar.tsx`**:
+- Replace the View/Edit toggle buttons with a single subtle pencil icon button positioned on the far right of the toolbar (after download button). When in edit mode, the pencil is highlighted. Remove the loud toggle UI.
 
-## Phase 6: Final Polish Pass
+### 11. Impact Analysis: Fix Missing Graph
 
-- Verify every button works (toast feedback minimum)
-- Verify all panels have independent scroll
-- Verify all tables are visually identical
-- Verify no duplicate controls
-- Verify sidebar navigation behavior
+**`src/pages/advertising/ImpactAnalysis.tsx`**:
+- Replace the placeholder "Impact comparison chart" div (line 88-89) with an actual PerformanceChart or a bar chart comparing baseline vs impact period metrics using mock data.
 
----
+### 12. Redesign Sidebar: Larger, More Visible
 
-## Recommended Execution
+**`src/components/layout/AppSidebar.tsx`**:
+- Increase expanded width from `w-60` to `w-64`
+- Increase font sizes: group labels from `text-[11px]` to `text-xs`, nav items from `text-[13px]` to `text-sm`
+- Increase icon sizes from `h-3.5 w-3.5` to `h-4 w-4` for nav items
+- Increase padding on nav items for better clickability
+- Make Aan button more distinct: add more vertical spacing/margin, make it visually separate from the logo with a clear gap
 
-Each phase is one approval cycle. Phase 1 is the most critical — it fixes the broken foundation. Phases 4-5 add new pages. Phase 6 is the final audit.
+### 13. Aan Button: Separate from Logo
 
-**I recommend starting with Phase 1 now.** It addresses the most user-visible issues: panel blur, overlay behavior, table styling, taskbar design, sidebar behavior, and duplicate controls.
+**`src/components/layout/AppSidebar.tsx`**:
+- Increase gap between logo and Aan button (increase `mb-3` to `mb-4` on logo, increase `py-3` to `py-4` on Aan container)
+- Add a subtle label "AI Assistant" below the Aan button when expanded
+
+### 14. Light Mode Text Visibility Fixes
+
+**`src/index.css`** — Audit and fix any CSS variables that produce low-contrast text in light mode. Check `--muted-foreground` value to ensure it's dark enough.
+
+Review specific components where text might be invisible (sidebar muted text, chart labels, etc.).
+
+### 15. Campaign Manager: Deep Navigation (Breadcrumb Drill-down)
+
+**Problem**: Reference images show breadcrumbs like "Advertising > SP > Catch All > Manual > PCT" — clicking a table row should drill into campaign detail, then ad group detail.
+
+This is a larger feature. For now:
+- **`src/pages/advertising/CampaignManager.tsx`** — Add `onClick` row handler to navigate to a campaign detail route when clicking a campaign row.
+- **`src/App.tsx`** — Add route `/advertising/campaigns/:campaignId` for campaign detail view.
+- **Create `src/pages/advertising/CampaignDetail.tsx`** — New page showing campaign-level data with breadcrumb, KPIs, chart, and tabs for Ad Groups/Product Ads/Targeting/Search Terms. Clicking an ad group row navigates to `/advertising/campaigns/:campaignId/:adGroupId`.
+- **Create `src/pages/advertising/AdGroupDetail.tsx`** — Ad group detail with breadcrumb, KPIs, chart, and tabs for Product Ads/Targeting/Search Terms.
+
+### Summary of Files Modified/Created
+
+| File | Change |
+|------|--------|
+| `src/pages/dayparting/HourlyData.tsx` | Merge with Campaigns, inline scheduling |
+| `src/components/dayparting/HourlyHeatmap.tsx` | Show numbers in cells |
+| `src/components/layout/AppSidebar.tsx` | Sidebar redesign, Rules separation, Day Parting merge, Aan spacing |
+| `src/components/layout/AppTaskbar.tsx` | Date range presets + Apply button |
+| `src/components/advertising/UnderlineTabs.tsx` | Remove count notches |
+| `src/components/advertising/DataTableToolbar.tsx` | Filter compact redesign, View/Edit pencil icon |
+| `src/pages/advertising/CampaignManager.tsx` | Fix double chart border, row click navigation |
+| `src/pages/advertising/ImpactAnalysis.tsx` | Add actual chart |
+| `src/components/charts/ChartContainer.tsx` | No change (already correct) |
+| `src/App.tsx` | Add campaign/ad-group detail routes |
+| `src/pages/advertising/CampaignDetail.tsx` | **New** — Campaign drill-down page |
+| `src/pages/advertising/AdGroupDetail.tsx` | **New** — Ad group drill-down page |
+| `src/index.css` | Light mode contrast fixes |
 
