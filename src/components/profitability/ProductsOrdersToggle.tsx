@@ -21,11 +21,11 @@ export function ProductsOrdersToggle({ activeTab, onTabChange }: ProductsOrdersT
       </button>
       <button
         onClick={() => onTabChange("orders")}
-        className={cn(
-          "rounded-md px-4 py-1.5 text-xs font-medium transition-colors",
-          activeTab === "orders" ?
-          "bg-primary text-primary-foreground" :
-          "text-muted-foreground hover:text-foreground"
+        className={cn("rounded-md py-1.5 text-xs font-medium transition-colors px-[16px]",
+
+        activeTab === "orders" ?
+        "bg-primary text-primary-foreground" :
+        "text-muted-foreground hover:text-foreground"
         )}>
         
         Orders
