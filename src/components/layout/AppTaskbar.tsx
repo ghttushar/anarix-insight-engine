@@ -125,104 +125,110 @@ export function AppTaskbar({ showAdType = true, showFrequency = true, showDateRa
     <div className="flex h-14 items-center rounded-lg border border-border bg-card px-4 shrink-0">
       {/* Left Zone: Labeled filter controls */}
       <div className="flex items-center gap-3">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1 cursor-pointer">
-              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
-              <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
-                <SelectTrigger className="h-8 w-[110px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All" className="text-xs cursor-pointer">All Types</SelectItem>
-                  <SelectItem value="SP" className="text-xs cursor-pointer">Sponsored Products</SelectItem>
-                  <SelectItem value="SB" className="text-xs cursor-pointer">Sponsored Brands</SelectItem>
-                  <SelectItem value="SD" className="text-xs cursor-pointer">Sponsored Display</SelectItem>
-                  <SelectItem value="SV" className="text-xs cursor-pointer">Sponsored Video</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Change ad type filter</TooltipContent>
-        </Tooltip>
+        {showAdType && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1 cursor-pointer">
+                <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
+                <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
+                  <SelectTrigger className="h-8 w-[110px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All" className="text-xs cursor-pointer">All Types</SelectItem>
+                    <SelectItem value="SP" className="text-xs cursor-pointer">Sponsored Products</SelectItem>
+                    <SelectItem value="SB" className="text-xs cursor-pointer">Sponsored Brands</SelectItem>
+                    <SelectItem value="SD" className="text-xs cursor-pointer">Sponsored Display</SelectItem>
+                    <SelectItem value="SV" className="text-xs cursor-pointer">Sponsored Video</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Change ad type filter</TooltipContent>
+          </Tooltip>
+        )}
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1 cursor-pointer">
-              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Frequency</span>
-              <Select value={frequency} onValueChange={(v) => setFrequency(v as any)}>
-                <SelectTrigger className="h-8 w-[90px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {["Daily", "Weekly", "Monthly"].map((f) => (
-                    <SelectItem key={f} value={f} className="text-xs cursor-pointer">{f}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Change data frequency</TooltipContent>
-        </Tooltip>
+        {showFrequency && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1 cursor-pointer">
+                <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Frequency</span>
+                <Select value={frequency} onValueChange={(v) => setFrequency(v as any)}>
+                  <SelectTrigger className="h-8 w-[90px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["Daily", "Weekly", "Monthly"].map((f) => (
+                      <SelectItem key={f} value={f} className="text-xs cursor-pointer">{f}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Change data frequency</TooltipContent>
+          </Tooltip>
+        )}
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1 cursor-pointer">
-              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Date Range</span>
-              <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-sm font-normal px-1.5 cursor-pointer">
-                    <CalendarIcon className="h-3 w-3" />
-                    {format(dateRange.from, "MMM dd")} – {format(dateRange.to, "MMM dd, yyyy")}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start" side="bottom">
-                  <div className="flex">
-                    {/* Left: Presets */}
-                    <div className="w-[180px] border-r border-border p-2 space-y-3 max-h-[380px] overflow-auto">
-                      {DATE_PRESET_GROUPS.map((group) => (
-                        <div key={group.label}>
-                          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1">{group.label}</p>
-                          {group.presets.map((preset) => (
-                            <button
-                              key={preset.label}
-                              onClick={() => handlePresetClick(preset)}
-                              className="w-full text-left text-xs px-2 py-1.5 rounded hover:bg-muted transition-colors text-foreground cursor-pointer"
-                            >
-                              {preset.label}
-                            </button>
-                          ))}
+        {showDateRange && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1 cursor-pointer">
+                <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Date Range</span>
+                <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-sm font-normal px-1.5 cursor-pointer">
+                      <CalendarIcon className="h-3 w-3" />
+                      {format(dateRange.from, "MMM dd")} – {format(dateRange.to, "MMM dd, yyyy")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start" side="bottom">
+                    <div className="flex">
+                      {/* Left: Presets */}
+                      <div className="w-[180px] border-r border-border p-2 space-y-3 max-h-[380px] overflow-auto">
+                        {DATE_PRESET_GROUPS.map((group) => (
+                          <div key={group.label}>
+                            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1">{group.label}</p>
+                            {group.presets.map((preset) => (
+                              <button
+                                key={preset.label}
+                                onClick={() => handlePresetClick(preset)}
+                                className="w-full text-left text-xs px-2 py-1.5 rounded hover:bg-muted transition-colors text-foreground cursor-pointer"
+                              >
+                                {preset.label}
+                              </button>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                      {/* Right: Calendar */}
+                      <div className="flex flex-col">
+                        <Calendar
+                          mode="range"
+                          selected={{ from: draftRange.from, to: draftRange.to }}
+                          onSelect={(range) => {
+                            if (range?.from && range?.to) {
+                              setDraftRange({ from: range.from, to: range.to });
+                            } else if (range?.from) {
+                              setDraftRange({ from: range.from, to: range.from });
+                            }
+                          }}
+                          numberOfMonths={2}
+                          className="p-3 pointer-events-auto"
+                        />
+                        {/* Apply / Cancel */}
+                        <div className="flex items-center justify-end gap-2 px-3 pb-3">
+                          <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={handleCancelDateRange}>Cancel</Button>
+                          <Button size="sm" className="h-8 text-xs" onClick={handleApplyDateRange}>Apply</Button>
                         </div>
-                      ))}
-                    </div>
-                    {/* Right: Calendar */}
-                    <div className="flex flex-col">
-                      <Calendar
-                        mode="range"
-                        selected={{ from: draftRange.from, to: draftRange.to }}
-                        onSelect={(range) => {
-                          if (range?.from && range?.to) {
-                            setDraftRange({ from: range.from, to: range.to });
-                          } else if (range?.from) {
-                            setDraftRange({ from: range.from, to: range.from });
-                          }
-                        }}
-                        numberOfMonths={2}
-                        className="p-3 pointer-events-auto"
-                      />
-                      {/* Apply / Cancel */}
-                      <div className="flex items-center justify-end gap-2 px-3 pb-3">
-                        <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={handleCancelDateRange}>Cancel</Button>
-                        <Button size="sm" className="h-8 text-xs" onClick={handleApplyDateRange}>Apply</Button>
                       </div>
                     </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Select date range</TooltipContent>
-        </Tooltip>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Select date range</TooltipContent>
+          </Tooltip>
+        )}
       </div>
 
       {/* Center Spacer */}
