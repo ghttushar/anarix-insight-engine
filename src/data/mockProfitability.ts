@@ -1,4 +1,4 @@
-import { ProfitabilitySummary, ProfitabilityProduct, GeographicalData, PnLRow, TrendDataPoint, ScatterDataPoint } from "@/types/profitability";
+import { ProfitabilitySummary, ProfitabilityProduct, ProfitabilityOrder, GeographicalData, PnLRow, TrendDataPoint, ScatterDataPoint } from "@/types/profitability";
 
 export const profitabilitySummaries: ProfitabilitySummary[] = [
   {
