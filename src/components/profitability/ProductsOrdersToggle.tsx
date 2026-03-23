@@ -7,13 +7,13 @@ interface ProductsOrdersToggleProps {
 
 export function ProductsOrdersToggle({ activeTab, onTabChange }: ProductsOrdersToggleProps) {
   return (
-    <div className="flex rounded-lg border border-border bg-background p-0.5 w-fit">
+    <div className="flex rounded-full border border-border bg-muted/50 p-0.5 w-fit">
       <button
         onClick={() => onTabChange("products")}
         className={cn(
-          "rounded-md px-4 py-1.5 text-xs font-medium transition-colors",
+          "rounded-full px-4 py-1 text-xs font-medium transition-colors",
           activeTab === "products"
-            ? "bg-primary text-primary-foreground"
+            ? "bg-primary text-primary-foreground shadow-sm"
             : "text-muted-foreground hover:text-foreground"
         )}
       >
@@ -22,9 +22,9 @@ export function ProductsOrdersToggle({ activeTab, onTabChange }: ProductsOrdersT
       <button
         onClick={() => onTabChange("orders")}
         className={cn(
-          "rounded-md px-4 py-1.5 text-xs font-medium transition-colors",
+          "rounded-full px-4 py-1 text-xs font-medium transition-colors",
           activeTab === "orders"
-            ? "bg-primary text-primary-foreground"
+            ? "bg-primary text-primary-foreground shadow-sm"
             : "text-muted-foreground hover:text-foreground"
         )}
       >

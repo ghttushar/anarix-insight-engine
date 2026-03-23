@@ -6,11 +6,14 @@ import {
 import { ChartDataPoint, MetricKey } from "@/types/campaign";
 import { METRIC_CONFIGS, MAX_VISIBLE_METRICS, DEFAULT_SELECTED_METRICS } from "@/lib/constants/chartColors";
 import { ChartContainer, ChartType, ChartMetric } from "./ChartContainer";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface PerformanceChartProps {
   data: ChartDataPoint[];
   title?: string;
   showImpact?: boolean;
+  onShowImpactChange?: (value: boolean) => void;
 }
 
 const IMPACT_MULTIPLIERS: Record<string, number> = {
@@ -40,11 +43,10 @@ function formatTooltipValue(value: number, format: string): string {
   }
 }
 
-export function PerformanceChart({ data, title = "Performance Overview", showImpact = false }: PerformanceChartProps) {
+export function PerformanceChart({ data, title = "Performance Overview", showImpact = false, onShowImpactChange }: PerformanceChartProps) {
   const [selectedMetrics, setSelectedMetrics] = useState<MetricKey[]>(DEFAULT_SELECTED_METRICS);
   const [chartType, setChartType] = useState<ChartType>("line");
 
-  // Generate impact comparison data when showImpact is true
   const chartData = showImpact
     ? data.map((point) => {
         const impactPoint: Record<string, any> = { ...point };
@@ -90,6 +92,20 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
       return [formatTooltipValue(value, config?.format || "number"), config?.label || name];
     },
   };
+
+  const impactControl = onShowImpactChange ? (
+    <div className="flex items-center gap-2">
+      <Switch
+        id="show-impact-chart"
+        checked={showImpact}
+        onCheckedChange={onShowImpactChange}
+        className="h-4 w-8 [&>span]:h-3 [&>span]:w-3 [&>span]:data-[state=checked]:translate-x-4"
+      />
+      <Label htmlFor="show-impact-chart" className="text-[11px] font-medium text-muted-foreground cursor-pointer whitespace-nowrap">
+        Show Impact
+      </Label>
+    </div>
+  ) : undefined;
 
   const renderChart = (height: number) => (
     <ResponsiveContainer width="100%" height={height}>
@@ -147,6 +163,7 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
       onMetricToggle={handleMetricToggle}
       chartType={chartType}
       onChartTypeChange={setChartType}
+      extraControls={impactControl}
       expandedChildren={renderChart(500)}
     >
       {renderChart(300)}

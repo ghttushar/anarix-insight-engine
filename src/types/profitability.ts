@@ -50,6 +50,33 @@ export interface ProfitabilityProduct {
   weeklyData?: Record<string, number>;
 }
 
+export interface ProfitabilityOrder {
+  id: string;
+  orderId: string;
+  date: string;
+  time: string;
+  status: "delivered" | "shipped" | "processing" | "cancelled" | "returned";
+  price: number;
+  country: string;
+  flag: string;
+  netProfit: number;
+  gmv: number;
+  units: number;
+  cogs: number;
+  wfsFulfillmentFee: number;
+  shippingFees: number;
+  commissionProduct: number;
+  commissionShipping: number;
+  additionalFee: number;
+  refundUnits: number;
+  adSpend: number;
+  authSales: number;
+  refundSales: number;
+  cancelledSales: number;
+  cancelledUnits: number;
+  products: ProfitabilityProduct[];
+}
+
 export interface GeographicalData {
   id: string;
   region: string;

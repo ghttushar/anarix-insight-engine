@@ -11,7 +11,7 @@ import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModa
 import { ProductsOrdersToggle } from "@/components/profitability/ProductsOrdersToggle";
 import { PeriodBreakdownPanel } from "@/components/profitability/PeriodBreakdownPanel";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
-import { profitabilitySummaries, profitabilityProducts, trendDataByPeriod } from "@/data/mockProfitability";
+import { profitabilitySummaries, profitabilityProducts, profitabilityOrders, trendDataByPeriod } from "@/data/mockProfitability";
 import { ProfitabilityProduct, ProfitabilitySummary } from "@/types/profitability";
 import { Upload, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,6 @@ export default function ProfitabilityDashboard() {
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [products, setProducts] = useState(profitabilityProducts);
 
-  // Panel data states
   const [cogsProduct, setCogsProduct] = useState<ProfitabilityProduct | null>(null);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
@@ -108,6 +107,12 @@ export default function ProfitabilityDashboard() {
     p.sku.toLowerCase().includes(searchValue.toLowerCase())
   );
 
+  const filteredOrders = profitabilityOrders.filter((o) =>
+    o.orderId.toLowerCase().includes(searchValue.toLowerCase()) ||
+    o.country.toLowerCase().includes(searchValue.toLowerCase()) ||
+    o.products.some((p) => p.name.toLowerCase().includes(searchValue.toLowerCase()))
+  );
+
   const showProductDetail = activePanel === "productDetail" && detailProduct;
   const showBreakdown = activePanel === "periodBreakdown" && breakdownSummary;
 
@@ -160,7 +165,7 @@ export default function ProfitabilityDashboard() {
               }
               searchValue={searchValue}
               onSearchChange={setSearchValue}
-              searchPlaceholder="Search by Product Name / Item ID / SKU..."
+              searchPlaceholder={tableTab === "products" ? "Search by Product Name / Item ID / SKU..." : "Search by Order ID / Country / Product..."}
               columns={columns}
               onColumnToggle={handleColumnToggle}
               onSelectAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: true })))}
@@ -168,11 +173,12 @@ export default function ProfitabilityDashboard() {
               activeFilters={activeFilters}
               onFiltersChange={setActiveFilters}
               filterFields={FILTER_FIELDS}
-              
             />
             <div className="rounded-lg border border-border">
               <ProductsPnLTable
                 products={filteredProducts}
+                orders={filteredOrders}
+                mode={tableTab}
                 visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
                 onCogsClick={(product) => setCogsProduct(product)}
                 onTrendsClick={(product) => setTrendsProduct(product)}
@@ -182,7 +188,6 @@ export default function ProfitabilityDashboard() {
           </div>
         </div>
 
-        {/* Right-side panels — only one at a time */}
         {showProductDetail && (
           <ProductDetailPanel product={detailProduct} isOpen={true} onClose={handleCloseRightPanel} />
         )}
