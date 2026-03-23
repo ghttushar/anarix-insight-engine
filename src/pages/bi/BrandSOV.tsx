@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { SOVKPIStrip } from "@/components/bi/SOVKPIStrip";
 import { BrandCoverageTable } from "@/components/bi/BrandCoverageTable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Download } from "lucide-react";
+import { Search, Download, Play } from "lucide-react";
 import { brands, sovTrendData, sovMetrics } from "@/data/mockBrandSOV";
 import { toast } from "sonner";
 
@@ -25,20 +26,15 @@ export default function BrandSOV() {
         <PageHeader
           title="Brand Share of Voice"
           subtitle="Track brand visibility across search results"
-          actions={
-            <Button variant="outline" onClick={handleExport}>
-              <Download className="mr-2 h-4 w-4" />Export
-            </Button>
-          }
         />
 
-        <div className="flex flex-wrap items-center gap-4 p-4 rounded-lg border border-border bg-card">
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search keyword..." value={keyword} onChange={(e) => setKeyword(e.target.value)} className="pl-10" />
+        <AppTaskbar>
+          <div className="relative min-w-[180px] max-w-[240px]">
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input placeholder="Search keyword..." value={keyword} onChange={(e) => setKeyword(e.target.value)} className="pl-8 h-9 text-xs" />
           </div>
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Date Range" /></SelectTrigger>
+            <SelectTrigger className="w-[130px] h-9 text-xs"><SelectValue placeholder="Date Range" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="today">Today</SelectItem>
               <SelectItem value="yesterday">Yesterday</SelectItem>
@@ -47,7 +43,7 @@ export default function BrandSOV() {
             </SelectContent>
           </Select>
           <Select value={position} onValueChange={setPosition}>
-            <SelectTrigger className="w-[120px]"><SelectValue placeholder="Position" /></SelectTrigger>
+            <SelectTrigger className="w-[120px] h-9 text-xs"><SelectValue placeholder="Position" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Positions</SelectItem>
               <SelectItem value="1">Position 1</SelectItem>
@@ -56,14 +52,23 @@ export default function BrandSOV() {
             </SelectContent>
           </Select>
           <Select value={frequency} onValueChange={setFrequency}>
-            <SelectTrigger className="w-[120px]"><SelectValue placeholder="Frequency" /></SelectTrigger>
+            <SelectTrigger className="w-[120px] h-9 text-xs"><SelectValue placeholder="Frequency" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="hourly">Hourly</SelectItem>
               <SelectItem value="daily">Daily</SelectItem>
               <SelectItem value="weekly">Weekly</SelectItem>
             </SelectContent>
           </Select>
-          <Button>Run</Button>
+          <Button size="sm" className="gap-1.5">
+            <Play className="h-3.5 w-3.5" />
+            Run
+          </Button>
+        </AppTaskbar>
+
+        <div className="flex items-center justify-end">
+          <Button variant="outline" size="sm" onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" />Export
+          </Button>
         </div>
 
         <SOVKPIStrip metrics={sovMetrics} />

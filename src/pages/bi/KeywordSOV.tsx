@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Download, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { keywordSOVData, sovTrendData } from "@/data/mockBrandSOV";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -33,8 +32,15 @@ export default function KeywordSOV() {
         <PageHeader
           title="Keyword Share of Voice"
           subtitle="Track SOV performance by keyword"
-          actions={<Button variant="outline" onClick={() => toast.success("Exporting...")}><Download className="mr-2 h-4 w-4" />Export</Button>}
         />
+
+        <AppTaskbar />
+
+        <div className="flex items-center justify-end">
+          <Button variant="outline" size="sm" onClick={() => toast.success("Exporting...")}>
+            <Download className="mr-2 h-4 w-4" />Export
+          </Button>
+        </div>
 
         <SOVChart data={sovTrendData} title="Keyword SOV Trend" subtitle="Hourly breakdown" />
 

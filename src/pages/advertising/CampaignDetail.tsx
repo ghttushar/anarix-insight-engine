@@ -87,16 +87,16 @@ export default function CampaignDetail() {
         {/* Page Title */}
         <PageHeader title="Advertising" />
 
-        {/* Campaign Info Card */}
-        {campaign && <CampaignInfoCard campaign={campaign} />}
-
-        {/* Universal Bar */}
+        {/* Universal Bar — always first after title */}
         <AppTaskbar showFrequency showDateRange>
           <Button size="sm" className="gap-1.5 ml-2">
             <Play className="h-3.5 w-3.5" />
             Run
           </Button>
         </AppTaskbar>
+
+        {/* Campaign Info Card — below universal bar */}
+        {campaign && <CampaignInfoCard campaign={campaign} />}
 
         {/* Performance Overview Section */}
         <div className="space-y-3">

@@ -231,7 +231,12 @@ export default function CampaignManager() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
-        <AppTaskbar showAdType showFrequency showDateRange />
+        <AppTaskbar showAdType showFrequency showDateRange>
+          <div className="flex items-center gap-2 ml-2">
+            <Switch id="show-impact" checked={showImpact} onCheckedChange={setShowImpact} className="h-5 w-9 [&>span]:h-4 [&>span]:w-4" />
+            <Label htmlFor="show-impact" className="text-xs font-medium text-muted-foreground cursor-pointer">Show Impact</Label>
+          </div>
+        </AppTaskbar>
 
         <div className="flex items-center justify-end">
           <Button size="sm" className="gap-1.5" onClick={() => setCreateModalOpen(true)}>
@@ -246,22 +251,11 @@ export default function CampaignManager() {
           onMetricChange={handleKPISwap}
         />
 
-        {/* Chart Controls Row */}
-        <div className="flex items-center justify-between rounded-md border border-border px-3 py-2">
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-2">
-              <Switch id="show-impact" checked={showImpact} onCheckedChange={setShowImpact} className="h-5 w-9 [&>span]:h-4 [&>span]:w-4" />
-              <Label htmlFor="show-impact" className="text-xs font-medium text-muted-foreground cursor-pointer">Show Impact</Label>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setChartVisible(!chartVisible)} className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-              {chartVisible ? "Hide Chart" : "Show Chart"}
-            </button>
-            <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-              {chartVisible ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-            </Button>
-          </div>
+        <div className="flex items-center justify-end">
+          <button onClick={() => setChartVisible(!chartVisible)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+            {chartVisible ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+            {chartVisible ? "Hide Chart" : "Show Chart"}
+          </button>
         </div>
 
         {chartVisible && <PerformanceChart data={mockChartData} showImpact={showImpact} />}
