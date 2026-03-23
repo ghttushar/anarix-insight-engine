@@ -1,75 +1,80 @@
 
 
-## Redesign Targeting Actions Table, Standardize Toolbar, Floating Filter, Wire Add Keywords
+## Fix Layout Hierarchy, Products/Orders Toggle, Show Impact Position, Remove Hide Chart, Button Audit
 
-### 1. Redesign Match Type Cells (image-124)
+### Issues Identified
 
-The reference shows each Broad/Exact/Phrase cell as a clean rounded card with:
-- Checkbox top-left corner
-- Bid value in a small input below, centered
-- Card has a subtle rounded border, light background when selected (blue tint), plain white when unselected
-- Clean spacing between cards across the row
+1. **CampaignDetail & AdGroupDetail**: The code order is correct (Taskbar above InfoCard), but user reports seeing InfoCard above Taskbar — likely a rendering/spacing issue. Will enforce the order explicitly and verify.
 
-**Current issue**: The cells use `flex-col items-center` with cramped styling. The checkbox and input are stacked but look messy.
+2. **Profitability Products/Orders Toggle**: Currently the toggle switches `tableTab` state but the table always shows products. The "Orders" tab needs a functional orders table view with expandable order rows (per image-126/127).
 
-**Fix in `TargetingActions.tsx`**: Redesign the match type cells to match image-124 exactly:
-- Each cell renders a rounded-lg card (~80px wide)
-- Checkbox in top-left with `absolute` positioning or top-aligned flex
-- Bid input below, centered, with clear border
-- Selected state: light blue/primary background tint, checked checkbox filled blue
-- Unselected: white/background, unchecked checkbox
+3. **Show Impact toggle**: Currently lives outside the chart (in page-level controls). User wants it INSIDE the chart toolbar, left of the Metrics button. Move it into `ChartContainer` via `extraControls` prop.
 
-### 2. Standardize DataTableToolbar Button Layout
+4. **Hide Chart**: Must be removed from ALL pages (CampaignManager, CampaignDetail, AdGroupDetail). Charts should always be visible.
 
-**Problem**: Toolbar buttons (Custom Bid, Columns, Filter, Download, Add Keywords) appear in inconsistent positions across pages. Some pages put extra buttons outside the toolbar row.
-
-**Fix**: The `DataTableToolbar` already has `rightContent` prop. Standardize all pages:
-- **Left**: Search input (always first)
-- **Right**: page-specific buttons (Custom Bid, Add Keywords) → Columns → Filter → Download → Edit toggle
-- Move Custom Bid and Add Keywords buttons into `rightContent` of `DataTableToolbar` in `TargetingActions.tsx` instead of a separate row
-- Remove the separate `<div className="flex items-center justify-between">` wrapper
-
-### 3. Floating Filter Panel (image-123)
-
-**Current**: Filter builder is inline `bg-muted/30` block below the toolbar. 
-**Reference**: Shows a floating popover/card with shadow, anchored to the Filter button.
-
-**Fix in `DataTableToolbar.tsx`**:
-- Replace the inline `div` filter builder with a `Popover` anchored to the Filter button
-- The popover content renders the same Where/And filter rows
-- Filter fields include: "Match Type To Add", "ACOS", "Ad Units", etc.
-- Operators include "is", "is less than", "is greater than or equal to"
-- Values can be text or multi-select (e.g., "Exact, Broad, Phrase")
-- "+ Add Filter" link at bottom-left, Cancel + Apply at bottom-right
-- Add a delete (trash) icon per row instead of X
-
-### 4. Wire Add Keywords Button
-
-**Current**: `handleAddKeywords` just shows a toast. No modal opens.
-
-**Fix**: Create a new `AddKeywordTargetModal` component for the Targeting Actions context (different from the BI `AddKeywordModal`). This modal allows:
-- Entering a keyword manually
-- Selecting match type (Broad, Exact, Phrase checkboxes)
-- Setting a bid value
-- Selecting target campaign and ad group from dropdowns
-- "Add" button creates a new row in the targeting actions table
-
-Wire the "Add Keywords" button in `TargetingActions.tsx` to open this modal with `useState` controlling open/close.
-
-### 5. Targeting Actions Toolbar Cleanup
-
-Remove the separate toolbar/button row. Merge everything into a single `DataTableToolbar` call:
-- `rightContent` includes: Custom Bid popover, Add Keywords button
-- Remove duplicate filter/download buttons
-- The `DataTableToolbar` provides Search, Columns, Filter, Download natively
+5. **Non-functional buttons**: Several `onDownload={() => {}}` handlers need toast feedback. Audit all empty handlers.
 
 ---
 
-### Files
+### 1. Remove All Hide Chart Controls
+
+**Files**: `CampaignManager.tsx`, `CampaignDetail.tsx`, `AdGroupDetail.tsx`
+
+- Remove `showChart`/`chartVisible` state variables
+- Remove the Hide/Show Chart button/link
+- Always render `PerformanceChart`
+- Remove `ChevronUp`/`ChevronDown`/`Minimize2` imports where no longer needed
+
+### 2. Move Show Impact into Chart Toolbar
+
+**Files**: `PerformanceChart.tsx`, `ChartContainer.tsx`, `CampaignManager.tsx`, `CampaignDetail.tsx`, `AdGroupDetail.tsx`
+
+- Add `showImpact` and `onShowImpactChange` props to `PerformanceChart`
+- Pass a Switch+Label as `extraControls` to `ChartContainer` (rendered left of Metrics button)
+- Remove Show Impact from `AppTaskbar` children in `CampaignManager.tsx`
+- Remove Show Impact from the "Performance Overview" header row in `CampaignDetail.tsx` and `AdGroupDetail.tsx`
+
+### 3. Enforce Layout Hierarchy on Detail Pages
+
+**Files**: `CampaignDetail.tsx`, `AdGroupDetail.tsx`
+
+- Ensure render order is strictly: Breadcrumb → PageHeader → AppTaskbar → InfoCard → Performance Overview
+- Remove the separate "Performance Overview" header row with Show Impact controls (now in chart)
+- Keep "Performance Overview" as just a section label above KPIs
+
+### 4. Functional Products/Orders Toggle in Profitability Dashboard
+
+**Files**: `ProductsPnLTable.tsx`, `Dashboard.tsx`, `mockProfitability.ts`, `types/profitability.ts`
+
+- Add `ProfitabilityOrder` type with fields: orderId, date, time, status, price, country, flag, netProfit, gmv, units, cogs, wfsFulfillmentFee, shippingFees, commissionProduct, commissionShipping, additionalFee, refundUnits, products (child array)
+- Add `mockProfitabilityOrders` data with expandable product children (matching image-126)
+- Update `ProductsPnLTable` to accept a `mode: "products" | "orders"` prop
+  - Products mode: current behavior (product image + name + ID/SKU/price/COGS/Trends)
+  - Orders mode: expandable rows showing order ID, date, time, status, price with child product rows. Header shows "Order Details" instead of "Product Details". Total row shows "Total for X Orders"
+- Wire the `tableTab` state to pass `mode` to `ProductsPnLTable`
+- Redesign the `ProductsOrdersToggle` to match image-129: pill-style toggle with filled active state
+
+### 5. Fix Non-Functional Buttons
+
+**Files**: `CampaignManager.tsx`, `CampaignDetail.tsx`, `AdGroupDetail.tsx`
+
+- Replace `onDownload={() => {}}` with `onDownload={() => toast.success("Exporting data as CSV...")}`
+- Audit all other empty handlers and add appropriate toast feedback
+
+---
+
+### Summary of Files
 
 | File | Change |
 |---|---|
-| `TargetingActions.tsx` | Redesign match type cells, merge toolbar into single DataTableToolbar with rightContent, wire Add Keywords modal |
-| `DataTableToolbar.tsx` | Convert filter builder from inline div to floating Popover, add trash icon, update operator list |
-| `AddKeywordTargetModal.tsx` | **NEW** — Modal for adding keyword targets with match type, bid, campaign/ad group selection |
+| `CampaignManager.tsx` | Remove Hide Chart, move Show Impact to PerformanceChart prop, fix onDownload |
+| `CampaignDetail.tsx` | Remove Hide Chart + Show Impact row, enforce layout order, fix onDownload |
+| `AdGroupDetail.tsx` | Remove Hide Chart + Show Impact row, enforce layout order, fix onDownload |
+| `PerformanceChart.tsx` | Accept `showImpact`/`onShowImpactChange` props, pass Switch as `extraControls` to ChartContainer |
+| `ChartContainer.tsx` | No changes needed (already has `extraControls` prop) |
+| `ProductsPnLTable.tsx` | Add `mode` prop supporting "products" and "orders" views with expandable order rows |
+| `ProductsOrdersToggle.tsx` | Restyle to match image-129 pill toggle |
+| `Dashboard.tsx` (profitability) | Pass `tableTab` as mode to table, pass orders data when in orders mode |
+| `mockProfitability.ts` | Add `mockProfitabilityOrders` data |
+| `types/profitability.ts` | Add `ProfitabilityOrder` interface |
 
