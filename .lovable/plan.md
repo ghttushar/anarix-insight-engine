@@ -1,143 +1,98 @@
-## Phase 3: Restructure Universal Bar, Fix Sticky Columns, Wire Show Impact, Remove Duplication
-
-Based on your screenshots, the current `AppTaskbar` is wrong. Each screen needs a different control layout in the header area. This plan restructures the header system to match your reference images exactly.
-
----
-
-### Part A: Restructure PageHeader + AppTaskbar System
-
-**Current problem**: `AppTaskbar` renders the same controls (Ad Type, Frequency, Date Range, Marketplace/Store) on every page. Screenshots show different controls per screen.
-
-**New architecture**:
-
-1. `**PageHeader**` gets a new `topRight` prop for the marketplace/account cluster + J icon + avatar
-2. `**AppTaskbar**` is removed from `PageHeader`. Instead, each page renders its own control bar below the title.
-3. A new reusable `PageControls` component provides the marketplace cluster + J icon that sits in `topRight`.
-
-**Screenshot-derived control map**:
 
 
-| Screen (there is no left right top or below the buttons will appere when required, market place is on every page so it'll have a fixed olace on the far right side of the bar, and if there is create campaigne, rule, schedule it'll all come after the universal bar | &nbsp;                               | &nbsp;                       | &nbsp;                           |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ---------------------------- | -------------------------------- |
-| Campaign Manager (image-110)                                                                                                                                                                                                                                           | Marketplace + Ad Type                | --                           | Frequency + Date Range           |
-| Impact Analysis (image-111)                                                                                                                                                                                                                                            | Marketplace + Ad Type                | Time Period vs Impact Period | Metrics                          |
-| Targeting Actions (image-112)                                                                                                                                                                                                                                          | Marketplace                          | (none)                       | (none)                           |
-| Day Parting (image-113)                                                                                                                                                                                                                                                | Marketplace                          | (none)                       | (none)                           |
-| History (image-114)                                                                                                                                                                                                                                                    | Marketplace                          | (none)                       | (none)                           |
-| Profit Dashboard (image-107)                                                                                                                                                                                                                                           | marketplace                          | --                           | Date Range + Frequency + Metrics |
-| Trends (image-108)                                                                                                                                                                                                                                                     | marketplace                          | &nbsp;                       | Date Range + Metrics             |
-| Profit & Loss (image-109)                                                                                                                                                                                                                                              | marketplace                          | &nbsp;                       | Date Range                       |
-| Day Parting hourly (image-105)                                                                                                                                                                                                                                         | (use current pattern but simplified) | --                           | &nbsp;                           |
+## Ad Group Detail Page — Match Reference Screenshots
 
-
-**Files modified**:
-
-- `src/components/layout/PageHeader.tsx` -- add `topRight` prop, remove `<AppTaskbar />` call, render topRight on the title row
-- `src/components/layout/PageControls.tsx` -- **NEW** reusable marketplace/J/avatar cluster
-- `src/components/layout/AppTaskbar.tsx` -- keep as standalone component but remove from PageHeader; pages that need it import it directly
-- All 39 page files that use `<PageHeader>` -- add `topRight={<PageControls />}` and render page-specific controls below
-
-**Implementation approach**: Since modifying all 39 pages is too large for one pass, we'll:
-
-1. Create `PageControls` component
-2. Update `PageHeader` to support `topRight` and add `hideTaskbar` as default true
-3. Update the 10 key screens (Campaign Manager, Impact Analysis, Targeting Actions, Day Parting, History, Profit Dashboard, Trends, P&L, Geographical, Catalog) with correct per-screen controls
-4. Other pages get `hideTaskbar={false}` temporarily to keep working
+Based on images 115-119, the Ad Group Detail page needs significant restructuring to match the reference design. Here's what needs to change:
 
 ---
 
-### Part B: Fix Sticky Column Transparency
+### 1. Page Structure (image-116, image-117)
 
-**Problem**: Sticky columns use `bg-background` but this is not opaque when scrolling horizontally -- data shows through.
+**Current**: PageHeader with title + subtitle, then KPIs, chart, tabs, toolbar, table.
 
-**Fix**: Change all sticky `<TableCell>` and `<TableHead>` backgrounds from `bg-background` and `bg-muted/50` to fully opaque values. Use CSS variable directly:
+**Reference shows**:
+- Title: "Advertising" (generic module title, not the ad group name)
+- Breadcrumb: `Advertising > SP > Rainbow Mattress | New | Manual | SP > Rainbow Mattress | New | Manual | Adgroup | SP`
+- **Ad Group Info Card**: A horizontal info strip showing Ad Group Name, Status badge, Keyword Targeting type, Min Bid, Max Bid, TRoAS — with an "Edit" button
+- Universal bar with: Marketplace (far right), Frequency, Date Range, Run button
+- "Performance Overview" section label
+- KPI strip (Ad Spend, Ad Sales, Ad Units, ROAS) with dropdowns and deltas
+- Show Impact / View Changes toggles + Hide Chart control
+- Performance chart
+- Tabs: Product Ads, Keyword Targeting, Search Terms
 
-```
-// Header sticky cells
-className="sticky left-0 z-10 bg-[hsl(var(--muted)/0.5)]" 
-// becomes
-className="sticky left-0 z-10 bg-muted"
+**Files**: `src/pages/advertising/AdGroupDetail.tsx`
 
-// Body sticky cells  
-className="sticky left-0 z-10 bg-background"
-// stays but we need to ensure bg-background is not transparent
-```
+**Changes**:
+- Replace `PageHeader` title with generic "Advertising" title
+- Rebuild breadcrumb to show: `Advertising > SP > [Campaign Name] > [Ad Group Name]`
+- Add new **AdGroupInfoCard** component below breadcrumb showing: Name, Status, Keyword Targeting, Min Bid, Max Bid, TRoAS, Edit button
+- Add `AppTaskbar` with `showFrequency`, `showDateRange` + Run button
+- Add "Performance Overview" section heading
+- Add Show Impact toggle and Hide Chart control row
+- Add chart visibility toggle
 
-The real issue: `bg-muted/30` and `bg-muted/50` are semi-transparent. Change to `bg-muted` (fully opaque) for header rows, and `bg-background` for body rows (which should already be opaque). The hover state `group-hover:bg-muted` handles the hover case.
+### 2. Ad Group Info Card (image-117)
 
-**Files**: `CampaignTable.tsx`, `AdGroupsTable.tsx`, `ProductAdsTable.tsx`, `KeywordTargetingTable.tsx`, `SearchTermsTable.tsx`, `ProductTargetingTable.tsx`, `ImpactTable.tsx`, `RegionalTable.tsx`
+A new reusable component rendering a bordered card with:
 
----
+| Ad Group Name | Status | Keyword Targeting | Min. Bid | Max. Bid | TRoAS |
+|---|---|---|---|---|---|
+| Rainbow Mattress \| New \| Manual \| Adgroup \| SP | Enabled (badge) | Bidded Value | $0.45 | $2.30 | $8.00 |
 
-### Part C: Wire Show Impact Toggle to Chart
+Min Bid, Max Bid, TRoAS values are clickable/editable (shown in teal/link color).
 
-**Problem**: Show Impact toggle exists but doesn't change the chart.
+**New file**: `src/components/advertising/AdGroupInfoCard.tsx`
 
-**Fix in `CampaignManager.tsx**`:
+### 3. Product Ads Tab (image-118)
 
-- Pass `showImpact` to `PerformanceChart` as a new prop
-- When `showImpact` is true, overlay impact tooltip data on the chart (showing top 5 campaign contributors with % change, matching image-106)
-- Add impact data lines to the chart from mock data
-- Remove `viewChanges` toggle (user asked to remove it)
+The table matches current `ProductAdsTable` closely but adds:
+- "Add Product Ads" primary button in toolbar (purple, filled)
+- View/Edit toggle
+- Filter row showing active filters (e.g., "Product Ad Status is ENABLED x")
+- "Clear" button for filters
+- Columns: checkbox, Status (toggle), Product Ad, Ad Group, Campaign, Impressions, Clicks, CTR, Ad Units, CVR (Units Based), CPC, Ad Spend, Ad Sales, ROAS, ACOS
+- Total row at bottom
+- Pagination: "Rows per page" selector + "1-2 of 2" + nav arrows
 
-**Fix in `PerformanceChart.tsx**`:
+### 4. Search Terms Tab (image-119)
 
-- Accept optional `showImpact` prop
-- When true, add a custom tooltip that shows top 5 campaign contributors with their % impact (matching the reference screenshot)
-- Add additional data series for impact overlay
+The table adds:
+- No "Add" button (search terms are read-only)
+- Columns: checkbox, Search Term, Keyword, Match Type, Ad Group, Campaign, Impressions, Clicks, CTR, Ad Units, CVR (Units Based), CPC, Ad Spend, Ad Sales, ROAS, ACOS
+- Total row
+- Pagination
 
----
+### 5. Add Product Ads Modal (image-115)
 
-### Part D: Remove Duplicate Buttons in Table Toolbar
+A new modal triggered by "Add Product Ads" button with:
+- Left panel: searchable product list from catalog (checkbox + image + name + item ID)
+- Right panel: "Added Product" staging area with Status, Product, Suggested Bid, Bid, Clear columns
+- Header: "Add Product" with count (15/2,000)
+- Cancel / Add buttons
 
-**Problem**: Pages like `ProfitabilityDashboard` pass `onDownload` to `DataTableToolbar` AND also put Export/Download buttons in `rightContent`, creating duplicates.
+**New file**: `src/components/advertising/AddProductAdsModal.tsx`
 
-**Fix**: Audit each page's `DataTableToolbar` usage:
+### 6. Campaign Detail Page (not shown but same pattern)
 
-- `ProfitabilityDashboard.tsx` -- remove `onDownload` prop since Export is already in `rightContent`
-- `TargetingActions.tsx` -- the toolbar and bid controls are on separate rows with different widths; unify into single toolbar row
-- `ImpactAnalysis.tsx` -- remove `onFilter` prop (no filter fields provided, button does nothing)
-
----
-
-### Part E: Column Visibility Actually Hides Columns
-
-**Problem**: Column toggle dropdown works now (Radix fix done), but toggling columns doesn't actually hide them in the table because the table components don't receive `hiddenColumns`.
-
-**Fix in `CampaignManager.tsx**`: Pass `hiddenColumns` set to `CampaignTable` and each sub-table. Each table component needs to conditionally render columns based on visibility.
-
-**Fix in `CampaignTable.tsx**`: Accept `hiddenColumns?: Set<string>` prop and skip rendering `<TableHead>` and `<TableCell>` for hidden column IDs.
-
-Same pattern for all sub-tables.
+Update `CampaignDetail.tsx` to follow the same pattern:
+- Generic "Advertising" title
+- Breadcrumb: `Advertising > SP > [Campaign Name]`
+- Campaign Info Card (Name, Status, Type, Budget, etc.)
+- AppTaskbar with Frequency + Date Range
+- Chart + tabs + tables
 
 ---
 
 ### Summary of Files
 
+| File | Change |
+|---|---|
+| `src/pages/advertising/AdGroupDetail.tsx` | Full restructure: generic title, info card, taskbar, chart controls, updated tabs/toolbar |
+| `src/pages/advertising/CampaignDetail.tsx` | Same pattern: generic title, campaign info card, taskbar, chart controls |
+| `src/components/advertising/AdGroupInfoCard.tsx` | **NEW** — horizontal info strip for ad group metadata |
+| `src/components/advertising/CampaignInfoCard.tsx` | **NEW** — horizontal info strip for campaign metadata |
+| `src/components/advertising/AddProductAdsModal.tsx` | **NEW** — product selection modal with staging area |
+| `src/components/tables/ProductAdsTable.tsx` | Add "Add Product Ads" button to toolbar, pagination, filter row |
+| `src/components/tables/SearchTermsTable.tsx` | Add pagination, ROAS/ACOS columns |
 
-| File                            | Change                                                                                                                |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `PageHeader.tsx`                | Add `topRight` prop, stop auto-rendering AppTaskbar                                                                   |
-| `PageControls.tsx`              | **NEW** -- Marketplace + J icon + Avatar cluster                                                                      |
-| `CampaignManager.tsx`           | Add PageControls, per-screen controls bar, pass showImpact to chart, pass hiddenColumns to tables, remove viewChanges |
-| `ImpactAnalysis.tsx`            | Add PageControls, per-screen period selectors, remove onFilter                                                        |
-| `TargetingActions.tsx`          | Add PageControls, clean toolbar                                                                                       |
-| `HourlyData.tsx`                | Add PageControls, move controls below title                                                                           |
-| `History.tsx`                   | Add PageControls                                                                                                      |
-| `Dashboard.tsx` (profitability) | Add PageControls with "Catalog" label variant                                                                         |
-| `Trends.tsx`                    | Add PageControls, move search to table toolbar                                                                        |
-| `ProfitLoss.tsx`                | Add PageControls, move search to table toolbar, remove duplicate download                                             |
-| `PerformanceChart.tsx`          | Accept showImpact prop, render impact tooltip overlay                                                                 |
-| `CampaignTable.tsx`             | Accept hiddenColumns, fix sticky bg opacity                                                                           |
-| `AdGroupsTable.tsx`             | Fix sticky bg opacity                                                                                                 |
-| `ProductAdsTable.tsx`           | Fix sticky bg opacity                                                                                                 |
-| `KeywordTargetingTable.tsx`     | Fix sticky bg opacity                                                                                                 |
-| `SearchTermsTable.tsx`          | Fix sticky bg opacity                                                                                                 |
-| `ProductTargetingTable.tsx`     | Fix sticky bg opacity                                                                                                 |
-| `ImpactTable.tsx`               | Fix sticky bg opacity                                                                                                 |
-
-
-This is the largest single phase. I recommend splitting implementation into two passes if needed:
-
-- **Pass 1**: Parts B + C + D (sticky fix, impact toggle, dedup) -- 12 files
-- **Pass 2**: Parts A + E (header restructure, column visibility) -- 15 files
