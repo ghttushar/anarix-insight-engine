@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, Download, Columns, X, Pencil, Plus } from "lucide-react";
+import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +53,16 @@ interface DataTableToolbarProps {
   rightContent?: React.ReactNode;
 }
 
-const OPERATORS = ["is", "is not", "contains", "starts with", "greater than", "less than"];
+const OPERATORS = [
+  "is",
+  "is not",
+  "contains",
+  "starts with",
+  "is less than",
+  "is greater than",
+  "is less than or equal to",
+  "is greater than or equal to",
+];
 
 export function DataTableToolbar({
   searchValue,
@@ -74,13 +84,13 @@ export function DataTableToolbar({
   leftContent,
   rightContent,
 }: DataTableToolbarProps) {
-  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState<FilterRule[]>(activeFilters);
   const [columnSearch, setColumnSearch] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const handleOpenFilter = () => {
     setDraftFilters(activeFilters.length > 0 ? [...activeFilters] : [{ id: crypto.randomUUID(), field: filterFields[0] || "", operator: "is", value: "" }]);
-    setFilterPanelOpen(true);
+    setFilterOpen(true);
   };
 
   const addFilterRule = () => {
@@ -98,17 +108,17 @@ export function DataTableToolbar({
   const applyFilters = () => {
     const valid = draftFilters.filter((f) => f.field && f.value);
     onFiltersChange?.(valid);
-    setFilterPanelOpen(false);
+    setFilterOpen(false);
   };
 
   const cancelFilters = () => {
-    setFilterPanelOpen(false);
+    setFilterOpen(false);
     setDraftFilters(activeFilters);
   };
 
   const clearAllFilters = () => {
     onFiltersChange?.([]);
-    setFilterPanelOpen(false);
+    setFilterOpen(false);
     setDraftFilters([]);
   };
 
@@ -134,8 +144,10 @@ export function DataTableToolbar({
           </div>
         </div>
 
-        {/* Right Side: Columns + Filter + Download + Edit toggle */}
+        {/* Right Side: rightContent → Columns → Filter → Download → Edit toggle */}
         <div className="flex items-center gap-1">
+          {rightContent}
+
           {/* Columns Dropdown */}
           {columns.length > 0 && onColumnToggle && (
             <DropdownMenu>
@@ -178,22 +190,66 @@ export function DataTableToolbar({
             </DropdownMenu>
           )}
 
-          {/* Filter Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 gap-1 text-xs cursor-pointer"
-            onClick={handleOpenFilter}
-            title="Add or manage filters"
-          >
-            <Filter className="h-3.5 w-3.5" />
-            Filter
-            {activeFilters.length > 0 && (
-              <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                {activeFilters.length}
-              </span>
-            )}
-          </Button>
+          {/* Filter Button — Floating Popover */}
+          <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1 text-xs cursor-pointer"
+                onClick={handleOpenFilter}
+                title="Add or manage filters"
+              >
+                <Filter className="h-3.5 w-3.5" />
+                Filter
+                {activeFilters.length > 0 && (
+                  <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                    {activeFilters.length}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-[520px] p-3 space-y-2">
+              <p className="text-xs font-medium text-foreground">Filters</p>
+              <div className="space-y-1.5">
+                {draftFilters.map((rule, idx) => (
+                  <div key={rule.id} className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-muted-foreground w-10 shrink-0">{idx === 0 ? "Where" : "And"}</span>
+                    <Select value={rule.field} onValueChange={(v) => updateFilterRule(rule.id, "field", v)}>
+                      <SelectTrigger className="h-7 w-[130px] text-[11px]"><SelectValue placeholder="Field" /></SelectTrigger>
+                      <SelectContent>
+                        {filterFields.map((f) => (<SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={rule.operator} onValueChange={(v) => updateFilterRule(rule.id, "operator", v)}>
+                      <SelectTrigger className="h-7 w-[160px] text-[11px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {OPERATORS.map((op) => (<SelectItem key={op} value={op} className="text-xs">{op}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      value={rule.value}
+                      onChange={(e) => updateFilterRule(rule.id, "value", e.target.value)}
+                      placeholder="Value..."
+                      className="h-7 w-[110px] text-[11px]"
+                    />
+                    <button onClick={() => removeFilterRule(rule.id)} className="p-1 hover:bg-muted rounded cursor-pointer" title="Remove filter">
+                      <Trash2 className="h-3 w-3 text-muted-foreground" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-between pt-1">
+                <button onClick={addFilterRule} className="flex items-center gap-1 text-[11px] text-primary hover:underline cursor-pointer">
+                  <Plus className="h-3 w-3" />Add Filter
+                </button>
+                <div className="flex items-center gap-1.5">
+                  <Button variant="ghost" size="sm" onClick={cancelFilters} className="h-7 text-xs px-3">Cancel</Button>
+                  <Button size="sm" onClick={applyFilters} className="h-7 text-xs px-3">Apply</Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           {/* Download Button */}
           {onDownload && (
@@ -201,8 +257,6 @@ export function DataTableToolbar({
               <Download className="h-3.5 w-3.5" />
             </Button>
           )}
-
-          {rightContent}
 
           {/* Edit Mode Toggle — Pencil icon, far right */}
           {showViewToggle && onViewModeChange && (
@@ -223,7 +277,7 @@ export function DataTableToolbar({
       </div>
 
       {/* Active Filters Display — compact */}
-      {activeFilters.length > 0 && !filterPanelOpen && (
+      {activeFilters.length > 0 && !filterOpen && (
         <div className="flex flex-wrap items-center gap-1">
           <span className="text-[10px] text-muted-foreground">Filters:</span>
           {activeFilters.map((filter) => (
@@ -240,47 +294,6 @@ export function DataTableToolbar({
           <button onClick={clearAllFilters} className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer">
             Clear all
           </button>
-        </div>
-      )}
-
-      {/* Compact Inline Filter Builder */}
-      {filterPanelOpen && (
-        <div className="rounded-md bg-muted/30 p-2 space-y-1.5">
-          {draftFilters.map((rule, idx) => (
-            <div key={rule.id} className="flex items-center gap-1">
-              <span className="text-[10px] text-muted-foreground w-8 shrink-0">{idx === 0 ? "Where" : "And"}</span>
-              <Select value={rule.field} onValueChange={(v) => updateFilterRule(rule.id, "field", v)}>
-                <SelectTrigger className="h-6 w-[120px] text-[11px]"><SelectValue placeholder="Field" /></SelectTrigger>
-                <SelectContent>
-                  {filterFields.map((f) => (<SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>))}
-                </SelectContent>
-              </Select>
-              <Select value={rule.operator} onValueChange={(v) => updateFilterRule(rule.id, "operator", v)}>
-                <SelectTrigger className="h-6 w-[90px] text-[11px]"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {OPERATORS.map((op) => (<SelectItem key={op} value={op} className="text-xs">{op}</SelectItem>))}
-                </SelectContent>
-              </Select>
-              <Input
-                value={rule.value}
-                onChange={(e) => updateFilterRule(rule.id, "value", e.target.value)}
-                placeholder="Value..."
-                className="h-6 w-[100px] text-[11px]"
-              />
-              <button onClick={() => removeFilterRule(rule.id)} className="p-0.5 hover:bg-muted rounded cursor-pointer">
-                <X className="h-3 w-3 text-muted-foreground" />
-              </button>
-            </div>
-          ))}
-          <div className="flex items-center justify-between">
-            <button onClick={addFilterRule} className="flex items-center gap-1 text-[11px] text-primary hover:underline cursor-pointer">
-              <Plus className="h-3 w-3" />Add
-            </button>
-            <div className="flex items-center gap-1">
-              <Button variant="ghost" size="sm" onClick={cancelFilters} className="h-6 text-[11px] px-2">Cancel</Button>
-              <Button size="sm" onClick={applyFilters} className="h-6 text-[11px] px-2">Apply</Button>
-            </div>
-          </div>
         </div>
       )}
     </div>
