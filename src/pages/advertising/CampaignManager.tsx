@@ -25,12 +25,9 @@ import { mockPageTypes, mockPlatforms } from "@/data/mockPageTypePlatform";
 import { mockProductTargets } from "@/data/mockProductTargeting";
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Campaign } from "@/types/campaign";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Maximize2, Minimize2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
@@ -133,12 +130,7 @@ export default function CampaignManager() {
   const [selectedKPIs, setSelectedKPIs] = useState<string[]>(
     mockKPIData.slice(0, 4).map((k) => k.label)
   );
-
-  // Show Impact & Chart visibility
   const [showImpact, setShowImpact] = useState(false);
-  const [chartVisible, setChartVisible] = useState(true);
-
-  // Create Campaign Modal
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const kpiItems = mockKPIData
@@ -231,12 +223,7 @@ export default function CampaignManager() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
-        <AppTaskbar showAdType showFrequency showDateRange>
-          <div className="flex items-center gap-2 ml-2">
-            <Switch id="show-impact" checked={showImpact} onCheckedChange={setShowImpact} className="h-5 w-9 [&>span]:h-4 [&>span]:w-4" />
-            <Label htmlFor="show-impact" className="text-xs font-medium text-muted-foreground cursor-pointer">Show Impact</Label>
-          </div>
-        </AppTaskbar>
+        <AppTaskbar showAdType showFrequency showDateRange />
 
         <div className="flex items-center justify-end">
           <Button size="sm" className="gap-1.5" onClick={() => setCreateModalOpen(true)}>
@@ -251,14 +238,7 @@ export default function CampaignManager() {
           onMetricChange={handleKPISwap}
         />
 
-        <div className="flex items-center justify-end">
-          <button onClick={() => setChartVisible(!chartVisible)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-            {chartVisible ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-            {chartVisible ? "Hide Chart" : "Show Chart"}
-          </button>
-        </div>
-
-        {chartVisible && <PerformanceChart data={mockChartData} showImpact={showImpact} />}
+        <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
 
@@ -276,7 +256,7 @@ export default function CampaignManager() {
           activeFilters={activeFilters}
           onFiltersChange={setActiveFilters}
           filterFields={FILTER_FIELDS[activeTab] || []}
-          onDownload={() => {}}
+          onDownload={() => toast.success("Exporting data as CSV...")}
         />
 
         {renderTable()}

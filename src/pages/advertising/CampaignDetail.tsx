@@ -14,11 +14,10 @@ import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Play, ChevronDown, ChevronUp } from "lucide-react";
+import { Play } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
+import { toast } from "sonner";
 
 type TabValue = "ad-groups" | "product-ads" | "keywords" | "search-terms";
 
@@ -36,7 +35,6 @@ export default function CampaignDetail() {
   const [activeTab, setActiveTab] = useState<TabValue>("ad-groups");
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
-  const [showChart, setShowChart] = useState(true);
 
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
   const campaignName = campaign?.name || `Campaign ${campaignId}`;
@@ -68,13 +66,13 @@ export default function CampaignDetail() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <button onClick={() => navigate("/advertising/campaigns")} className="hover:underline cursor-pointer">Advertising</button>
+                <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <button onClick={() => navigate("/advertising/campaigns")} className="hover:underline cursor-pointer">{adTypeLabel}</button>
+                <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -100,26 +98,9 @@ export default function CampaignDetail() {
 
         {/* Performance Overview Section */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Switch id="show-impact-campaign" checked={showImpact} onCheckedChange={setShowImpact} />
-                <Label htmlFor="show-impact-campaign" className="text-sm text-muted-foreground cursor-pointer">Show Impact</Label>
-              </div>
-              <button
-                onClick={() => setShowChart(!showChart)}
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
-              >
-                {showChart ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                {showChart ? "Hide Chart" : "Show Chart"}
-              </button>
-            </div>
-          </div>
-
+          <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
           <InlineKPIStrip items={kpiItems} />
-
-          {showChart && <PerformanceChart data={mockChartData} showImpact={showImpact} />}
+          <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
         </div>
 
         {/* Tabs + Table */}
@@ -129,7 +110,7 @@ export default function CampaignDetail() {
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
           searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
-          onDownload={() => {}}
+          onDownload={() => toast.success("Exporting data as CSV...")}
         />
 
         {renderTable()}
