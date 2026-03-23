@@ -2,16 +2,23 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { PerformanceChart } from "@/components/charts/PerformanceChart";
+import { CampaignInfoCard } from "@/components/advertising/CampaignInfoCard";
 import { AdGroupsTable } from "@/components/tables/AdGroupsTable";
 import { ProductAdsTable } from "@/components/tables/ProductAdsTable";
 import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable";
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Play, ChevronDown, ChevronUp } from "lucide-react";
+import { useFilter } from "@/contexts/FilterContext";
 
 type TabValue = "ad-groups" | "product-ads" | "keywords" | "search-terms";
 
@@ -25,11 +32,15 @@ const tabs = [
 export default function CampaignDetail() {
   const { campaignId } = useParams();
   const navigate = useNavigate();
+  const { adType } = useFilter();
   const [activeTab, setActiveTab] = useState<TabValue>("ad-groups");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showImpact, setShowImpact] = useState(false);
+  const [showChart, setShowChart] = useState(true);
 
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
   const campaignName = campaign?.name || `Campaign ${campaignId}`;
+  const adTypeLabel = adType === "All" ? "SP" : adType;
 
   const kpiItems = mockKPIData.slice(0, 4).map((kpi, index) => ({
     label: kpi.label,
@@ -42,7 +53,7 @@ export default function CampaignDetail() {
   const renderTable = () => {
     switch (activeTab) {
       case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} />;
-      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} />;
+      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showAddButton />;
       case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} />;
       case "search-terms": return <SearchTermsTable searchQuery={searchQuery} />;
       default: return null;
@@ -51,15 +62,20 @@ export default function CampaignDetail() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
+      <div className="space-y-4">
+        {/* Breadcrumb */}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink asChild><button onClick={() => navigate("/advertising/campaigns")} className="hover:underline">Advertising</button></BreadcrumbLink>
+              <BreadcrumbLink asChild>
+                <button onClick={() => navigate("/advertising/campaigns")} className="hover:underline cursor-pointer">Advertising</button>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink asChild><button onClick={() => navigate("/advertising/campaigns")} className="hover:underline">Campaign Manager</button></BreadcrumbLink>
+              <BreadcrumbLink asChild>
+                <button onClick={() => navigate("/advertising/campaigns")} className="hover:underline cursor-pointer">{adTypeLabel}</button>
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -68,12 +84,45 @@ export default function CampaignDetail() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <PageHeader title={campaignName} subtitle={`Campaign type: ${campaign?.type || "auto"} · Status: ${campaign?.status || "live"}`} />
+        {/* Page Title */}
+        <PageHeader title="Advertising" />
 
-        <InlineKPIStrip items={kpiItems} />
+        {/* Campaign Info Card */}
+        {campaign && <CampaignInfoCard campaign={campaign} />}
 
-        <PerformanceChart data={mockChartData} />
+        {/* Universal Bar */}
+        <AppTaskbar showFrequency showDateRange>
+          <Button size="sm" className="gap-1.5 ml-2">
+            <Play className="h-3.5 w-3.5" />
+            Run
+          </Button>
+        </AppTaskbar>
 
+        {/* Performance Overview Section */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Switch id="show-impact-campaign" checked={showImpact} onCheckedChange={setShowImpact} />
+                <Label htmlFor="show-impact-campaign" className="text-sm text-muted-foreground cursor-pointer">Show Impact</Label>
+              </div>
+              <button
+                onClick={() => setShowChart(!showChart)}
+                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              >
+                {showChart ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                {showChart ? "Hide Chart" : "Show Chart"}
+              </button>
+            </div>
+          </div>
+
+          <InlineKPIStrip items={kpiItems} />
+
+          {showChart && <PerformanceChart data={mockChartData} showImpact={showImpact} />}
+        </div>
+
+        {/* Tabs + Table */}
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
 
         <DataTableToolbar
