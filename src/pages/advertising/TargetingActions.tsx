@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
+import { AddKeywordTargetModal } from "@/components/advertising/AddKeywordTargetModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -24,11 +25,15 @@ const tabs = [
   { value: "archive", label: "Archive" },
 ];
 
+const FILTER_FIELDS = ["Search Term", "Term Type", "Match Type", "ROAS", "ACOS", "Ad Spend", "Ad Sales", "Impressions", "Clicks"];
+
 export default function TargetingActions() {
   const [activeTab, setActiveTab] = useState<ActionTab>("keyword-action");
   const [searchQuery, setSearchQuery] = useState("");
   const [bidAction, setBidAction] = useState("increase_pct");
   const [bidValue, setBidValue] = useState("");
+  const [addKeywordsOpen, setAddKeywordsOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<{ id: string; field: string; operator: string; value: string }[]>([]);
 
   const filteredActions = mockTargetingActions.filter((action) => {
     const matchesSearch =
@@ -43,13 +48,14 @@ export default function TargetingActions() {
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
   const handleFetchKeywords = () => { toast.info("Fetching keywords..."); };
-  const handleAddKeywords = () => { toast.info("Opening keyword builder..."); };
   const handleDownload = () => { toast.success("Exporting targeting data..."); };
-  const handleFilter = () => { toast.info("Opening advanced filters..."); };
   const handleApplyBid = () => {
     if (!bidValue) return;
     toast.success(`Bid adjustment applied: ${bidAction === "set_to" ? "Set to" : bidAction === "increase_pct" ? "Increase by" : "Decrease by"} ${bidValue}${bidAction !== "set_to" ? "%" : ""}`);
     setBidValue("");
+  };
+  const handleAddKeywords = (keywords: any[], campaignId: string, adGroupId: string) => {
+    toast.success(`Added ${keywords.length} keyword(s) to target campaign`);
   };
 
   return (
@@ -89,69 +95,72 @@ export default function TargetingActions() {
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as ActionTab)} />
 
-        <div className="flex items-center justify-between">
-          <DataTableToolbar
-            searchValue={searchQuery}
-            onSearchChange={setSearchQuery}
-            searchPlaceholder="Search terms..."
-            onFilter={handleFilter}
-            onDownload={handleDownload}
-          />
-          <div className="flex items-center gap-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <DollarSign className="h-4 w-4" />Custom Bid
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-72" align="end">
-                <div className="space-y-3">
-                  <p className="text-sm font-medium">Adjust Bids</p>
-                  <Select value={bidAction} onValueChange={setBidAction}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="increase_pct">Increase By %</SelectItem>
-                      <SelectItem value="decrease_pct">Decrease By %</SelectItem>
-                      <SelectItem value="set_to">Set To</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type="number"
-                    placeholder={bidAction === "set_to" ? "Enter bid value" : "Enter percentage"}
-                    value={bidValue}
-                    onChange={(e) => setBidValue(e.target.value)}
-                    className="h-8 text-xs"
-                    step={bidAction === "set_to" ? 0.01 : 1}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Are you sure you want to adjust the budget? This action might affect the spends.
-                  </p>
-                  <Button size="sm" className="w-full" onClick={handleApplyBid} disabled={!bidValue}>
-                    Apply
+        {/* Unified Toolbar — all buttons in one row */}
+        <DataTableToolbar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search terms..."
+          activeFilters={activeFilters}
+          onFiltersChange={setActiveFilters}
+          filterFields={FILTER_FIELDS}
+          onDownload={handleDownload}
+          rightContent={
+            <>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+                    <DollarSign className="h-3.5 w-3.5" />Custom Bid
                   </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-            <Button size="sm" className="gap-2" onClick={handleAddKeywords}>
-              <Plus className="h-4 w-4" />Add Keywords
-            </Button>
-          </div>
-        </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-72" align="end">
+                  <div className="space-y-3">
+                    <p className="text-sm font-medium">Adjust Bids</p>
+                    <Select value={bidAction} onValueChange={setBidAction}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="increase_pct">Increase By %</SelectItem>
+                        <SelectItem value="decrease_pct">Decrease By %</SelectItem>
+                        <SelectItem value="set_to">Set To</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      type="number"
+                      placeholder={bidAction === "set_to" ? "Enter bid value" : "Enter percentage"}
+                      value={bidValue}
+                      onChange={(e) => setBidValue(e.target.value)}
+                      className="h-8 text-xs"
+                      step={bidAction === "set_to" ? 0.01 : 1}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Are you sure you want to adjust the budget? This action might affect the spends.
+                    </p>
+                    <Button size="sm" className="w-full" onClick={handleApplyBid} disabled={!bidValue}>
+                      Apply
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => setAddKeywordsOpen(true)}>
+                <Plus className="h-3.5 w-3.5" />Add Keywords
+              </Button>
+            </>
+          }
+        />
 
         <div className="rounded-lg border border-border">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted hover:bg-muted">
-                  <TableHead className="min-w-[200px]">Search Term</TableHead>
+                  <TableHead className="min-w-[200px] sticky left-0 z-10 bg-muted">Search Term</TableHead>
                   <TableHead className="min-w-[160px]">Normalized Term</TableHead>
                   <TableHead className="min-w-[140px]">Source Campaign</TableHead>
                   <TableHead className="min-w-[130px]">Source AdGroup</TableHead>
                   <TableHead className="min-w-[150px]">Target Campaign</TableHead>
                   <TableHead className="min-w-[150px]">Target Ad Group</TableHead>
-                  <TableHead className="min-w-[120px] text-center">Broad</TableHead>
-                  <TableHead className="min-w-[120px] text-center">Exact</TableHead>
-                  <TableHead className="min-w-[120px] text-center">Phrase</TableHead>
+                  <TableHead className="w-[100px] text-center">Broad</TableHead>
+                  <TableHead className="w-[100px] text-center">Exact</TableHead>
+                  <TableHead className="w-[100px] text-center">Phrase</TableHead>
                   <TableHead className="w-14 text-center">Archive</TableHead>
                   <TableHead className="text-right">Impressions</TableHead>
                   <TableHead className="text-right">Clicks</TableHead>
@@ -170,9 +179,9 @@ export default function TargetingActions() {
                   const acos = action.adSales > 0 ? (action.adSpend / action.adSales) * 100 : 0;
                   return (
                     <TableRow key={action.id}>
-                      <TableCell>
+                      <TableCell className="sticky left-0 z-10 bg-background">
                         <div className="space-y-1">
-                          <span className="font-medium text-sm">{action.searchTerm}</span>
+                          <span className="font-medium text-sm text-foreground">{action.searchTerm}</span>
                           <Select defaultValue={action.termType}>
                             <SelectTrigger className="h-6 w-24 text-[11px] border-dashed">
                               <SelectValue />
@@ -200,42 +209,56 @@ export default function TargetingActions() {
                           <SelectContent>{mockTargetAdGroups.map((ag) => (<SelectItem key={ag.id} value={ag.id}>{ag.name}</SelectItem>))}</SelectContent>
                         </Select>
                       </TableCell>
-                      {(["broad", "exact", "phrase"] as const).map((matchType) => (
-                        <TableCell key={matchType} className="px-2">
-                          <div className={cn(
-                            "flex flex-col items-center gap-1.5 rounded-md border px-3 py-2",
-                            action.matchTypes[matchType].selected
-                              ? "border-primary/30 bg-primary/5"
-                              : "border-border bg-muted/20"
-                          )}>
-                            <Checkbox
-                              checked={action.matchTypes[matchType].selected}
-                              className="h-3.5 w-3.5"
-                            />
-                            <Input
-                              type="number"
-                              value={action.matchTypes[matchType].bid}
-                              className="h-6 w-16 border border-border bg-background px-1 text-center text-xs shadow-none focus-visible:ring-1 focus-visible:ring-primary/30 rounded"
-                              step={0.01}
-                            />
-                          </div>
-                        </TableCell>
-                      ))}
+
+                      {/* Redesigned Match Type Cards */}
+                      {(["broad", "exact", "phrase"] as const).map((matchType) => {
+                        const mt = action.matchTypes[matchType];
+                        return (
+                          <TableCell key={matchType} className="px-1.5">
+                            <div
+                              className={cn(
+                                "relative flex flex-col items-center gap-1 rounded-lg border p-2 min-w-[80px] transition-colors",
+                                mt.selected
+                                  ? "border-primary/40 bg-primary/5"
+                                  : "border-border bg-background"
+                              )}
+                            >
+                              <Checkbox
+                                checked={mt.selected}
+                                className="absolute left-1.5 top-1.5 h-3 w-3"
+                              />
+                              <span className={cn(
+                                "text-[10px] uppercase font-medium tracking-wide",
+                                mt.selected ? "text-primary" : "text-muted-foreground"
+                              )}>
+                                {matchType}
+                              </span>
+                              <Input
+                                type="number"
+                                value={mt.bid}
+                                step={0.01}
+                                className="h-6 w-14 text-center text-xs border-border bg-background shadow-none focus-visible:ring-1 focus-visible:ring-primary/30 rounded px-1"
+                              />
+                            </div>
+                          </TableCell>
+                        );
+                      })}
+
                       <TableCell className="text-center">
                         <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                           <Archive className="h-3.5 w-3.5 text-muted-foreground" />
                         </Button>
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{formatNumber(action.impressions)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{formatNumber(action.clicks)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{formatPercent(action.ctr)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{formatCurrency(action.cpc)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{formatCurrency(action.adSpend)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{formatCurrency(action.adSales)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{formatNumber(action.adUnits)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{formatPercent(action.cvr)}</TableCell>
-                      <TableCell className="text-right tabular-nums font-medium">{action.roas.toFixed(2)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{formatPercent(acos)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-foreground">{formatNumber(action.impressions)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-foreground">{formatNumber(action.clicks)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-foreground">{formatPercent(action.ctr)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-foreground">{formatCurrency(action.cpc)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-foreground">{formatCurrency(action.adSpend)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-foreground">{formatCurrency(action.adSales)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-foreground">{formatNumber(action.adUnits)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-foreground">{formatPercent(action.cvr)}</TableCell>
+                      <TableCell className="text-right tabular-nums font-medium text-foreground">{action.roas.toFixed(2)}</TableCell>
+                      <TableCell className="text-right tabular-nums text-foreground">{formatPercent(acos)}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -251,6 +274,12 @@ export default function TargetingActions() {
           </div>
         </div>
       </div>
+
+      <AddKeywordTargetModal
+        isOpen={addKeywordsOpen}
+        onClose={() => setAddKeywordsOpen(false)}
+        onAdd={handleAddKeywords}
+      />
     </AppLayout>
   );
 }
