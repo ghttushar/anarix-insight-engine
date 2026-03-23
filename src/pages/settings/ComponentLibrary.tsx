@@ -2041,6 +2041,291 @@ function ComponentShowcase() {
         </div>
       </section>
 
+      {/* ========== NEW COMPONENTS (Phase 3+) ========== */}
+      <section className="space-y-6">
+        <div>
+          <h2 className="text-xl font-bold text-foreground mb-1">New Components</h2>
+          <p className="text-sm text-muted-foreground">Recently added components for advertising detail pages, BI modals, and day parting.</p>
+        </div>
+
+        {/* Item Breadcrumb */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-foreground">Item Breadcrumb (Drill-Down Navigation)</h3>
+          <p className="text-xs text-muted-foreground">Used on Campaign Detail, Ad Group Detail pages. Shows hierarchical path from module → ad type → campaign → ad group.</p>
+          <div className="p-4 rounded-lg border border-border bg-card space-y-4">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem><BreadcrumbLink className="text-primary hover:underline cursor-pointer">Advertising</BreadcrumbLink></BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem><BreadcrumbLink className="text-primary hover:underline cursor-pointer">SP</BreadcrumbLink></BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem><BreadcrumbLink className="text-primary hover:underline cursor-pointer">Rainbow Mattress | New | Manual | SP</BreadcrumbLink></BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem><BreadcrumbPage className="text-foreground font-medium">Rainbow Mattress | New | Manual | Adgroup | SP</BreadcrumbPage></BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem><BreadcrumbLink className="text-primary hover:underline cursor-pointer">Advertising</BreadcrumbLink></BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem><BreadcrumbLink className="text-primary hover:underline cursor-pointer">SP</BreadcrumbLink></BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem><BreadcrumbPage className="text-foreground font-medium">Rainbow Mattress | New | Manual | SP</BreadcrumbPage></BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </div>
+
+        {/* Campaign Info Card */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-foreground">Campaign Info Card</h3>
+          <p className="text-xs text-muted-foreground">Horizontal metadata strip on Campaign Detail page. Shows campaign name, status, type, budgets. Editable values in primary color with underline on hover.</p>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center gap-6 rounded-lg border border-border bg-card px-5 py-3">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Campaign Name</span>
+                <span className="text-sm font-medium text-foreground">Rainbow Mattress | New | Manual | SP</span>
+              </div>
+              <div className="h-8 w-px bg-border" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Status</span>
+                <StatusBadge status="live" />
+              </div>
+              <div className="h-8 w-px bg-border" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Type</span>
+                <span className="text-sm text-foreground">Manual</span>
+              </div>
+              <div className="h-8 w-px bg-border" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Daily Budget</span>
+                <span className="text-sm font-medium text-primary cursor-pointer hover:underline">$150.00</span>
+              </div>
+              <div className="h-8 w-px bg-border" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Total Budget</span>
+                <span className="text-sm font-medium text-primary cursor-pointer hover:underline">$4,500.00</span>
+              </div>
+              <div className="flex-1" />
+              <Button variant="outline" size="sm" className="gap-1.5"><Edit className="h-3.5 w-3.5" />Edit</Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Ad Group Info Card */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-foreground">Ad Group Info Card</h3>
+          <p className="text-xs text-muted-foreground">Horizontal metadata strip on Ad Group Detail page. Shows ad group name, status, targeting type, bids, TRoAS. Editable values in primary color.</p>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center gap-6 rounded-lg border border-border bg-card px-5 py-3">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Ad Group Name</span>
+                <span className="text-sm font-medium text-foreground">Rainbow Mattress | New | Manual | Adgroup | SP</span>
+              </div>
+              <div className="h-8 w-px bg-border" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Status</span>
+                <StatusBadge status="live" />
+              </div>
+              <div className="h-8 w-px bg-border" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Keyword Targeting</span>
+                <span className="text-sm text-foreground">Bidded Value</span>
+              </div>
+              <div className="h-8 w-px bg-border" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Min. Bid</span>
+                <span className="text-sm font-medium text-primary cursor-pointer hover:underline">$0.45</span>
+              </div>
+              <div className="h-8 w-px bg-border" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Max. Bid</span>
+                <span className="text-sm font-medium text-primary cursor-pointer hover:underline">$2.30</span>
+              </div>
+              <div className="h-8 w-px bg-border" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">TRoAS</span>
+                <span className="text-sm font-medium text-primary cursor-pointer hover:underline">$8.00</span>
+              </div>
+              <div className="flex-1" />
+              <Button variant="outline" size="sm" className="gap-1.5"><Edit className="h-3.5 w-3.5" />Edit</Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Add Product Ads Modal Anatomy */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-foreground">Add Product Ads Modal</h3>
+          <p className="text-xs text-muted-foreground">Dual-pane modal for adding products to an ad group. Left: searchable catalog. Right: staging area with bid inputs.</p>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="border border-border rounded-lg overflow-hidden">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-muted/30">
+                <div>
+                  <h4 className="text-sm font-semibold text-foreground">Add Product</h4>
+                  <p className="text-xs text-muted-foreground">15 / 2,000</p>
+                </div>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><X className="h-4 w-4" /></Button>
+              </div>
+              {/* Modal Body */}
+              <div className="flex divide-x divide-border" style={{ minHeight: 200 }}>
+                {/* Left: Catalog */}
+                <div className="flex-1 p-4 space-y-3">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                    <Input placeholder="Search products..." className="pl-8 h-8 text-xs" readOnly />
+                  </div>
+                  <div className="space-y-2">
+                    {["Rainbow Memory Foam Mattress", "Ultra Comfort Pillow Set", "Bamboo Sheet Set"].map((name, i) => (
+                      <div key={i} className="flex items-center gap-3 p-2 rounded border border-border">
+                        <Checkbox checked={i === 0} />
+                        <div className="h-8 w-8 rounded bg-muted border border-border" />
+                        <div>
+                          <p className="text-xs font-medium text-foreground">{name}</p>
+                          <p className="text-[10px] text-muted-foreground">ITEM-{1000 + i}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Right: Staging */}
+                <div className="flex-1 p-4 space-y-3">
+                  <h5 className="text-xs font-semibold text-muted-foreground uppercase">Added Products</h5>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="text-[10px]">
+                        <TableHead className="text-[10px]">Product</TableHead>
+                        <TableHead className="text-[10px] text-right">Suggested Bid</TableHead>
+                        <TableHead className="text-[10px] text-right">Bid</TableHead>
+                        <TableHead className="text-[10px] w-8"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="text-xs">Rainbow Memory Foam</TableCell>
+                        <TableCell className="text-xs text-right text-muted-foreground">$1.25</TableCell>
+                        <TableCell className="text-right"><Input className="h-6 w-16 text-xs text-right" defaultValue="1.25" readOnly /></TableCell>
+                        <TableCell><Button variant="ghost" size="sm" className="h-6 w-6 p-0"><X className="h-3 w-3" /></Button></TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+              {/* Modal Footer */}
+              <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-muted/30">
+                <Button variant="outline" size="sm">Cancel</Button>
+                <Button size="sm">Add</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Add Keyword Modal Anatomy */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-foreground">Add Keyword Modal</h3>
+          <p className="text-xs text-muted-foreground">Modal for adding a tracked keyword with region and channel selection. Used in Keyword Tracker (BI).</p>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="border border-border rounded-lg overflow-hidden max-w-md">
+              <div className="px-5 py-3 border-b border-border bg-muted/30">
+                <h4 className="text-sm font-semibold text-foreground">Add Keyword</h4>
+                <p className="text-xs text-muted-foreground">Add a new keyword to track share of voice</p>
+              </div>
+              <div className="p-5 space-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Keyword</Label>
+                  <Input placeholder="Enter keyword..." className="h-9 text-sm" defaultValue="memory foam mattress" readOnly />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Region</Label>
+                  <Select defaultValue="US">
+                    <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="US">🇺🇸 United States</SelectItem>
+                      <SelectItem value="CA">🇨🇦 Canada</SelectItem>
+                      <SelectItem value="UK">🇬🇧 United Kingdom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">Channels</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2"><Checkbox checked /><span className="text-sm">Organic</span></div>
+                    <div className="flex items-center gap-2"><Checkbox checked /><span className="text-sm">Sponsored</span></div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-muted/30">
+                <Button variant="outline" size="sm">Cancel</Button>
+                <Button size="sm">Add Keyword</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Create Schedule (Day Parting) Anatomy */}
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold text-foreground">Create Schedule (Day Parting)</h3>
+          <p className="text-xs text-muted-foreground">Schedule creation panel for day parting. Includes campaign selection, action type, day/time selectors, and frequency.</p>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="border border-border rounded-lg overflow-hidden max-w-lg">
+              <div className="px-5 py-3 border-b border-border bg-muted/30">
+                <h4 className="text-sm font-semibold text-foreground">Create Schedule</h4>
+                <p className="text-xs text-muted-foreground">Set up automated bid adjustments for specific time windows</p>
+              </div>
+              <div className="p-5 space-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Campaign</Label>
+                  <Select defaultValue="camp1">
+                    <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent><SelectItem value="camp1">Rainbow Mattress | New | Manual | SP</SelectItem></SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Action Type</Label>
+                  <Select defaultValue="pause">
+                    <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pause">Pause Campaign</SelectItem>
+                      <SelectItem value="boost">Increase Bids</SelectItem>
+                      <SelectItem value="reduce">Decrease Bids</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Days</Label>
+                  <div className="flex gap-1.5">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => (
+                      <Button key={day} variant={i < 5 ? "default" : "outline"} size="sm" className="h-8 w-10 text-xs px-0">{day}</Button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Start Time</Label>
+                    <Select defaultValue="09:00">
+                      <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent><SelectItem value="09:00">09:00 AM</SelectItem></SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">End Time</Label>
+                    <Select defaultValue="17:00">
+                      <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent><SelectItem value="17:00">05:00 PM</SelectItem></SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-muted/30">
+                <Button variant="outline" size="sm">Cancel</Button>
+                <Button size="sm">Create Schedule</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
     </div>
   );
 }

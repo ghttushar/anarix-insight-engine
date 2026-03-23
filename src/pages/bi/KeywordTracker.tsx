@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { KeywordTrackerTable } from "@/components/bi/KeywordTrackerTable";
 import { AddKeywordModal } from "@/components/bi/AddKeywordModal";
@@ -40,6 +41,8 @@ export default function KeywordTracker() {
           title="Keyword Tracker"
           subtitle="Manage keywords for share of voice tracking"
         />
+
+        <AppTaskbar />
 
         <div className="flex items-center justify-end">
           <Button onClick={() => setIsAddModalOpen(true)}><Plus className="mr-2 h-4 w-4" />Add Keyword</Button>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -25,21 +26,25 @@ export default function ProductSOV() {
         <PageHeader
           title="Product Share of Voice"
           subtitle="Track SOV performance by product"
-          actions={
-            <>
-              <Select value={position} onValueChange={setPosition}>
-                <SelectTrigger className="w-[140px] h-9 text-xs"><SelectValue placeholder="Position" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Positions</SelectItem>
-                  <SelectItem value="1-3">Top 3</SelectItem>
-                  <SelectItem value="1-10">Top 10</SelectItem>
-                  <SelectItem value="1-20">Top 20</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button variant="outline" onClick={() => toast.success("Exporting...")}><Download className="mr-2 h-4 w-4" />Export</Button>
-            </>
-          }
         />
+
+        <AppTaskbar>
+          <Select value={position} onValueChange={setPosition}>
+            <SelectTrigger className="w-[140px] h-9 text-xs"><SelectValue placeholder="Position" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Positions</SelectItem>
+              <SelectItem value="1-3">Top 3</SelectItem>
+              <SelectItem value="1-10">Top 10</SelectItem>
+              <SelectItem value="1-20">Top 20</SelectItem>
+            </SelectContent>
+          </Select>
+        </AppTaskbar>
+
+        <div className="flex items-center justify-end">
+          <Button variant="outline" size="sm" onClick={() => toast.success("Exporting...")}>
+            <Download className="mr-2 h-4 w-4" />Export
+          </Button>
+        </div>
 
         <SOVChart data={sovTrendData} title="Product SOV Trend" subtitle="Hourly breakdown" />
 
