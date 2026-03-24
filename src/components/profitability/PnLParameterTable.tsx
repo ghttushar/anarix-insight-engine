@@ -3,6 +3,8 @@ import { ChevronDown, ChevronRight, ChevronsUpDown } from "lucide-react";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import { DeltaBadge } from "@/components/ui/delta-badge";
+import { getDelta } from "@/lib/utils/deltaGenerator";
 import { PnLRow } from "@/types/profitability";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -11,9 +13,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 interface PnLParameterTableProps {
   data: PnLRow[];
   weeks: string[];
+  showDeltas?: boolean;
 }
 
-export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
+export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParameterTableProps) {
   const { formatCurrency } = useCurrency();
   const formatValue = (value: number | null, isCurrency: boolean = true): string => {
     if (value === null) return "-";
@@ -21,7 +24,6 @@ export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
     return new Intl.NumberFormat("en-US").format(value);
   };
 
-  // Collect all expandable row IDs
   const collectExpandableIds = (rows: PnLRow[]): string[] => {
     const ids: string[] = [];
     rows.forEach((row) => {
@@ -93,11 +95,21 @@ export function PnLParameterTable({ data, weeks }: PnLParameterTableProps) {
           </TableCell>
           {weeks.map((week) => (
             <TableCell key={week} className="text-right text-sm">
-              {formatValue(row.weeklyValues[week], isCurrency)}
+              <div className="flex items-center justify-end gap-1">
+                <span>{formatValue(row.weeklyValues[week], isCurrency)}</span>
+                {showDeltas && row.weeklyValues[week] !== null && (
+                  <DeltaBadge value={getDelta(row.id, week)} />
+                )}
+              </div>
             </TableCell>
           ))}
           <TableCell className="text-right font-medium text-sm">
-            {formatValue(row.total, isCurrency)}
+            <div className="flex items-center justify-end gap-1">
+              <span>{formatValue(row.total, isCurrency)}</span>
+              {showDeltas && row.total !== null && (
+                <DeltaBadge value={getDelta(row.id, "total")} />
+              )}
+            </div>
           </TableCell>
         </TableRow>
         {hasChildren &&
