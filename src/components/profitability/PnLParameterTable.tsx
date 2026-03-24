@@ -122,40 +122,42 @@ export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParame
   };
 
   return (
-    <div className="rounded-lg border border-border overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/50">
-            <TableHead className="sticky left-0 z-10 bg-muted/50 min-w-[200px]">
-              <div className="flex items-center gap-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={allExpanded ? collapseAll : expandAll}
-                      className="p-0.5 hover:bg-muted rounded cursor-pointer"
-                    >
-                      <ChevronsUpDown className="h-3.5 w-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>{allExpanded ? "Collapse all" : "Expand all"}</TooltipContent>
-                </Tooltip>
-                <span>Parameter / Date</span>
-              </div>
-            </TableHead>
-            {weeks.map((week) => (
-              <TableHead key={week} className="text-right min-w-[100px] text-xs">
-                {week}
+    <div className="rounded-lg border border-border overflow-hidden">
+      <div className="max-h-[70vh] overflow-auto overscroll-contain">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="sticky top-0 left-0 z-20 bg-muted/50 min-w-[200px]">
+                <div className="flex items-center gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={allExpanded ? collapseAll : expandAll}
+                        className="p-0.5 hover:bg-muted rounded cursor-pointer"
+                      >
+                        <ChevronsUpDown className="h-3.5 w-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>{allExpanded ? "Collapse all" : "Expand all"}</TooltipContent>
+                  </Tooltip>
+                  <span>Parameter / Date</span>
+                </div>
               </TableHead>
-            ))}
-            <TableHead className="text-right min-w-[120px] font-semibold text-xs">Total</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((row) =>
-            renderRow(row, !row.parameter.toLowerCase().includes("unit"))
-          )}
-        </TableBody>
-      </Table>
+              {weeks.map((week) => (
+                <TableHead key={week} className="sticky top-0 z-10 bg-muted/50 text-right min-w-[100px] text-xs">
+                  {week}
+                </TableHead>
+              ))}
+              <TableHead className="sticky top-0 z-10 bg-muted/50 text-right min-w-[120px] font-semibold text-xs">Total</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((row) =>
+              renderRow(row, !row.parameter.toLowerCase().includes("unit"))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
