@@ -9,7 +9,6 @@ import { ProductsOrdersToggle } from "@/components/profitability/ProductsOrdersT
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { pnlData, profitabilityProducts } from "@/data/mockProfitability";
 import { ProfitabilityProduct } from "@/types/profitability";
-import { Download } from "lucide-react";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 
@@ -28,7 +27,7 @@ const COLUMN_DEFS = [
 const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Net Profit", "Units"];
 
 export default function ProfitLoss() {
-  const { activePanel, setActivePanel, closePanel } = useActivePanel();
+  const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
   const weeks = ["Week-05", "Week-04", "Week-02", "Week-01"];
   const [tableTab, setTableTab] = useState<"products" | "orders">("products");
   const [searchValue, setSearchValue] = useState("");
@@ -44,19 +43,19 @@ export default function ProfitLoss() {
 
   const handleOpenDetail = (product: ProfitabilityProduct) => {
     setDetailProduct(product);
-    setActivePanel("productDetail");
+    setDataPanel("productDetail");
   };
 
   const handleCloseDetail = () => {
     setDetailProduct(null);
-    closePanel();
+    closeDataPanel();
   };
 
   const handleDownload = () => {
     toast.success("Exporting data as CSV...");
   };
 
-  const showDetail = activePanel === "productDetail" && detailProduct;
+  const showDetail = dataPanel === "productDetail" && detailProduct;
 
   return (
     <AppLayout>
