@@ -8,6 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DeltaBadge } from "@/components/ui/delta-badge";
+import { getDelta } from "@/lib/utils/deltaGenerator";
 import { ProfitabilityProduct, ProfitabilityOrder } from "@/types/profitability";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -18,6 +20,7 @@ interface ProductsPnLTableProps {
   orders?: ProfitabilityOrder[];
   mode?: "products" | "orders";
   visibleColumns?: string[];
+  showDeltas?: boolean;
   onCogsClick?: (product: ProfitabilityProduct) => void;
   onTrendsClick?: (product: ProfitabilityProduct) => void;
   onMoreClick?: (product: ProfitabilityProduct) => void;
@@ -34,26 +37,26 @@ const STATUS_STYLES: Record<string, string> = {
   returned: "bg-orange-500/10 text-orange-600 border-orange-500/20",
 };
 
-export function ProductsPnLTable({ products, orders = [], mode = "products", visibleColumns, onCogsClick, onTrendsClick, onMoreClick }: ProductsPnLTableProps) {
+export function ProductsPnLTable({ products, orders = [], mode = "products", visibleColumns, showDeltas = false, onCogsClick, onTrendsClick, onMoreClick }: ProductsPnLTableProps) {
   const { formatCurrency } = useCurrency();
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
 
   const ALL_COLUMNS = [
-    { id: "units", label: "Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.units) },
-    { id: "refundUnits", label: "Refund Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.refundUnits) },
-    { id: "cancelledUnits", label: "Cancelled Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.cancelledUnits) },
-    { id: "gmv", label: "GMV", getValue: (p: ProfitabilityProduct) => formatCurrency(p.gmv) },
-    { id: "authSales", label: "Auth Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.authSales) },
-    { id: "refundSales", label: "Refund Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.refundSales) },
-    { id: "cancelledSales", label: "Cancelled Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.cancelledSales) },
-    { id: "adSpend", label: "Ad Spend", getValue: (p: ProfitabilityProduct) => formatCurrency(p.adSpend) },
-    { id: "commissionProduct", label: "Comm. Product", getValue: (p: ProfitabilityProduct) => formatCurrency(p.commissionProduct) },
-    { id: "commissionShipping", label: "Comm. Shipping", getValue: (p: ProfitabilityProduct) => formatCurrency(p.commissionShipping) },
-    { id: "wfsFulfillmentFee", label: "WFS Fee", getValue: (p: ProfitabilityProduct) => formatCurrency(p.wfsFulfillmentFee) },
-    { id: "shippingFees", label: "Shipping Fees", getValue: (p: ProfitabilityProduct) => formatCurrency(p.shippingFees) },
-    { id: "cogs", label: "COGS", getValue: (p: ProfitabilityProduct) => formatCurrency(p.cogs) },
-    { id: "netProfit", label: "Net Profit", getValue: (p: ProfitabilityProduct) => formatCurrency(p.netProfit) },
-    { id: "additionalFee", label: "Additional Fee", getValue: (p: ProfitabilityProduct) => formatCurrency(p.additionalFee) },
+    { id: "units", label: "Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.units), isUnit: true },
+    { id: "refundUnits", label: "Refund Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.refundUnits), isUnit: true },
+    { id: "cancelledUnits", label: "Cancelled Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.cancelledUnits), isUnit: true },
+    { id: "gmv", label: "GMV", getValue: (p: ProfitabilityProduct) => formatCurrency(p.gmv), isUnit: false },
+    { id: "authSales", label: "Auth Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.authSales), isUnit: false },
+    { id: "refundSales", label: "Refund Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.refundSales), isUnit: false },
+    { id: "cancelledSales", label: "Cancelled Sales", getValue: (p: ProfitabilityProduct) => formatCurrency(p.cancelledSales), isUnit: false },
+    { id: "adSpend", label: "Ad Spend", getValue: (p: ProfitabilityProduct) => formatCurrency(p.adSpend), isUnit: false },
+    { id: "commissionProduct", label: "Comm. Product", getValue: (p: ProfitabilityProduct) => formatCurrency(p.commissionProduct), isUnit: false },
+    { id: "commissionShipping", label: "Comm. Shipping", getValue: (p: ProfitabilityProduct) => formatCurrency(p.commissionShipping), isUnit: false },
+    { id: "wfsFulfillmentFee", label: "WFS Fee", getValue: (p: ProfitabilityProduct) => formatCurrency(p.wfsFulfillmentFee), isUnit: false },
+    { id: "shippingFees", label: "Shipping Fees", getValue: (p: ProfitabilityProduct) => formatCurrency(p.shippingFees), isUnit: false },
+    { id: "cogs", label: "COGS", getValue: (p: ProfitabilityProduct) => formatCurrency(p.cogs), isUnit: false },
+    { id: "netProfit", label: "Net Profit", getValue: (p: ProfitabilityProduct) => formatCurrency(p.netProfit), isUnit: false },
+    { id: "additionalFee", label: "Additional Fee", getValue: (p: ProfitabilityProduct) => formatCurrency(p.additionalFee), isUnit: false },
   ];
   const cols = visibleColumns
     ? ALL_COLUMNS.filter((c) => visibleColumns.includes(c.id))
@@ -116,7 +119,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                         {onCogsClick && (
                           <button
                             onClick={() => onCogsClick(product)}
-                            className="text-xs text-primary hover:underline flex items-center gap-1"
+                            className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer"
                           >
                             <ExternalLink className="h-3 w-3" />
                             COGS
@@ -125,7 +128,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                         {onTrendsClick && (
                           <button
                             onClick={() => onTrendsClick(product)}
-                            className="text-xs text-primary hover:underline flex items-center gap-1"
+                            className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer"
                           >
                             <TrendingUp className="h-3 w-3" />
                             Trends
@@ -137,12 +140,15 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                 </TableCell>
                 {cols.map((col) => (
                   <TableCell key={col.id} className="text-right">
-                    {col.getValue(product)}
+                    <div className="flex items-center justify-end gap-1">
+                      <span>{col.getValue(product)}</span>
+                      {showDeltas && <DeltaBadge value={getDelta(product.id, col.id)} />}
+                    </div>
                   </TableCell>
                 ))}
                 <TableCell className="text-center">
                   {onMoreClick ? (
-                    <button onClick={() => onMoreClick(product)} className="text-xs text-primary hover:underline">More</button>
+                    <button onClick={() => onMoreClick(product)} className="text-xs text-primary hover:underline cursor-pointer">More</button>
                   ) : (
                     <span className="text-xs text-muted-foreground">-</span>
                   )}
@@ -156,9 +162,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                 const val = totals[col.id] || 0;
                 return (
                   <TableCell key={col.id} className="text-right">
-                    {col.id.includes("Unit") || col.id === "units" || col.id === "refundUnits" || col.id === "cancelledUnits"
-                      ? formatNumber(val)
-                      : formatCurrency(val)}
+                    {col.isUnit ? formatNumber(val) : formatCurrency(val)}
                   </TableCell>
                 );
               })}
@@ -196,7 +200,8 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
   const getOrderColumnValue = (order: ProfitabilityOrder, colId: string) => {
     const val = (order as any)[colId];
     if (val === undefined) return "-";
-    if (colId.includes("Unit") || colId === "units" || colId === "refundUnits" || colId === "cancelledUnits") return formatNumber(val);
+    const colDef = ALL_COLUMNS.find((c) => c.id === colId);
+    if (colDef?.isUnit) return formatNumber(val);
     return formatCurrency(val);
   };
 
@@ -244,7 +249,10 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                   </TableCell>
                   {cols.map((col) => (
                     <TableCell key={col.id} className="text-right">
-                      {getOrderColumnValue(order, col.id)}
+                      <div className="flex items-center justify-end gap-1">
+                        <span>{getOrderColumnValue(order, col.id)}</span>
+                        {showDeltas && <DeltaBadge value={getDelta(order.id, col.id)} />}
+                      </div>
                     </TableCell>
                   ))}
                   <TableCell className="text-center">
@@ -252,7 +260,6 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                   </TableCell>
                 </TableRow>
 
-                {/* Expanded child products */}
                 {isExpanded && order.products.map((product, idx) => (
                   <TableRow key={`${order.id}-${product.id}-${idx}`} className="bg-muted/20 hover:bg-muted/40">
                     <TableCell className="sticky left-0 z-10 bg-muted/20 pl-14">
@@ -293,11 +300,10 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
             <TableCell className="sticky left-0 z-10 bg-muted">Total for {orders.length} Orders</TableCell>
             {cols.map((col) => {
               const val = (orderTotals as any)[col.id] || 0;
+              const colDef = ALL_COLUMNS.find((c) => c.id === col.id);
               return (
                 <TableCell key={col.id} className="text-right">
-                  {col.id.includes("Unit") || col.id === "units" || col.id === "refundUnits" || col.id === "cancelledUnits"
-                    ? formatNumber(val)
-                    : formatCurrency(val)}
+                  {colDef?.isUnit ? formatNumber(val) : formatCurrency(val)}
                 </TableCell>
               );
             })}

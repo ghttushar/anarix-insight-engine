@@ -49,6 +49,7 @@ export default function ProfitabilityDashboard() {
   const [columns, setColumns] = useState(COLUMN_DEFS);
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [products, setProducts] = useState(profitabilityProducts);
+  const [showDeltas, setShowDeltas] = useState(false);
 
   const [cogsProduct, setCogsProduct] = useState<ProfitabilityProduct | null>(null);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
@@ -118,8 +119,8 @@ export default function ProfitabilityDashboard() {
 
   return (
     <AppLayout>
-      <div className="flex flex-1 min-h-0">
-        <div className="flex-1 space-y-6 overflow-auto">
+      <div className="flex flex-1 h-full min-h-0">
+        <div className="flex-1 space-y-6 overflow-auto p-0">
           <PageHeader title="Profitability Dashboard" subtitle="Track your profit metrics and financial performance" />
           <AppTaskbar showDateRange showFrequency />
 
@@ -173,6 +174,8 @@ export default function ProfitabilityDashboard() {
               activeFilters={activeFilters}
               onFiltersChange={setActiveFilters}
               filterFields={FILTER_FIELDS}
+              showDeltas={showDeltas}
+              onShowDeltasChange={setShowDeltas}
             />
             <div className="rounded-lg border border-border">
               <ProductsPnLTable
@@ -180,6 +183,7 @@ export default function ProfitabilityDashboard() {
                 orders={filteredOrders}
                 mode={tableTab}
                 visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
+                showDeltas={showDeltas}
                 onCogsClick={(product) => setCogsProduct(product)}
                 onTrendsClick={(product) => setTrendsProduct(product)}
                 onMoreClick={handleOpenDetail}

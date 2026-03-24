@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2 } from "lucide-react";
+import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,6 +52,8 @@ interface DataTableToolbarProps {
   filterFields?: string[];
   leftContent?: React.ReactNode;
   rightContent?: React.ReactNode;
+  showDeltas?: boolean;
+  onShowDeltasChange?: (show: boolean) => void;
 }
 
 const OPERATORS = [
@@ -83,6 +86,8 @@ export function DataTableToolbar({
   filterFields = [],
   leftContent,
   rightContent,
+  showDeltas,
+  onShowDeltasChange,
 }: DataTableToolbarProps) {
   const [draftFilters, setDraftFilters] = useState<FilterRule[]>(activeFilters);
   const [columnSearch, setColumnSearch] = useState("");
@@ -144,9 +149,22 @@ export function DataTableToolbar({
           </div>
         </div>
 
-        {/* Right Side: rightContent → Columns → Filter → Download → Edit toggle */}
+        {/* Right Side: rightContent → Deltas → Columns → Filter → Download → Edit toggle */}
         <div className="flex items-center gap-1">
           {rightContent}
+
+          {/* Show Deltas Toggle */}
+          {onShowDeltasChange !== undefined && (
+            <div className="flex items-center gap-1.5 mr-1 px-2 py-1 rounded-md border border-border/50">
+              <TrendingUp className="h-3 w-3 text-muted-foreground" />
+              <span className="text-[11px] text-muted-foreground">Δ</span>
+              <Switch
+                checked={showDeltas ?? false}
+                onCheckedChange={onShowDeltasChange}
+                className="h-4 w-7 data-[state=checked]:bg-primary"
+              />
+            </div>
+          )}
 
           {/* Columns Dropdown */}
           {columns.length > 0 && onColumnToggle && (

@@ -67,14 +67,14 @@ function LayoutInner({ children }: { children: ReactNode }) {
       <CollapseNotch />
       <div className="flex flex-1 h-screen overflow-hidden">
         <main className={cn(
-          "flex-1 overflow-auto bg-background",
+          "flex-1 overflow-auto bg-background min-h-0",
           density === "compact" ? "p-4" : "p-6"
         )}>
           {children}
         </main>
-        {/* Data panel (left of copilot) */}
+        {/* Data panel (left of copilot) — fixed height, independent scroll */}
         {showInsights && <InsightsPanel />}
-        {/* AI panel (rightmost) */}
+        {/* AI panel (rightmost) — fixed height, independent scroll */}
         {showCopilot && <Suspense fallback={null}><AanCopilotPanel /></Suspense>}
       </div>
     </div>

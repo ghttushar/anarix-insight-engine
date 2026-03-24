@@ -34,6 +34,7 @@ export default function ProfitLoss() {
   const [columns, setColumns] = useState(COLUMN_DEFS);
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
+  const [showDeltas, setShowDeltas] = useState(false);
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -59,8 +60,8 @@ export default function ProfitLoss() {
 
   return (
     <AppLayout>
-      <div className="flex flex-1 min-h-0">
-        <div className="flex-1 space-y-6 overflow-auto">
+      <div className="flex flex-1 h-full min-h-0">
+        <div className="flex-1 space-y-6 overflow-auto p-0">
           <PageHeader title="Profit & Loss" subtitle="Detailed P&L breakdown by period" />
           <AppTaskbar showDateRange />
 
@@ -80,11 +81,14 @@ export default function ProfitLoss() {
               onFiltersChange={setActiveFilters}
               filterFields={FILTER_FIELDS}
               onDownload={handleDownload}
+              showDeltas={showDeltas}
+              onShowDeltasChange={setShowDeltas}
             />
             <div className="rounded-lg border border-border">
               <ProductsPnLTable
                 products={filteredProducts}
                 visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
+                showDeltas={showDeltas}
                 onMoreClick={handleOpenDetail}
               />
             </div>
