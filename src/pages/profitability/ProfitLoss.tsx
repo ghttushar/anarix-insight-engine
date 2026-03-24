@@ -65,7 +65,7 @@ export default function ProfitLoss() {
           <PageHeader title="Profit & Loss" subtitle="Detailed P&L breakdown by period" />
           <AppTaskbar showDateRange />
 
-          <PnLParameterTable data={pnlData} weeks={weeks} />
+          <PnLParameterTable data={pnlData} weeks={weeks} showDeltas={showDeltas} />
 
           <div className="space-y-3">
             <DataTableToolbar
