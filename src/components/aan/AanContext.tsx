@@ -51,12 +51,10 @@ interface AanContextType {
   openSplit: (artifact: AanDraft) => void;
   openWorkspace: () => void;
   closeAan: () => void;
-
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   openPanel: () => void;
   closePanel: () => void;
-
   messages: Message[];
   addMessage: (content: string, role: "user" | "assistant", draft?: AanDraft) => void;
   currentDraft: AanDraft | null;
@@ -64,37 +62,29 @@ interface AanContextType {
   setCurrentDraft: (draft: AanDraft | null) => void;
   approveDraft: (draftId: string) => void;
   rejectDraft: (draftId: string) => void;
-
   viewingArtifact: AanDraft | null;
   viewArtifact: (artifact: AanDraft) => void;
   closeArtifactView: () => void;
-
   isGenerating: boolean;
   generationType: "report" | "audit" | null;
   generationProgress: number;
   setGenerationState: (isGenerating: boolean, type: "report" | "audit" | null, progress: number) => void;
-
   conversations: Conversation[];
   currentConversation: Conversation | null;
   activeFilter: FilterType;
   setActiveFilter: (filter: FilterType) => void;
   startNewConversation: () => void;
   selectConversation: (id: string) => void;
-
   context: AanContextInfo;
   setContext: (context: AanContextInfo) => void;
 }
 
 const AanContext = createContext<AanContextType | undefined>(undefined);
 
-// Mock initial conversations
 const initialConversations: Conversation[] = [
   {
-    id: "conv-1",
-    title: "Campaign Performance Analysis",
-    type: "report",
-    createdAt: new Date(Date.now() - 86400000),
-    updatedAt: new Date(Date.now() - 3600000),
+    id: "conv-1", title: "Campaign Performance Analysis", type: "report",
+    createdAt: new Date(Date.now() - 86400000), updatedAt: new Date(Date.now() - 3600000),
     messages: [
       { id: "msg-1-1", role: "user", content: "Generate a report for my last 7 days campaign performance", timestamp: new Date(Date.now() - 3700000) },
       { id: "msg-1-2", role: "assistant", content: "I've analyzed your campaign performance for the last 7 days.\n\n**Summary:**\n- **Total Ad Spend:** $10,973.60\n- **Total Ad Sales:** $36,955.24\n- **Overall ROAS:** 3.37x\n\nYour campaigns are performing well above the 2.5x benchmark. Top performer is SP | Catch All Brand with 4.2x ROAS.", timestamp: new Date(Date.now() - 3650000) },
@@ -103,11 +93,8 @@ const initialConversations: Conversation[] = [
     artifacts: [],
   },
   {
-    id: "conv-2",
-    title: "Q4 2025 Audit Review",
-    type: "audit",
-    createdAt: new Date(Date.now() - 172800000),
-    updatedAt: new Date(Date.now() - 86400000),
+    id: "conv-2", title: "Q4 2025 Audit Review", type: "audit",
+    createdAt: new Date(Date.now() - 172800000), updatedAt: new Date(Date.now() - 86400000),
     messages: [
       { id: "msg-2-1", role: "user", content: "Create an account health summary for Q4 2025", timestamp: new Date(Date.now() - 90000000) },
       { id: "msg-2-2", role: "assistant", content: "**Overall Health Score: 78/100**\n\nYour account shows strong fundamentals with some optimization opportunities.\n\n**Strengths:**\n- Consistent ROAS above benchmark\n- Good keyword coverage\n- Low wasted spend\n\n**Areas for Improvement:**\n- 12 campaigns with no conversions in 30 days\n- 3 ad groups with high ACoS (>50%)\n- Missing negative keywords on 8 campaigns", timestamp: new Date(Date.now() - 89000000) },
@@ -116,11 +103,8 @@ const initialConversations: Conversation[] = [
     artifacts: [],
   },
   {
-    id: "conv-3",
-    title: "New Bid Strategy Discussion",
-    type: "general",
-    createdAt: new Date(Date.now() - 604800000),
-    updatedAt: new Date(Date.now() - 604800000),
+    id: "conv-3", title: "New Bid Strategy Discussion", type: "general",
+    createdAt: new Date(Date.now() - 604800000), updatedAt: new Date(Date.now() - 604800000),
     messages: [
       { id: "msg-3-1", role: "assistant", content: "Hello! I'm Aan, your AI assistant for Anarix. I can help you analyze campaign performance, create rules, and optimize your advertising strategy. What would you like to explore?", timestamp: new Date(Date.now() - 604800000) },
     ],
@@ -129,17 +113,15 @@ const initialConversations: Conversation[] = [
 ];
 
 export function AanProvider({ children }: { children: ReactNode }) {
-  const { activePanel, setActivePanel, closePanel: closePanelCtx } = useActivePanel();
+  const { aiPanel, setAiPanel, closeAiPanel } = useActivePanel();
 
-  // Derive mode from activePanel for copilot/split, keep workspace separate
   const [internalMode, setInternalMode] = useState<"workspace" | null>(null);
 
   const mode: AanMode = useMemo(() => {
     if (internalMode === "workspace") return "workspace";
-    if (activePanel === "copilot") return "copilot";
-    if (activePanel === "split") return "split";
+    if (aiPanel === "copilot") return "copilot";
     return "closed";
-  }, [activePanel, internalMode]);
+  }, [aiPanel, internalMode]);
 
   const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>("conv-1");
@@ -161,22 +143,22 @@ export function AanProvider({ children }: { children: ReactNode }) {
   const setMode = (newMode: AanMode) => {
     if (newMode === "workspace") {
       setInternalMode("workspace");
-      closePanelCtx(); // close any active panel
+      closeAiPanel();
     } else if (newMode === "copilot") {
       setInternalMode(null);
-      setActivePanel("copilot");
+      setAiPanel("copilot");
     } else if (newMode === "split") {
       setInternalMode(null);
-      setActivePanel("split");
+      setAiPanel("copilot");
     } else {
       setInternalMode(null);
-      closePanelCtx();
+      closeAiPanel();
     }
   };
 
   const openCopilot = () => {
     setInternalMode(null);
-    setActivePanel("copilot");
+    setAiPanel("copilot");
   };
 
   const openSplit = (artifact: AanDraft) => {
@@ -185,30 +167,25 @@ export function AanProvider({ children }: { children: ReactNode }) {
     } else {
       setCurrentArtifact(artifact);
       setInternalMode(null);
-      setActivePanel("split");
+      setAiPanel("copilot");
     }
   };
 
-  const viewArtifact = (artifact: AanDraft) => {
-    setViewingArtifact(artifact);
-  };
-
-  const closeArtifactView = () => {
-    setViewingArtifact(null);
-  };
+  const viewArtifact = (artifact: AanDraft) => setViewingArtifact(artifact);
+  const closeArtifactView = () => setViewingArtifact(null);
 
   const openWorkspace = () => {
     setCurrentArtifact(null);
     setViewingArtifact(null);
     setInternalMode("workspace");
-    closePanelCtx();
+    closeAiPanel();
   };
 
   const closeAan = () => {
     setInternalMode(null);
     setCurrentArtifact(null);
     setViewingArtifact(null);
-    closePanelCtx();
+    closeAiPanel();
   };
 
   const isOpen = mode !== "closed";
@@ -264,17 +241,15 @@ export function AanProvider({ children }: { children: ReactNode }) {
   const selectConversation = (id: string) => setCurrentConversationId(id);
 
   return (
-    <AanContext.Provider
-      value={{
-        mode, setMode, openCopilot, openSplit, openWorkspace, closeAan,
-        isOpen, setIsOpen, openPanel, closePanel,
-        messages, addMessage, currentDraft, currentArtifact, setCurrentDraft, approveDraft, rejectDraft,
-        viewingArtifact, viewArtifact, closeArtifactView,
-        isGenerating, generationType, generationProgress, setGenerationState,
-        conversations, currentConversation, activeFilter, setActiveFilter, startNewConversation, selectConversation,
-        context, setContext,
-      }}
-    >
+    <AanContext.Provider value={{
+      mode, setMode, openCopilot, openSplit, openWorkspace, closeAan,
+      isOpen, setIsOpen, openPanel, closePanel,
+      messages, addMessage, currentDraft, currentArtifact, setCurrentDraft, approveDraft, rejectDraft,
+      viewingArtifact, viewArtifact, closeArtifactView,
+      isGenerating, generationType, generationProgress, setGenerationState,
+      conversations, currentConversation, activeFilter, setActiveFilter, startNewConversation, selectConversation,
+      context, setContext,
+    }}>
       {children}
     </AanContext.Provider>
   );

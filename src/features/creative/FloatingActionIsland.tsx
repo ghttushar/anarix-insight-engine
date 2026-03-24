@@ -36,7 +36,7 @@ export function FloatingActionIsland() {
 
   // Universal fixed actions
   const actions: ActionItem[] = [
-    { icon: Sparkles, label: "Ask Aan", onClick: openPanel },
+    { icon: Sparkles, label: "Ask Aan", onClick: () => openPanel() },
     {
       icon: Lightbulb,
       label: criticalCount > 0 ? `Insights (${criticalCount})` : "Insights",

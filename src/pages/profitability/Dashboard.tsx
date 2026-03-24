@@ -42,7 +42,7 @@ const COLUMN_DEFS = [
 const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Net Profit", "Ad Spend", "Units"];
 
 export default function ProfitabilityDashboard() {
-  const { activePanel, setActivePanel, closePanel } = useActivePanel();
+  const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
   const [selectedPeriod, setSelectedPeriod] = useState<string>("today");
   const [tableTab, setTableTab] = useState<"products" | "orders">("products");
   const [searchValue, setSearchValue] = useState("");
@@ -58,19 +58,19 @@ export default function ProfitabilityDashboard() {
   const handleOpenDetail = (product: ProfitabilityProduct) => {
     setBreakdownSummary(null);
     setDetailProduct(product);
-    setActivePanel("productDetail");
+    setDataPanel("productDetail");
   };
 
   const handleOpenBreakdown = (summary: ProfitabilitySummary) => {
     setDetailProduct(null);
     setBreakdownSummary(summary);
-    setActivePanel("periodBreakdown");
+    setDataPanel("periodBreakdown");
   };
 
   const handleCloseRightPanel = () => {
     setDetailProduct(null);
     setBreakdownSummary(null);
-    closePanel();
+    closeDataPanel();
   };
 
   const handleCogsSave = (productId: string, newCogs: number) => {
@@ -113,8 +113,8 @@ export default function ProfitabilityDashboard() {
     o.products.some((p) => p.name.toLowerCase().includes(searchValue.toLowerCase()))
   );
 
-  const showProductDetail = activePanel === "productDetail" && detailProduct;
-  const showBreakdown = activePanel === "periodBreakdown" && breakdownSummary;
+  const showProductDetail = dataPanel === "productDetail" && detailProduct;
+  const showBreakdown = dataPanel === "periodBreakdown" && breakdownSummary;
 
   return (
     <AppLayout>

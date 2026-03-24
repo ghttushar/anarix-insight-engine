@@ -16,6 +16,7 @@ import { PageTypeTable } from "@/components/tables/PageTypeTable";
 import { PlatformTable } from "@/components/tables/PlatformTable";
 import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable";
 import { CreateCampaignModal } from "@/components/advertising/CreateCampaignModal";
+import { CreateCampaignPanel } from "@/components/panels/CreateCampaignPanel";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { mockAdGroups } from "@/data/mockAdGroups";
 import { mockProductAds } from "@/data/mockProductAds";
@@ -28,6 +29,7 @@ import { Campaign } from "@/types/campaign";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
@@ -121,6 +123,7 @@ const AVAILABLE_METRICS = [
 export default function CampaignManager() {
   const navigate = useNavigate();
   const { isWalmart } = useMarketplace();
+  const { setDataPanel } = useActivePanel();
   const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
   const [activeTab, setActiveTab] = useState<TabValue>("campaigns");
   const [searchQuery, setSearchQuery] = useState("");
@@ -181,26 +184,11 @@ export default function CampaignManager() {
 
   const handleCreateCampaign = (data: { name: string; type: string; biddingStrategy: string; dailyBudget: number; startDate: string; endDate?: string }) => {
     const newCampaign: Campaign = {
-      id: `camp-new-${Date.now()}`,
-      name: data.name,
-      status: "live",
-      isActive: true,
-      biddingStrategy: data.biddingStrategy as any,
-      type: data.type as any,
-      dailyBudget: data.dailyBudget,
-      totalBudget: data.dailyBudget * 30,
-      spend: 0,
-      sales: 0,
-      roas: 0,
-      impressions: 0,
-      clicks: 0,
-      ctr: 0,
-      acos: 0,
-      orders: 0,
-      cpc: 0,
-      units: 0,
-      startDate: data.startDate,
-      endDate: data.endDate,
+      id: `camp-new-${Date.now()}`, name: data.name, status: "live", isActive: true,
+      biddingStrategy: data.biddingStrategy as any, type: data.type as any,
+      dailyBudget: data.dailyBudget, totalBudget: data.dailyBudget * 30,
+      spend: 0, sales: 0, roas: 0, impressions: 0, clicks: 0, ctr: 0, acos: 0, orders: 0, cpc: 0, units: 0,
+      startDate: data.startDate, endDate: data.endDate,
     };
     setCampaigns((prev) => [newCampaign, ...prev]);
   };
@@ -221,45 +209,44 @@ export default function CampaignManager() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
-        <AppTaskbar showAdType showFrequency showDateRange />
+      <div className="flex flex-1 min-h-0">
+        <div className="flex-1 space-y-6 overflow-auto">
+          <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
+          <AppTaskbar showAdType showFrequency showDateRange />
 
-        <div className="flex items-center justify-end">
-          <Button size="sm" className="gap-1.5" onClick={() => setCreateModalOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Create Campaign
-          </Button>
+          <div className="flex items-center justify-end">
+            <Button size="sm" className="gap-1.5" onClick={() => setDataPanel("createCampaign")}>
+              <Plus className="h-4 w-4" />
+              Create Campaign
+            </Button>
+          </div>
+
+          <InlineKPIStrip items={kpiItems} availableMetrics={AVAILABLE_METRICS} onMetricChange={handleKPISwap} />
+          <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+          <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
+
+          <DataTableToolbar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            showViewToggle={activeTab === "campaigns" || activeTab === "ad-groups" || activeTab === "keywords"}
+            columns={columns}
+            onColumnToggle={handleColumnToggle}
+            onSelectAllColumns={handleSelectAllColumns}
+            onClearAllColumns={handleClearAllColumns}
+            activeFilters={activeFilters}
+            onFiltersChange={setActiveFilters}
+            filterFields={FILTER_FIELDS[activeTab] || []}
+            onDownload={() => toast.success("Exporting data as CSV...")}
+          />
+
+          {renderTable()}
         </div>
 
-        <InlineKPIStrip
-          items={kpiItems}
-          availableMetrics={AVAILABLE_METRICS}
-          onMetricChange={handleKPISwap}
-        />
-
-        <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
-
-        <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
-
-        <DataTableToolbar
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          showViewToggle={activeTab === "campaigns" || activeTab === "ad-groups" || activeTab === "keywords"}
-          columns={columns}
-          onColumnToggle={handleColumnToggle}
-          onSelectAllColumns={handleSelectAllColumns}
-          onClearAllColumns={handleClearAllColumns}
-          activeFilters={activeFilters}
-          onFiltersChange={setActiveFilters}
-          filterFields={FILTER_FIELDS[activeTab] || []}
-          onDownload={() => toast.success("Exporting data as CSV...")}
-        />
-
-        {renderTable()}
+        {/* Right panel for creating campaign */}
+        <CreateCampaignPanel onSubmit={handleCreateCampaign} />
       </div>
 
       <CreateCampaignModal
