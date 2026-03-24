@@ -34,20 +34,19 @@ function CollapseNotch() {
 }
 
 function LayoutInner({ children }: { children: ReactNode }) {
-  const { activePanel } = useActivePanel();
+  const { dataPanel, aiPanel, hasAnyPanel } = useActivePanel();
   const { open, setOpen } = useSidebar();
   const { density } = useDensity();
 
   const autoCollapsedRef = useRef(false);
-  const prevPanelRef = useRef(activePanel);
+  const prevHasPanelRef = useRef(hasAnyPanel);
 
-  const hasPanel = activePanel !== "none";
-  const showCopilot = activePanel === "copilot";
-  const showInsights = activePanel === "insights";
+  const showInsights = dataPanel === "insights";
+  const showCopilot = aiPanel === "copilot";
 
   useEffect(() => {
-    const panelJustOpened = hasPanel && prevPanelRef.current === "none";
-    const panelJustClosed = !hasPanel && prevPanelRef.current !== "none";
+    const panelJustOpened = hasAnyPanel && !prevHasPanelRef.current;
+    const panelJustClosed = !hasAnyPanel && prevHasPanelRef.current;
 
     if (panelJustOpened && open) {
       autoCollapsedRef.current = true;
@@ -57,8 +56,8 @@ function LayoutInner({ children }: { children: ReactNode }) {
       setOpen(true);
     }
 
-    prevPanelRef.current = activePanel;
-  }, [activePanel, hasPanel, open, setOpen]);
+    prevHasPanelRef.current = hasAnyPanel;
+  }, [hasAnyPanel, open, setOpen]);
 
   return (
     <div className="flex min-h-screen w-full">
@@ -71,7 +70,9 @@ function LayoutInner({ children }: { children: ReactNode }) {
         )}>
           {children}
         </main>
+        {/* Data panel (left of copilot) */}
         {showInsights && <InsightsPanel />}
+        {/* AI panel (rightmost) */}
         {showCopilot && <AanCopilotPanel />}
       </div>
     </div>

@@ -61,7 +61,7 @@ export function ProductDetailPanel({ product, isOpen, onClose }: ProductDetailPa
   ];
 
   return (
-    <div className="flex h-full w-[400px] shrink-0 flex-col border-l border-border bg-background">
+    <div className="flex h-full w-[320px] shrink-0 flex-col border-l border-border bg-background">
       <div className="border-b border-border shrink-0">
         <div className="flex items-center gap-3 px-4 py-4">
           <img
