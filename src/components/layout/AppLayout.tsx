@@ -1,13 +1,15 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef, lazy, Suspense } from "react";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
-import { AanCopilotPanel } from "@/components/aan/AanCopilotPanel";
 import { InsightsPanel } from "@/components/insights/InsightsPanel";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useDensity } from "@/contexts/DensityContext";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+
+// Lazy-load to ensure AanProvider is always mounted before this renders
+const AanCopilotPanel = lazy(() => import("@/components/aan/AanCopilotPanel").then(m => ({ default: m.AanCopilotPanel })));
 
 function CollapseNotch() {
   const { state, toggleSidebar } = useSidebar();
