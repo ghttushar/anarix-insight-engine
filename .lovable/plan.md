@@ -1,80 +1,103 @@
 
 
-## Fix Layout Hierarchy, Products/Orders Toggle, Show Impact Position, Remove Hide Chart, Button Audit
+## Phase 1: Panel System Redesign — Dual-Panel Logic, Right-Side Create Forms, Independent Scroll
 
-### Issues Identified
-
-1. **CampaignDetail & AdGroupDetail**: The code order is correct (Taskbar above InfoCard), but user reports seeing InfoCard above Taskbar — likely a rendering/spacing issue. Will enforce the order explicitly and verify.
-
-2. **Profitability Products/Orders Toggle**: Currently the toggle switches `tableTab` state but the table always shows products. The "Orders" tab needs a functional orders table view with expandable order rows (per image-126/127).
-
-3. **Show Impact toggle**: Currently lives outside the chart (in page-level controls). User wants it INSIDE the chart toolbar, left of the Metrics button. Move it into `ChartContainer` via `extraControls` prop.
-
-4. **Hide Chart**: Must be removed from ALL pages (CampaignManager, CampaignDetail, AdGroupDetail). Charts should always be visible.
-
-5. **Non-functional buttons**: Several `onDownload={() => {}}` handlers need toast feedback. Audit all empty handlers.
+### Problem
+Currently `ActivePanelContext` enforces mutual exclusivity — only ONE panel can be open at a time. User wants: one **data panel** (Product Detail, Period Breakdown, Create Schedule, etc.) AND one **Aan panel** (Copilot) can be open simultaneously. Also, all "Create" forms (Day Parting Rule, Create Campaign, etc.) should open in the right viewing panel instead of inline/modal. Panel widths need reducing, and every scrollable area needs independent scroll.
 
 ---
 
-### 1. Remove All Hide Chart Controls
+### 1. Restructure ActivePanelContext — Two Independent Slots
 
-**Files**: `CampaignManager.tsx`, `CampaignDetail.tsx`, `AdGroupDetail.tsx`
+**File: `src/contexts/ActivePanelContext.tsx`**
 
-- Remove `showChart`/`chartVisible` state variables
-- Remove the Hide/Show Chart button/link
-- Always render `PerformanceChart`
-- Remove `ChevronUp`/`ChevronDown`/`Minimize2` imports where no longer needed
+Replace single `activePanel` with two independent states:
+- `dataPanel`: `"none" | "productDetail" | "periodBreakdown" | "insights" | "createSchedule" | "createCampaign"` 
+- `aiPanel`: `"none" | "copilot"`
 
-### 2. Move Show Impact into Chart Toolbar
+New API:
+```
+setDataPanel(panel) / closeDataPanel()
+setAiPanel(panel) / closeAiPanel()
+```
 
-**Files**: `PerformanceChart.tsx`, `ChartContainer.tsx`, `CampaignManager.tsx`, `CampaignDetail.tsx`, `AdGroupDetail.tsx`
+Both can be open at the same time. Opening a new data panel replaces the current data panel. Opening copilot is independent.
 
-- Add `showImpact` and `onShowImpactChange` props to `PerformanceChart`
-- Pass a Switch+Label as `extraControls` to `ChartContainer` (rendered left of Metrics button)
-- Remove Show Impact from `AppTaskbar` children in `CampaignManager.tsx`
-- Remove Show Impact from the "Performance Overview" header row in `CampaignDetail.tsx` and `AdGroupDetail.tsx`
+### 2. Update AppLayout for Dual-Panel Rendering
 
-### 3. Enforce Layout Hierarchy on Detail Pages
+**File: `src/components/layout/AppLayout.tsx`**
 
-**Files**: `CampaignDetail.tsx`, `AdGroupDetail.tsx`
+Current: renders either InsightsPanel OR AanCopilotPanel.
+New: renders data panel (left) + AI panel (right), both as flex siblings of main content.
 
-- Ensure render order is strictly: Breadcrumb → PageHeader → AppTaskbar → InfoCard → Performance Overview
-- Remove the separate "Performance Overview" header row with Show Impact controls (now in chart)
-- Keep "Performance Overview" as just a section label above KPIs
+```
+[Sidebar] [Main Content] [Data Panel (320px)] [Copilot Panel (360px)]
+```
 
-### 4. Functional Products/Orders Toggle in Profitability Dashboard
+- Reduce panel widths: Data panels from 400px → 320px, Copilot from 420px → 360px
+- Both can render simultaneously
+- Sidebar auto-collapse triggers if ANY panel is open
 
-**Files**: `ProductsPnLTable.tsx`, `Dashboard.tsx`, `mockProfitability.ts`, `types/profitability.ts`
+### 3. Move Create Forms to Right Panel
 
-- Add `ProfitabilityOrder` type with fields: orderId, date, time, status, price, country, flag, netProfit, gmv, units, cogs, wfsFulfillmentFee, shippingFees, commissionProduct, commissionShipping, additionalFee, refundUnits, products (child array)
-- Add `mockProfitabilityOrders` data with expandable product children (matching image-126)
-- Update `ProductsPnLTable` to accept a `mode: "products" | "orders"` prop
-  - Products mode: current behavior (product image + name + ID/SKU/price/COGS/Trends)
-  - Orders mode: expandable rows showing order ID, date, time, status, price with child product rows. Header shows "Order Details" instead of "Product Details". Total row shows "Total for X Orders"
-- Wire the `tableTab` state to pass `mode` to `ProductsPnLTable`
-- Redesign the `ProductsOrdersToggle` to match image-129: pill-style toggle with filled active state
+**New files:**
+- `src/components/panels/CreateSchedulePanel.tsx` — Extract day parting rule form from `HourlyData.tsx` into a right-side panel component (320px wide, with independent ScrollArea)
+- `src/components/panels/CreateCampaignPanel.tsx` — Convert `CreateCampaignModal` content into a right-side panel variant
 
-### 5. Fix Non-Functional Buttons
+**Updated files:**
+- `HourlyData.tsx` — Replace inline schedule form with button that calls `setDataPanel("createSchedule")`
+- `CampaignManager.tsx` — "Create Campaign" button opens right panel instead of modal (keep modal as fallback)
 
-**Files**: `CampaignManager.tsx`, `CampaignDetail.tsx`, `AdGroupDetail.tsx`
+### 4. Reduce All Panel Widths
 
-- Replace `onDownload={() => {}}` with `onDownload={() => toast.success("Exporting data as CSV...")}`
-- Audit all other empty handlers and add appropriate toast feedback
+| Panel | Old Width | New Width |
+|---|---|---|
+| ProductDetailPanel | 400px | 320px |
+| PeriodBreakdownPanel | 400px | 320px |
+| InsightsPanel | 420px | 320px |
+| AanCopilotPanel | 420px | 360px |
+| CreateSchedulePanel | inline | 320px |
+| CreateCampaignPanel | modal | 320px |
+
+### 5. Independent Scroll on Every Container
+
+Audit and fix scroll containers:
+- `AppLayout` main content: already `overflow-auto` ✓
+- All right panels: wrap content in `<ScrollArea className="flex-1 min-h-0">` 
+- All table wrappers: ensure `<div className="relative w-full overflow-auto">` (already in ui/table.tsx ✓)
+- `HourlyData.tsx` heatmap: wrap in `overflow-auto` container
+- PnL tables: ensure horizontal scroll works with `overflow-x-auto`
+- Day parting campaigns table: independent scroll
+
+### 6. Update All Panel Consumers
+
+Pages that use `useActivePanel()` need to switch to the new API:
+- `ProfitLoss.tsx` — `setDataPanel("productDetail")` instead of `setActivePanel("productDetail")`
+- `Dashboard.tsx` (profitability) — same
+- `HourlyData.tsx` — new `setDataPanel("createSchedule")`
+- `CampaignManager.tsx` — new `setDataPanel("createCampaign")`
+- `FloatingActionIsland.tsx` — Aan button calls `setAiPanel("copilot")`
+- `AppSidebar.tsx` — Aan button calls `setAiPanel("copilot")`
 
 ---
 
-### Summary of Files
+### Files Summary
 
 | File | Change |
 |---|---|
-| `CampaignManager.tsx` | Remove Hide Chart, move Show Impact to PerformanceChart prop, fix onDownload |
-| `CampaignDetail.tsx` | Remove Hide Chart + Show Impact row, enforce layout order, fix onDownload |
-| `AdGroupDetail.tsx` | Remove Hide Chart + Show Impact row, enforce layout order, fix onDownload |
-| `PerformanceChart.tsx` | Accept `showImpact`/`onShowImpactChange` props, pass Switch as `extraControls` to ChartContainer |
-| `ChartContainer.tsx` | No changes needed (already has `extraControls` prop) |
-| `ProductsPnLTable.tsx` | Add `mode` prop supporting "products" and "orders" views with expandable order rows |
-| `ProductsOrdersToggle.tsx` | Restyle to match image-129 pill toggle |
-| `Dashboard.tsx` (profitability) | Pass `tableTab` as mode to table, pass orders data when in orders mode |
-| `mockProfitability.ts` | Add `mockProfitabilityOrders` data |
-| `types/profitability.ts` | Add `ProfitabilityOrder` interface |
+| `ActivePanelContext.tsx` | Split into `dataPanel` + `aiPanel` with independent getters/setters |
+| `AppLayout.tsx` | Render data panel + AI panel as independent siblings, reduce widths |
+| `CreateSchedulePanel.tsx` | **NEW** — Day parting rule form as right panel |
+| `CreateCampaignPanel.tsx` | **NEW** — Campaign creation as right panel |
+| `ProductDetailPanel.tsx` | Reduce width to 320px |
+| `PeriodBreakdownPanel.tsx` | Reduce width to 320px |
+| `InsightsPanel.tsx` | Reduce width to 320px |
+| `AanCopilotPanel.tsx` | Reduce width to 360px |
+| `HourlyData.tsx` | Remove inline form, button opens right panel |
+| `CampaignManager.tsx` | Create Campaign opens right panel |
+| `ProfitLoss.tsx` | Update to new `setDataPanel` API |
+| `Dashboard.tsx` (profitability) | Update to new API |
+| `FloatingActionIsland.tsx` | Update to `setAiPanel` |
+| `AppSidebar.tsx` | Update to `setAiPanel` |
+| `AanContext.tsx` | Update mode derivation for new panel API |
 
