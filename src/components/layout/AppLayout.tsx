@@ -75,7 +75,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
         {/* Data panel (left of copilot) */}
         {showInsights && <InsightsPanel />}
         {/* AI panel (rightmost) */}
-        {showCopilot && <AanCopilotPanel />}
+        {showCopilot && <Suspense fallback={null}><AanCopilotPanel /></Suspense>}
       </div>
     </div>
   );
