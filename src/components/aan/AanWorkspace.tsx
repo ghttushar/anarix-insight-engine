@@ -7,6 +7,7 @@ import { AanWorkspaceSidebar } from "./AanWorkspaceSidebar";
 import { AanConversation } from "./AanConversation";
 import { AanInput } from "./AanInput";
 import { AanArtifactViewer } from "./AanArtifactViewer";
+import { MiniSidebar } from "@/components/layout/MiniSidebar";
 
 export function AanWorkspace() {
   const { mode, closeAan, viewingArtifact, closeArtifactView } = useAan();
@@ -15,87 +16,64 @@ export function AanWorkspace() {
   const isOpen = mode === "workspace";
   if (!isOpen) return null;
 
-  // When artifact is being viewed, hide sidebar
   const showSidebar = sidebarExpanded && !viewingArtifact;
   const showArtifactPanel = !!viewingArtifact;
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-background">
-      {/* Header - Aan by Anarix branding */}
-      <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 aan-gradient-text" />
-          <span className="font-aan text-aan aan-gradient-text font-bold">Aan</span>
-          <span className="text-sm text-muted-foreground">by Anarix</span>
-        </div>
+    <div className="fixed inset-0 z-[60] flex bg-background">
+      {/* Mini app sidebar for navigation */}
+      <MiniSidebar />
 
-        <div className="flex items-center gap-2">
-          {/* Creative Sidebar Toggle - Sleek pill design */}
-          <button
-            onClick={() => {
-              if (viewingArtifact) {
-                closeArtifactView();
-              }
-              setSidebarExpanded(!sidebarExpanded);
-            }}
-            className={cn(
-              "group relative flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-3",
-              "hover:border-primary/50 transition-all overflow-hidden"
-            )}
-            title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
-          >
-            {/* Gradient hover effect */}
-            <div className="absolute inset-0 aan-gradient opacity-0 group-hover:opacity-10 transition-opacity" />
+      {/* Aan workspace content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <header className="flex h-12 items-center justify-between border-b border-border/30 bg-card px-4 shrink-0">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 aan-gradient-text" />
+            <span className="font-aan text-lg aan-gradient-text font-bold" style={{ lineHeight: 1 }}>Aan</span>
+            <span className="text-xs text-muted-foreground">by Anarix</span>
+          </div>
 
-            {/* Animated chevrons */}
-            <div className="relative flex items-center">
-              {sidebarExpanded && !viewingArtifact ? (
-                <>
-                  <ChevronLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
-                  <ChevronLeft className="h-3.5 w-3.5 -ml-2 opacity-50 transition-transform group-hover:-translate-x-0.5" />
-                </>
-              ) : (
-                <>
-                  <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                  <ChevronRight className="h-3.5 w-3.5 -ml-2 opacity-50 transition-transform group-hover:translate-x-0.5" />
-                </>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => {
+                if (viewingArtifact) closeArtifactView();
+                setSidebarExpanded(!sidebarExpanded);
+              }}
+              className={cn(
+                "group relative flex h-7 items-center gap-1 rounded-full border border-border/60 bg-background px-2",
+                "hover:border-primary/40 transition-all text-muted-foreground hover:text-foreground"
               )}
-            </div>
-
-            {/* Label - only when sidebar is expanded */}
-            {sidebarExpanded && !viewingArtifact && (
-              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                Hide
+            >
+              {sidebarExpanded && !viewingArtifact ? (
+                <ChevronLeft className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
+              <span className="text-xs">
+                {sidebarExpanded && !viewingArtifact ? "Hide" : "Show"}
               </span>
-            )}
-            {(!sidebarExpanded || viewingArtifact) && (
-              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-                Show
-              </span>
-            )}
-          </button>
+            </button>
 
-          <Button variant="ghost" size="icon" onClick={closeAan} className="h-8 w-8 hover:bg-muted" title="Close Aan">
-            <X className="h-4 w-4" />
-          </Button>
+            <Button variant="ghost" size="icon" onClick={closeAan} className="h-7 w-7 hover:bg-muted">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <div className="flex flex-1 overflow-hidden">
+          {showSidebar && <AanWorkspaceSidebar />}
+
+          <main className="flex-1 flex flex-col overflow-hidden min-w-0">
+            <AanConversation />
+            <AanInput />
+          </main>
+
+          {showArtifactPanel && viewingArtifact && (
+            <AanArtifactViewer artifact={viewingArtifact} onClose={closeArtifactView} />
+          )}
         </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Aan Sidebar - hidden when viewing artifact */}
-        {showSidebar && <AanWorkspaceSidebar />}
-
-        {/* Workspace Content */}
-        <main className="flex-1 flex flex-col overflow-hidden">
-          <AanConversation />
-          <AanInput />
-        </main>
-
-        {/* Artifact Viewer Panel - shown when artifact selected */}
-        {showArtifactPanel && viewingArtifact && (
-          <AanArtifactViewer artifact={viewingArtifact} onClose={closeArtifactView} />
-        )}
       </div>
     </div>
   );

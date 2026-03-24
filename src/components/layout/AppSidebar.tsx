@@ -5,7 +5,7 @@ import {
   MousePointerClick, Package, Database, Search, BarChart3, Clock,
   CalendarClock, History, ListTodo, Settings, Users, ChevronDown,
   ChevronRight, Sparkles, Layers, Image, FlaskConical, PackageCheck,
-  Send, ChevronLeft, Sun, Moon, User, LogOut,
+  Send, Sun, Moon, User, LogOut, PanelLeft,
   Gauge, Wheat, Bell, Activity, Link, Wrench, LayoutDashboard, Palette, ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -120,6 +120,9 @@ const navigationGroups: NavGroup[] = [{
   ]
 }];
 
+export { navigationGroups };
+export type { NavItem, NavGroup };
+
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
@@ -191,75 +194,81 @@ export function AppSidebar() {
   }).filter(group => group.items.length > 0);
 
   return (
-    <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-300", collapsed ? "w-14" : "w-64")} collapsible="icon">
-      <SidebarContent className="py-3 flex flex-col h-full">
-        {/* Logo */}
-        <div className={cn("flex items-center", collapsed ? "justify-center px-2 mb-4" : "px-4 mb-4")}>
-          {!collapsed
-            ? <img src={logoSrc} alt="Anarix" className="h-8 w-auto" />
-            : <img src={logoSrc} alt="Anarix" className="h-6 w-6 object-contain" />
-          }
+    <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-200", collapsed ? "w-14" : "w-56")} collapsible="icon">
+      <SidebarContent className="flex flex-col h-full">
+        {/* Header: Toggle + Logo */}
+        <div className={cn(
+          "flex items-center h-12 border-b border-border/30 shrink-0",
+          collapsed ? "justify-center px-1" : "px-3 gap-2"
+        )}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={toggleSidebar}
+                className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+              >
+                <PanelLeft className="h-4 w-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">{collapsed ? "Expand sidebar" : "Collapse sidebar"}</TooltipContent>
+          </Tooltip>
+          {!collapsed && (
+            <img src={logoSrc} alt="Anarix" className="h-6 w-auto" />
+          )}
         </div>
 
-        <div className="mx-3 border-t border-border/50" />
-
-        {/* Aan AI Button */}
-        <div className="px-3 py-4">
+        {/* Aan Button — slim pill */}
+        <div className={cn("shrink-0", collapsed ? "px-1 py-2" : "px-3 py-2")}>
           {!collapsed ? (
-            <div className="space-y-1">
-              <button
-                onClick={e => { e.stopPropagation(); e.preventDefault(); openWorkspace(); }}
-                className="group relative w-full rounded-lg text-sm font-medium transition-all overflow-hidden aan-gradient py-3 flex items-center justify-center gap-2.5 shadow-sm hover:shadow-md hover:brightness-110"
-              >
-                <Sparkles className="h-4 w-4 shrink-0 text-white" />
-                <span className="font-aan text-white" style={{ fontSize: "1.4rem", lineHeight: 1 }}>Aan</span>
-              </button>
-              <p className="text-[10px] text-muted-foreground text-center">AI Assistant</p>
-            </div>
+            <button
+              onClick={e => { e.stopPropagation(); e.preventDefault(); openWorkspace(); }}
+              className="group relative w-full flex items-center gap-2 h-9 rounded-full border border-border/60 bg-background px-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
+            >
+              <div className="absolute inset-0 rounded-full aan-gradient opacity-0 group-hover:opacity-[0.06] transition-opacity" />
+              <Sparkles className="h-4 w-4 shrink-0 aan-gradient-text" />
+              <span>Ask Aan</span>
+            </button>
           ) : (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={e => { e.stopPropagation(); e.preventDefault(); openWorkspace(); }}
-                  className="group relative flex w-full items-center justify-center rounded-lg p-2.5 transition-all aan-gradient shadow-sm hover:shadow-md hover:brightness-110"
+                  className="group relative flex w-full items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
                 >
-                  <Sparkles className="h-4 w-4 text-white" />
+                  <Sparkles className="h-4 w-4 aan-gradient-text" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right">Open Aan Workspace</TooltipContent>
+              <TooltipContent side="right">Ask Aan</TooltipContent>
             </Tooltip>
           )}
         </div>
 
-        <div className="mx-3 border-t border-border/50" />
+        <div className="mx-3 border-t border-border/30" />
 
         {/* Navigation Groups */}
-        <div className="flex-1 overflow-auto mt-1">
+        <div className="flex-1 overflow-auto py-1">
           {filteredGroups.map(group => (
-            <SidebarGroup key={group.label} className="relative py-0.5">
+            <SidebarGroup key={group.label} className="py-0.5">
               {!collapsed ? (
                 <Collapsible open={openSections.has(group.label)} onOpenChange={() => toggleSection(group.label)}>
                   <CollapsibleTrigger asChild>
-                    <SidebarGroupLabel className="flex cursor-pointer items-center justify-between px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground hover:text-foreground transition-colors rounded-md mx-2">
-                      <div className="flex items-center gap-2.5">
-                        <group.icon className="h-4 w-4" />
-                        <span>{group.label}</span>
-                      </div>
-                      {openSections.has(group.label) ? <ChevronDown className="h-3.5 w-3.5 opacity-50" /> : <ChevronRight className="h-3.5 w-3.5 opacity-50" />}
+                    <SidebarGroupLabel className="flex cursor-pointer items-center justify-between px-3 py-2 text-[13px] font-semibold text-muted-foreground hover:text-foreground transition-colors rounded-md mx-1">
+                      <span>{group.label}</span>
+                      {openSections.has(group.label) ? <ChevronDown className="h-3 w-3 opacity-50" /> : <ChevronRight className="h-3 w-3 opacity-50" />}
                     </SidebarGroupLabel>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="overflow-hidden transition-all duration-200 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                     <SidebarGroupContent>
-                      <SidebarMenu className="pl-4 border-l border-border/50 ml-5 mt-0.5 space-y-px">
+                      <SidebarMenu className="space-y-px">
                         {group.items.map(item => (
                           <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton asChild>
                               <NavLink
                                 to={item.url}
                                 className={cn(
-                                  "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                                  "flex items-center gap-2.5 rounded-md pl-8 pr-3 py-1.5 text-sm transition-colors",
                                   isActive(item.url)
-                                    ? "bg-primary/10 text-primary border-l-2 border-primary -ml-[1px] pl-[13px]"
+                                    ? "bg-primary/8 text-primary border-l-2 border-primary ml-0 pl-[30px]"
                                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                                 )}
                               >
@@ -299,110 +308,114 @@ export function AppSidebar() {
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="mt-auto px-3 pt-2 border-t border-border/50 space-y-2">
-          {/* Theme toggle */}
-          <div className={cn("flex items-center", collapsed ? "justify-center" : "px-1")}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-                  className="flex items-center justify-center h-8 w-8 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
-                >
-                  {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side={collapsed ? "right" : "top"}>{resolvedTheme === "dark" ? "Light mode" : "Dark mode"}</TooltipContent>
-            </Tooltip>
-          </div>
-
-          {/* Profile with Settings in dropdown */}
+        {/* Footer: Theme + Profile in single row */}
+        <div className="shrink-0 border-t border-border/30 px-2 py-2">
           {!collapsed ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex w-full items-center gap-2.5 rounded-md px-2 py-2.5 text-sm hover:bg-sidebar-accent transition-colors">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">JD</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 text-left min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">John Doe</p>
-                    <p className="text-[11px] text-muted-foreground truncate">john@anarix.com</p>
-                  </div>
-                  <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start" className="w-[220px]">
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/appearance")}>
-                  <Settings className="h-4 w-4" /><span>Preferences</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/accounts")}>
-                  <Link className="h-4 w-4" /><span>Accounts</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/team")}>
-                  <Users className="h-4 w-4" /><span>Team</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/system")}>
-                  <Wrench className="h-4 w-4" /><span>System</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/design-system")}>
-                  <Palette className="h-4 w-4" /><span>Design System</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/component-library")}>
-                  <Layers className="h-4 w-4" /><span>Component Library</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                  <User className="h-4 w-4" /><span>Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-destructive">
-                  <LogOut className="h-4 w-4" /><span>Logout</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-2">
+              {/* Theme toggle */}
+              <button
+                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors shrink-0"
+              >
+                {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+
+              {/* Profile dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex flex-1 items-center gap-2 rounded-md px-1.5 py-1.5 text-sm hover:bg-sidebar-accent transition-colors min-w-0">
+                    <Avatar className="h-7 w-7 shrink-0">
+                      <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-semibold">JD</AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-foreground truncate">John Doe</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="w-[220px]">
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/appearance")}>
+                    <Settings className="h-4 w-4" /><span>Preferences</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/accounts")}>
+                    <Link className="h-4 w-4" /><span>Accounts</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/team")}>
+                    <Users className="h-4 w-4" /><span>Team</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/system")}>
+                    <Wrench className="h-4 w-4" /><span>System</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/design-system")}>
+                    <Palette className="h-4 w-4" /><span>Design System</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/component-library")}>
+                    <Layers className="h-4 w-4" /><span>Component Library</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                    <User className="h-4 w-4" /><span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-destructive">
+                    <LogOut className="h-4 w-4" /><span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex w-full items-center justify-center rounded-md p-2 hover:bg-sidebar-accent transition-colors">
-                  <Avatar className="h-7 w-7">
-                    <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-semibold">JD</AvatarFallback>
-                  </Avatar>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" align="end" className="w-[220px]">
-                <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-xs text-muted-foreground">john@anarix.com</p>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/appearance")}>
-                  <Settings className="h-4 w-4" /><span>Preferences</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/accounts")}>
-                  <Link className="h-4 w-4" /><span>Accounts</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/team")}>
-                  <Users className="h-4 w-4" /><span>Team</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/system")}>
-                  <Wrench className="h-4 w-4" /><span>System</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/design-system")}>
-                  <Palette className="h-4 w-4" /><span>Design System</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/component-library")}>
-                  <Layers className="h-4 w-4" /><span>Component Library</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                  <User className="h-4 w-4" /><span>Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-destructive">
-                  <LogOut className="h-4 w-4" /><span>Logout</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex flex-col items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                    className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
+                  >
+                    {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">{resolvedTheme === "dark" ? "Light mode" : "Dark mode"}</TooltipContent>
+              </Tooltip>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center justify-center rounded-md p-1.5 hover:bg-sidebar-accent transition-colors">
+                    <Avatar className="h-7 w-7">
+                      <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-semibold">JD</AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="right" align="end" className="w-[220px]">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium">John Doe</p>
+                    <p className="text-xs text-muted-foreground">john@anarix.com</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/appearance")}>
+                    <Settings className="h-4 w-4" /><span>Preferences</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/accounts")}>
+                    <Link className="h-4 w-4" /><span>Accounts</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/team")}>
+                    <Users className="h-4 w-4" /><span>Team</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/system")}>
+                    <Wrench className="h-4 w-4" /><span>System</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/design-system")}>
+                    <Palette className="h-4 w-4" /><span>Design System</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/settings/component-library")}>
+                    <Layers className="h-4 w-4" /><span>Component Library</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                    <User className="h-4 w-4" /><span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="flex items-center gap-2 cursor-pointer text-destructive">
+                    <LogOut className="h-4 w-4" /><span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           )}
         </div>
 
