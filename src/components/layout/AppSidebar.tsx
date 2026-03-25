@@ -25,8 +25,10 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import logoFull from "@/assets/logo-full.png";
-import logoWhite from "@/assets/logo-white.png";
+import logoLightFull from "@/assets/logo-light-full.svg";
+import logoDarkFull from "@/assets/logo-dark-full.svg";
+import logoLightSymbol from "@/assets/logo-light-symbol.svg";
+import logoDarkSymbol from "@/assets/logo-dark-symbol.svg";
 
 interface NavItem {
   title: string;
