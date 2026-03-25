@@ -116,6 +116,7 @@ export function MiniSidebar() {
           currentPath={currentPath}
           onMouseEnter={() => handleMouseEnter(group.label)}
           onMouseLeave={handleMouseLeave}
+          onNavigate={() => { closeAan(); }}
         />
       ))}
     </div>
