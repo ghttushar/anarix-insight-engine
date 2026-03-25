@@ -9,8 +9,8 @@ import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
 import { useAan } from "@/components/aan";
 import { SidebarHoverPopup } from "./SidebarHoverPopup";
 import { navigationGroups } from "./AppSidebar";
-import logoFull from "@/assets/logo-full.png";
-import logoWhite from "@/assets/logo-white.png";
+import logoLightSymbol from "@/assets/logo-light-symbol.svg";
+import logoDarkSymbol from "@/assets/logo-dark-symbol.svg";
 
 export function MiniSidebar() {
   const location = useLocation();
