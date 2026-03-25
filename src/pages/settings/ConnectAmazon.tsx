@@ -9,8 +9,8 @@ import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { useAccounts } from "@/contexts/AccountContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
-import logoFull from "@/assets/logo-full.png";
-import logoWhite from "@/assets/logo-white.png";
+import logoFull from "@/assets/logo-light-full.svg";
+import logoWhite from "@/assets/logo-dark-full.svg";
 
 const connectionOptions = [
   {
