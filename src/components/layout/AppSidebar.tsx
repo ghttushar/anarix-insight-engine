@@ -199,24 +199,33 @@ export function AppSidebar() {
   return (
     <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-200", collapsed ? "w-14" : "w-56")} collapsible="icon">
       <SidebarContent className="flex flex-col h-full">
-        {/* Header: Toggle + Logo */}
+        {/* Header: Logo left, Toggle right */}
         <div className={cn(
           "flex items-center h-12 border-b border-border/30 shrink-0",
-          collapsed ? "justify-center px-1" : "px-3 gap-2"
+          collapsed ? "justify-center px-1" : "justify-between px-3"
         )}>
-          <Tooltip>
-            <TooltipTrigger asChild>
+          {collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={toggleSidebar}
+                  className="flex items-center justify-center h-8 w-8 rounded-md hover:bg-sidebar-accent transition-colors"
+                >
+                  <img src={logoSymbolSrc} alt="Anarix" className="h-6 w-6 object-contain" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Expand sidebar</TooltipContent>
+            </Tooltip>
+          ) : (
+            <>
+              <img src={logoFullSrc} alt="Anarix" className="h-6 w-auto" />
               <button
                 onClick={toggleSidebar}
                 className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
               >
                 <PanelLeft className="h-4 w-4" />
               </button>
-            </TooltipTrigger>
-            <TooltipContent side="right">{collapsed ? "Expand sidebar" : "Collapse sidebar"}</TooltipContent>
-          </Tooltip>
-          {!collapsed && (
-            <img src={logoSrc} alt="Anarix" className="h-6 w-auto" />
+            </>
           )}
         </div>
 
