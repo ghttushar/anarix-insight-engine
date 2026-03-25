@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAccounts } from "@/contexts/AccountContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import logoFull from "@/assets/logo-full.png";
-import logoWhite from "@/assets/logo-white.png";
+import logoFull from "@/assets/logo-light-full.svg";
+import logoWhite from "@/assets/logo-dark-full.svg";
 
 export default function Login() {
   const navigate = useNavigate();

@@ -7,8 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { FullPageLoader } from "@/components/ui/loader";
 import { useAccounts } from "@/contexts/AccountContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import logoFull from "@/assets/logo-full.png";
-import logoWhite from "@/assets/logo-white.png";
+import logoFull from "@/assets/logo-light-full.svg";
+import logoWhite from "@/assets/logo-dark-full.svg";
 
 // Walmart logo
 const WalmartLogo = ({ className }: { className?: string }) => (
