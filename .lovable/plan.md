@@ -1,130 +1,71 @@
 
 
-## Complete Sidebar Revamp + Aan Workspace with App Nav
+## Fix Sidebar Logo/Collapse Layout + Embed SVG Logos + Fix MiniSidebar Navigation
 
-### Problems Identified
+### Issues
+1. **MiniSidebar in Aan workspace** — nav clicks don't work (hover popups use `NavLink` but MiniSidebar uses `handleNavClick` which may not trigger properly)
+2. **Collapse button placement** — Currently toggle is on LEFT, logo on RIGHT. User wants: Logo LEFT, collapse button RIGHT (like ChatGPT reference)
+3. **Logos** — Currently using PNG files. User provided 4 SVG variants that should be embedded:
+   - `Anarix_logo_variation-01.svg` → Full logo, dark text (light mode, expanded)
+   - `Anarix_logo_variation-02.svg` → Full logo, white text (dark mode, expanded)
+   - `Anarix_logo_variation-03.svg` → Symbol only, colored (light mode, collapsed)
+   - `Anarix_logo_variation-04.svg` → Symbol only, white (dark mode, collapsed)
 
-1. **Collapse notch overlaps submenu chevrons** — The floating circular collapse button at the sidebar edge sits at 50% height and visually merges with group expand/collapse arrows
-2. **Aan button is too prominent and poorly designed** — Giant gradient block with "AI Assistant" subtitle looks amateurish, takes too much vertical space
-3. **Logo placement awkward** — Logo has inconsistent sizing between collapsed/expanded states
-4. **Navigation groups look cluttered** — Uppercase labels, too much vertical spacing, the left-border active indicator fights with the collapsible tree lines
-5. **Aan Workspace (fullscreen)** — Currently hides the main app sidebar entirely; user wants both navbars visible so they can navigate the app while using Aan
-6. **Footer (profile/theme)** — Bulky, theme toggle is a random circle button
+### Changes
 
----
+#### 1. Copy SVG logos into `src/assets/`
 
-### Redesign Concept
+Copy all 4 SVGs:
+- `src/assets/logo-light-full.svg` (variation-01, colored full logo)
+- `src/assets/logo-dark-full.svg` (variation-02, white full logo)
+- `src/assets/logo-light-symbol.svg` (variation-03, colored symbol)
+- `src/assets/logo-dark-symbol.svg` (variation-04, white symbol)
 
-**Clean, professional sidebar** with these principles:
-- Slim, quiet, functional — no gradients except on Aan icon
-- Logo top-left, always visible
-- Aan trigger as a small, elegant pill below logo (not a giant block)
-- Navigation groups use simple expand/collapse with clean indentation
-- Collapse control moves to the sidebar header (hamburger icon), removing the floating notch entirely
-- Active state: subtle background highlight + left accent bar (no tree lines)
-- Profile: compact avatar row at bottom
-- Theme: icon toggle inline with profile
+#### 2. Restructure AppSidebar Header
 
-**Aan Workspace** gets a split layout: app sidebar on the left (collapsed to icon mode), Aan workspace content on the right.
+**Current**: `[Toggle] [Logo]`
+**New**: `[Logo] [spacer] [Toggle]`
 
----
+- Expanded: full logo on left, PanelLeft toggle on right
+- Collapsed: symbol logo centered (no toggle button visible — click logo area to expand, or use hover)
 
-### 1. Remove CollapseNotch, Add Header Toggle
-
-**File: `src/components/layout/AppLayout.tsx`**
-
-- Remove the `CollapseNotch` component entirely
-- The sidebar toggle moves into the sidebar header itself
-
-**File: `src/components/layout/AppSidebar.tsx`**
-
-- Add a small hamburger/menu icon button in the header row (next to logo) that calls `toggleSidebar()`
-- In collapsed mode, show just the icon; in expanded, show logo + toggle button
-
-### 2. Redesign Sidebar Structure
-
-**File: `src/components/layout/AppSidebar.tsx`** — Full rewrite of the render:
-
-```text
-┌─────────────────────┐
-│ [≡] Logo            │  ← Toggle + logo, compact
-│─────────────────────│
-│ ✦ Ask Aan           │  ← Small pill button, one line
-│─────────────────────│
-│ Workspace        >  │  ← Clean group headers
-│   Dashboard Builder │
-│   Health Score      │
-│                     │
-│ Profitability    >  │
-│   Dashboard         │
-│   Trends            │
-│   Profit & Loss  ◄  │  ← Active: bg-primary/8 + left-2 accent
-│   ...               │
-│                     │
-│ ... more groups ... │
-│─────────────────────│
-│ ☀ ─── JD John Doe  │  ← Compact footer: theme + avatar + name
-└─────────────────────┘
+Logo selection:
+```
+expanded + light → logo-light-full.svg
+expanded + dark  → logo-dark-full.svg
+collapsed + light → logo-light-symbol.svg
+collapsed + dark  → logo-dark-symbol.svg
 ```
 
-Changes:
-- **Logo row**: `h-12` header with menu toggle (PanelLeft icon) on the left, logo on the right. In collapsed: just the toggle icon centered
-- **Aan button**: Single-line pill — `h-9` with Sparkles icon + "Ask Aan" text, subtle border with aan-gradient on hover only. No "AI Assistant" subtitle. In collapsed: just Sparkles icon with tooltip
-- **Group headers**: Remove uppercase, use normal-case `text-[13px] font-semibold text-muted-foreground`. Chevron on right. No group icons in expanded mode (cleaner)
-- **Nav items**: Remove the tree-line left border (`border-l`). Use clean `pl-8` indentation. Active: `bg-primary/8 text-primary` + `border-l-2 border-primary` on the item itself
-- **Footer**: Single row — theme toggle icon (left), then avatar + name (right), dropdown on click. `h-12` max
-- **Dividers**: Use `border-t border-border/30` (very subtle)
+#### 3. Fix MiniSidebar Navigation in Aan Workspace
 
-### 3. Collapsed State Polish
+The hover popups render `NavLink` components which navigate via React Router but don't call `closeAan()`. Fix by:
+- Passing an `onNavigate` callback to `SidebarHoverPopup`
+- When a link is clicked inside the popup, call `closeAan()` then navigate
+- Alternatively, wrap MiniSidebar in a click listener that calls `closeAan()` on any `NavLink` click
 
-- Each group shows just the group icon (keep current hover popup behavior)
-- Aan shows Sparkles icon with tooltip
-- Profile shows avatar only with dropdown
-- Toggle button shows PanelLeft icon centered
+#### 4. Update MiniSidebar Logo
 
-### 4. Aan Workspace with App Sidebar
+Use the symbol SVG instead of trying to shrink the full logo into 20px. In collapsed/mini context:
+- Light mode: `logo-light-symbol.svg`
+- Dark mode: `logo-dark-symbol.svg`
 
-**File: `src/components/aan/AanWorkspace.tsx`**
+#### 5. Remove old PNG logos
 
-Current: `fixed inset-0 z-[60]` — covers everything including sidebar.
-
-New layout:
-```text
-┌──────┬──────────────────────────────────────┐
-│ Mini │  Aan Workspace Header (Aan branding) │
-│ Side │──────────────────────────────────────│
-│ bar  │  [Sidebar] │ Conversation │ Artifact │
-│ (48) │            │              │          │
-│      │  Input bar                           │
-└──────┴──────────────────────────────────────┘
-```
-
-- Render the main `AppSidebar` in forced-collapsed (icon) mode on the left side of the Aan workspace
-- This lets users navigate to any page even while Aan is open — clicking a nav link closes Aan and navigates
-- The Aan workspace content fills the remaining space
-- Implementation: Instead of `fixed inset-0`, use `fixed inset-0 z-[60] flex` with a mini sidebar (icon-only `w-14`) on the left + Aan content on the right
-
-**New component: `src/components/layout/MiniSidebar.tsx`**
-- A stripped-down version of AppSidebar that only shows: logo icon, group icons (with hover popups), theme toggle, profile avatar
-- Clicking any nav item: navigates to the page AND closes Aan workspace
-- Width: `w-14` fixed
-
-### 5. Width and Spacing
-
-- Sidebar expanded: `w-56` (down from `w-64` — tighter)
-- Sidebar collapsed: `w-14` (keep)
-- Remove all excess `py-4` padding; use `py-2` between sections
+Delete `logo-full.png` and `logo-white.png` after migrating all references.
 
 ---
 
-### Files Summary
+### Files
 
 | File | Change |
 |---|---|
-| `AppSidebar.tsx` | Complete redesign: header toggle, slim Aan pill, clean nav groups, compact footer |
-| `AppLayout.tsx` | Remove CollapseNotch component entirely |
-| `AanWorkspace.tsx` | Add mini app sidebar on left side for navigation while Aan is open |
-| `MiniSidebar.tsx` | **NEW** — Icon-only sidebar for Aan workspace with nav + close-on-click |
-| `SidebarHoverPopup.tsx` | Minor: ensure it works with new trigger positioning |
-| `index.css` | Minor: adjust sidebar CSS variables if needed for w-56 |
+| `src/assets/logo-light-full.svg` | **NEW** — copy from variation-01 |
+| `src/assets/logo-dark-full.svg` | **NEW** — copy from variation-02 |
+| `src/assets/logo-light-symbol.svg` | **NEW** — copy from variation-03 |
+| `src/assets/logo-dark-symbol.svg` | **NEW** — copy from variation-04 |
+| `AppSidebar.tsx` | Swap header layout (logo left, toggle right), use new SVG imports based on theme+collapsed state |
+| `MiniSidebar.tsx` | Use symbol SVGs, fix nav by calling `closeAan()` on link clicks in hover popups |
+| `SidebarHoverPopup.tsx` | Add optional `onNavigate` callback prop that fires on link click |
+| `AanWorkspace.tsx` | No changes needed (MiniSidebar fix handles it) |
 
