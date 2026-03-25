@@ -138,7 +138,8 @@ export function AppSidebar() {
   const [triggerRects, setTriggerRects] = useState<Record<string, DOMRect | null>>({});
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
+  const logoFullSrc = resolvedTheme === "dark" ? logoDarkFull : logoLightFull;
+  const logoSymbolSrc = resolvedTheme === "dark" ? logoDarkSymbol : logoLightSymbol;
 
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
     const initial = new Set<string>();
