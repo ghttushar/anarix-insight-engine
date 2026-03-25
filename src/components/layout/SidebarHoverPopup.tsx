@@ -17,6 +17,7 @@ interface SidebarHoverPopupProps {
   currentPath: string;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  onNavigate?: () => void;
 }
 
 export function SidebarHoverPopup({
