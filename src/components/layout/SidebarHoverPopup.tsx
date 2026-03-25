@@ -28,6 +28,7 @@ export function SidebarHoverPopup({
   currentPath,
   onMouseEnter,
   onMouseLeave,
+  onNavigate,
 }: SidebarHoverPopupProps) {
   const popupRef = useRef<HTMLDivElement>(null);
 
