@@ -19,7 +19,7 @@ export function MiniSidebar() {
   const { resolvedTheme, setTheme } = useTheme();
   const { newFeaturesVisible } = useFeatureToggle();
   const { closeAan } = useAan();
-  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
+  const logoSrc = resolvedTheme === "dark" ? logoDarkSymbol : logoLightSymbol;
 
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [triggerRects, setTriggerRects] = useState<Record<string, DOMRect | null>>({});
