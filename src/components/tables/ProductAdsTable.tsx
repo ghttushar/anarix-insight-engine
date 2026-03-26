@@ -19,7 +19,7 @@ interface ProductAdsTableProps {
   onRowClick?: (productAd: typeof import("@/data/mockProductAds").mockProductAds[0]) => void;
 }
 
-export function ProductAdsTable({ searchQuery = "", showAddButton = false, showDeltas = false }: ProductAdsTableProps) {
+export function ProductAdsTable({ searchQuery = "", showAddButton = false, showDeltas = false, onRowClick }: ProductAdsTableProps) {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
