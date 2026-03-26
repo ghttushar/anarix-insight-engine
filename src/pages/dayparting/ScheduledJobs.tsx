@@ -3,20 +3,22 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { ScheduledJobsTable } from "@/components/dayparting/ScheduledJobsTable";
+import { CreateSchedulePanel } from "@/components/panels/CreateSchedulePanel";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus } from "lucide-react";
 import { schedules as initialSchedules } from "@/data/mockDayParting";
 import { DayPartingSchedule } from "@/types/dayparting";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 
 export default function ScheduledJobs() {
-  const navigate = useNavigate();
+  const { setDataPanel } = useActivePanel();
   const [schedules, setSchedules] = useState<DayPartingSchedule[]>(initialSchedules);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null);
+  const [showDeltas, setShowDeltas] = useState(false);
 
   const filteredSchedules = schedules.filter((s) =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -45,40 +47,44 @@ export default function ScheduledJobs() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <PageHeader
-          title="Scheduled Jobs"
-          subtitle="Manage your day parting schedules"
-          actions={
-            <Button onClick={() => navigate("/dayparting/scheduled/new")}>
-              <Plus className="mr-2 h-4 w-4" />Create Schedule
-            </Button>
-          }
-        />
+      <div className="flex flex-1 min-h-0">
+        <div className="flex-1 space-y-6 overflow-auto">
+          <PageHeader title="Scheduled Jobs" subtitle="Manage your day parting schedules" />
 
-        <DataTableToolbar
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search schedules..."
-          onDownload={() => toast.success("Exporting schedules...")}
-        />
-
-        {filteredSchedules.length > 0 ? (
-          <ScheduledJobsTable
-            schedules={filteredSchedules}
-            onPauseResume={handlePauseResume}
-            onDelete={handleDeleteClick}
+          <DataTableToolbar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search schedules..."
+            onDownload={() => toast.success("Exporting schedules...")}
+            showDeltas={showDeltas}
+            onShowDeltasChange={setShowDeltas}
+            leftContent={
+              <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createSchedule")}>
+                <Plus className="h-3.5 w-3.5" />Create Schedule
+              </Button>
+            }
           />
-        ) : (
-          <div className="text-center py-12 border border-border rounded-lg bg-card">
-            <p className="text-muted-foreground">No scheduled jobs found</p>
-            {searchQuery ? (
-              <p className="text-sm mt-1 text-muted-foreground">Try adjusting your search query</p>
-            ) : (
-              <Button variant="link" onClick={() => navigate("/dayparting/scheduled/new")} className="mt-2">Create your first schedule</Button>
-            )}
-          </div>
-        )}
+
+          {filteredSchedules.length > 0 ? (
+            <ScheduledJobsTable
+              schedules={filteredSchedules}
+              onPauseResume={handlePauseResume}
+              onDelete={handleDeleteClick}
+            />
+          ) : (
+            <div className="text-center py-12 border border-border rounded-lg bg-card">
+              <p className="text-muted-foreground">No scheduled jobs found</p>
+              {searchQuery ? (
+                <p className="text-sm mt-1 text-muted-foreground">Try adjusting your search query</p>
+              ) : (
+                <Button variant="link" onClick={() => setDataPanel("createSchedule")} className="mt-2">Create your first schedule</Button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Right panel for creating schedule */}
+        <CreateSchedulePanel />
       </div>
 
       {/* Delete Confirmation Dialog */}

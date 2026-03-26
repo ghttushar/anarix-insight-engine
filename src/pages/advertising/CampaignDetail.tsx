@@ -35,6 +35,7 @@ export default function CampaignDetail() {
   const [activeTab, setActiveTab] = useState<TabValue>("ad-groups");
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
+  const [showDeltas, setShowDeltas] = useState(false);
 
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
   const campaignName = campaign?.name || `Campaign ${campaignId}`;
@@ -111,6 +112,8 @@ export default function CampaignDetail() {
           onSearchChange={setSearchQuery}
           searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
           onDownload={() => toast.success("Exporting data as CSV...")}
+          showDeltas={showDeltas}
+          onShowDeltasChange={setShowDeltas}
         />
 
         {renderTable()}

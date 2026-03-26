@@ -3,7 +3,6 @@ import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2, TrendingUp 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -153,17 +152,20 @@ export function DataTableToolbar({
         <div className="flex items-center gap-1">
           {rightContent}
 
-          {/* Show Deltas Toggle */}
+          {/* Delta Toggle — simple icon button */}
           {onShowDeltasChange !== undefined && (
-            <div className="flex items-center gap-1.5 mr-1 px-2 py-1 rounded-md border border-border/50">
-              <TrendingUp className="h-3 w-3 text-muted-foreground" />
-              <span className="text-[11px] text-muted-foreground">Δ</span>
-              <Switch
-                checked={showDeltas ?? false}
-                onCheckedChange={onShowDeltasChange}
-                className="h-4 w-7 data-[state=checked]:bg-primary"
-              />
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-8 w-8 p-0 cursor-pointer",
+                showDeltas && "bg-primary/10 text-primary"
+              )}
+              onClick={() => onShowDeltasChange(!showDeltas)}
+              title={showDeltas ? "Hide deltas" : "Show deltas"}
+            >
+              <TrendingUp className="h-3.5 w-3.5" />
+            </Button>
           )}
 
           {/* Columns Dropdown */}
@@ -283,10 +285,10 @@ export function DataTableToolbar({
               size="sm"
               className={cn(
                 "h-8 w-8 p-0 ml-1 cursor-pointer",
-                viewMode === "edit" && "bg-primary/10 text-primary"
+                viewMode === "edit" && "bg-destructive/10 text-destructive"
               )}
               onClick={() => onViewModeChange(viewMode === "view" ? "edit" : "view")}
-              title={viewMode === "edit" ? "Switch to View mode" : "Switch to Edit mode"}
+              title={viewMode === "edit" ? "Save & exit edit mode" : "Switch to Edit mode"}
             >
               <Pencil className="h-3.5 w-3.5" />
             </Button>
@@ -294,22 +296,27 @@ export function DataTableToolbar({
         </div>
       </div>
 
-      {/* Active Filters Display — compact */}
+      {/* Active Filters Display — redesigned pills */}
       {activeFilters.length > 0 && !filterOpen && (
-        <div className="flex flex-wrap items-center gap-1">
-          <span className="text-[10px] text-muted-foreground">Filters:</span>
+        <div className="flex flex-wrap items-center gap-1.5">
           {activeFilters.map((filter) => (
-            <Badge key={filter.id} variant="secondary" className="gap-0.5 pr-0.5 text-[10px] h-5">
-              <span>{filter.field} {filter.operator} {filter.value}</span>
+            <Badge
+              key={filter.id}
+              variant="outline"
+              className="gap-1 pr-1 text-[11px] h-6 bg-muted/50 border-border"
+            >
+              <span className="font-medium text-foreground">{filter.field}:</span>
+              <span className="text-muted-foreground">{filter.operator}</span>
+              <span className="text-foreground">{filter.value}</span>
               <button
                 onClick={() => onFiltersChange?.(activeFilters.filter((f) => f.id !== filter.id))}
-                className="rounded-full p-0.5 hover:bg-muted cursor-pointer"
+                className="ml-0.5 rounded-full p-0.5 hover:bg-muted-foreground/20 cursor-pointer"
               >
                 <X className="h-2.5 w-2.5" />
               </button>
             </Badge>
           ))}
-          <button onClick={clearAllFilters} className="text-[10px] text-muted-foreground hover:text-foreground cursor-pointer">
+          <button onClick={clearAllFilters} className="text-[11px] text-muted-foreground hover:text-foreground cursor-pointer">
             Clear all
           </button>
         </div>

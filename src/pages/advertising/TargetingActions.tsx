@@ -34,6 +34,7 @@ export default function TargetingActions() {
   const [bidValue, setBidValue] = useState("");
   const [addKeywordsOpen, setAddKeywordsOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<{ id: string; field: string; operator: string; value: string }[]>([]);
+  const [showDeltas, setShowDeltas] = useState(false);
 
   const filteredActions = mockTargetingActions.filter((action) => {
     const matchesSearch =
@@ -104,6 +105,8 @@ export default function TargetingActions() {
           onFiltersChange={setActiveFilters}
           filterFields={FILTER_FIELDS}
           onDownload={handleDownload}
+          showDeltas={showDeltas}
+          onShowDeltasChange={setShowDeltas}
           rightContent={
             <>
               <Popover>

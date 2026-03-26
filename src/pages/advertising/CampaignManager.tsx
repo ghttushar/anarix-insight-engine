@@ -134,6 +134,7 @@ export default function CampaignManager() {
     mockKPIData.slice(0, 4).map((k) => k.label)
   );
   const [showImpact, setShowImpact] = useState(false);
+  const [showDeltas, setShowDeltas] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const kpiItems = mockKPIData
@@ -240,6 +241,8 @@ export default function CampaignManager() {
             onFiltersChange={setActiveFilters}
             filterFields={FILTER_FIELDS[activeTab] || []}
             onDownload={() => toast.success("Exporting data as CSV...")}
+            showDeltas={showDeltas}
+            onShowDeltasChange={setShowDeltas}
           />
 
           {renderTable()}

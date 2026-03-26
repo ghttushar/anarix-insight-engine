@@ -17,6 +17,7 @@ export default function KeywordTracker() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("active");
+  const [showDeltas, setShowDeltas] = useState(false);
 
   const activeKeywords = keywords.filter((k) => k.status === "active");
   const inactiveKeywords = keywords.filter((k) => k.status === "inactive");
@@ -53,6 +54,8 @@ export default function KeywordTracker() {
           onSearchChange={setSearchQuery}
           searchPlaceholder="Search by keyword..."
           onDownload={() => toast.success("Exporting keywords...")}
+          showDeltas={showDeltas}
+          onShowDeltasChange={setShowDeltas}
         />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
