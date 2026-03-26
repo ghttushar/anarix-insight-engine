@@ -154,16 +154,6 @@ export default function ProfitabilityDashboard() {
           <div className="space-y-3">
             <DataTableToolbar
               leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />}
-              rightContent={
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={handleUploadCOGS}>
-                    <Upload className="mr-2 h-4 w-4" />Upload COGS
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleDownload}>
-                    <Download className="mr-2 h-4 w-4" />Export
-                  </Button>
-                </div>
-              }
               searchValue={searchValue}
               onSearchChange={setSearchValue}
               searchPlaceholder={tableTab === "products" ? "Search by Product Name / Item ID / SKU..." : "Search by Order ID / Country / Product..."}
@@ -176,6 +166,14 @@ export default function ProfitabilityDashboard() {
               filterFields={FILTER_FIELDS}
               showDeltas={showDeltas}
               onShowDeltasChange={setShowDeltas}
+              showUpload
+              onUpload={(files) => {
+                toast.info(`Analyzing ${files[0]?.name}...`);
+                setTimeout(() => toast.success("COGS uploaded successfully. Table refreshed."), 1500);
+              }}
+              uploadTitle="Upload COGS"
+              uploadAccept=".csv,.xlsx,.xls"
+              onDownload={handleDownload}
             />
             <div className="rounded-lg border border-border">
               <ProductsPnLTable
