@@ -131,7 +131,7 @@ export default function CampaignManager() {
   const [activeFilters, setActiveFilters] = useState<FilterRule[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
   const [selectedKPIs, setSelectedKPIs] = useState<string[]>(
-    mockKPIData.slice(0, 4).map((k) => k.label)
+    mockKPIData.slice(0, 5).map((k) => k.label)
   );
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
@@ -144,7 +144,7 @@ export default function CampaignManager() {
       value: kpi.value,
       previousValue: kpi.previousValue,
       format: kpi.format as "currency" | "number" | "percentage" | "decimal",
-      accentColor: index === 0 ? "primary" : index === 1 ? "success" : index === 2 ? "accent" : "warning",
+      accentColor: index === 0 ? "primary" : index === 1 ? "success" : index === 2 ? "accent" : index === 3 ? "warning" : "destructive",
     }));
 
   const currentColumnDefs = COLUMN_DEFS[activeTab] || [];

@@ -191,6 +191,7 @@ export const mockKPIData: KPIData[] = [
   { label: "Ad Sales", value: 38234.87, previousValue: 32456.78, format: "currency", trend: "up" },
   { label: "Ad Units", value: 1203, previousValue: 1087, format: "number", trend: "up" },
   { label: "ROAS", value: 4.52, previousValue: 4.49, format: "decimal", trend: "up" },
+  { label: "Impressions", value: 1245678, previousValue: 1098234, format: "number", trend: "up" },
 ];
 
 export const campaignTotals = {

@@ -31,6 +31,24 @@ interface InlineKPIStripProps {
 function formatValue(value: number, format: string): string {
   switch (format) {
     case "currency":
+      if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+      if (value >= 100000) return `$${(value / 1000).toFixed(0)}K`;
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+    case "percentage":
+      return `${value.toFixed(2)}%`;
+    case "decimal":
+      return value.toFixed(2);
+    case "number":
+    default:
+      if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+      if (value >= 100000) return `${(value / 1000).toFixed(0)}K`;
+      return new Intl.NumberFormat("en-US").format(value);
+  }
+}
+
+function formatPrevValue(value: number, format: string): string {
+  switch (format) {
+    case "currency":
       return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
     case "percentage":
       return `${value.toFixed(2)}%`;
@@ -69,7 +87,7 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
         const cardContent = (
           <div
             className={cn(
-              "flex flex-1 flex-col gap-1 border-l-4 bg-background/50 px-4 py-3 first:rounded-l-md last:rounded-r-md",
+              "flex flex-1 flex-col gap-0.5 border-l-4 bg-background/50 px-3 py-2.5 first:rounded-l-md last:rounded-r-md min-w-0",
               colorClass,
               isSwappable && "cursor-pointer hover:bg-muted/50 transition-colors"
             )}
@@ -78,9 +96,9 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
               {isSwappable ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                    <button className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                       {item.label}
-                      <ChevronDown className="h-3 w-3" />
+                      <ChevronDown className="h-2.5 w-2.5" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="max-h-[240px] overflow-auto">
@@ -96,18 +114,18 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                   {item.label}
                 </span>
               )}
             </div>
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-xl font-semibold text-foreground">
+              <span className="text-lg font-semibold text-foreground leading-tight">
                 {formatValue(item.value, item.format)}
               </span>
               <div
                 className={cn(
-                  "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+                  "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium shrink-0",
                   isNeutral
                     ? "bg-muted text-muted-foreground"
                     : isPositive
@@ -116,15 +134,18 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
                 )}
               >
                 {isNeutral ? (
-                  <Minus className="h-3.5 w-3.5" />
+                  <Minus className="h-3 w-3" />
                 ) : isPositive ? (
-                  <ArrowUp className="h-3.5 w-3.5" />
+                  <ArrowUp className="h-3 w-3" />
                 ) : (
-                  <ArrowDown className="h-3.5 w-3.5" />
+                  <ArrowDown className="h-3 w-3" />
                 )}
                 <span>{Math.abs(delta).toFixed(1)}%</span>
               </div>
             </div>
+            <span className="text-[10px] text-muted-foreground">
+              Prev 7 days: {formatPrevValue(item.previousValue, item.format)}
+            </span>
           </div>
         );
 
@@ -137,7 +158,7 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
           );
         }
 
-        return <div key={`${item.label}-${index}`}>{cardContent}</div>;
+        return <div key={`${item.label}-${index}`} className="flex flex-1 min-w-0">{cardContent}</div>;
       })}
     </div>
   );
