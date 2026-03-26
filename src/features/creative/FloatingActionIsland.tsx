@@ -27,8 +27,34 @@ export function FloatingActionIsland() {
   const { openPanel } = useAan();
   const { openPanel: openInsights, criticalCount } = useInsights();
 
-  const shouldHide = hiddenRoutes.some((route) => location.pathname.startsWith(route));
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const rect = (e.currentTarget.closest('[data-island]') as HTMLElement)?.getBoundingClientRect();
+    if (!rect) return;
+    setIsDragging(true);
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startPosX: rect.left + rect.width / 2,
+      startPosY: rect.top,
+    };
+    const handleMove = (ev: MouseEvent) => {
+      if (!dragRef.current) return;
+      const dx = ev.clientX - dragRef.current.startX;
+      const dy = ev.clientY - dragRef.current.startY;
+      setPosition({ x: dragRef.current.startPosX + dx, y: dragRef.current.startPosY + dy });
+    };
+    const handleUp = () => {
+      setIsDragging(false);
+      dragRef.current = null;
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
+  }, []);
 
+  const shouldHide = hiddenRoutes.some((route) => location.pathname.startsWith(route));
   if (shouldHide) return null;
 
   const actions: ActionItem[] = [
@@ -54,7 +80,7 @@ export function FloatingActionIsland() {
     }
   };
 
-  const handleDragStart = useCallback((e: React.MouseEvent) => {
+  const handleDragStartWrapped = handleDragStart;
     e.preventDefault();
     const rect = (e.currentTarget.closest('[data-island]') as HTMLElement)?.getBoundingClientRect();
     if (!rect) return;
