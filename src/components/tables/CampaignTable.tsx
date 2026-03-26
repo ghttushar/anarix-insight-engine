@@ -29,6 +29,7 @@ interface CampaignTableProps {
   viewMode?: "view" | "edit";
   onRowClick?: (id: string) => void;
   hiddenColumns?: Set<string>;
+  showDeltas?: boolean;
 }
 
 type SortField = keyof Campaign | null;
