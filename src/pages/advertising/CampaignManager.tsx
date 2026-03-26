@@ -18,12 +18,6 @@ import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable
 import { CreateCampaignModal } from "@/components/advertising/CreateCampaignModal";
 import { CreateCampaignPanel } from "@/components/panels/CreateCampaignPanel";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
-import { mockAdGroups } from "@/data/mockAdGroups";
-import { mockProductAds } from "@/data/mockProductAds";
-import { mockKeywords } from "@/data/mockKeywords";
-import { mockSearchTerms } from "@/data/mockSearchTerms";
-import { mockPageTypes, mockPlatforms } from "@/data/mockPageTypePlatform";
-import { mockProductTargets } from "@/data/mockProductTargeting";
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { Campaign } from "@/types/campaign";
 import { Button } from "@/components/ui/button";
@@ -196,14 +190,14 @@ export default function CampaignManager() {
 
   const renderTable = () => {
     switch (activeTab) {
-      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} onRowClick={(id) => navigate(`/advertising/campaigns/${id}`)} hiddenColumns={hiddenColumns} />;
-      case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} />;
-      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} />;
-      case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} />;
-      case "product-targeting": return <ProductTargetingTable searchQuery={searchQuery} />;
-      case "search-terms": return <SearchTermsTable searchQuery={searchQuery} />;
-      case "page-type": return <PageTypeTable searchQuery={searchQuery} />;
-      case "platform": return <PlatformTable searchQuery={searchQuery} />;
+      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} onRowClick={(id) => navigate(`/advertising/campaigns/${id}`)} hiddenColumns={hiddenColumns} showDeltas={showDeltas} />;
+      case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "product-targeting": return <ProductTargetingTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "search-terms": return <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "page-type": return <PageTypeTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "platform": return <PlatformTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       default: return null;
     }
   };
@@ -214,13 +208,6 @@ export default function CampaignManager() {
         <div className="flex-1 space-y-6 overflow-auto">
           <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
           <AppTaskbar showAdType showFrequency showDateRange />
-
-          <div className="flex items-center justify-end">
-            <Button size="sm" className="gap-1.5" onClick={() => setDataPanel("createCampaign")}>
-              <Plus className="h-4 w-4" />
-              Create Campaign
-            </Button>
-          </div>
 
           <InlineKPIStrip items={kpiItems} availableMetrics={AVAILABLE_METRICS} onMetricChange={handleKPISwap} />
           <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
@@ -243,12 +230,18 @@ export default function CampaignManager() {
             onDownload={() => toast.success("Exporting data as CSV...")}
             showDeltas={showDeltas}
             onShowDeltasChange={setShowDeltas}
+            showUpload
+            onUpload={(files) => toast.success(`${files.length} file(s) uploaded`)}
+            leftContent={
+              <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createCampaign")}>
+                <Plus className="h-3.5 w-3.5" />Create Campaign
+              </Button>
+            }
           />
 
           {renderTable()}
         </div>
 
-        {/* Right panel for creating campaign */}
         <CreateCampaignPanel onSubmit={handleCreateCampaign} />
       </div>
 

@@ -1,22 +1,21 @@
 import { useState } from "react";
-import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2, TrendingUp } from "lucide-react";
+import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2, TrendingUp, Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { UploadDialog } from "@/components/advertising/UploadDialog";
 import { cn } from "@/lib/utils";
 
 interface FilterRule {
@@ -53,17 +52,16 @@ interface DataTableToolbarProps {
   rightContent?: React.ReactNode;
   showDeltas?: boolean;
   onShowDeltasChange?: (show: boolean) => void;
+  onUpload?: (files: File[]) => void;
+  showUpload?: boolean;
+  uploadAccept?: string;
+  uploadTitle?: string;
 }
 
 const OPERATORS = [
-  "is",
-  "is not",
-  "contains",
-  "starts with",
-  "is less than",
-  "is greater than",
-  "is less than or equal to",
-  "is greater than or equal to",
+  "is", "is not", "contains", "starts with",
+  "is less than", "is greater than",
+  "is less than or equal to", "is greater than or equal to",
 ];
 
 export function DataTableToolbar({
@@ -77,8 +75,6 @@ export function DataTableToolbar({
   onSelectAllColumns,
   onClearAllColumns,
   onDownload,
-  onFilter,
-  filterCount = 0,
   viewMode = "view",
   onViewModeChange,
   showViewToggle = false,
@@ -87,10 +83,16 @@ export function DataTableToolbar({
   rightContent,
   showDeltas,
   onShowDeltasChange,
+  onUpload,
+  showUpload = false,
+  uploadAccept,
+  uploadTitle,
 }: DataTableToolbarProps) {
   const [draftFilters, setDraftFilters] = useState<FilterRule[]>(activeFilters);
   const [columnSearch, setColumnSearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [editConfirmOpen, setEditConfirmOpen] = useState(false);
 
   const handleOpenFilter = () => {
     setDraftFilters(activeFilters.length > 0 ? [...activeFilters] : [{ id: crypto.randomUUID(), field: filterFields[0] || "", operator: "is", value: "" }]);
@@ -126,17 +128,51 @@ export function DataTableToolbar({
     setDraftFilters([]);
   };
 
+  const handleEditToggle = () => {
+    if (viewMode === "edit") {
+      // Turning off edit mode → show confirmation
+      setEditConfirmOpen(true);
+    } else {
+      onViewModeChange?.("edit");
+    }
+  };
+
+  const handleEditSave = () => {
+    setEditConfirmOpen(false);
+    onViewModeChange?.("view");
+  };
+
+  const handleEditDiscard = () => {
+    setEditConfirmOpen(false);
+    onViewModeChange?.("view");
+  };
+
   const filteredColumns = columns.filter((c) =>
     c.label.toLowerCase().includes(columnSearch.toLowerCase())
   );
 
   return (
     <div className="space-y-1.5">
-      {/* Main Toolbar Row */}
+      {/* Main Toolbar Row — Order: [leftContent] | [Upload] | [Search] | [Delta] | [Filter] | [Columns] | [Export] | [Edit] */}
       <div className="flex items-center justify-between gap-2">
-        {/* Left Side: leftContent + Search */}
+        {/* Left Side: leftContent + Upload + Search */}
         <div className="flex items-center gap-2">
           {leftContent}
+
+          {/* Upload Button */}
+          {(showUpload || onUpload) && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1 text-xs cursor-pointer"
+              onClick={() => setUploadOpen(true)}
+              title="Upload files"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Upload
+            </Button>
+          )}
+
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -148,11 +184,11 @@ export function DataTableToolbar({
           </div>
         </div>
 
-        {/* Right Side: rightContent → Deltas → Columns → Filter → Download → Edit toggle */}
+        {/* Right Side: rightContent → Delta → Filter → Columns → Export → Edit */}
         <div className="flex items-center gap-1">
           {rightContent}
 
-          {/* Delta Toggle — simple icon button */}
+          {/* Delta Toggle — icon button */}
           {onShowDeltasChange !== undefined && (
             <Button
               variant="ghost"
@@ -166,6 +202,69 @@ export function DataTableToolbar({
             >
               <TrendingUp className="h-3.5 w-3.5" />
             </Button>
+          )}
+
+          {/* Filter Button */}
+          {filterFields.length > 0 && (
+            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1 text-xs cursor-pointer"
+                  onClick={handleOpenFilter}
+                  title="Add or manage filters"
+                >
+                  <Filter className="h-3.5 w-3.5" />
+                  Filter
+                  {activeFilters.length > 0 && (
+                    <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                      {activeFilters.length}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[520px] p-3 space-y-2">
+                <p className="text-xs font-medium text-foreground">Filters</p>
+                <div className="space-y-1.5">
+                  {draftFilters.map((rule, idx) => (
+                    <div key={rule.id} className="flex items-center gap-1.5">
+                      <span className="text-[11px] text-muted-foreground w-10 shrink-0">{idx === 0 ? "Where" : "And"}</span>
+                      <Select value={rule.field} onValueChange={(v) => updateFilterRule(rule.id, "field", v)}>
+                        <SelectTrigger className="h-7 w-[130px] text-[11px]"><SelectValue placeholder="Field" /></SelectTrigger>
+                        <SelectContent>
+                          {filterFields.map((f) => (<SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={rule.operator} onValueChange={(v) => updateFilterRule(rule.id, "operator", v)}>
+                        <SelectTrigger className="h-7 w-[160px] text-[11px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {OPERATORS.map((op) => (<SelectItem key={op} value={op} className="text-xs">{op}</SelectItem>))}
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        value={rule.value}
+                        onChange={(e) => updateFilterRule(rule.id, "value", e.target.value)}
+                        placeholder="Value..."
+                        className="h-7 w-[110px] text-[11px]"
+                      />
+                      <button onClick={() => removeFilterRule(rule.id)} className="p-1 hover:bg-muted rounded cursor-pointer" title="Remove filter">
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <button onClick={addFilterRule} className="flex items-center gap-1 text-[11px] text-primary hover:underline cursor-pointer">
+                    <Plus className="h-3 w-3" />Add Filter
+                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <Button variant="ghost" size="sm" onClick={cancelFilters} className="h-7 text-xs px-3">Cancel</Button>
+                    <Button size="sm" onClick={applyFilters} className="h-7 text-xs px-3">Apply</Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
 
           {/* Columns Dropdown */}
@@ -210,75 +309,15 @@ export function DataTableToolbar({
             </DropdownMenu>
           )}
 
-          {/* Filter Button — Floating Popover */}
-          <Popover open={filterOpen} onOpenChange={setFilterOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-1 text-xs cursor-pointer"
-                onClick={handleOpenFilter}
-                title="Add or manage filters"
-              >
-                <Filter className="h-3.5 w-3.5" />
-                Filter
-                {activeFilters.length > 0 && (
-                  <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                    {activeFilters.length}
-                  </span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-[520px] p-3 space-y-2">
-              <p className="text-xs font-medium text-foreground">Filters</p>
-              <div className="space-y-1.5">
-                {draftFilters.map((rule, idx) => (
-                  <div key={rule.id} className="flex items-center gap-1.5">
-                    <span className="text-[11px] text-muted-foreground w-10 shrink-0">{idx === 0 ? "Where" : "And"}</span>
-                    <Select value={rule.field} onValueChange={(v) => updateFilterRule(rule.id, "field", v)}>
-                      <SelectTrigger className="h-7 w-[130px] text-[11px]"><SelectValue placeholder="Field" /></SelectTrigger>
-                      <SelectContent>
-                        {filterFields.map((f) => (<SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={rule.operator} onValueChange={(v) => updateFilterRule(rule.id, "operator", v)}>
-                      <SelectTrigger className="h-7 w-[160px] text-[11px]"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {OPERATORS.map((op) => (<SelectItem key={op} value={op} className="text-xs">{op}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      value={rule.value}
-                      onChange={(e) => updateFilterRule(rule.id, "value", e.target.value)}
-                      placeholder="Value..."
-                      className="h-7 w-[110px] text-[11px]"
-                    />
-                    <button onClick={() => removeFilterRule(rule.id)} className="p-1 hover:bg-muted rounded cursor-pointer" title="Remove filter">
-                      <Trash2 className="h-3 w-3 text-muted-foreground" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center justify-between pt-1">
-                <button onClick={addFilterRule} className="flex items-center gap-1 text-[11px] text-primary hover:underline cursor-pointer">
-                  <Plus className="h-3 w-3" />Add Filter
-                </button>
-                <div className="flex items-center gap-1.5">
-                  <Button variant="ghost" size="sm" onClick={cancelFilters} className="h-7 text-xs px-3">Cancel</Button>
-                  <Button size="sm" onClick={applyFilters} className="h-7 text-xs px-3">Apply</Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* Download Button */}
+          {/* Export/Download Button */}
           {onDownload && (
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 cursor-pointer" onClick={onDownload} title="Download data">
+            <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" onClick={onDownload} title="Export data">
               <Download className="h-3.5 w-3.5" />
+              Export
             </Button>
           )}
 
-          {/* Edit Mode Toggle — Pencil icon, far right */}
+          {/* Edit Mode Toggle — far right, with save confirmation */}
           {showViewToggle && onViewModeChange && (
             <Button
               variant="ghost"
@@ -287,7 +326,7 @@ export function DataTableToolbar({
                 "h-8 w-8 p-0 ml-1 cursor-pointer",
                 viewMode === "edit" && "bg-destructive/10 text-destructive"
               )}
-              onClick={() => onViewModeChange(viewMode === "view" ? "edit" : "view")}
+              onClick={handleEditToggle}
               title={viewMode === "edit" ? "Save & exit edit mode" : "Switch to Edit mode"}
             >
               <Pencil className="h-3.5 w-3.5" />
@@ -296,7 +335,7 @@ export function DataTableToolbar({
         </div>
       </div>
 
-      {/* Active Filters Display — redesigned pills */}
+      {/* Active Filters Display — pill chips */}
       {activeFilters.length > 0 && !filterOpen && (
         <div className="flex flex-wrap items-center gap-1.5">
           {activeFilters.map((filter) => (
@@ -321,6 +360,31 @@ export function DataTableToolbar({
           </button>
         </div>
       )}
+
+      {/* Upload Dialog */}
+      <UploadDialog
+        isOpen={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        onUpload={onUpload}
+        accept={uploadAccept}
+        title={uploadTitle}
+      />
+
+      {/* Edit Save Confirmation */}
+      <AlertDialog open={editConfirmOpen} onOpenChange={setEditConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Save Changes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have made edits to this table. Would you like to save your changes or discard them?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleEditDiscard}>Discard</AlertDialogCancel>
+            <AlertDialogAction onClick={handleEditSave}>Save Changes</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
