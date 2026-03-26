@@ -174,6 +174,20 @@ export function DataTableToolbar({
         <div className="flex items-center gap-1">
           {rightContent}
 
+          {/* Upload Button — right side */}
+          {(showUpload || onUpload) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1 text-xs cursor-pointer"
+              onClick={() => setUploadOpen(true)}
+              title={uploadTitle || "Upload files"}
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Upload
+            </Button>
+          )}
+
           {/* Delta Toggle — icon button */}
           {onShowDeltasChange !== undefined && (
             <Button
