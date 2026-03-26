@@ -6,27 +6,28 @@ import { SOVChart } from "@/components/bi/SOVChart";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 import { productSOVData, sovTrendData } from "@/data/mockBrandSOV";
 import { toast } from "sonner";
+import { TablePagination } from "@/components/tables/TablePagination";
 
 export default function ProductSOV() {
   const [searchQuery, setSearchQuery] = useState("");
   const [position, setPosition] = useState("all");
+  const [showDeltas, setShowDeltas] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const filteredProducts = productSOVData.filter((p) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.sku.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const paginatedProducts = filteredProducts.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Product Share of Voice"
-          subtitle="Track SOV performance by product"
-        />
+        <PageHeader title="Product Share of Voice" subtitle="Track SOV performance by product" />
 
         <AppTaskbar>
           <Select value={position} onValueChange={setPosition}>
@@ -40,12 +41,6 @@ export default function ProductSOV() {
           </Select>
         </AppTaskbar>
 
-        <div className="flex items-center justify-end">
-          <Button variant="outline" size="sm" onClick={() => toast.success("Exporting...")}>
-            <Download className="mr-2 h-4 w-4" />Export
-          </Button>
-        </div>
-
         <SOVChart data={sovTrendData} title="Product SOV Trend" subtitle="Hourly breakdown" />
 
         <div className="rounded-lg border border-border bg-card">
@@ -55,6 +50,8 @@ export default function ProductSOV() {
               onSearchChange={setSearchQuery}
               searchPlaceholder="Search by product name or SKU..."
               onDownload={() => toast.success("Exporting product SOV...")}
+              showDeltas={showDeltas}
+              onShowDeltasChange={setShowDeltas}
             />
           </div>
           <Table>
@@ -69,7 +66,7 @@ export default function ProductSOV() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredProducts.map((product) => (
+              {paginatedProducts.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -92,6 +89,7 @@ export default function ProductSOV() {
               )}
             </TableBody>
           </Table>
+          <TablePagination page={page} pageSize={pageSize} totalItems={filteredProducts.length} onPageChange={setPage} onPageSizeChange={setPageSize} />
         </div>
       </div>
     </AppLayout>

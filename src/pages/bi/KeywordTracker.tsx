@@ -38,16 +38,8 @@ export default function KeywordTracker() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Keyword Tracker"
-          subtitle="Manage keywords for share of voice tracking"
-        />
-
+        <PageHeader title="Keyword Tracker" subtitle="Manage keywords for share of voice tracking" />
         <AppTaskbar />
-
-        <div className="flex items-center justify-end">
-          <Button onClick={() => setIsAddModalOpen(true)}><Plus className="mr-2 h-4 w-4" />Add Keyword</Button>
-        </div>
 
         <DataTableToolbar
           searchValue={searchQuery}
@@ -56,6 +48,11 @@ export default function KeywordTracker() {
           onDownload={() => toast.success("Exporting keywords...")}
           showDeltas={showDeltas}
           onShowDeltasChange={setShowDeltas}
+          leftContent={
+            <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setIsAddModalOpen(true)}>
+              <Plus className="h-3.5 w-3.5" />Add Keyword
+            </Button>
+          }
         />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>

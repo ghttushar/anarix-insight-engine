@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { TrendingUp, TrendingDown, Download, RefreshCw } from "lucide-react";
 import { mockCompetitorProducts, type CompetitorProduct } from "@/data/mockCompetitorPricing";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { TablePagination } from "@/components/tables/TablePagination";
 
 function PriceHistoryChart({ selected }: { selected: CompetitorProduct }) {
   const { formatCurrency } = useCurrency();
@@ -80,6 +82,17 @@ function PriceHistoryChart({ selected }: { selected: CompetitorProduct }) {
 export default function CompetitorPricing() {
   const { formatCurrency } = useCurrency();
   const [selected, setSelected] = useState<CompetitorProduct | null>(mockCompetitorProducts[0]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDeltas, setShowDeltas] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
+  const filteredProducts = mockCompetitorProducts.filter((p) =>
+    p.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.competitorName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const paginatedProducts = filteredProducts.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <AppLayout>
@@ -90,12 +103,10 @@ export default function CompetitorPricing() {
           actions={
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => toast.info("Refreshing competitor data...")}><RefreshCw className="mr-2 h-4 w-4" />Refresh</Button>
-              <Button variant="outline" size="sm" onClick={() => toast.success("Exporting pricing data...")}><Download className="mr-2 h-4 w-4" />Export</Button>
             </div>
           }
         />
 
-        {/* Summary */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Tracked Competitors</p>
@@ -116,7 +127,6 @@ export default function CompetitorPricing() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Price History Chart */}
           <div className="lg:col-span-2">
             {selected ? (
               <PriceHistoryChart selected={selected} />
@@ -126,8 +136,6 @@ export default function CompetitorPricing() {
               </div>
             )}
           </div>
-
-          {/* Impact Summary */}
           <div className="space-y-3">
             <h3 className="font-heading text-sm font-semibold text-foreground">Your Impact</h3>
             {selected && (
@@ -157,8 +165,17 @@ export default function CompetitorPricing() {
           </div>
         </div>
 
-        {/* Competitor Table */}
         <div className="rounded-lg border border-border">
+          <div className="border-b border-border p-4">
+            <DataTableToolbar
+              searchValue={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder="Search competitors..."
+              onDownload={() => toast.success("Exporting pricing data...")}
+              showDeltas={showDeltas}
+              onShowDeltasChange={setShowDeltas}
+            />
+          </div>
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
@@ -172,7 +189,7 @@ export default function CompetitorPricing() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockCompetitorProducts.map((p) => {
+              {paginatedProducts.map((p) => {
                 const diff = p.yourPrice - p.currentPrice;
                 return (
                   <TableRow key={p.id} className={cn("cursor-pointer", selected?.id === p.id && "bg-primary/5")} onClick={() => setSelected(p)}>
@@ -194,6 +211,7 @@ export default function CompetitorPricing() {
               })}
             </TableBody>
           </Table>
+          <TablePagination page={page} pageSize={pageSize} totalItems={filteredProducts.length} onPageChange={setPage} onPageSizeChange={setPageSize} />
         </div>
       </div>
     </AppLayout>

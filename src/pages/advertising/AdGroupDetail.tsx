@@ -15,7 +15,7 @@ import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns"
 import { mockAdGroups } from "@/data/mockAdGroups";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import { Play, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
 import { toast } from "sonner";
 
@@ -52,9 +52,9 @@ export default function AdGroupDetail() {
 
   const renderTable = () => {
     switch (activeTab) {
-      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showAddButton />;
-      case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} />;
-      case "search-terms": return <SearchTermsTable searchQuery={searchQuery} />;
+      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showAddButton showDeltas={showDeltas} />;
+      case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "search-terms": return <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       default: return null;
     }
   };
@@ -62,7 +62,6 @@ export default function AdGroupDetail() {
   return (
     <AppLayout>
       <div className="space-y-4">
-        {/* Breadcrumb */}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -89,28 +88,22 @@ export default function AdGroupDetail() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Page Title */}
         <PageHeader title="Advertising" />
 
-        {/* Universal Bar — always first after title */}
         <AppTaskbar showFrequency showDateRange>
           <Button size="sm" className="gap-1.5 ml-2">
-            <Play className="h-3.5 w-3.5" />
-            Run
+            <Play className="h-3.5 w-3.5" />Run
           </Button>
         </AppTaskbar>
 
-        {/* Ad Group Info Card — below universal bar */}
         {adGroup && <AdGroupInfoCard adGroup={adGroup} />}
 
-        {/* Performance Overview Section */}
         <div className="space-y-3">
           <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
           <InlineKPIStrip items={kpiItems} />
           <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
         </div>
 
-        {/* Tabs + Table */}
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
 
         <DataTableToolbar
@@ -120,6 +113,13 @@ export default function AdGroupDetail() {
           onDownload={() => toast.success("Exporting data as CSV...")}
           showDeltas={showDeltas}
           onShowDeltasChange={setShowDeltas}
+          leftContent={
+            activeTab === "product-ads" ? (
+              <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => toast.info("Add Product Ad panel coming soon")}>
+                <Plus className="h-3.5 w-3.5" />Add Product Ad
+              </Button>
+            ) : undefined
+          }
         />
 
         {renderTable()}

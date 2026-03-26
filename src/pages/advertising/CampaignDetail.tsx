@@ -51,10 +51,10 @@ export default function CampaignDetail() {
 
   const renderTable = () => {
     switch (activeTab) {
-      case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} />;
-      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showAddButton />;
-      case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} />;
-      case "search-terms": return <SearchTermsTable searchQuery={searchQuery} />;
+      case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showAddButton showDeltas={showDeltas} />;
+      case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "search-terms": return <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       default: return null;
     }
   };
@@ -62,7 +62,6 @@ export default function CampaignDetail() {
   return (
     <AppLayout>
       <div className="space-y-4">
-        {/* Breadcrumb */}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -83,28 +82,22 @@ export default function CampaignDetail() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Page Title */}
         <PageHeader title="Advertising" />
 
-        {/* Universal Bar — always first after title */}
         <AppTaskbar showFrequency showDateRange>
           <Button size="sm" className="gap-1.5 ml-2">
-            <Play className="h-3.5 w-3.5" />
-            Run
+            <Play className="h-3.5 w-3.5" />Run
           </Button>
         </AppTaskbar>
 
-        {/* Campaign Info Card — below universal bar */}
         {campaign && <CampaignInfoCard campaign={campaign} />}
 
-        {/* Performance Overview Section */}
         <div className="space-y-3">
           <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
           <InlineKPIStrip items={kpiItems} />
           <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
         </div>
 
-        {/* Tabs + Table */}
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
 
         <DataTableToolbar
