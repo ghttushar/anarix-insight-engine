@@ -60,8 +60,8 @@ export default function KeywordTracker() {
             <TabsTrigger value="active">Active ({activeKeywords.length})</TabsTrigger>
             <TabsTrigger value="inactive">Inactive ({inactiveKeywords.length})</TabsTrigger>
           </TabsList>
-          <TabsContent value="active" className="mt-4"><KeywordTrackerTable keywords={filteredKeywords} onStatusChange={handleStatusChange} onDelete={handleDelete} showDeltas={showDeltas} /></TabsContent>
-          <TabsContent value="inactive" className="mt-4"><KeywordTrackerTable keywords={filteredKeywords} onStatusChange={handleStatusChange} onDelete={handleDelete} showDeltas={showDeltas} /></TabsContent>
+          <TabsContent value="active" className="mt-4"><KeywordTrackerTable keywords={filteredKeywords} onStatusChange={handleStatusChange} onDelete={handleDelete} /></TabsContent>
+          <TabsContent value="inactive" className="mt-4"><KeywordTrackerTable keywords={filteredKeywords} onStatusChange={handleStatusChange} onDelete={handleDelete} /></TabsContent>
         </Tabs>
 
         {filteredKeywords.length === 0 && (
