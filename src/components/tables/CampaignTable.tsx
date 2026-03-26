@@ -285,7 +285,7 @@ export function CampaignTable({
                     {show("roas") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{campaign.roas.toFixed(2)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'roas')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'roas')} />}
                       </div>
                     </TableCell>}
                     {show("impressions") && <TableCell className="text-right">
