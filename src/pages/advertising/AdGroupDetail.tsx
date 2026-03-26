@@ -118,6 +118,8 @@ export default function AdGroupDetail() {
           onSearchChange={setSearchQuery}
           searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
           onDownload={() => toast.success("Exporting data as CSV...")}
+          showDeltas={showDeltas}
+          onShowDeltasChange={setShowDeltas}
         />
 
         {renderTable()}

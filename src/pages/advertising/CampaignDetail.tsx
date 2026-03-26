@@ -112,6 +112,8 @@ export default function CampaignDetail() {
           onSearchChange={setSearchQuery}
           searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
           onDownload={() => toast.success("Exporting data as CSV...")}
+          showDeltas={showDeltas}
+          onShowDeltasChange={setShowDeltas}
         />
 
         {renderTable()}

@@ -105,6 +105,8 @@ export default function TargetingActions() {
           onFiltersChange={setActiveFilters}
           filterFields={FILTER_FIELDS}
           onDownload={handleDownload}
+          showDeltas={showDeltas}
+          onShowDeltasChange={setShowDeltas}
           rightContent={
             <>
               <Popover>

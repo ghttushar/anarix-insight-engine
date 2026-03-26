@@ -134,6 +134,7 @@ export default function CampaignManager() {
     mockKPIData.slice(0, 4).map((k) => k.label)
   );
   const [showImpact, setShowImpact] = useState(false);
+  const [showDeltas, setShowDeltas] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const kpiItems = mockKPIData

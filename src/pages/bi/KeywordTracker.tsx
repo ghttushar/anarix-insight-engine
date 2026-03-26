@@ -54,6 +54,8 @@ export default function KeywordTracker() {
           onSearchChange={setSearchQuery}
           searchPlaceholder="Search by keyword..."
           onDownload={() => toast.success("Exporting keywords...")}
+          showDeltas={showDeltas}
+          onShowDeltasChange={setShowDeltas}
         />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
