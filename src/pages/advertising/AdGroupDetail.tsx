@@ -126,6 +126,7 @@ export default function AdGroupDetail() {
 
         {renderTable()}
       </div>
+      <AddProductAdsModal open={addProductAdOpen} onOpenChange={setAddProductAdOpen} />
     </AppLayout>
   );
 }
