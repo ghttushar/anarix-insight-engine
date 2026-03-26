@@ -240,6 +240,8 @@ export default function CampaignManager() {
             onFiltersChange={setActiveFilters}
             filterFields={FILTER_FIELDS[activeTab] || []}
             onDownload={() => toast.success("Exporting data as CSV...")}
+            showDeltas={showDeltas}
+            onShowDeltasChange={setShowDeltas}
           />
 
           {renderTable()}
