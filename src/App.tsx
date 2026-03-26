@@ -30,6 +30,7 @@ import ImpactAnalysis from "./pages/advertising/ImpactAnalysis";
 import TargetingActions from "./pages/advertising/TargetingActions";
 import AdvCampaignDetail from "./pages/advertising/CampaignDetail";
 import AdGroupDetail from "./pages/advertising/AdGroupDetail";
+import ProductAdDetail from "./pages/advertising/ProductAdDetail";
 import BudgetPacing from "./pages/advertising/BudgetPacing";
 import SearchHarvesting from "./pages/advertising/SearchHarvesting";
 import AnomalyAlerts from "./pages/advertising/AnomalyAlerts";
