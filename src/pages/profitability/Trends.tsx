@@ -91,6 +91,8 @@ export default function ProfitabilityTrends() {
             onFiltersChange={setActiveFilters}
             filterFields={FILTER_FIELDS}
             onDownload={handleDownload}
+            showDeltas={showDeltas}
+            onShowDeltasChange={setShowDeltas}
           />
           <div className="rounded-lg border border-border">
           <div className="overflow-x-auto">

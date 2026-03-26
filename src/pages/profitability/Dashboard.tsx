@@ -80,22 +80,6 @@ export default function ProfitabilityDashboard() {
     setColumns((prev) => prev.map((c) => c.id === columnId ? { ...c, visible: !c.visible } : c));
   };
 
-  const handleUploadCOGS = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".csv,.xlsx,.xls";
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        toast.info(`Analyzing ${file.name}...`);
-        setTimeout(() => {
-          toast.success("COGS uploaded successfully. Table refreshed.");
-        }, 1500);
-      }
-    };
-    input.click();
-  };
-
   const handleDownload = () => {
     toast.success("Exporting data as CSV...");
   };

@@ -90,11 +90,6 @@ export default function Geographical() {
                 </button>
               </div>
             }
-            rightContent={
-              <Button variant="outline" size="sm" onClick={() => toast.info("Upload COGS file...")}>
-                <Upload className="mr-2 h-4 w-4" />Upload COGS
-              </Button>
-            }
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             searchPlaceholder={viewLevel === "state" ? "Search region..." : "Search by Product Name / Item ID..."}
@@ -106,6 +101,9 @@ export default function Geographical() {
             onFiltersChange={setActiveFilters}
             filterFields={FILTER_FIELDS}
             onDownload={handleDownload}
+            showUpload
+            onUpload={(files) => toast.info(`Uploading ${files[0]?.name}...`)}
+            uploadTitle="Upload COGS"
           />
 
           <div className="rounded-lg border border-border">

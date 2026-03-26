@@ -309,7 +309,7 @@ export function CampaignTable({
                     {show("acos") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatPercent(campaign.acos)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'acos')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'acos')} />}
                       </div>
                     </TableCell>}
                   </TableRow>
