@@ -144,6 +144,7 @@ export function CampaignTable({
               <TableRow className="bg-muted">
               {isEdit && show("active") && <TableHead className="w-16">Active</TableHead>}
               {show("status") && <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>}
+              {show("type") && <TableHead className="w-24">Type</TableHead>}
               {show("name") && <TableHead className={cn("min-w-[200px] cursor-pointer sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
                 <div className="flex items-center gap-1">Campaign Name <SortIcon field="name" /></div>
               </TableHead>}
