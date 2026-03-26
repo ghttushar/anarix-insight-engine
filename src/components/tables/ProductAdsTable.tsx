@@ -16,6 +16,7 @@ interface ProductAdsTableProps {
   searchQuery?: string;
   showAddButton?: boolean;
   showDeltas?: boolean;
+  onRowClick?: (productAd: typeof import("@/data/mockProductAds").mockProductAds[0]) => void;
 }
 
 export function ProductAdsTable({ searchQuery = "", showAddButton = false, showDeltas = false }: ProductAdsTableProps) {

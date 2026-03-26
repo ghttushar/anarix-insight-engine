@@ -15,6 +15,7 @@ import { TablePagination } from "./TablePagination";
 interface AdGroupsTableProps {
   searchQuery?: string;
   showDeltas?: boolean;
+  onRowClick?: (adGroup: typeof import("@/data/mockAdGroups").mockAdGroups[0]) => void;
 }
 
 export function AdGroupsTable({ searchQuery = "", showDeltas = false }: AdGroupsTableProps) {
