@@ -29,6 +29,7 @@ interface CampaignTableProps {
   viewMode?: "view" | "edit";
   onRowClick?: (id: string) => void;
   hiddenColumns?: Set<string>;
+  showDeltas?: boolean;
 }
 
 type SortField = keyof Campaign | null;
@@ -100,6 +101,7 @@ export function CampaignTable({
   viewMode = "view",
   onRowClick,
   hiddenColumns,
+  showDeltas = false,
 }: CampaignTableProps) {
   const { formatCurrency } = useCurrency();
   const show = (col: string) => !hiddenColumns?.has(col);
@@ -142,6 +144,7 @@ export function CampaignTable({
               <TableRow className="bg-muted">
               {isEdit && show("active") && <TableHead className="w-16">Active</TableHead>}
               {show("status") && <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>}
+              {show("type") && <TableHead className="w-24">Type</TableHead>}
               {show("name") && <TableHead className={cn("min-w-[200px] cursor-pointer sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
                 <div className="flex items-center gap-1">Campaign Name <SortIcon field="name" /></div>
               </TableHead>}
@@ -202,6 +205,18 @@ export function CampaignTable({
                       </TableCell>
                     )}
                     {show("status") && <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={campaign.status} /></TableCell>}
+                    {show("type") && (
+                      <TableCell>
+                        <span className={cn(
+                          "rounded-full px-2.5 py-0.5 text-xs font-medium border",
+                          campaign.type === "auto"
+                            ? "border-primary/30 text-primary bg-primary/5"
+                            : "border-border text-foreground bg-muted"
+                        )}>
+                          {campaign.type === "auto" ? "Auto" : "Manual"}
+                        </span>
+                      </TableCell>
+                    )}
                     {show("name") && <TableCell className={cn("font-medium sticky z-10 bg-background group-hover:bg-muted transition-colors", isEdit ? "left-[64px]" : "left-[112px]")}>
                       {isEdit ? (
                         <Input defaultValue={campaign.name} className="h-8 text-sm" onBlur={(e) => onCampaignUpdate?.(campaign.id, { name: e.target.value })} onClick={(e) => e.stopPropagation()} />
@@ -244,7 +259,7 @@ export function CampaignTable({
                       ) : (
                         <div className="flex flex-col items-end">
                           <span className="text-foreground">{formatCurrency(campaign.dailyBudget)}</span>
-                          <DeltaBadge value={getDelta(campaign.id, 'dailyBudget')} />
+                          {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'dailyBudget')} />}
                         </div>
                       )}
                     </TableCell>}
@@ -258,43 +273,43 @@ export function CampaignTable({
                     {show("spend") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatCurrency(campaign.spend)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'spend')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'spend')} />}
                       </div>
                     </TableCell>}
                     {show("sales") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatCurrency(campaign.sales)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'sales')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'sales')} />}
                       </div>
                     </TableCell>}
                     {show("roas") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{campaign.roas.toFixed(2)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'roas')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'roas')} />}
                       </div>
                     </TableCell>}
                     {show("impressions") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatNumber(campaign.impressions)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'impressions')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'impressions')} />}
                       </div>
                     </TableCell>}
                     {show("clicks") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatNumber(campaign.clicks)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'clicks')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'clicks')} />}
                       </div>
                     </TableCell>}
                     {show("ctr") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatPercent(campaign.ctr)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'ctr')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'ctr')} />}
                       </div>
                     </TableCell>}
                     {show("acos") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatPercent(campaign.acos)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'acos')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'acos')} />}
                       </div>
                     </TableCell>}
                   </TableRow>

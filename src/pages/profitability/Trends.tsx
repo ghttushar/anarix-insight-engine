@@ -37,6 +37,7 @@ export default function ProfitabilityTrends() {
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDeltas, setShowDeltas] = useState(false);
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -91,6 +92,8 @@ export default function ProfitabilityTrends() {
             onFiltersChange={setActiveFilters}
             filterFields={FILTER_FIELDS}
             onDownload={handleDownload}
+            showDeltas={showDeltas}
+            onShowDeltasChange={setShowDeltas}
           />
           <div className="rounded-lg border border-border">
           <div className="overflow-x-auto">

@@ -47,7 +47,8 @@ const tabs = [
 
 const COLUMN_DEFS: Record<string, { id: string; label: string }[]> = {
   campaigns: [
-    { id: "active", label: "Active" }, { id: "status", label: "Status" }, { id: "name", label: "Campaign Name" },
+    { id: "active", label: "Active" }, { id: "status", label: "Status" }, { id: "type", label: "Type" },
+    { id: "name", label: "Campaign Name" },
     { id: "startDate", label: "Start Date" }, { id: "endDate", label: "End Date" },
     { id: "biddingStrategy", label: "Bidding Strategy" }, { id: "dailyBudget", label: "Budget" },
     { id: "totalBudget", label: "Total Budget" }, { id: "spend", label: "Spend" },
@@ -190,7 +191,7 @@ export default function CampaignManager() {
 
   const renderTable = () => {
     switch (activeTab) {
-      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} onRowClick={(id) => navigate(`/advertising/campaigns/${id}`)} hiddenColumns={hiddenColumns} />;
+      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} onRowClick={(id) => navigate(`/advertising/campaigns/${id}`)} hiddenColumns={hiddenColumns} showDeltas={showDeltas} />;
       case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} showDeltas={showDeltas} />;

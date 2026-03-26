@@ -153,25 +153,11 @@ export function DataTableToolbar({
 
   return (
     <div className="space-y-1.5">
-      {/* Main Toolbar Row — Order: [leftContent] | [Upload] | [Search] | [Delta] | [Filter] | [Columns] | [Export] | [Edit] */}
+      {/* Main Toolbar Row — Order: [leftContent | Search] LEFT — [Upload | Delta | Filter | Columns | Export | Edit] RIGHT */}
       <div className="flex items-center justify-between gap-2">
-        {/* Left Side: leftContent + Upload + Search */}
+        {/* Left Side: leftContent + Search */}
         <div className="flex items-center gap-2">
           {leftContent}
-
-          {/* Upload Button */}
-          {(showUpload || onUpload) && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1 text-xs cursor-pointer"
-              onClick={() => setUploadOpen(true)}
-              title="Upload files"
-            >
-              <Upload className="h-3.5 w-3.5" />
-              Upload
-            </Button>
-          )}
 
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -184,9 +170,23 @@ export function DataTableToolbar({
           </div>
         </div>
 
-        {/* Right Side: rightContent → Delta → Filter → Columns → Export → Edit */}
+        {/* Right Side: Upload → Delta → Filter → Columns → Export → Edit */}
         <div className="flex items-center gap-1">
           {rightContent}
+
+          {/* Upload Button — right side */}
+          {(showUpload || onUpload) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1 text-xs cursor-pointer"
+              onClick={() => setUploadOpen(true)}
+              title={uploadTitle || "Upload files"}
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Upload
+            </Button>
+          )}
 
           {/* Delta Toggle — icon button */}
           {onShowDeltasChange !== undefined && (
