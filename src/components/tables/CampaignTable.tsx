@@ -291,7 +291,7 @@ export function CampaignTable({
                     {show("impressions") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatNumber(campaign.impressions)}</span>
-                        <DeltaBadge value={getDelta(campaign.id, 'impressions')} />
+                        {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'impressions')} />}
                       </div>
                     </TableCell>}
                     {show("clicks") && <TableCell className="text-right">
