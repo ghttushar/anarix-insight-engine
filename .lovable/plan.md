@@ -1,108 +1,128 @@
 
 
-## Critical Fix: All Outstanding Requirements — Final Comprehensive Implementation
+## Comprehensive Fix: Toolbar Consistency, Aan Redesign, Table Styling, Upload Dialog
 
-### Audit Summary: What's Actually Missing
-
-After thorough codebase analysis, here is the truth of what exists vs what's broken:
-
-**Actually implemented:**
-- Pagination (`TablePagination`) IS in all table components (AdGroups, Keywords, SearchTerms, ProductAds, ProductTargeting, PageType, Platform, Regional, ScheduledJobs, History, BrandCoverage, KeywordTracker, Impact, ProductsPnL)
-- Delta toggle state IS wired in CampaignManager, CampaignDetail, AdGroupDetail, TargetingActions, KeywordTracker, HourlyData, ProfitLoss, Dashboard
-- CreateSchedulePanel IS rendered as flex sibling in HourlyData and ScheduledJobs
-- InlineKPIStrip already supports 5 items with Prev subtitle
-
-**Actually broken / never done:**
-1. **3-level campaign hierarchy**: CampaignDetail only has 2 levels (Campaign > AdGroup). Missing Campaign > AdGroup > ProductAd (3rd level with its own detail page)
-2. **Floating island NOT draggable**: Still has X close button, no GripVertical drag handle
-3. **Toolbar button order wrong**: Current order is `leftContent | Search | ... | Deltas | Columns | Filter | Download | Edit`. Required: `Create | Upload | Search | Delta | Filter | Columns | Export | Edit`
-4. **Create buttons NOT in toolbar**: CampaignManager has Create Campaign as a standalone button ABOVE the toolbar (line 218-223), not inside it
-5. **Upload button missing**: No upload dialog with drag-and-drop anywhere in toolbar
-6. **Edit mode has NO save confirmation**: Pencil toggle just switches mode silently
-7. **Delta toggle not passed to child tables**: Pages pass `showDeltas` to `DataTableToolbar` but NOT to the table components (e.g., CampaignDetail renders `<AdGroupsTable searchQuery={searchQuery} />` without `showDeltas`)
-8. **BrandSOV, KeywordSOV, ProductSOV, CompetitorPricing** pages have NO DataTableToolbar at all — no delta toggle
-9. **Right panels NOT independently scrolling**: CreateSchedulePanel uses `ScrollArea` but the outer `div` with `flex h-full` may not constrain height properly when parent scrolls
-10. **Orders view in profitability**: ProductsPnLTable has orders mode but styling may not match expectations
-11. **Show Impact toggle NOT in chart toolbar**: It's rendered separately, needs to be inside ChartContainer's toolbar on the left of metric selector
+This plan addresses all outstanding issues across the entire application in 3 phases.
 
 ---
 
-### Phase 1: Toolbar Contract + Create in Toolbar + Upload Dialog + Edit Confirmation
+### Issues Identified (Audit)
 
-**Files: `DataTableToolbar.tsx`, `CampaignManager.tsx`, all pages with toolbars**
-
-1. **Reorder toolbar buttons**: `[leftContent(Create/Upload)] | [Search] | [Delta] | [Filter] | [Columns] | [Export] | [Edit]`
-2. **Add `onUpload` prop** to DataTableToolbar — renders Upload icon button that opens new `UploadDialog`
-3. **Create `UploadDialog.tsx`** — modal with drag-and-drop zone, file list, upload/cancel buttons
-4. **Edit save confirmation**: When edit mode toggles OFF, show AlertDialog "Save changes?" with list + Save/Discard buttons
-5. **Move Create Campaign button** into toolbar's `leftContent` in CampaignManager
-6. **Wire `showDeltas` from pages to child table components** on ALL pages (CampaignManager, CampaignDetail, AdGroupDetail, etc.)
-7. **Add DataTableToolbar** to BrandSOV, KeywordSOV, ProductSOV, CompetitorPricing pages with delta toggle
-
-### Phase 2: 3-Level Campaign Hierarchy
-
-**Files: `App.tsx`, `AdGroupDetail.tsx`, new `ProductAdDetail.tsx`**
-
-1. **CampaignDetail** (Level 1): Click campaign row → shows Campaign info, tabs: Ad Groups, Product Ads, Keywords, Search Terms
-2. **AdGroupDetail** (Level 2): Click ad group row → shows AdGroup info, tabs: Product Ads, Keywords, Search Terms. Breadcrumb: Advertising > Campaign > AdGroup
-3. **ProductAdDetail** (Level 3 — NEW): Click product ad row → shows Product Ad info. Breadcrumb: Advertising > Campaign > AdGroup > Product Ad. Add Product Ad button available here
-4. Add route `/advertising/campaigns/:campaignId/ad-groups/:adGroupId/product-ads/:productAdId`
-5. Each level has its own InlineKPIStrip with level-appropriate data and its own edit dialog
-
-### Phase 3: Floating Island Draggable + Show Impact in Chart + Right Panel Independent Scroll
-
-**Files: `FloatingActionIsland.tsx`, `PerformanceChart.tsx`/`ChartContainer.tsx`, panel components**
-
-1. **Floating Island**: Replace X with `GripVertical`. Add `onMouseDown` drag handler, track position with `useState({ x, y })`, apply via `style={{ left, top }}` instead of centering. Remove close/reopen logic entirely
-2. **Show Impact toggle**: Move into `ChartContainer` toolbar, left of metric selector. Remove from standalone position in pages
-3. **Right panel scroll fix**: Ensure all right panels have parent container with `h-full` and panel itself uses `position: sticky` or the flex parent constrains height via `min-h-0 overflow-hidden`
-
-### Phase 4: Full Screen-by-Screen Audit + Verification Report
-
-After implementation, audit every screen:
-
-| Screen | Create in Toolbar | Delta Toggle | Pagination | Upload | Edit Confirm | Panel Scroll |
-|---|---|---|---|---|---|---|
-| Campaign Manager | Create Campaign | yes | yes | yes | yes | yes |
-| Campaign Detail | — | yes→table | yes | — | yes | — |
-| Ad Group Detail | — | yes→table | yes | — | yes | — |
-| Product Ad Detail | Add Product Ad | yes→table | yes | — | — | — |
-| Targeting Actions | Add Keyword | yes | yes | — | — | — |
-| Day Parting Hourly | Create Rule | yes | yes | — | — | yes |
-| Scheduled Jobs | Create Schedule | yes | yes | — | — | yes |
-| Budget Pacing | — | yes | yes | — | — | — |
-| Profitability Dash | — | yes | yes | Upload COGS | — | yes |
-| Profit & Loss | — | yes | yes | — | — | yes |
-| Brand SOV | — | yes | yes | — | — | — |
-| Keyword Tracker | Add Keyword | yes | yes | — | — | — |
-| Keyword/Product SOV | — | yes | yes | — | — | — |
-| Competitor Pricing | — | yes | yes | — | — | — |
-
-Post-implementation: detailed changes report listing every file modified and what was verified.
+1. **Profitability Dashboard toolbar**: Upload COGS and Export are custom `rightContent` buttons (different style), not using the built-in toolbar props. No upload dialog popup.
+2. **Campaign Manager**: Upload button is on left side (inside toolbar `leftContent` slot via `showUpload`). Should be on right side. Only Create + Products/Orders toggle + Search should be left.
+3. **CampaignTable**: No `type` column (Auto/Manual badge) — completely missing. Image-143 shows it should exist.
+4. **Auto/Manual badge**: In light mode, if using `bg-muted text-muted-foreground`, the "Manual" tag is invisible.
+5. **Delta toggle in CampaignTable**: DeltaBadges are hardcoded (always shown), not controlled by `showDeltas` prop from parent.
+6. **Add Product Ad button**: Not functional — no modal wired.
+7. **Aan workspace**: Has a top header bar with Hide/X buttons — user wants this removed.
+8. **Aan sidebar (MiniSidebar)**: Should match main AppSidebar style (logo placement, collapse button).
+9. **Aan prompt suggestion**: After AI response, show a gradient notch below the input with a bulb icon + suggested prompt + X to close.
+10. **Aan stop button**: No way to cancel generation.
+11. **Aan copilot**: Same prompt suggestion notch needed.
 
 ---
 
-### Files Summary
+### Phase 1: Toolbar Standardization + Upload Dialog + Type Column + Delta Control
 
-| File | Phase | Change |
-|---|---|---|
-| `DataTableToolbar.tsx` | 1 | Reorder buttons, add onUpload prop, edit save confirmation dialog |
-| `UploadDialog.tsx` | 1 | **NEW** — drag-and-drop upload modal |
-| `CampaignManager.tsx` | 1 | Move Create into toolbar leftContent, pass showDeltas to tables |
-| `CampaignDetail.tsx` | 1,2 | Pass showDeltas to tables, wire AdGroup click to level 2 |
-| `AdGroupDetail.tsx` | 1,2 | Pass showDeltas to tables, wire ProductAd click to level 3 |
-| `ProductAdDetail.tsx` | 2 | **NEW** — Level 3 detail page |
-| `App.tsx` | 2 | Add route for product ad detail |
-| `BrandSOV.tsx` | 1 | Add DataTableToolbar with delta toggle |
-| `KeywordSOV.tsx` | 1 | Add DataTableToolbar with delta toggle |
-| `ProductSOV.tsx` | 1 | Add DataTableToolbar with delta toggle |
-| `CompetitorPricing.tsx` | 1 | Add DataTableToolbar with delta toggle |
-| `FloatingActionIsland.tsx` | 3 | Draggable with GripVertical, remove close logic |
-| `ChartContainer.tsx` | 3 | Add showImpact toggle prop to chart toolbar |
-| `PerformanceChart.tsx` | 3 | Pass showImpact to ChartContainer instead of standalone |
-| `CreateSchedulePanel.tsx` | 3 | Fix independent scroll container |
-| `CreateCampaignPanel.tsx` | 3 | Fix independent scroll container |
-| `ProductDetailPanel.tsx` | 3 | Fix independent scroll container |
-| `PeriodBreakdownPanel.tsx` | 3 | Fix independent scroll container |
-| All table components | 1 | Accept and use showDeltas prop from parent |
+**DataTableToolbar.tsx** — Move Upload to right side (after rightContent, before Delta). Remove it from left section.
+
+**Dashboard.tsx (profitability)** — Remove custom `rightContent` with Upload COGS / Export buttons. Instead use built-in toolbar props:
+- `leftContent`: ProductsOrdersToggle only
+- `showUpload`: true, `onUpload`: handler, `uploadTitle`: "Upload COGS"
+- `onDownload`: handler
+- Remove the old `handleUploadCOGS` function
+
+**CampaignManager.tsx** — Move `showUpload`/`onUpload` to right side (already in toolbar props, just need toolbar to render it on right). `leftContent` should only have Create Campaign button.
+
+**CampaignTable.tsx** — Add `type` column after Status showing Auto/Manual badge. Add `showDeltas` prop — wrap DeltaBadge renders in `{showDeltas && ...}` conditionals. Pass from CampaignManager.
+
+**Auto/Manual Badge styling** — Use `border` variant with explicit colors: Auto = `border-primary text-primary bg-primary/5`, Manual = `border-border text-foreground bg-muted`.
+
+**All other pages** — Audit and ensure toolbar uses built-in props consistently (Trends, ProfitLoss, Geographical, all BI pages, DayParting, Catalog). Remove any custom rightContent buttons that duplicate built-in Upload/Export.
+
+**ProductAdDetail.tsx** — Wire Add Product Ad button to open `AddProductAdsModal`.
+
+**Files:**
+| File | Change |
+|---|---|
+| `DataTableToolbar.tsx` | Move Upload button from left to right section |
+| `Dashboard.tsx` (profitability) | Use built-in toolbar props, remove custom buttons |
+| `CampaignManager.tsx` | Clean leftContent (Create only) |
+| `CampaignTable.tsx` | Add type column, add showDeltas prop |
+| `ProductAdDetail.tsx` | Wire AddProductAdsModal |
+| `Trends.tsx` | Standardize toolbar |
+| `ProfitLoss.tsx` | Standardize toolbar |
+| `Geographical.tsx` | Standardize toolbar |
+| All BI pages | Verify toolbar consistency |
+
+---
+
+### Phase 2: Aan Workspace Redesign + Prompt Suggestions + Stop Button
+
+**AanWorkspace.tsx** — Remove the top header bar entirely (the one with Sparkles/Aan/Hide/X). The MiniSidebar handles navigation. Workspace should be just: MiniSidebar | [Sidebar] | [Chat + Input] | [ArtifactViewer].
+
+**MiniSidebar.tsx** — Redesign to match main AppSidebar:
+- Add logo at top (same as AppSidebar collapsed state)
+- Add collapse/expand toggle
+- When expanded: show full nav groups like AppSidebar (w-56)
+- When collapsed: icon-only (w-14) as current
+- Add "close Aan" button in footer area
+- Remove the separate header bar from AanWorkspace
+
+**AanInput.tsx** — Add:
+1. **Stop button**: When `isLoading`, show a red "Stop" button that clears timers and stops generation.
+2. **Prompt suggestion notch**: After assistant response, show a small bar below input with `Lightbulb` icon, suggested prompt text, gradient background (same as Ask Aan button: `border border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5`), and X to dismiss.
+
+**AanCopilotPanel.tsx** — Same prompt suggestion notch below the AanInput.
+
+**Files:**
+| File | Change |
+|---|---|
+| `AanWorkspace.tsx` | Remove header bar, let MiniSidebar handle all nav |
+| `MiniSidebar.tsx` | Add expand/collapse, match AppSidebar style, add close Aan |
+| `AanInput.tsx` | Add stop button + prompt suggestion notch |
+| `AanCopilotPanel.tsx` | Ensure prompt suggestion visible |
+
+---
+
+### Phase 3: Color/Font Audit + Full Verification Report
+
+Systematic review of every screen:
+- Verify toolbar button order: `[Create/Toggle] | [Search]` LEFT — `[Upload] | [Delta] | [Filter] | [Columns] | [Export] | [Edit]` RIGHT
+- Verify delta toggle controls only the table below
+- Verify Auto/Manual badges visible in both light and dark mode
+- Verify upload popup opens with drag-and-drop
+- Verify all fonts use Satoshi (headings) / Noto Sans (body)
+- Verify color consistency (text-foreground for data, text-muted-foreground for labels)
+- Post-build changes report
+
+**Screens to verify:**
+Profitability (Dashboard, Trends, P&L, Geographical), Advertising (Campaign Manager, Campaign Detail, AdGroup Detail, ProductAd Detail, Impact Analysis, Targeting Actions), Catalog, Day Parting (all), Business Intelligence (all), AMC (all)
+
+---
+
+### Technical Details
+
+**Toolbar layout change** — In `DataTableToolbar.tsx`, the Upload button currently sits in the left `div` (line 162-174). Move it to right `div` (line 187), before the Delta toggle.
+
+**CampaignTable type column** — Insert after `show("status")` column. Render:
+```tsx
+{show("type") && (
+  <TableCell>
+    <span className={cn(
+      "rounded-full px-2.5 py-0.5 text-xs font-medium border",
+      campaign.type === "auto" 
+        ? "border-primary/30 text-primary bg-primary/5" 
+        : "border-border text-foreground bg-muted"
+    )}>
+      {campaign.type === "auto" ? "Auto" : "Manual"}
+    </span>
+  </TableCell>
+)}
+```
+
+**Prompt suggestion mock data** — Array of suggestions rotated after each response:
+```
+["Optimize my top spending campaigns", "Show me wasted spend analysis", "Compare this week vs last week"]
+```
 
