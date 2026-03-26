@@ -7,6 +7,7 @@ import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { PerformanceChart } from "@/components/charts/PerformanceChart";
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
+import { AddProductAdsModal } from "@/components/advertising/AddProductAdsModal";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { mockAdGroups } from "@/data/mockAdGroups";
 import { mockProductAds } from "@/data/mockProductAds";
@@ -14,7 +15,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/status/StatusBadge";
-import { Play, Pencil } from "lucide-react";
+import { Play, Pencil, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ export default function ProductAdDetail() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [addProductAdOpen, setAddProductAdOpen] = useState(false);
 
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
   const adGroup = mockAdGroups.find((ag) => ag.id === adGroupId);
@@ -124,10 +126,17 @@ export default function ProductAdDetail() {
           onDownload={() => toast.success("Exporting data as CSV...")}
           showDeltas={showDeltas}
           onShowDeltasChange={setShowDeltas}
+          leftContent={
+            <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setAddProductAdOpen(true)}>
+              <Plus className="h-3.5 w-3.5" />Add Product Ad
+            </Button>
+          }
         />
 
         <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />
       </div>
+
+      <AddProductAdsModal open={addProductAdOpen} onOpenChange={setAddProductAdOpen} />
     </AppLayout>
   );
 }
