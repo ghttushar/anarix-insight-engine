@@ -117,7 +117,7 @@ export default function AdGroupDetail() {
           onShowDeltasChange={setShowDeltas}
           leftContent={
             activeTab === "product-ads" ? (
-              <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => toast.info("Add Product Ad panel coming soon")}>
+              <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setAddProductAdOpen(true)}>
                 <Plus className="h-3.5 w-3.5" />Add Product Ad
               </Button>
             ) : undefined
