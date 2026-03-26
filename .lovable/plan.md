@@ -1,128 +1,141 @@
 
 
-## Comprehensive Fix: Toolbar Consistency, Aan Redesign, Table Styling, Upload Dialog
+## 3-Bar Architecture Redesign + Table Backgrounds + Column Pinning
 
-This plan addresses all outstanding issues across the entire application in 3 phases.
+### Architecture: 3 Control Bars
 
----
+The current system uses 2 bars: `AppTaskbar` (page-level filters + marketplace selector) and `DataTableToolbar` (table controls). The user wants 3 distinct bars:
 
-### Issues Identified (Audit)
+1. **App Level Metric Selector** (NEW) — sits top-right against the page title inside `PageHeader`. Contains global selectors like Marketplace and Ad Type/Catalogue.
+2. **Page Level Metric Selector** — replaces current `AppTaskbar`. Contains page-specific controls (date range, frequency, metrics, run button, search). No marketplace selector here anymore.
+3. **Table Toolbar** — current `DataTableToolbar`, keeps its role but per-page button sets are redefined.
 
-1. **Profitability Dashboard toolbar**: Upload COGS and Export are custom `rightContent` buttons (different style), not using the built-in toolbar props. No upload dialog popup.
-2. **Campaign Manager**: Upload button is on left side (inside toolbar `leftContent` slot via `showUpload`). Should be on right side. Only Create + Products/Orders toggle + Search should be left.
-3. **CampaignTable**: No `type` column (Auto/Manual badge) — completely missing. Image-143 shows it should exist.
-4. **Auto/Manual badge**: In light mode, if using `bg-muted text-muted-foreground`, the "Manual" tag is invisible.
-5. **Delta toggle in CampaignTable**: DeltaBadges are hardcoded (always shown), not controlled by `showDeltas` prop from parent.
-6. **Add Product Ad button**: Not functional — no modal wired.
-7. **Aan workspace**: Has a top header bar with Hide/X buttons — user wants this removed.
-8. **Aan sidebar (MiniSidebar)**: Should match main AppSidebar style (logo placement, collapse button).
-9. **Aan prompt suggestion**: After AI response, show a gradient notch below the input with a bulb icon + suggested prompt + X to close.
-10. **Aan stop button**: No way to cancel generation.
-11. **Aan copilot**: Same prompt suggestion notch needed.
+Plus: all tables/charts get `bg-card` background, and tables get a column pin feature.
 
 ---
 
-### Phase 1: Toolbar Standardization + Upload Dialog + Type Column + Delta Control
+### Phase 1: Create App Level Metric Selector + Restructure PageHeader + Refactor AppTaskbar
 
-**DataTableToolbar.tsx** — Move Upload to right side (after rightContent, before Delta). Remove it from left section.
+**New Component: `AppLevelSelector.tsx`**
+- Renders inside `PageHeader` on the right side (where `actions` currently goes)
+- Extracts Marketplace/Store selector FROM `AppTaskbar` INTO this component
+- Accepts `children` for page-specific items (Ad Type, Catalogue selector)
+- Same visual style as current marketplace dropdown but compact
 
-**Dashboard.tsx (profitability)** — Remove custom `rightContent` with Upload COGS / Export buttons. Instead use built-in toolbar props:
-- `leftContent`: ProductsOrdersToggle only
-- `showUpload`: true, `onUpload`: handler, `uploadTitle`: "Upload COGS"
-- `onDownload`: handler
-- Remove the old `handleUploadCOGS` function
+**Modify `PageHeader.tsx`**
+- Replace `actions` prop with `appLevelSelector` prop (ReactNode)
+- Layout: Title/subtitle LEFT, app level selector RIGHT
 
-**CampaignManager.tsx** — Move `showUpload`/`onUpload` to right side (already in toolbar props, just need toolbar to render it on right). `leftContent` should only have Create Campaign button.
+**Modify `AppTaskbar.tsx`**
+- Remove marketplace/store selector (moved to app level)
+- Remove `showAdType` (moved to app level)
+- Keep as page-level bar: date range, frequency, and children
+- Rename conceptually to "Page Level Metric Selector"
 
-**CampaignTable.tsx** — Add `type` column after Status showing Auto/Manual badge. Add `showDeltas` prop — wrap DeltaBadge renders in `{showDeltas && ...}` conditionals. Pass from CampaignManager.
+**Per-page app level content:**
 
-**Auto/Manual Badge styling** — Use `border` variant with explicit colors: Auto = `border-primary text-primary bg-primary/5`, Manual = `border-border text-foreground bg-muted`.
-
-**All other pages** — Audit and ensure toolbar uses built-in props consistently (Trends, ProfitLoss, Geographical, all BI pages, DayParting, Catalog). Remove any custom rightContent buttons that duplicate built-in Upload/Export.
-
-**ProductAdDetail.tsx** — Wire Add Product Ad button to open `AddProductAdsModal`.
-
-**Files:**
-| File | Change |
+| Page | App Level Items |
 |---|---|
-| `DataTableToolbar.tsx` | Move Upload button from left to right section |
-| `Dashboard.tsx` (profitability) | Use built-in toolbar props, remove custom buttons |
-| `CampaignManager.tsx` | Clean leftContent (Create only) |
-| `CampaignTable.tsx` | Add type column, add showDeltas prop |
-| `ProductAdDetail.tsx` | Wire AddProductAdsModal |
-| `Trends.tsx` | Standardize toolbar |
-| `ProfitLoss.tsx` | Standardize toolbar |
-| `Geographical.tsx` | Standardize toolbar |
-| All BI pages | Verify toolbar consistency |
+| Profitability Dashboard | Marketplace, Catalogue |
+| Profitability Trends | Marketplace, Catalogue |
+| Profit & Loss | Marketplace, Catalogue |
+| Geographical | Marketplace, Catalogue |
+| Campaign Manager | Marketplace, Ad Type |
+| Impact Analysis | Marketplace, Ad Type |
+| Targeting Actions | Marketplace |
+| Day Parting | Marketplace, Ad Type |
+| History | Marketplace, Ad Type |
+| Scheduled Jobs | Marketplace, Ad Type |
+| Catalog | Marketplace, Account |
+| All BI pages | Marketplace |
 
----
+**Per-page page-level content (AppTaskbar children):**
 
-### Phase 2: Aan Workspace Redesign + Prompt Suggestions + Stop Button
-
-**AanWorkspace.tsx** — Remove the top header bar entirely (the one with Sparkles/Aan/Hide/X). The MiniSidebar handles navigation. Workspace should be just: MiniSidebar | [Sidebar] | [Chat + Input] | [ArtifactViewer].
-
-**MiniSidebar.tsx** — Redesign to match main AppSidebar:
-- Add logo at top (same as AppSidebar collapsed state)
-- Add collapse/expand toggle
-- When expanded: show full nav groups like AppSidebar (w-56)
-- When collapsed: icon-only (w-14) as current
-- Add "close Aan" button in footer area
-- Remove the separate header bar from AanWorkspace
-
-**AanInput.tsx** — Add:
-1. **Stop button**: When `isLoading`, show a red "Stop" button that clears timers and stops generation.
-2. **Prompt suggestion notch**: After assistant response, show a small bar below input with `Lightbulb` icon, suggested prompt text, gradient background (same as Ask Aan button: `border border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5`), and X to dismiss.
-
-**AanCopilotPanel.tsx** — Same prompt suggestion notch below the AanInput.
-
-**Files:**
-| File | Change |
+| Page | Page Level Items |
 |---|---|
-| `AanWorkspace.tsx` | Remove header bar, let MiniSidebar handle all nav |
-| `MiniSidebar.tsx` | Add expand/collapse, match AppSidebar style, add close Aan |
-| `AanInput.tsx` | Add stop button + prompt suggestion notch |
-| `AanCopilotPanel.tsx` | Ensure prompt suggestion visible |
+| Prof. Dashboard | Date Range, Run |
+| Prof. Trends | Search, Date Range, Metrics, Run, Export |
+| Profit & Loss | Search, Date Range, Run, Export |
+| Campaign Manager | Frequency, Date Range, Run |
+| Impact Analysis | Baseline vs Impact periods, Metrics, Run |
+| Targeting Actions | Action Type, Date Range, Priority, Fetch |
+| Day Parting | Campaign selector, Metrics, Date Range, Run |
+| History | Search |
+| Scheduled Jobs | (empty — no page-level bar needed) |
+| Catalog | Search, Date Range, Run |
+| Brand SOV | Keyword search, Date Range, Position, Frequency, Run |
+| Keyword/Product SOV, Competitor | (current children stay) |
+
+### Phase 2: Redefine Table Toolbar Per Page
+
+Strip each page's `DataTableToolbar` to ONLY the buttons specified:
+
+| Page | Left | Right |
+|---|---|---|
+| Prof. Dashboard | Product/Orders, Search | Upload COGS, Delta, Filter, Column, Export |
+| Prof. Trends | (none — no table toolbar, data viz has its own) | — |
+| Profit & Loss | Product/Order, Search | Delta, Filter, Column, Export |
+| Campaign Manager | Search | Create, Delta, Filter, Column, Export, Edit |
+| Impact Analysis | Search | Filter, Column, Export |
+| Targeting Actions | Search | Custom Bid, Create, Archive, Filter, Column, Export, Edit |
+| Day Parting | Search (in campaigns table) | Create Rule (leftContent stays) |
+| Scheduled Jobs | Search | Create Schedule |
+| Catalog | — | Upload COGS, Delta, Filter, Column, Export |
+| Brand SOV | Search | Delta, Export |
+| Keyword SOV | Search | Delta, Export |
+| Product SOV | Search | Delta, Export |
+| Competitor | Search | Delta, Export |
+| Keyword Tracker | Search | Create (Add Keyword), Delta, Export |
+
+### Phase 3: Table/Chart Backgrounds + Column Pinning
+
+**Backgrounds:**
+- All `<div className="rounded-lg border border-border">` table wrappers → add `bg-card`
+- All chart containers → add `bg-card` if not already
+
+**Column Pinning:**
+- Add pin icon to table column headers (small `Pin` icon on hover)
+- Pinned columns get `sticky left-[offset]` with `z-10 bg-background`
+- Track pinned columns in state per table
+- Add to `DataTableToolbar` columns dropdown: pin toggle per column
+
+### Phase 4: Data Visualization Toolbar for Trends
+
+For Profitability Trends scatter chart, add a mini toolbar:
+- Drag selector zoom, +, -, Reset, Full view
+- Similar to ChartContainer expand pattern
+
+Also for Profit & Loss top PnL table: add Frequency toggle (Daily/Weekly/Monthly)
 
 ---
 
-### Phase 3: Color/Font Audit + Full Verification Report
+### Files Summary
 
-Systematic review of every screen:
-- Verify toolbar button order: `[Create/Toggle] | [Search]` LEFT — `[Upload] | [Delta] | [Filter] | [Columns] | [Export] | [Edit]` RIGHT
-- Verify delta toggle controls only the table below
-- Verify Auto/Manual badges visible in both light and dark mode
-- Verify upload popup opens with drag-and-drop
-- Verify all fonts use Satoshi (headings) / Noto Sans (body)
-- Verify color consistency (text-foreground for data, text-muted-foreground for labels)
-- Post-build changes report
+| File | Phase | Change |
+|---|---|---|
+| `AppLevelSelector.tsx` | 1 | **NEW** — Marketplace + page-specific selectors |
+| `PageHeader.tsx` | 1 | Add `appLevelSelector` prop, layout change |
+| `AppTaskbar.tsx` | 1 | Remove marketplace selector, remove showAdType |
+| `Dashboard.tsx` (profitability) | 1,2 | Wire app level + page level + table toolbar |
+| `Trends.tsx` | 1,2 | Wire app level + page level, add data viz toolbar |
+| `ProfitLoss.tsx` | 1,2 | Wire app level + page level + frequency toggle + table toolbar |
+| `Geographical.tsx` | 1,2 | Wire app level + page level + table toolbar |
+| `CampaignManager.tsx` | 1,2 | Wire app level (marketplace+ad type) + page level (freq+date+run) + table toolbar |
+| `ImpactAnalysis.tsx` | 1,2 | Wire app level + page level + table toolbar |
+| `TargetingActions.tsx` | 1,2 | Wire app level + page level + table toolbar |
+| `HourlyData.tsx` | 1,2 | Wire app level + page level + table toolbar |
+| `History.tsx` | 1,2 | Wire app level + page level |
+| `ScheduledJobs.tsx` | 1,2 | Wire app level + table toolbar |
+| `Products.tsx` (catalog) | 1,2 | Wire app level + page level + table toolbar |
+| `BrandSOV.tsx` | 1,2 | Wire app level + page level + table toolbar |
+| `KeywordSOV.tsx` | 1,2 | Wire app level + table toolbar |
+| `ProductSOV.tsx` | 1,2 | Wire app level + table toolbar |
+| `CompetitorPricing.tsx` | 1,2 | Wire app level + table toolbar |
+| `KeywordTracker.tsx` | 1,2 | Wire app level + table toolbar |
+| `UnifiedPnL.tsx` | 1 | Wire app level |
+| `DataTableToolbar.tsx` | 2 | No structural change, just per-page prop cleanup |
+| All table wrappers | 3 | Add `bg-card` |
+| Table column headers | 3 | Add pin feature (hover icon + sticky positioning) |
 
-**Screens to verify:**
-Profitability (Dashboard, Trends, P&L, Geographical), Advertising (Campaign Manager, Campaign Detail, AdGroup Detail, ProductAd Detail, Impact Analysis, Targeting Actions), Catalog, Day Parting (all), Business Intelligence (all), AMC (all)
-
----
-
-### Technical Details
-
-**Toolbar layout change** — In `DataTableToolbar.tsx`, the Upload button currently sits in the left `div` (line 162-174). Move it to right `div` (line 187), before the Delta toggle.
-
-**CampaignTable type column** — Insert after `show("status")` column. Render:
-```tsx
-{show("type") && (
-  <TableCell>
-    <span className={cn(
-      "rounded-full px-2.5 py-0.5 text-xs font-medium border",
-      campaign.type === "auto" 
-        ? "border-primary/30 text-primary bg-primary/5" 
-        : "border-border text-foreground bg-muted"
-    )}>
-      {campaign.type === "auto" ? "Auto" : "Manual"}
-    </span>
-  </TableCell>
-)}
-```
-
-**Prompt suggestion mock data** — Array of suggestions rotated after each response:
-```
-["Optimize my top spending campaigns", "Show me wasted spend analysis", "Compare this week vs last week"]
-```
+**Delivery:** Phase 1 + 2 together (app level + page level + table toolbar rewiring for all pages), then Phase 3 (backgrounds + column pinning).
 
