@@ -8,17 +8,21 @@ import { getDelta } from "@/lib/utils/deltaGenerator";
 import { GeographicalData } from "@/types/profitability";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { TablePagination } from "@/components/tables/TablePagination";
 
 interface RegionalTableProps {
   data: GeographicalData[];
   searchValue?: string;
+  showDeltas?: boolean;
 }
 
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
 
-export function RegionalTable({ data, searchValue = "" }: RegionalTableProps) {
+export function RegionalTable({ data, searchValue = "", showDeltas = false }: RegionalTableProps) {
   const { formatCurrency } = useCurrency();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) => {
@@ -33,10 +37,12 @@ export function RegionalTable({ data, searchValue = "" }: RegionalTableProps) {
     ? data.filter((r) => r.region.toLowerCase().includes(searchValue.toLowerCase()))
     : data;
 
+  const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   const NumCell = ({ value, formatted, id, metric }: { value: number; formatted: string; id: string; metric: string }) => (
     <div className="flex flex-col items-end">
       <span className="text-foreground">{formatted}</span>
-      <DeltaBadge value={getDelta(id, metric)} />
+      {showDeltas && <DeltaBadge value={getDelta(id, metric)} />}
     </div>
   );
 
@@ -77,23 +83,32 @@ export function RegionalTable({ data, searchValue = "" }: RegionalTableProps) {
   };
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted">
-            <TableHead className="sticky left-0 z-20 bg-muted min-w-[200px] border-r border-border">Region</TableHead>
-            <TableHead className="text-right">Stocks</TableHead>
-            <TableHead className="text-right">Orders</TableHead>
-            <TableHead className="text-right">Units Sold</TableHead>
-            <TableHead className="text-right">Refunds</TableHead>
-            <TableHead className="text-right">Sales</TableHead>
-            <TableHead className="text-right">Amazon Fees</TableHead>
-            <TableHead className="text-right">Sellable Returns</TableHead>
-            <TableHead className="text-center">Info</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>{filteredData.map((region) => renderRow(region))}</TableBody>
-      </Table>
+    <div className="rounded-lg border border-border">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted">
+              <TableHead className="sticky left-0 z-20 bg-muted min-w-[200px] border-r border-border">Region</TableHead>
+              <TableHead className="text-right">Stocks</TableHead>
+              <TableHead className="text-right">Orders</TableHead>
+              <TableHead className="text-right">Units Sold</TableHead>
+              <TableHead className="text-right">Refunds</TableHead>
+              <TableHead className="text-right">Sales</TableHead>
+              <TableHead className="text-right">Amazon Fees</TableHead>
+              <TableHead className="text-right">Sellable Returns</TableHead>
+              <TableHead className="text-center">Info</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>{paginatedData.map((region) => renderRow(region))}</TableBody>
+        </Table>
+      </div>
+      <TablePagination
+        page={currentPage}
+        pageSize={pageSize}
+        totalItems={filteredData.length}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
     </div>
   );
 }

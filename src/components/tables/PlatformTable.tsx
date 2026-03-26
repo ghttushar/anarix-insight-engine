@@ -1,5 +1,5 @@
-import { useCurrency } from "@/contexts/CurrencyContext";
 import { useState } from "react";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { Input } from "@/components/ui/input";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -7,12 +7,16 @@ import {
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockPlatforms, platformsTotals } from "@/data/mockPageTypePlatform";
+import { TablePagination } from "./TablePagination";
 
 interface PlatformTableProps {
   searchQuery?: string;
+  showDeltas?: boolean;
 }
 
-export function PlatformTable({ searchQuery = "" }: PlatformTableProps) {
+export function PlatformTable({ searchQuery = "", showDeltas = false }: PlatformTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const [bidModifiers, setBidModifiers] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
     mockPlatforms.forEach((p) => { initial[p.id] = p.bidModifier; });
@@ -23,6 +27,8 @@ export function PlatformTable({ searchQuery = "" }: PlatformTableProps) {
     p.platform.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const paginatedPlatforms = filteredPlatforms.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
@@ -30,7 +36,14 @@ export function PlatformTable({ searchQuery = "" }: PlatformTableProps) {
   const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
     <div className="flex flex-col items-end">
       <span className="text-foreground">{formatted}</span>
-      <DeltaBadge value={getDelta(id, metric)} />
+      {showDeltas && <DeltaBadge value={getDelta(id, metric)} />}
+    </div>
+  );
+
+  const TotalCell = ({ value, metric }: { value: string; metric: string }) => (
+    <div className="flex flex-col items-end">
+      <span className="text-foreground">{value}</span>
+      {showDeltas && <DeltaBadge value={getDelta("total", metric)} />}
     </div>
   );
 
@@ -53,7 +66,7 @@ export function PlatformTable({ searchQuery = "" }: PlatformTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredPlatforms.map((platform) => (
+            {paginatedPlatforms.map((platform) => (
               <TableRow key={platform.id}>
                 <TableCell className="font-medium text-foreground">{platform.platform}</TableCell>
                 <TableCell className="text-right">
@@ -74,18 +87,25 @@ export function PlatformTable({ searchQuery = "" }: PlatformTableProps) {
             ))}
             <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={2} className="font-semibold">Total ({filteredPlatforms.length} platforms)</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(platformsTotals.impressions)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(platformsTotals.clicks)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(platformsTotals.ctr)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(platformsTotals.cpc)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(platformsTotals.adSpend)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(platformsTotals.adSales)}</TableCell>
-              <TableCell className="text-right text-foreground">{platformsTotals.roas.toFixed(2)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(platformsTotals.acos)}</TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(platformsTotals.impressions)} metric="impressions" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(platformsTotals.clicks)} metric="clicks" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(platformsTotals.ctr)} metric="ctr" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(platformsTotals.cpc)} metric="cpc" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(platformsTotals.adSpend)} metric="adSpend" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(platformsTotals.adSales)} metric="adSales" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={platformsTotals.roas.toFixed(2)} metric="roas" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(platformsTotals.acos)} metric="acos" /></TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
+      <TablePagination
+        page={currentPage}
+        pageSize={pageSize}
+        totalItems={filteredPlatforms.length}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
     </div>
   );
 }

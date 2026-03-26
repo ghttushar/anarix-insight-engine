@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +10,11 @@ import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockProductTargets, productTargetsTotals } from "@/data/mockProductTargeting";
 import { cn } from "@/lib/utils";
+import { TablePagination } from "./TablePagination";
 
 interface ProductTargetingTableProps {
   searchQuery?: string;
+  showDeltas?: boolean;
 }
 
 const targetTypeColors: Record<string, string> = {
@@ -19,13 +22,18 @@ const targetTypeColors: Record<string, string> = {
   category: "bg-teal-500/10 text-teal-600 border-teal-500/20",
 };
 
-export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTableProps) {
+export function ProductTargetingTable({ searchQuery = "", showDeltas = false }: ProductTargetingTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
   const filteredTargets = mockProductTargets.filter((pt) =>
     pt.targetLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
     pt.targetValue.toLowerCase().includes(searchQuery.toLowerCase()) ||
     pt.adGroupName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     pt.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const paginatedTargets = filteredTargets.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
@@ -34,7 +42,14 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
   const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
     <div className="flex flex-col items-end">
       <span className="text-foreground">{formatted}</span>
-      <DeltaBadge value={getDelta(id, metric)} />
+      {showDeltas && <DeltaBadge value={getDelta(id, metric)} />}
+    </div>
+  );
+
+  const TotalCell = ({ value, metric }: { value: string; metric: string }) => (
+    <div className="flex flex-col items-end">
+      <span className="text-foreground">{value}</span>
+      {showDeltas && <DeltaBadge value={getDelta("total", metric)} />}
     </div>
   );
 
@@ -66,7 +81,7 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredTargets.map((target) => (
+            {paginatedTargets.map((target) => (
               <TableRow key={target.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
                 <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={target.status} /></TableCell>
                 <TableCell className="sticky left-[96px] z-10 bg-background group-hover:bg-muted transition-colors">
@@ -83,9 +98,7 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
                 <TableCell className="text-foreground">{target.adGroupName}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs border-secondary/30 bg-secondary/5 text-secondary-foreground">
-                      Manual
-                    </Badge>
+                    <Badge variant="outline" className="text-xs border-secondary/30 bg-secondary/5 text-secondary-foreground">Manual</Badge>
                     <span className="text-foreground">{target.campaignName}</span>
                   </div>
                 </TableCell>
@@ -101,26 +114,33 @@ export function ProductTargetingTable({ searchQuery = "" }: ProductTargetingTabl
                 <TableCell className="text-right"><NumCell formatted={formatCurrency(target.cpc)} id={target.id} metric="cpc" /></TableCell>
                 <TableCell className="text-right"><NumCell formatted={formatCurrency(target.adSpend)} id={target.id} metric="adSpend" /></TableCell>
                 <TableCell className="text-right"><NumCell formatted={formatCurrency(target.adSales)} id={target.id} metric="adSales" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={productTargetsTotals.roas ? target.roas.toFixed(2) : "0.00"} id={target.id} metric="roas" /></TableCell>
+                <TableCell className="text-right"><NumCell formatted={target.roas.toFixed(2)} id={target.id} metric="roas" /></TableCell>
                 <TableCell className="text-right"><NumCell formatted={formatPercent(target.acos)} id={target.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
             <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={9} className="font-semibold">Total ({filteredTargets.length} targets)</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(productTargetsTotals.impressions)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(productTargetsTotals.clicks)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(productTargetsTotals.ctr)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(productTargetsTotals.adUnits)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(productTargetsTotals.cvr)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(productTargetsTotals.cpc)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(productTargetsTotals.adSpend)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(productTargetsTotals.adSales)}</TableCell>
-              <TableCell className="text-right text-foreground">{productTargetsTotals.roas.toFixed(2)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(productTargetsTotals.acos)}</TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(productTargetsTotals.impressions)} metric="impressions" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(productTargetsTotals.clicks)} metric="clicks" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(productTargetsTotals.ctr)} metric="ctr" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(productTargetsTotals.adUnits)} metric="adUnits" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(productTargetsTotals.cvr)} metric="cvr" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(productTargetsTotals.cpc)} metric="cpc" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(productTargetsTotals.adSpend)} metric="adSpend" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(productTargetsTotals.adSales)} metric="adSales" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={productTargetsTotals.roas.toFixed(2)} metric="roas" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(productTargetsTotals.acos)} metric="acos" /></TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
+      <TablePagination
+        page={currentPage}
+        pageSize={pageSize}
+        totalItems={filteredTargets.length}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
     </div>
   );
 }

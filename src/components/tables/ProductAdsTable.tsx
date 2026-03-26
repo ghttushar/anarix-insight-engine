@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -9,21 +8,21 @@ import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockProductAds, productAdsTotals } from "@/data/mockProductAds";
-import { Button } from "@/components/ui/button";
-import { Plus, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { X } from "lucide-react";
 import { AddProductAdsModal } from "@/components/advertising/AddProductAdsModal";
+import { TablePagination } from "./TablePagination";
 
 interface ProductAdsTableProps {
   searchQuery?: string;
   showAddButton?: boolean;
+  showDeltas?: boolean;
 }
 
-export function ProductAdsTable({ searchQuery = "", showAddButton = false }: ProductAdsTableProps) {
+export function ProductAdsTable({ searchQuery = "", showAddButton = false, showDeltas = false }: ProductAdsTableProps) {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const [activeFilters, setActiveFilters] = useState<string[]>(["Product Ad Status is ENABLED"]);
 
   const filteredAds = mockProductAds.filter((ad) =>
@@ -32,10 +31,7 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false }: Pro
     ad.itemId.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredAds.length / rowsPerPage);
-  const paginatedAds = filteredAds.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-  const startRow = (currentPage - 1) * rowsPerPage + 1;
-  const endRow = Math.min(currentPage * rowsPerPage, filteredAds.length);
+  const paginatedAds = filteredAds.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
@@ -65,13 +61,19 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false }: Pro
   const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
     <div className="flex flex-col items-end">
       <span className="text-foreground">{formatted}</span>
-      <DeltaBadge value={getDelta(id, metric)} />
+      {showDeltas && <DeltaBadge value={getDelta(id, metric)} />}
+    </div>
+  );
+
+  const TotalCell = ({ value, metric }: { value: string; metric: string }) => (
+    <div className="flex flex-col items-end">
+      <span className="text-foreground">{value}</span>
+      {showDeltas && <DeltaBadge value={getDelta("total", metric)} />}
     </div>
   );
 
   return (
     <>
-      {/* Filter row */}
       {activeFilters.length > 0 && (
         <div className="flex items-center gap-2 mb-3">
           {activeFilters.map((filter) => (
@@ -82,19 +84,7 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false }: Pro
               </button>
             </div>
           ))}
-          <button onClick={() => setActiveFilters([])} className="text-xs text-muted-foreground hover:text-foreground cursor-pointer">
-            Clear
-          </button>
-        </div>
-      )}
-
-      {/* Add button row */}
-      {showAddButton && (
-        <div className="flex items-center justify-end mb-3">
-          <Button size="sm" className="gap-1.5" onClick={() => setAddModalOpen(true)}>
-            <Plus className="h-3.5 w-3.5" />
-            Add Product Ads
-          </Button>
+          <button onClick={() => setActiveFilters([])} className="text-xs text-muted-foreground hover:text-foreground cursor-pointer">Clear</button>
         </div>
       )}
 
@@ -154,46 +144,27 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false }: Pro
               ))}
               <TableRow className="bg-muted font-medium hover:bg-muted">
                 <TableCell colSpan={5} className="font-semibold">Total ({filteredAds.length} product ads)</TableCell>
-                <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.impressions)}</TableCell>
-                <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.clicks)}</TableCell>
-                <TableCell className="text-right text-foreground">{formatPercent(productAdsTotals.ctr)}</TableCell>
-                <TableCell className="text-right text-foreground">{formatNumber(productAdsTotals.adUnits)}</TableCell>
-                <TableCell className="text-right text-foreground">{formatPercent(productAdsTotals.cvr)}</TableCell>
-                <TableCell className="text-right text-foreground">{formatCurrency(productAdsTotals.cpc)}</TableCell>
-                <TableCell className="text-right text-foreground">{formatCurrency(productAdsTotals.adSpend)}</TableCell>
-                <TableCell className="text-right text-foreground">{formatCurrency(productAdsTotals.adSpend * 4.2)}</TableCell>
-                <TableCell className="text-right text-foreground">{(4.2).toFixed(2)}</TableCell>
-                <TableCell className="text-right text-foreground">{formatPercent(23.8)}</TableCell>
+                <TableCell className="text-right"><TotalCell value={formatNumber(productAdsTotals.impressions)} metric="impressions" /></TableCell>
+                <TableCell className="text-right"><TotalCell value={formatNumber(productAdsTotals.clicks)} metric="clicks" /></TableCell>
+                <TableCell className="text-right"><TotalCell value={formatPercent(productAdsTotals.ctr)} metric="ctr" /></TableCell>
+                <TableCell className="text-right"><TotalCell value={formatNumber(productAdsTotals.adUnits)} metric="adUnits" /></TableCell>
+                <TableCell className="text-right"><TotalCell value={formatPercent(productAdsTotals.cvr)} metric="cvr" /></TableCell>
+                <TableCell className="text-right"><TotalCell value={formatCurrency(productAdsTotals.cpc)} metric="cpc" /></TableCell>
+                <TableCell className="text-right"><TotalCell value={formatCurrency(productAdsTotals.adSpend)} metric="adSpend" /></TableCell>
+                <TableCell className="text-right"><TotalCell value={formatCurrency(productAdsTotals.adSpend * 4.2)} metric="adSales" /></TableCell>
+                <TableCell className="text-right"><TotalCell value={(4.2).toFixed(2)} metric="roas" /></TableCell>
+                <TableCell className="text-right"><TotalCell value={formatPercent(23.8)} metric="acos" /></TableCell>
               </TableRow>
             </TableBody>
           </Table>
         </div>
-
-        {/* Pagination */}
-        <div className="flex items-center justify-between border-t border-border px-4 py-2">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Rows per page</span>
-            <Select value={String(rowsPerPage)} onValueChange={(v) => { setRowsPerPage(Number(v)); setCurrentPage(1); }}>
-              <SelectTrigger className="h-7 w-[65px] text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {[10, 25, 50, 100].map((n) => (
-                  <SelectItem key={n} value={String(n)} className="text-xs">{n}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{startRow}-{endRow} of {filteredAds.length}</span>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={currentPage <= 1} onClick={() => setCurrentPage((p) => p - 1)}>
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={currentPage >= totalPages} onClick={() => setCurrentPage((p) => p + 1)}>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </div>
+        <TablePagination
+          page={currentPage}
+          pageSize={pageSize}
+          totalItems={filteredAds.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+        />
       </div>
 
       <AddProductAdsModal open={addModalOpen} onOpenChange={setAddModalOpen} />
