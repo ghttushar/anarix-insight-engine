@@ -52,7 +52,7 @@ export default function AdGroupDetail() {
 
   const renderTable = () => {
     switch (activeTab) {
-      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showAddButton showDeltas={showDeltas} />;
+      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showAddButton showDeltas={showDeltas} onRowClick={(pa) => navigate(`/advertising/campaigns/${campaignId}/${adGroupId}/${pa.id}`)} />;
       case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       case "search-terms": return <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       default: return null;

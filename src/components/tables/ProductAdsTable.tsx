@@ -16,9 +16,10 @@ interface ProductAdsTableProps {
   searchQuery?: string;
   showAddButton?: boolean;
   showDeltas?: boolean;
+  onRowClick?: (productAd: typeof import("@/data/mockProductAds").mockProductAds[0]) => void;
 }
 
-export function ProductAdsTable({ searchQuery = "", showAddButton = false, showDeltas = false }: ProductAdsTableProps) {
+export function ProductAdsTable({ searchQuery = "", showAddButton = false, showDeltas = false, onRowClick }: ProductAdsTableProps) {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
@@ -114,7 +115,7 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
             </TableHeader>
             <TableBody>
               {paginatedAds.map((ad) => (
-                <TableRow key={ad.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableRow key={ad.id} className="group cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => onRowClick?.(ad)}>
                   <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors">
                     <Checkbox checked={selectedRows.has(ad.id)} onCheckedChange={() => toggleRow(ad.id)} />
                   </TableCell>

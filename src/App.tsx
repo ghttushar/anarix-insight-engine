@@ -30,6 +30,7 @@ import ImpactAnalysis from "./pages/advertising/ImpactAnalysis";
 import TargetingActions from "./pages/advertising/TargetingActions";
 import AdvCampaignDetail from "./pages/advertising/CampaignDetail";
 import AdGroupDetail from "./pages/advertising/AdGroupDetail";
+import ProductAdDetail from "./pages/advertising/ProductAdDetail";
 import BudgetPacing from "./pages/advertising/BudgetPacing";
 import SearchHarvesting from "./pages/advertising/SearchHarvesting";
 import AnomalyAlerts from "./pages/advertising/AnomalyAlerts";
@@ -148,6 +149,7 @@ function AppRoutes() {
       <Route path="/advertising/campaigns" element={<CampaignManager />} />
       <Route path="/advertising/campaigns/:campaignId" element={<AdvCampaignDetail />} />
       <Route path="/advertising/campaigns/:campaignId/:adGroupId" element={<AdGroupDetail />} />
+      <Route path="/advertising/campaigns/:campaignId/:adGroupId/:productAdId" element={<ProductAdDetail />} />
       <Route path="/advertising/impact" element={<ImpactAnalysis />} />
       <Route path="/advertising/targeting" element={<TargetingActions />} />
       <Route path="/advertising/budget-pacing" element={<BudgetPacing />} />

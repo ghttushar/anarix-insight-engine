@@ -3,42 +3,37 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { PerformanceChart } from "@/components/charts/PerformanceChart";
-import { CampaignInfoCard } from "@/components/advertising/CampaignInfoCard";
-import { AdGroupsTable } from "@/components/tables/AdGroupsTable";
-import { ProductAdsTable } from "@/components/tables/ProductAdsTable";
-import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable";
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
+import { mockAdGroups } from "@/data/mockAdGroups";
+import { mockProductAds } from "@/data/mockProductAds";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/status/StatusBadge";
+import { Play, Pencil } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { toast } from "sonner";
 
-type TabValue = "ad-groups" | "product-ads" | "keywords" | "search-terms";
-
-const tabs = [
-  { value: "ad-groups", label: "Ad Groups" },
-  { value: "product-ads", label: "Product Ads" },
-  { value: "keywords", label: "Keywords" },
-  { value: "search-terms", label: "Search Terms" },
-];
-
-export default function CampaignDetail() {
-  const { campaignId } = useParams();
+export default function ProductAdDetail() {
+  const { campaignId, adGroupId, productAdId } = useParams();
   const navigate = useNavigate();
   const { adType } = useFilter();
-  const [activeTab, setActiveTab] = useState<TabValue>("ad-groups");
+  const { formatCurrency } = useCurrency();
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
 
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
+  const adGroup = mockAdGroups.find((ag) => ag.id === adGroupId);
+  const productAd = mockProductAds.find((pa) => pa.id === productAdId);
   const campaignName = campaign?.name || `Campaign ${campaignId}`;
+  const adGroupName = adGroup?.name || `Ad Group ${adGroupId}`;
+  const productAdName = productAd?.productName || `Product Ad ${productAdId}`;
   const adTypeLabel = adType === "All" ? "SP" : adType;
 
   const kpiItems = mockKPIData.slice(0, 5).map((kpi, index) => ({
@@ -48,16 +43,6 @@ export default function CampaignDetail() {
     format: kpi.format as "currency" | "number" | "percentage" | "decimal",
     accentColor: index === 0 ? "primary" : index === 1 ? "success" : index === 2 ? "accent" : index === 3 ? "warning" : "destructive",
   }));
-
-  const renderTable = () => {
-    switch (activeTab) {
-      case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} showDeltas={showDeltas} onRowClick={(ag) => navigate(`/advertising/campaigns/${campaignId}/${ag.id}`)} />;
-      case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showAddButton showDeltas={showDeltas} onRowClick={(pa) => navigate(`/advertising/campaigns/${campaignId}/${pa.adGroupId}/${pa.id}`)} />;
-      case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} showDeltas={showDeltas} />;
-      case "search-terms": return <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
-      default: return null;
-    }
-  };
 
   return (
     <AppLayout>
@@ -77,7 +62,19 @@ export default function CampaignDetail() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <span className="text-foreground font-medium">{campaignName}</span>
+              <BreadcrumbLink asChild>
+                <button onClick={() => navigate(`/advertising/campaigns/${campaignId}`)} className="text-primary hover:underline cursor-pointer">{campaignName}</button>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <button onClick={() => navigate(`/advertising/campaigns/${campaignId}/${adGroupId}`)} className="text-primary hover:underline cursor-pointer">{adGroupName}</button>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <span className="text-foreground font-medium">{productAdName}</span>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -90,7 +87,29 @@ export default function CampaignDetail() {
           </Button>
         </AppTaskbar>
 
-        {campaign && <CampaignInfoCard campaign={campaign} />}
+        {/* Product Ad Info Card */}
+        {productAd && (
+          <div className="rounded-lg border border-border bg-card p-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                <img src={productAd.productImage} alt={productAd.productName} className="h-16 w-16 rounded-lg object-cover border border-border" />
+                <div className="space-y-1.5">
+                  <h3 className="text-sm font-semibold text-foreground">{productAd.productName}</h3>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <StatusBadge status={productAd.status} />
+                    <Badge variant="outline" className="text-xs">{productAd.itemId}</Badge>
+                    <Badge variant="outline" className="text-xs">SKU: {productAd.sku}</Badge>
+                    <span className="text-xs text-muted-foreground">Bid: {formatCurrency(productAd.productBid)}</span>
+                    <span className="text-xs text-muted-foreground">Min: {formatCurrency(productAd.minBid)} · Max: {formatCurrency(productAd.maxBid)}</span>
+                  </div>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs" onClick={() => toast.info("Product Ad settings coming soon")}>
+                <Pencil className="h-3.5 w-3.5" />Edit
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-3">
           <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
@@ -98,18 +117,16 @@ export default function CampaignDetail() {
           <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
         </div>
 
-        <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
-
         <DataTableToolbar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
+          searchPlaceholder="Search search terms..."
           onDownload={() => toast.success("Exporting data as CSV...")}
           showDeltas={showDeltas}
           onShowDeltasChange={setShowDeltas}
         />
 
-        {renderTable()}
+        <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />
       </div>
     </AppLayout>
   );
