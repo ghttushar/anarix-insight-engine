@@ -2,11 +2,13 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { GeographyMap } from "@/components/profitability/GeographyMap";
 import { RegionStatsPanel } from "@/components/profitability/RegionStatsPanel";
 import { RegionalTable } from "@/components/tables/RegionalTable";
 import { RegionalProductTable } from "@/components/tables/RegionalProductTable";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { geographicalData } from "@/data/mockProfitability";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -37,6 +39,8 @@ export default function Geographical() {
   const [searchValue, setSearchValue] = useState("");
   const [columns, setColumns] = useState(COLUMN_DEFS);
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
+  const [showDeltas, setShowDeltas] = useState(false);
+  const [catalogue, setCatalogue] = useState("all");
   const selectedRegion = regionLookup[selectedRegionCode] || geographicalData[0];
 
   const handleColumnToggle = (id: string) => {
@@ -48,21 +52,32 @@ export default function Geographical() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Geographical Data" subtitle="Regional performance breakdown across markets" />
-        <AppTaskbar showDateRange />
+        <PageHeader
+          title="Geographical Data"
+          subtitle="Regional performance breakdown across markets"
+          appLevelSelector={
+            <AppLevelSelector>
+              <Select value={catalogue} onValueChange={setCatalogue}>
+                <SelectTrigger className="h-8 w-[120px] text-xs border-border">
+                  <SelectValue placeholder="Catalogue" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="text-xs">All Catalogues</SelectItem>
+                  <SelectItem value="electronics" className="text-xs">Electronics</SelectItem>
+                  <SelectItem value="home" className="text-xs">Home & Garden</SelectItem>
+                </SelectContent>
+              </Select>
+            </AppLevelSelector>
+          }
+        />
+        <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} />
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 h-full">
-            <GeographyMap
-              selectedRegion={selectedRegionCode}
-              onRegionSelect={setSelectedRegionCode}
-            />
+            <GeographyMap selectedRegion={selectedRegionCode} onRegionSelect={setSelectedRegionCode} />
           </div>
           <div className="h-full">
-            <RegionStatsPanel
-              region={selectedRegion}
-              dateRange="Jan 1 - Jan 30, 2026"
-            />
+            <RegionStatsPanel region={selectedRegion} dateRange="Jan 1 - Jan 30, 2026" />
           </div>
         </div>
 
@@ -70,24 +85,8 @@ export default function Geographical() {
           <DataTableToolbar
             leftContent={
               <div className="flex rounded-md border border-border">
-                <button
-                  className={cn(
-                    "px-3 py-1.5 text-sm font-medium transition-colors",
-                    viewLevel === "state" ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
-                  )}
-                  onClick={() => setViewLevel("state")}
-                >
-                  State Level
-                </button>
-                <button
-                  className={cn(
-                    "px-3 py-1.5 text-sm font-medium transition-colors",
-                    viewLevel === "product" ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
-                  )}
-                  onClick={() => setViewLevel("product")}
-                >
-                  Product Level
-                </button>
+                <button className={cn("px-3 py-1.5 text-sm font-medium transition-colors", viewLevel === "state" ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground")} onClick={() => setViewLevel("state")}>State Level</button>
+                <button className={cn("px-3 py-1.5 text-sm font-medium transition-colors", viewLevel === "product" ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground")} onClick={() => setViewLevel("product")}>Product Level</button>
               </div>
             }
             searchValue={searchValue}
@@ -101,12 +100,14 @@ export default function Geographical() {
             onFiltersChange={setActiveFilters}
             filterFields={FILTER_FIELDS}
             onDownload={handleDownload}
+            showDeltas={showDeltas}
+            onShowDeltasChange={setShowDeltas}
             showUpload
             onUpload={(files) => toast.info(`Uploading ${files[0]?.name}...`)}
             uploadTitle="Upload COGS"
           />
 
-          <div className="rounded-lg border border-border">
+          <div className="rounded-lg border border-border bg-card">
             {viewLevel === "state" ? (
               <RegionalTable data={geographicalData} searchValue={searchValue} />
             ) : (
