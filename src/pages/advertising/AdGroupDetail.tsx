@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { AddProductAdsModal } from "@/components/advertising/AddProductAdsModal";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -35,6 +36,7 @@ export default function AdGroupDetail() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [addProductAdOpen, setAddProductAdOpen] = useState(false);
 
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
   const adGroup = mockAdGroups.find((ag) => ag.id === adGroupId);
@@ -115,7 +117,7 @@ export default function AdGroupDetail() {
           onShowDeltasChange={setShowDeltas}
           leftContent={
             activeTab === "product-ads" ? (
-              <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => toast.info("Add Product Ad panel coming soon")}>
+              <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setAddProductAdOpen(true)}>
                 <Plus className="h-3.5 w-3.5" />Add Product Ad
               </Button>
             ) : undefined
@@ -124,6 +126,7 @@ export default function AdGroupDetail() {
 
         {renderTable()}
       </div>
+      <AddProductAdsModal open={addProductAdOpen} onOpenChange={setAddProductAdOpen} />
     </AppLayout>
   );
 }
