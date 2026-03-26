@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -6,6 +7,7 @@ import {
 import { ImpactComparison } from "@/types/advertising";
 import { cn } from "@/lib/utils";
 import { ArrowDown, ArrowUp } from "lucide-react";
+import { TablePagination } from "./TablePagination";
 
 interface ImpactTableProps {
   data: ImpactComparison[];
@@ -14,13 +16,17 @@ interface ImpactTableProps {
 }
 
 export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
   const filteredData = data.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   const { formatCurrency } = useCurrency();
-  const formatNumber = (value: number) =>
-    new Intl.NumberFormat("en-US").format(value);
+  const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
   const calculateDelta = (baseline: number, impact: number) => {
@@ -42,12 +48,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
         <span className="font-medium">
           {format === "currency" ? formatCurrency(impact) : format === "percent" ? formatPercent(impact) : formatNumber(impact)}
         </span>
-        <span
-          className={cn(
-            "flex items-center gap-1 text-xs font-medium",
-            isNeutral ? "text-muted-foreground" : isPositive ? "text-success" : "text-destructive"
-          )}
-        >
+        <span className={cn("flex items-center gap-1 text-xs font-medium", isNeutral ? "text-muted-foreground" : isPositive ? "text-success" : "text-destructive")}>
           {!isNeutral && (isPositive ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />)}
           {Math.abs(delta).toFixed(1)}%
         </span>
@@ -73,7 +74,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredData.map((item) => {
+            {paginatedData.map((item) => {
               const isPositive = item.impactPercentage > 0;
               const isNeutral = item.impactPercentage === 0;
 
@@ -82,15 +83,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
                   <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors">
                     <div className="flex items-center gap-2">
                       {showType && item.type && (
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            "text-xs",
-                            item.type === "auto"
-                              ? "border-primary/30 bg-primary/5 text-primary"
-                              : "border-secondary/30 bg-secondary/5 text-secondary-foreground"
-                          )}
-                        >
+                        <Badge variant="outline" className={cn("text-xs", item.type === "auto" ? "border-primary/30 bg-primary/5 text-primary" : "border-secondary/30 bg-secondary/5 text-secondary-foreground")}>
                           {item.type === "auto" ? "Auto" : "Manual"}
                         </Badge>
                       )}
@@ -98,17 +91,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
                     </div>
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "gap-1",
-                        isNeutral
-                          ? "border-muted bg-muted text-muted-foreground"
-                          : isPositive
-                          ? "border-success/30 bg-success/10 text-success"
-                          : "border-destructive/30 bg-destructive/10 text-destructive"
-                      )}
-                    >
+                    <Badge variant="outline" className={cn("gap-1", isNeutral ? "border-muted bg-muted text-muted-foreground" : isPositive ? "border-success/30 bg-success/10 text-success" : "border-destructive/30 bg-destructive/10 text-destructive")}>
                       {isPositive ? <ArrowUp className="h-3 w-3" /> : !isNeutral ? <ArrowDown className="h-3 w-3" /> : null}
                       {Math.abs(item.impactPercentage).toFixed(1)}%
                     </Badge>
@@ -126,6 +109,13 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
           </TableBody>
         </Table>
       </div>
+      <TablePagination
+        page={currentPage}
+        pageSize={pageSize}
+        totalItems={filteredData.length}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
     </div>
   );
 }

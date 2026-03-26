@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -9,16 +10,24 @@ import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockAdGroups, adGroupsTotals } from "@/data/mockAdGroups";
 import { cn } from "@/lib/utils";
+import { TablePagination } from "./TablePagination";
 
 interface AdGroupsTableProps {
   searchQuery?: string;
+  showDeltas?: boolean;
 }
 
-export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
+export function AdGroupsTable({ searchQuery = "", showDeltas = false }: AdGroupsTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
   const filteredGroups = mockAdGroups.filter((group) =>
     group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     group.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filteredGroups.length / pageSize);
+  const paginatedGroups = filteredGroups.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
@@ -27,7 +36,14 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
   const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
     <div className="flex flex-col items-end">
       <span className="text-foreground">{formatted}</span>
-      <DeltaBadge value={getDelta(id, metric)} />
+      {showDeltas && <DeltaBadge value={getDelta(id, metric)} />}
+    </div>
+  );
+
+  const TotalCell = ({ value, metric }: { value: string; metric: string }) => (
+    <div className="flex flex-col items-end">
+      <span className="text-foreground">{value}</span>
+      {showDeltas && <DeltaBadge value={getDelta("total", metric)} />}
     </div>
   );
 
@@ -57,7 +73,7 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredGroups.map((group) => (
+            {paginatedGroups.map((group) => (
               <TableRow key={group.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
                 <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={group.status} /></TableCell>
                 <TableCell className="font-medium sticky left-[96px] z-10 bg-background group-hover:bg-muted transition-colors"><span className="text-primary hover:underline cursor-pointer">{group.name}</span></TableCell>
@@ -87,20 +103,27 @@ export function AdGroupsTable({ searchQuery = "" }: AdGroupsTableProps) {
             ))}
             <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={7} className="font-semibold">Total ({filteredGroups.length} ad groups)</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(adGroupsTotals.impressions)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(adGroupsTotals.clicks)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(adGroupsTotals.ctr)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(adGroupsTotals.adUnits)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(adGroupsTotals.cvr)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(adGroupsTotals.cpc)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(adGroupsTotals.adSpend)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(adGroupsTotals.adSales)}</TableCell>
-              <TableCell className="text-right text-foreground">{adGroupsTotals.roas.toFixed(2)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(adGroupsTotals.acos)}</TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(adGroupsTotals.impressions)} metric="impressions" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(adGroupsTotals.clicks)} metric="clicks" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(adGroupsTotals.ctr)} metric="ctr" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(adGroupsTotals.adUnits)} metric="adUnits" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(adGroupsTotals.cvr)} metric="cvr" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(adGroupsTotals.cpc)} metric="cpc" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(adGroupsTotals.adSpend)} metric="adSpend" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(adGroupsTotals.adSales)} metric="adSales" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={adGroupsTotals.roas.toFixed(2)} metric="roas" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(adGroupsTotals.acos)} metric="acos" /></TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
+      <TablePagination
+        page={currentPage}
+        pageSize={pageSize}
+        totalItems={filteredGroups.length}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
     </div>
   );
 }

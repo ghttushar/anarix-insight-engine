@@ -9,12 +9,11 @@ import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockSearchTerms, searchTermsTotals } from "@/data/mockSearchTerms";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TablePagination } from "./TablePagination";
 
 interface SearchTermsTableProps {
   searchQuery?: string;
+  showDeltas?: boolean;
 }
 
 const matchTypeColors: Record<string, string> = {
@@ -23,10 +22,10 @@ const matchTypeColors: Record<string, string> = {
   phrase: "bg-purple-500/10 text-purple-600 border-purple-500/20",
 };
 
-export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
+export function SearchTermsTable({ searchQuery = "", showDeltas = false }: SearchTermsTableProps) {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const filteredTerms = mockSearchTerms.filter((term) =>
     term.searchTerm.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -34,10 +33,7 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
     term.keyword.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredTerms.length / rowsPerPage);
-  const paginatedTerms = filteredTerms.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-  const startRow = (currentPage - 1) * rowsPerPage + 1;
-  const endRow = Math.min(currentPage * rowsPerPage, filteredTerms.length);
+  const paginatedTerms = filteredTerms.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
@@ -63,7 +59,14 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
   const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
     <div className="flex flex-col items-end">
       <span className="text-foreground">{formatted}</span>
-      <DeltaBadge value={getDelta(id, metric)} />
+      {showDeltas && <DeltaBadge value={getDelta(id, metric)} />}
+    </div>
+  );
+
+  const TotalCell = ({ value, metric }: { value: string; metric: string }) => (
+    <div className="flex flex-col items-end">
+      <span className="text-foreground">{value}</span>
+      {showDeltas && <DeltaBadge value={getDelta("total", metric)} />}
     </div>
   );
 
@@ -118,46 +121,27 @@ export function SearchTermsTable({ searchQuery = "" }: SearchTermsTableProps) {
             ))}
             <TableRow className="bg-muted font-medium hover:bg-muted">
               <TableCell colSpan={6} className="font-semibold">Total ({filteredTerms.length} search terms)</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.impressions)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.clicks)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(searchTermsTotals.ctr)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatNumber(searchTermsTotals.adUnits)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(searchTermsTotals.cvr)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(searchTermsTotals.cpc)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(searchTermsTotals.adSpend)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatCurrency(searchTermsTotals.adSpend * 3.8)}</TableCell>
-              <TableCell className="text-right text-foreground">{(3.8).toFixed(2)}</TableCell>
-              <TableCell className="text-right text-foreground">{formatPercent(26.3)}</TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(searchTermsTotals.impressions)} metric="impressions" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(searchTermsTotals.clicks)} metric="clicks" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(searchTermsTotals.ctr)} metric="ctr" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatNumber(searchTermsTotals.adUnits)} metric="adUnits" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(searchTermsTotals.cvr)} metric="cvr" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(searchTermsTotals.cpc)} metric="cpc" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(searchTermsTotals.adSpend)} metric="adSpend" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatCurrency(searchTermsTotals.adSpend * 3.8)} metric="adSales" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={(3.8).toFixed(2)} metric="roas" /></TableCell>
+              <TableCell className="text-right"><TotalCell value={formatPercent(26.3)} metric="acos" /></TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between border-t border-border px-4 py-2">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Rows per page</span>
-          <Select value={String(rowsPerPage)} onValueChange={(v) => { setRowsPerPage(Number(v)); setCurrentPage(1); }}>
-            <SelectTrigger className="h-7 w-[65px] text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[10, 25, 50, 100].map((n) => (
-                <SelectItem key={n} value={String(n)} className="text-xs">{n}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{startRow}-{endRow} of {filteredTerms.length}</span>
-          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={currentPage <= 1} onClick={() => setCurrentPage((p) => p - 1)}>
-            <ChevronLeft className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={currentPage >= totalPages} onClick={() => setCurrentPage((p) => p + 1)}>
-            <ChevronRight className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      </div>
+      <TablePagination
+        page={currentPage}
+        pageSize={pageSize}
+        totalItems={filteredTerms.length}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
     </div>
   );
 }

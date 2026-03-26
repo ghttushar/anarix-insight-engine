@@ -311,7 +311,6 @@ export function CampaignTable({
         page={page}
         pageSize={pageSize}
         totalItems={campaigns.length}
-        totalPages={totalPages}
         onPageChange={setPage}
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
       />
