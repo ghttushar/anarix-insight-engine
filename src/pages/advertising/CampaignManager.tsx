@@ -144,7 +144,7 @@ export default function CampaignManager() {
       value: kpi.value,
       previousValue: kpi.previousValue,
       format: kpi.format as "currency" | "number" | "percentage" | "decimal",
-      accentColor: index === 0 ? "primary" : index === 1 ? "success" : index === 2 ? "accent" : "warning",
+      accentColor: index === 0 ? "primary" : index === 1 ? "success" : index === 2 ? "accent" : index === 3 ? "warning" : "destructive",
     }));
 
   const currentColumnDefs = COLUMN_DEFS[activeTab] || [];

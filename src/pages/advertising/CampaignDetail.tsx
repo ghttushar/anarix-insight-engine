@@ -41,12 +41,12 @@ export default function CampaignDetail() {
   const campaignName = campaign?.name || `Campaign ${campaignId}`;
   const adTypeLabel = adType === "All" ? "SP" : adType;
 
-  const kpiItems = mockKPIData.slice(0, 4).map((kpi, index) => ({
+  const kpiItems = mockKPIData.slice(0, 5).map((kpi, index) => ({
     label: kpi.label,
     value: kpi.value,
     previousValue: kpi.previousValue,
     format: kpi.format as "currency" | "number" | "percentage" | "decimal",
-    accentColor: index === 0 ? "primary" : index === 1 ? "success" : index === 2 ? "accent" : "warning",
+    accentColor: index === 0 ? "primary" : index === 1 ? "success" : index === 2 ? "accent" : index === 3 ? "warning" : "destructive",
   }));
 
   const renderTable = () => {
