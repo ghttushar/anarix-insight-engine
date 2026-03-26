@@ -259,7 +259,7 @@ export function CampaignTable({
                       ) : (
                         <div className="flex flex-col items-end">
                           <span className="text-foreground">{formatCurrency(campaign.dailyBudget)}</span>
-                          <DeltaBadge value={getDelta(campaign.id, 'dailyBudget')} />
+                          {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'dailyBudget')} />}
                         </div>
                       )}
                     </TableCell>}
