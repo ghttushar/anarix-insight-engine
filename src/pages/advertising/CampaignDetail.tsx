@@ -51,7 +51,7 @@ export default function CampaignDetail() {
 
   const renderTable = () => {
     switch (activeTab) {
-      case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
+      case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} showDeltas={showDeltas} onRowClick={(ag) => navigate(`/advertising/campaigns/${campaignId}/${ag.id}`)} />;
       case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showAddButton showDeltas={showDeltas} />;
       case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       case "search-terms": return <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
