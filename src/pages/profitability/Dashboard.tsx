@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { PeriodSummaryCard } from "@/components/profitability/PeriodSummaryCard";
 import { ProfitabilityTrendChart } from "@/components/profitability/ProfitabilityTrendChart";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
@@ -13,6 +14,7 @@ import { PeriodBreakdownPanel } from "@/components/profitability/PeriodBreakdown
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { profitabilitySummaries, profitabilityProducts, profitabilityOrders, trendDataByPeriod } from "@/data/mockProfitability";
 import { ProfitabilityProduct, ProfitabilitySummary } from "@/types/profitability";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
@@ -48,6 +50,7 @@ export default function ProfitabilityDashboard() {
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [products, setProducts] = useState(profitabilityProducts);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [catalogue, setCatalogue] = useState("all");
 
   const [cogsProduct, setCogsProduct] = useState<ProfitabilityProduct | null>(null);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
@@ -103,8 +106,25 @@ export default function ProfitabilityDashboard() {
     <AppLayout>
       <div className="flex flex-1 h-full min-h-0">
         <div className="flex-1 space-y-6 overflow-auto p-0">
-          <PageHeader title="Profitability Dashboard" subtitle="Track your profit metrics and financial performance" />
-          <AppTaskbar showDateRange showFrequency />
+          <PageHeader
+            title="Profitability Dashboard"
+            subtitle="Track your profit metrics and financial performance"
+            appLevelSelector={
+              <AppLevelSelector>
+                <Select value={catalogue} onValueChange={setCatalogue}>
+                  <SelectTrigger className="h-8 w-[120px] text-xs border-border">
+                    <SelectValue placeholder="Catalogue" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all" className="text-xs">All Catalogues</SelectItem>
+                    <SelectItem value="electronics" className="text-xs">Electronics</SelectItem>
+                    <SelectItem value="home" className="text-xs">Home & Garden</SelectItem>
+                  </SelectContent>
+                </Select>
+              </AppLevelSelector>
+            }
+          />
+          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} />
 
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-3">
@@ -157,7 +177,7 @@ export default function ProfitabilityDashboard() {
               uploadAccept=".csv,.xlsx,.xls"
               onDownload={handleDownload}
             />
-            <div className="rounded-lg border border-border">
+            <div className="rounded-lg border border-border bg-card">
               <ProductsPnLTable
                 products={filteredProducts}
                 orders={filteredOrders}

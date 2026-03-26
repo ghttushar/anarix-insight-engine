@@ -2,11 +2,13 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { PnLParameterTable } from "@/components/profitability/PnLParameterTable";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
 import { ProductDetailPanel } from "@/components/profitability/ProductDetailPanel";
 import { ProductsOrdersToggle } from "@/components/profitability/ProductsOrdersToggle";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { pnlData, profitabilityProducts } from "@/data/mockProfitability";
 import { ProfitabilityProduct } from "@/types/profitability";
 import { toast } from "sonner";
@@ -35,6 +37,8 @@ export default function ProfitLoss() {
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [catalogue, setCatalogue] = useState("all");
+  const [pnlFrequency, setPnlFrequency] = useState("weekly");
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -62,8 +66,41 @@ export default function ProfitLoss() {
     <AppLayout>
       <div className="flex flex-1 h-full min-h-0">
         <div className="flex-1 space-y-6 overflow-auto p-0">
-          <PageHeader title="Profit & Loss" subtitle="Detailed P&L breakdown by period" />
-          <AppTaskbar showDateRange />
+          <PageHeader
+            title="Profit & Loss"
+            subtitle="Detailed P&L breakdown by period"
+            appLevelSelector={
+              <AppLevelSelector>
+                <Select value={catalogue} onValueChange={setCatalogue}>
+                  <SelectTrigger className="h-8 w-[120px] text-xs border-border">
+                    <SelectValue placeholder="Catalogue" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all" className="text-xs">All Catalogues</SelectItem>
+                    <SelectItem value="electronics" className="text-xs">Electronics</SelectItem>
+                    <SelectItem value="home" className="text-xs">Home & Garden</SelectItem>
+                  </SelectContent>
+                </Select>
+              </AppLevelSelector>
+            }
+          />
+          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} />
+
+          {/* P&L Frequency Toggle */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">Frequency:</span>
+            <div className="flex rounded-md border border-border">
+              {["Daily", "Weekly", "Monthly"].map((f) => (
+                <button
+                  key={f}
+                  className={`px-3 py-1 text-xs font-medium transition-colors ${pnlFrequency === f.toLowerCase() ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"}`}
+                  onClick={() => setPnlFrequency(f.toLowerCase())}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <PnLParameterTable data={pnlData} weeks={weeks} showDeltas={showDeltas} />
 
@@ -84,7 +121,7 @@ export default function ProfitLoss() {
               showDeltas={showDeltas}
               onShowDeltasChange={setShowDeltas}
             />
-            <div className="rounded-lg border border-border">
+            <div className="rounded-lg border border-border bg-card">
               <ProductsPnLTable
                 products={filteredProducts}
                 visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}

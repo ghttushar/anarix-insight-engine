@@ -2,14 +2,15 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { SOVKPIStrip } from "@/components/bi/SOVKPIStrip";
 import { BrandCoverageTable } from "@/components/bi/BrandCoverageTable";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { brands, sovTrendData, sovMetrics } from "@/data/mockBrandSOV";
 import { toast } from "sonner";
 
@@ -24,42 +25,52 @@ export default function BrandSOV() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Brand Share of Voice" subtitle="Track brand visibility across search results" />
+        <PageHeader
+          title="Brand Share of Voice"
+          subtitle="Track brand visibility across search results"
+          appLevelSelector={<AppLevelSelector />}
+        />
 
-        <AppTaskbar>
+        <AppTaskbar showRunButton onRun={() => toast.info("Running SOV analysis...")}>
           <div className="relative min-w-[180px] max-w-[240px]">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search keyword..." value={keyword} onChange={(e) => setKeyword(e.target.value)} className="pl-8 h-9 text-xs" />
+            <Input placeholder="Search keyword..." value={keyword} onChange={(e) => setKeyword(e.target.value)} className="pl-8 h-8 text-xs" />
           </div>
-          <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[130px] h-9 text-xs"><SelectValue placeholder="Date Range" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="yesterday">Yesterday</SelectItem>
-              <SelectItem value="7days">Last 7 Days</SelectItem>
-              <SelectItem value="30days">Last 30 Days</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={position} onValueChange={setPosition}>
-            <SelectTrigger className="w-[120px] h-9 text-xs"><SelectValue placeholder="Position" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Positions</SelectItem>
-              <SelectItem value="1">Position 1</SelectItem>
-              <SelectItem value="1-3">Top 3</SelectItem>
-              <SelectItem value="1-10">Top 10</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={frequency} onValueChange={setFrequency}>
-            <SelectTrigger className="w-[120px] h-9 text-xs"><SelectValue placeholder="Frequency" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="hourly">Hourly</SelectItem>
-              <SelectItem value="daily">Daily</SelectItem>
-              <SelectItem value="weekly">Weekly</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button size="sm" className="gap-1.5">
-            <Play className="h-3.5 w-3.5" />Run
-          </Button>
+          <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Date Range</span>
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger className="h-8 w-[120px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today" className="text-xs">Today</SelectItem>
+                <SelectItem value="yesterday" className="text-xs">Yesterday</SelectItem>
+                <SelectItem value="7days" className="text-xs">Last 7 Days</SelectItem>
+                <SelectItem value="30days" className="text-xs">Last 30 Days</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Position</span>
+            <Select value={position} onValueChange={setPosition}>
+              <SelectTrigger className="h-8 w-[100px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-xs">All</SelectItem>
+                <SelectItem value="1" className="text-xs">Position 1</SelectItem>
+                <SelectItem value="1-3" className="text-xs">Top 3</SelectItem>
+                <SelectItem value="1-10" className="text-xs">Top 10</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Frequency</span>
+            <Select value={frequency} onValueChange={setFrequency}>
+              <SelectTrigger className="h-8 w-[90px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hourly" className="text-xs">Hourly</SelectItem>
+                <SelectItem value="daily" className="text-xs">Daily</SelectItem>
+                <SelectItem value="weekly" className="text-xs">Weekly</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </AppTaskbar>
 
         <SOVKPIStrip metrics={sovMetrics} />

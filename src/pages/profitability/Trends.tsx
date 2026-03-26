@@ -2,42 +2,25 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { ScatterPlotChart } from "@/components/profitability/ScatterPlotChart";
 import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModal";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { scatterData, profitabilityProducts, profitabilityMetrics } from "@/data/mockProfitability";
 import { ProfitabilityProduct } from "@/types/profitability";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
-import { Play, Download, TrendingUp } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Download, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
-const COLUMN_DEFS = [
-  { id: "weeklyData", label: "Weekly Data", visible: true },
-  { id: "total", label: "Total", visible: true },
-];
-
-const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Price"];
-
 export default function ProfitabilityTrends() {
   const { formatCurrency } = useCurrency();
   const [selectedMetric, setSelectedMetric] = useState("Total Sales");
-  const [dateRange, setDateRange] = useState("quarter");
   const [searchValue, setSearchValue] = useState("");
-  const [columns, setColumns] = useState(COLUMN_DEFS);
-  const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showDeltas, setShowDeltas] = useState(false);
+  const [catalogue, setCatalogue] = useState("all");
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -47,12 +30,6 @@ export default function ProfitabilityTrends() {
 
   const weeks = ["Week-01", "Week-02", "Week-04", "Week-05"];
 
-  const handleRun = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 800);
-    toast.info("Refreshing data...");
-  };
-
   const handleDownload = () => {
     toast.success("Exporting data as CSV...");
   };
@@ -60,8 +37,25 @@ export default function ProfitabilityTrends() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Profitability Trends" subtitle="Analyze product performance quadrants" />
-        <AppTaskbar showDateRange>
+        <PageHeader
+          title="Profitability Trends"
+          subtitle="Analyze product performance quadrants"
+          appLevelSelector={
+            <AppLevelSelector>
+              <Select value={catalogue} onValueChange={setCatalogue}>
+                <SelectTrigger className="h-8 w-[120px] text-xs border-border">
+                  <SelectValue placeholder="Catalogue" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="text-xs">All Catalogues</SelectItem>
+                  <SelectItem value="electronics" className="text-xs">Electronics</SelectItem>
+                  <SelectItem value="home" className="text-xs">Home & Garden</SelectItem>
+                </SelectContent>
+              </Select>
+            </AppLevelSelector>
+          }
+        />
+        <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
           <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
             <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Metrics</span>
             <Select value={selectedMetric} onValueChange={setSelectedMetric}>
@@ -80,22 +74,7 @@ export default function ProfitabilityTrends() {
         <ScatterPlotChart data={scatterData} />
 
         <div className="space-y-3">
-          <DataTableToolbar
-            searchValue={searchValue}
-            onSearchChange={setSearchValue}
-            searchPlaceholder="Search by Item ID / Product Name / SKU..."
-            columns={columns}
-            onColumnToggle={(id) => setColumns((prev) => prev.map((c) => c.id === id ? { ...c, visible: !c.visible } : c))}
-            onSelectAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: true })))}
-            onClearAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: false })))}
-            activeFilters={activeFilters}
-            onFiltersChange={setActiveFilters}
-            filterFields={FILTER_FIELDS}
-            onDownload={handleDownload}
-            showDeltas={showDeltas}
-            onShowDeltasChange={setShowDeltas}
-          />
-          <div className="rounded-lg border border-border">
+          <div className="rounded-lg border border-border bg-card">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>

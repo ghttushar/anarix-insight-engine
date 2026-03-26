@@ -2,11 +2,12 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { ImpactTable } from "@/components/tables/ImpactTable";
 import { Button } from "@/components/ui/button";
-import { Calendar, ChevronDown, BarChart3, Download, Maximize2 } from "lucide-react";
+import { Calendar, ChevronDown, Download, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -14,6 +15,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { useFilter } from "@/contexts/FilterContext";
 import {
   mockImpactCampaigns,
   mockImpactAdGroups,
@@ -41,6 +43,7 @@ const impactChartData = mockImpactCampaigns.map((c) => ({
 }));
 
 export default function ImpactAnalysis() {
+  const { adType, setAdType } = useFilter();
   const [activeTab, setActiveTab] = useState<ImpactTab>("campaigns");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMetric, setSelectedMetric] = useState("adSpend");
@@ -58,10 +61,6 @@ export default function ImpactAnalysis() {
 
   const { data, showType } = getTabData();
 
-  const handleAnalyze = () => {
-    toast.info("Analyzing impact comparison...");
-  };
-
   const handleDownload = () => {
     toast.success("Exporting impact data as CSV...");
   };
@@ -69,9 +68,26 @@ export default function ImpactAnalysis() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Impact Analysis" subtitle="Compare performance across time periods to measure campaign impact" />
-        <AppTaskbar showAdType>
-          {/* Period selectors inside taskbar */}
+        <PageHeader
+          title="Impact Analysis"
+          subtitle="Compare performance across time periods to measure campaign impact"
+          appLevelSelector={
+            <AppLevelSelector>
+              <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
+                <SelectTrigger className="h-8 w-[130px] text-xs border-border">
+                  <SelectValue placeholder="Ad Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All" className="text-xs">All Types</SelectItem>
+                  <SelectItem value="SP" className="text-xs">Sponsored Products</SelectItem>
+                  <SelectItem value="SB" className="text-xs">Sponsored Brands</SelectItem>
+                  <SelectItem value="SD" className="text-xs">Sponsored Display</SelectItem>
+                </SelectContent>
+              </Select>
+            </AppLevelSelector>
+          }
+        />
+        <AppTaskbar showRunButton onRun={() => toast.info("Analyzing impact comparison...")}>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Baseline</span>
@@ -103,8 +119,7 @@ export default function ImpactAnalysis() {
           </div>
         </AppTaskbar>
 
-        {/* Performance Comparison Chart */}
-        <div className="rounded-lg border border-border p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-heading text-sm font-medium text-foreground">Performance Comparison</h3>
             <div className="flex items-center gap-1">
@@ -117,14 +132,7 @@ export default function ImpactAnalysis() {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
               <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px",
-                  fontSize: "12px",
-                }}
-              />
+              <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "6px", fontSize: "12px" }} />
               <Legend wrapperStyle={{ fontSize: "11px" }} />
               <Bar dataKey="Baseline Spend" fill="hsl(var(--muted-foreground))" radius={[2, 2, 0, 0]} />
               <Bar dataKey="Impact Spend" fill="hsl(var(--primary))" radius={[2, 2, 0, 0]} />

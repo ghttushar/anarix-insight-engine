@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { AddKeywordTargetModal } from "@/components/advertising/AddKeywordTargetModal";
@@ -62,41 +63,41 @@ export default function TargetingActions() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Targeting Actions" subtitle="Convert search terms into keyword targets across your campaigns" />
-        <AppTaskbar />
-
-        {/* Action Configuration */}
-        <div className="flex items-center gap-4 rounded-lg border border-border p-4">
+        <PageHeader
+          title="Targeting Actions"
+          subtitle="Convert search terms into keyword targets across your campaigns"
+          appLevelSelector={<AppLevelSelector />}
+        />
+        <AppTaskbar>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">Action Type:</span>
-            <Select defaultValue="auto-manual">
-              <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="auto-manual">Auto to Manual</SelectItem>
-                <SelectItem value="manual-manual">Manual to Manual</SelectItem>
-                <SelectItem value="new-keywords">New Keywords</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Action Type</span>
+              <Select defaultValue="auto-manual">
+                <SelectTrigger className="h-8 w-[140px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="auto-manual" className="text-xs">Auto to Manual</SelectItem>
+                  <SelectItem value="manual-manual" className="text-xs">Manual to Manual</SelectItem>
+                  <SelectItem value="new-keywords" className="text-xs">New Keywords</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Priority</span>
+              <Select defaultValue="high">
+                <SelectTrigger className="h-8 w-[80px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high" className="text-xs">High</SelectItem>
+                  <SelectItem value="medium" className="text-xs">Medium</SelectItem>
+                  <SelectItem value="low" className="text-xs">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-muted-foreground">Priority:</span>
-            <Select defaultValue="high">
-              <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="ml-auto">
-            <Button size="sm" onClick={handleFetchKeywords}>Fetch Keywords</Button>
-          </div>
-        </div>
+          <Button size="sm" className="gap-1.5 h-8" onClick={handleFetchKeywords}>Fetch</Button>
+        </AppTaskbar>
 
         <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as ActionTab)} />
 
-        {/* Unified Toolbar — all buttons in one row */}
         <DataTableToolbar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
@@ -107,6 +108,8 @@ export default function TargetingActions() {
           onDownload={handleDownload}
           showDeltas={showDeltas}
           onShowDeltasChange={setShowDeltas}
+          showViewToggle
+          viewMode="view"
           rightContent={
             <>
               <Popover>
@@ -126,20 +129,9 @@ export default function TargetingActions() {
                         <SelectItem value="set_to">Set To</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Input
-                      type="number"
-                      placeholder={bidAction === "set_to" ? "Enter bid value" : "Enter percentage"}
-                      value={bidValue}
-                      onChange={(e) => setBidValue(e.target.value)}
-                      className="h-8 text-xs"
-                      step={bidAction === "set_to" ? 0.01 : 1}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Are you sure you want to adjust the budget? This action might affect the spends.
-                    </p>
-                    <Button size="sm" className="w-full" onClick={handleApplyBid} disabled={!bidValue}>
-                      Apply
-                    </Button>
+                    <Input type="number" placeholder={bidAction === "set_to" ? "Enter bid value" : "Enter percentage"} value={bidValue} onChange={(e) => setBidValue(e.target.value)} className="h-8 text-xs" step={bidAction === "set_to" ? 0.01 : 1} />
+                    <p className="text-xs text-muted-foreground">Are you sure you want to adjust the budget? This action might affect the spends.</p>
+                    <Button size="sm" className="w-full" onClick={handleApplyBid} disabled={!bidValue}>Apply</Button>
                   </div>
                 </PopoverContent>
               </Popover>
@@ -150,7 +142,7 @@ export default function TargetingActions() {
           }
         />
 
-        <div className="rounded-lg border border-border">
+        <div className="rounded-lg border border-border bg-card">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -186,9 +178,7 @@ export default function TargetingActions() {
                         <div className="space-y-1">
                           <span className="font-medium text-sm text-foreground">{action.searchTerm}</span>
                           <Select defaultValue={action.termType}>
-                            <SelectTrigger className="h-6 w-24 text-[11px] border-dashed">
-                              <SelectValue />
-                            </SelectTrigger>
+                            <SelectTrigger className="h-6 w-24 text-[11px] border-dashed"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="generic">Generic</SelectItem>
                               <SelectItem value="branded">Branded</SelectItem>
@@ -212,45 +202,20 @@ export default function TargetingActions() {
                           <SelectContent>{mockTargetAdGroups.map((ag) => (<SelectItem key={ag.id} value={ag.id}>{ag.name}</SelectItem>))}</SelectContent>
                         </Select>
                       </TableCell>
-
-                      {/* Redesigned Match Type Cards */}
                       {(["broad", "exact", "phrase"] as const).map((matchType) => {
                         const mt = action.matchTypes[matchType];
                         return (
                           <TableCell key={matchType} className="px-1.5">
-                            <div
-                              className={cn(
-                                "relative flex flex-col items-center gap-1 rounded-lg border p-2 min-w-[80px] transition-colors",
-                                mt.selected
-                                  ? "border-primary/40 bg-primary/5"
-                                  : "border-border bg-background"
-                              )}
-                            >
-                              <Checkbox
-                                checked={mt.selected}
-                                className="absolute left-1.5 top-1.5 h-3 w-3"
-                              />
-                              <span className={cn(
-                                "text-[10px] uppercase font-medium tracking-wide",
-                                mt.selected ? "text-primary" : "text-muted-foreground"
-                              )}>
-                                {matchType}
-                              </span>
-                              <Input
-                                type="number"
-                                value={mt.bid}
-                                step={0.01}
-                                className="h-6 w-14 text-center text-xs border-border bg-background shadow-none focus-visible:ring-1 focus-visible:ring-primary/30 rounded px-1"
-                              />
+                            <div className={cn("relative flex flex-col items-center gap-1 rounded-lg border p-2 min-w-[80px] transition-colors", mt.selected ? "border-primary/40 bg-primary/5" : "border-border bg-background")}>
+                              <Checkbox checked={mt.selected} className="absolute left-1.5 top-1.5 h-3 w-3" />
+                              <span className={cn("text-[10px] uppercase font-medium tracking-wide", mt.selected ? "text-primary" : "text-muted-foreground")}>{matchType}</span>
+                              <Input type="number" value={mt.bid} step={0.01} className="h-6 w-14 text-center text-xs border-border bg-background shadow-none focus-visible:ring-1 focus-visible:ring-primary/30 rounded px-1" />
                             </div>
                           </TableCell>
                         );
                       })}
-
                       <TableCell className="text-center">
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                          <Archive className="h-3.5 w-3.5 text-muted-foreground" />
-                        </Button>
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Archive className="h-3.5 w-3.5 text-muted-foreground" /></Button>
                       </TableCell>
                       <TableCell className="text-right tabular-nums text-foreground">{formatNumber(action.impressions)}</TableCell>
                       <TableCell className="text-right tabular-nums text-foreground">{formatNumber(action.clicks)}</TableCell>
@@ -278,11 +243,7 @@ export default function TargetingActions() {
         </div>
       </div>
 
-      <AddKeywordTargetModal
-        isOpen={addKeywordsOpen}
-        onClose={() => setAddKeywordsOpen(false)}
-        onAdd={handleAddKeywords}
-      />
+      <AddKeywordTargetModal isOpen={addKeywordsOpen} onClose={() => setAddKeywordsOpen(false)} onAdd={handleAddKeywords} />
     </AppLayout>
   );
 }

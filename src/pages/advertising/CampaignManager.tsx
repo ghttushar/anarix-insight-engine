@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -19,8 +20,10 @@ import { CreateCampaignModal } from "@/components/advertising/CreateCampaignModa
 import { CreateCampaignPanel } from "@/components/panels/CreateCampaignPanel";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { useMarketplace } from "@/contexts/MarketplaceContext";
+import { useFilter } from "@/contexts/FilterContext";
 import { Campaign } from "@/types/campaign";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
@@ -118,6 +121,7 @@ const AVAILABLE_METRICS = [
 export default function CampaignManager() {
   const navigate = useNavigate();
   const { isWalmart } = useMarketplace();
+  const { adType, setAdType } = useFilter();
   const { setDataPanel } = useActivePanel();
   const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
   const [activeTab, setActiveTab] = useState<TabValue>("campaigns");
@@ -207,8 +211,27 @@ export default function CampaignManager() {
     <AppLayout>
       <div className="flex flex-1 min-h-0">
         <div className="flex-1 space-y-6 overflow-auto">
-          <PageHeader title="Campaign Manager" subtitle="Manage and optimize your advertising campaigns" />
-          <AppTaskbar showAdType showFrequency showDateRange />
+          <PageHeader
+            title="Campaign Manager"
+            subtitle="Manage and optimize your advertising campaigns"
+            appLevelSelector={
+              <AppLevelSelector>
+                <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
+                  <SelectTrigger className="h-8 w-[130px] text-xs border-border">
+                    <SelectValue placeholder="Ad Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All" className="text-xs">All Types</SelectItem>
+                    <SelectItem value="SP" className="text-xs">Sponsored Products</SelectItem>
+                    <SelectItem value="SB" className="text-xs">Sponsored Brands</SelectItem>
+                    <SelectItem value="SD" className="text-xs">Sponsored Display</SelectItem>
+                    <SelectItem value="SV" className="text-xs">Sponsored Video</SelectItem>
+                  </SelectContent>
+                </Select>
+              </AppLevelSelector>
+            }
+          />
+          <AppTaskbar showFrequency showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} />
 
           <InlineKPIStrip items={kpiItems} availableMetrics={AVAILABLE_METRICS} onMetricChange={handleKPISwap} />
           <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
@@ -231,8 +254,6 @@ export default function CampaignManager() {
             onDownload={() => toast.success("Exporting data as CSV...")}
             showDeltas={showDeltas}
             onShowDeltasChange={setShowDeltas}
-            showUpload
-            onUpload={(files) => toast.success(`${files.length} file(s) uploaded`)}
             leftContent={
               <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createCampaign")}>
                 <Plus className="h-3.5 w-3.5" />Create Campaign
