@@ -53,7 +53,7 @@ export function AdGroupSettingsDialog({ adGroup, open, onOpenChange, onSave }: A
 
           <div className="space-y-1.5">
             <Label className="text-xs">Status</Label>
-            <Select value={status} onValueChange={setStatus}>
+            <Select value={status} onValueChange={(v) => setStatus(v as AdGroup["status"])}>
               <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="live">Live</SelectItem>
