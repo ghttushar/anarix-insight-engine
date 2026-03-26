@@ -13,8 +13,6 @@ import { PeriodBreakdownPanel } from "@/components/profitability/PeriodBreakdown
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { profitabilitySummaries, profitabilityProducts, profitabilityOrders, trendDataByPeriod } from "@/data/mockProfitability";
 import { ProfitabilityProduct, ProfitabilitySummary } from "@/types/profitability";
-import { Upload, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
