@@ -115,7 +115,7 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
             </TableHeader>
             <TableBody>
               {paginatedAds.map((ad) => (
-                <TableRow key={ad.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
+                <TableRow key={ad.id} className="group cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => onRowClick?.(ad)}>
                   <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors">
                     <Checkbox checked={selectedRows.has(ad.id)} onCheckedChange={() => toggleRow(ad.id)} />
                   </TableCell>
