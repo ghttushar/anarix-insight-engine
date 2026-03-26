@@ -37,6 +37,7 @@ export default function ProfitabilityTrends() {
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDeltas, setShowDeltas] = useState(false);
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
