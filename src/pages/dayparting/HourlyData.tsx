@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { HourlyHeatmap } from "@/components/dayparting/HourlyHeatmap";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { CreateSchedulePanel } from "@/components/panels/CreateSchedulePanel";
@@ -16,9 +17,11 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
+import { useFilter } from "@/contexts/FilterContext";
 
 export default function HourlyData() {
   const navigate = useNavigate();
+  const { adType, setAdType } = useFilter();
   const { setDataPanel } = useActivePanel();
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>(["camp-1"]);
   const [metric, setMetric] = useState<MetricType>("roas");
@@ -36,37 +39,51 @@ export default function HourlyData() {
     <AppLayout>
       <div className="flex flex-1 min-h-0">
         <div className="flex-1 space-y-6 overflow-auto">
-          <PageHeader title="Day Parting" subtitle="Analyze hourly performance and manage campaign schedules" />
-          <AppTaskbar />
-
-          {/* Hourly Trends Section */}
-          <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-foreground">Hourly Trends</h2>
-
-            <div className="flex items-center gap-4 rounded-md border border-border px-3 py-2">
-              <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-muted-foreground">Campaign:</label>
-                <Select value={selectedCampaigns[0]} onValueChange={(v) => setSelectedCampaigns([v])}>
-                  <SelectTrigger className="w-56 h-7 text-xs"><SelectValue placeholder="Select campaign" /></SelectTrigger>
-                  <SelectContent>{dayPartingCampaigns.map((camp) => (<SelectItem key={camp.id} value={camp.id} className="text-xs">{camp.name}</SelectItem>))}</SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-muted-foreground">Metric:</label>
-                <Select value={metric} onValueChange={(v) => setMetric(v as MetricType)}>
-                  <SelectTrigger className="w-28 h-7 text-xs"><SelectValue /></SelectTrigger>
+          <PageHeader
+            title="Day Parting"
+            subtitle="Analyze hourly performance and manage campaign schedules"
+            appLevelSelector={
+              <AppLevelSelector>
+                <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
+                  <SelectTrigger className="h-8 w-[130px] text-xs border-border">
+                    <SelectValue placeholder="Ad Type" />
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="spend" className="text-xs">Spend</SelectItem>
-                    <SelectItem value="revenue" className="text-xs">Revenue</SelectItem>
-                    <SelectItem value="roas" className="text-xs">ROAS</SelectItem>
-                    <SelectItem value="acos" className="text-xs">ACOS</SelectItem>
-                    <SelectItem value="orders" className="text-xs">Orders</SelectItem>
-                    <SelectItem value="ctr" className="text-xs">CTR</SelectItem>
+                    <SelectItem value="All" className="text-xs">All Types</SelectItem>
+                    <SelectItem value="SP" className="text-xs">Sponsored Products</SelectItem>
+                    <SelectItem value="SB" className="text-xs">Sponsored Brands</SelectItem>
+                    <SelectItem value="SD" className="text-xs">Sponsored Display</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </AppLevelSelector>
+            }
+          />
+          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Campaign</span>
+              <Select value={selectedCampaigns[0]} onValueChange={(v) => setSelectedCampaigns([v])}>
+                <SelectTrigger className="h-8 w-[200px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer"><SelectValue placeholder="Select campaign" /></SelectTrigger>
+                <SelectContent>{dayPartingCampaigns.map((camp) => (<SelectItem key={camp.id} value={camp.id} className="text-xs">{camp.name}</SelectItem>))}</SelectContent>
+              </Select>
             </div>
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Metrics</span>
+              <Select value={metric} onValueChange={(v) => setMetric(v as MetricType)}>
+                <SelectTrigger className="h-8 w-[100px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="spend" className="text-xs">Spend</SelectItem>
+                  <SelectItem value="revenue" className="text-xs">Revenue</SelectItem>
+                  <SelectItem value="roas" className="text-xs">ROAS</SelectItem>
+                  <SelectItem value="acos" className="text-xs">ACOS</SelectItem>
+                  <SelectItem value="orders" className="text-xs">Orders</SelectItem>
+                  <SelectItem value="ctr" className="text-xs">CTR</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </AppTaskbar>
 
+          <div className="space-y-3">
+            <h2 className="text-sm font-semibold text-foreground">Hourly Trends</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
               {[
                 { label: "Spend", value: formatCurrency(summary.totalSpend) },
@@ -76,22 +93,19 @@ export default function HourlyData() {
                 { label: "Orders", value: summary.totalOrders.toString() },
                 { label: "Units", value: summary.totalUnits.toString() },
               ].map((item) => (
-                <div key={item.label} className="rounded-md border border-border px-3 py-2">
+                <div key={item.label} className="rounded-md border border-border bg-card px-3 py-2">
                   <p className="text-[10px] font-medium text-muted-foreground uppercase">{item.label}</p>
                   <p className="text-lg font-semibold text-foreground">{item.value}</p>
                 </div>
               ))}
             </div>
-
             <div className="overflow-auto">
               <HourlyHeatmap data={hourlyData} metric={metric} />
             </div>
           </div>
 
-          {/* Day Parting Campaigns Section */}
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-foreground">Day Parting Campaigns</h2>
-
             <DataTableToolbar
               searchValue={searchQuery}
               onSearchChange={setSearchQuery}
@@ -105,7 +119,7 @@ export default function HourlyData() {
                 </Button>
               }
             />
-            <div className="rounded-lg border border-border overflow-auto">
+            <div className="rounded-lg border border-border bg-card overflow-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30 hover:bg-muted/30">
@@ -153,8 +167,6 @@ export default function HourlyData() {
             </div>
           </div>
         </div>
-
-        {/* Right panel for creating schedule */}
         <CreateSchedulePanel />
       </div>
     </AppLayout>

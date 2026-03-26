@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { ScheduledJobsTable } from "@/components/dayparting/ScheduledJobsTable";
 import { CreateSchedulePanel } from "@/components/panels/CreateSchedulePanel";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Plus } from "lucide-react";
 import { schedules as initialSchedules } from "@/data/mockDayParting";
 import { DayPartingSchedule } from "@/types/dayparting";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
+import { useFilter } from "@/contexts/FilterContext";
 
 export default function ScheduledJobs() {
+  const { adType, setAdType } = useFilter();
   const { setDataPanel } = useActivePanel();
   const [schedules, setSchedules] = useState<DayPartingSchedule[]>(initialSchedules);
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +53,24 @@ export default function ScheduledJobs() {
     <AppLayout>
       <div className="flex flex-1 min-h-0">
         <div className="flex-1 space-y-6 overflow-auto">
-          <PageHeader title="Scheduled Jobs" subtitle="Manage your day parting schedules" />
+          <PageHeader
+            title="Scheduled Jobs"
+            subtitle="Manage your day parting schedules"
+            appLevelSelector={
+              <AppLevelSelector>
+                <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
+                  <SelectTrigger className="h-8 w-[130px] text-xs border-border">
+                    <SelectValue placeholder="Ad Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All" className="text-xs">All Types</SelectItem>
+                    <SelectItem value="SP" className="text-xs">Sponsored Products</SelectItem>
+                    <SelectItem value="SB" className="text-xs">Sponsored Brands</SelectItem>
+                  </SelectContent>
+                </Select>
+              </AppLevelSelector>
+            }
+          />
 
           <DataTableToolbar
             searchValue={searchQuery}
@@ -66,11 +87,7 @@ export default function ScheduledJobs() {
           />
 
           {filteredSchedules.length > 0 ? (
-            <ScheduledJobsTable
-              schedules={filteredSchedules}
-              onPauseResume={handlePauseResume}
-              onDelete={handleDeleteClick}
-            />
+            <ScheduledJobsTable schedules={filteredSchedules} onPauseResume={handlePauseResume} onDelete={handleDeleteClick} />
           ) : (
             <div className="text-center py-12 border border-border rounded-lg bg-card">
               <p className="text-muted-foreground">No scheduled jobs found</p>
@@ -82,25 +99,18 @@ export default function ScheduledJobs() {
             </div>
           )}
         </div>
-
-        {/* Right panel for creating schedule */}
         <CreateSchedulePanel />
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Schedule</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this schedule? This action cannot be undone and all scheduled jobs will be removed.
-            </AlertDialogDescription>
+            <AlertDialogDescription>Are you sure you want to delete this schedule? This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

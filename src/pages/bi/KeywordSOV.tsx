@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
@@ -34,8 +34,11 @@ export default function KeywordSOV() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Keyword Share of Voice" subtitle="Track SOV performance by keyword" />
-        <AppTaskbar />
+        <PageHeader
+          title="Keyword Share of Voice"
+          subtitle="Track SOV performance by keyword"
+          appLevelSelector={<AppLevelSelector />}
+        />
 
         <SOVChart data={sovTrendData} title="Keyword SOV Trend" subtitle="Hourly breakdown" />
 

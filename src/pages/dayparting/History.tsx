@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { HistoryTable } from "@/components/dayparting/HistoryTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Download, RefreshCw } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { executionHistory } from "@/data/mockDayParting";
 import { toast } from "sonner";
+import { useFilter } from "@/contexts/FilterContext";
 
 export default function DayPartingHistory() {
+  const { adType, setAdType } = useFilter();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
@@ -34,13 +36,34 @@ export default function DayPartingHistory() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Execution History" subtitle="View past day parting schedule executions" />
-        <AppTaskbar />
-
-        <div className="flex items-center justify-end gap-2">
-          <Button variant="outline" size="icon" onClick={() => toast.info("Refreshing...")} title="Refresh"><RefreshCw className="h-4 w-4" /></Button>
-          <Button variant="outline" onClick={() => toast.success("Exporting history...")}><Download className="mr-2 h-4 w-4" />Export</Button>
-        </div>
+        <PageHeader
+          title="Execution History"
+          subtitle="View past day parting schedule executions"
+          appLevelSelector={
+            <AppLevelSelector>
+              <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
+                <SelectTrigger className="h-8 w-[130px] text-xs border-border">
+                  <SelectValue placeholder="Ad Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All" className="text-xs">All Types</SelectItem>
+                  <SelectItem value="SP" className="text-xs">Sponsored Products</SelectItem>
+                  <SelectItem value="SB" className="text-xs">Sponsored Brands</SelectItem>
+                </SelectContent>
+              </Select>
+            </AppLevelSelector>
+          }
+        />
+        <AppTaskbar>
+          <div className="relative min-w-[200px]">
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by schedule or campaign..."
+              className="h-8 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground"
+            />
+          </div>
+        </AppTaskbar>
 
         <DataTableToolbar
           searchValue={searchQuery}
@@ -56,7 +79,6 @@ export default function DayPartingHistory() {
             <TabsTrigger value="failed">Failed ({statusCounts.failed})</TabsTrigger>
             <TabsTrigger value="cancelled">Cancelled ({statusCounts.cancelled})</TabsTrigger>
           </TabsList>
-
           <TabsContent value={activeTab} className="mt-4">
             {filteredHistory.length > 0 ? (
               <HistoryTable history={filteredHistory} onRetry={handleRetry} />

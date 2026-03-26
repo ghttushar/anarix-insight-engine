@@ -1,5 +1,6 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -15,7 +16,6 @@ const isMarginRow = (label: string) => label.toLowerCase().includes("margin");
 
 export default function UnifiedPnL() {
   const { formatCurrency } = useCurrency();
-  // Summary cards
   const netProfit = mockUnifiedPnL.find((r) => r.label === "Net Profit");
   const grossRevenue = mockUnifiedPnL.find((r) => r.label === "Gross Revenue");
   const grossProfit = mockUnifiedPnL.find((r) => r.label === "Gross Profit");
@@ -27,12 +27,12 @@ export default function UnifiedPnL() {
         <PageHeader
           title="Cross-Marketplace Unified P&L"
           subtitle="Combined Amazon + Walmart profitability in a single view"
+          appLevelSelector={<AppLevelSelector />}
           actions={
             <Button variant="outline" size="sm" onClick={() => toast.success("Exporting unified P&L...")}><Download className="mr-2 h-4 w-4" />Export PDF</Button>
           }
         />
 
-        {/* Summary */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: "Combined Revenue", value: grossRevenue?.combined || 0 },
@@ -40,14 +40,13 @@ export default function UnifiedPnL() {
             { label: "Combined Ad Spend", value: adSpend?.combined || 0 },
             { label: "Combined Net Profit", value: netProfit?.combined || 0 },
           ].map((kpi) => (
-            <Card key={kpi.label} className="h-full"><CardContent className="pt-4 pb-3 px-4">
+            <Card key={kpi.label} className="h-full bg-card"><CardContent className="pt-4 pb-3 px-4">
               <p className="text-xs text-muted-foreground mb-1">{kpi.label}</p>
               <p className="text-xl font-semibold text-foreground">{formatCurrency(kpi.value)}</p>
             </CardContent></Card>
           ))}
         </div>
 
-        {/* P&L Table */}
         <div className="rounded-lg border border-border bg-card overflow-x-auto">
           <Table>
             <TableHeader>
@@ -55,14 +54,12 @@ export default function UnifiedPnL() {
                 <TableHead className="min-w-[260px]">Line Item</TableHead>
                 <TableHead className="text-right min-w-[140px]">
                   <div className="flex items-center justify-end gap-2">
-                    <img src={amazonLogo} alt="Amazon" className="h-4 w-auto" />
-                    Amazon
+                    <img src={amazonLogo} alt="Amazon" className="h-4 w-auto" />Amazon
                   </div>
                 </TableHead>
                 <TableHead className="text-right min-w-[140px]">
                   <div className="flex items-center justify-end gap-2">
-                    <img src={walmartLogo} alt="Walmart" className="h-4 w-auto" />
-                    Walmart
+                    <img src={walmartLogo} alt="Walmart" className="h-4 w-auto" />Walmart
                   </div>
                 </TableHead>
                 <TableHead className="text-right min-w-[140px] font-semibold">Combined</TableHead>
@@ -70,20 +67,9 @@ export default function UnifiedPnL() {
             </TableHeader>
             <TableBody>
               {mockUnifiedPnL.map((row, i) => (
-                <TableRow
-                  key={i}
-                  className={cn(
-                    row.isTotal && "bg-muted/20 font-semibold border-t-2 border-border",
-                    row.isHeader && "bg-muted/10 font-medium",
-                  )}
-                >
+                <TableRow key={i} className={cn(row.isTotal && "bg-muted/20 font-semibold border-t-2 border-border", row.isHeader && "bg-muted/10 font-medium")}>
                   <TableCell className={cn(row.indent && `pl-${4 + row.indent * 4}`)}>
-                    <span className={cn(
-                      row.isTotal && "font-semibold text-foreground",
-                      row.isHeader && "font-medium text-foreground",
-                      !row.isTotal && !row.isHeader && "text-muted-foreground",
-                      row.indent && "text-sm",
-                    )}>
+                    <span className={cn(row.isTotal && "font-semibold text-foreground", row.isHeader && "font-medium text-foreground", !row.isTotal && !row.isHeader && "text-muted-foreground", row.indent && "text-sm")}>
                       {row.indent ? "  " : ""}{row.label}
                     </span>
                   </TableCell>

@@ -1,18 +1,16 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { productSOVData, sovTrendData } from "@/data/mockBrandSOV";
 import { toast } from "sonner";
 import { TablePagination } from "@/components/tables/TablePagination";
 
 export default function ProductSOV() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [position, setPosition] = useState("all");
   const [showDeltas, setShowDeltas] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
@@ -27,19 +25,11 @@ export default function ProductSOV() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Product Share of Voice" subtitle="Track SOV performance by product" />
-
-        <AppTaskbar>
-          <Select value={position} onValueChange={setPosition}>
-            <SelectTrigger className="w-[140px] h-9 text-xs"><SelectValue placeholder="Position" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Positions</SelectItem>
-              <SelectItem value="1-3">Top 3</SelectItem>
-              <SelectItem value="1-10">Top 10</SelectItem>
-              <SelectItem value="1-20">Top 20</SelectItem>
-            </SelectContent>
-          </Select>
-        </AppTaskbar>
+        <PageHeader
+          title="Product Share of Voice"
+          subtitle="Track SOV performance by product"
+          appLevelSelector={<AppLevelSelector />}
+        />
 
         <SOVChart data={sovTrendData} title="Product SOV Trend" subtitle="Hourly breakdown" />
 
