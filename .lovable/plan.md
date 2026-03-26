@@ -1,94 +1,108 @@
 
 
-## Multi-Phase Fix: Day Parting, Toolbar, Deltas, Info Cards, KPIs, Floating Island, Pagination
+## Critical Fix: All Outstanding Requirements — Final Comprehensive Implementation
 
-This is broken into 4 phases due to scope. Each phase will be verified before moving to the next.
+### Audit Summary: What's Actually Missing
 
----
+After thorough codebase analysis, here is the truth of what exists vs what's broken:
 
-### Phase 1: Fix Create Day Parting + Panel Scroll + Toolbar Redesign
+**Actually implemented:**
+- Pagination (`TablePagination`) IS in all table components (AdGroups, Keywords, SearchTerms, ProductAds, ProductTargeting, PageType, Platform, Regional, ScheduledJobs, History, BrandCoverage, KeywordTracker, Impact, ProductsPnL)
+- Delta toggle state IS wired in CampaignManager, CampaignDetail, AdGroupDetail, TargetingActions, KeywordTracker, HourlyData, ProfitLoss, Dashboard
+- CreateSchedulePanel IS rendered as flex sibling in HourlyData and ScheduledJobs
+- InlineKPIStrip already supports 5 items with Prev subtitle
 
-**1a. Fix Create Day Parting Rule** — The `setDataPanel("createSchedule")` call works, but the `CreateSchedulePanel` renders inside pages that may not include it as a sibling. Must ensure `CreateSchedulePanel` is rendered in `HourlyData.tsx` (and `ScheduledJobs.tsx`) as a flex sibling like `CreateCampaignPanel` is in `CampaignManager`.
-
-**1b. Independent scroll on ALL right panels** — Already using `ScrollArea` in `CreateSchedulePanel`. Verify all panels (`ProductDetailPanel`, `PeriodBreakdownPanel`, `CreateCampaignPanel`) use the same pattern: `flex h-full flex-col` with `ScrollArea className="flex-1 min-h-0"`.
-
-**1c. Toolbar button hierarchy redesign** — New universal order (left to right):
-1. Create button (if applicable)
-2. Upload button (with drag-drop dialog)  
-3. Search
-4. Delta toggle (redesigned — just icon toggle, no box/switch)
-5. Filter (redesigned active chips)
-6. Columns
-7. Export
-8. Edit (with save confirmation dialog on deactivate)
-
-**1d. Delta toggle redesign** — Replace the bordered box+switch with a simple icon toggle button (like the Insights button). When active: highlighted. Controls ONLY the table below it, not page-wide.
-
-**1e. Delta toggle on EVERY table toolbar** — Add `showDeltas`/`onShowDeltasChange` props to every page that uses `DataTableToolbar`.
-
-**1f. Active filter chips redesign** — Replace raw text dump with cleaner pills: `Field: Value` with subtle background, proper spacing, individual remove buttons.
-
-### Phase 2: Campaign Detail Info Cards + Edit Modals + KPI Strip
-
-**2a. CampaignInfoCard redesign** — Match image-136/137: Show Campaign Name with SP/MANUAL badges, Status (ENABLED badge), Daily Budget (clickable), Bidding Strategy (clickable "Up & Down"), Schedule (date range). Edit button opens a Campaign Settings dialog (image-137).
-
-**2b. Campaign Settings Dialog** — Modal with: Campaign Name input, Campaign ID (read-only), Type of Ad (SP badge), Type of Targeting (AUTO badge), Status dropdown, Start/End Date pickers, Budget input, Bidding Strategy radio (Dynamic down only / Dynamic up and down / Fixed bids with descriptions), Placement Bids section (Top of Search %, Product Pages %, Rest of Search %).
-
-**2c. AdGroupInfoCard redesign** — Match image-138: Ad Group Name, Status (ENABLED), Default Bid (clickable), Keyword Targeting (Bidded Value), Min. Bid, Max. Bid, TRoAS. Edit opens Ad Group Settings dialog (image-139): AdGroup Name, AdGroup ID, Status dropdown, Default Bid input.
-
-**2d. InlineKPIStrip to show 5 items** — Expand from 4 to 5 KPI cards. Mock data should include varied digit counts: 1-digit, 5-digit, 6-digit, 7-digit, 7-digit+suffix (K/M/T) to demonstrate formatting at different scales.
-
-**2e. KPI data matching image-135** — Each KPI shows: label, value, delta badge (colored arrow + percentage), "Prev 7 days: $X" subtitle.
-
-### Phase 3: Profitability Table Redesign + Pagination Everywhere + Products/Orders
-
-**3a. ProductsPnLTable redesign** — Match the standard table style used everywhere else: `rounded-lg border`, standardized padding (`px-4 py-2.5`), subtle column dividers, consistent with CampaignTable styling. Orders view matches image-132: card-style rows with Order ID, country flag, date/time, status badge, price, item count, expandable chevron.
-
-**3b. Pagination on EVERY table** — Add `CampaignTablePagination` (rename to `TablePagination`) to ALL table components across the app: AdGroupsTable, ProductAdsTable, KeywordTargetingTable, SearchTermsTable, PageTypeTable, PlatformTable, ProductTargetingTable, ProductsPnLTable, RegionalTable, ScheduledJobsTable, HistoryTable, BrandCoverageTable, KeywordTrackerTable, ImpactTable.
-
-**3c. Total row with deltas** — Match image-133: Total row at bottom of tables showing summed values with delta badges beneath each total.
-
-### Phase 4: Floating Island Drag + Buttons Audit + Create Buttons in Toolbar
-
-**4a. Floating Island draggable** — Replace X close button with a drag handle icon (GripVertical). Implement drag-and-drop positioning using mouse events, persist position in state. Remove close/reopen logic entirely.
-
-**4b. Move ALL create buttons into table toolbar** — Create Campaign, Create Schedule, Add Keywords, Add Product Ads — all move from standalone buttons above tables into the toolbar's `leftContent` slot as the first button.
-
-**4c. Edit mode save confirmation** — When user clicks Edit toggle to deactivate (going from edit → view), show a confirmation dialog listing changes made with "Save" / "Discard" options.
-
-**4d. Upload button with dialog** — New upload button in toolbar that opens a dialog with drag-and-drop zone, file list showing selected files, and upload/cancel actions.
-
-**4e. Full audit** — Verify every screen has: toolbar with correct buttons, pagination, delta toggle, working create/edit flows, consistent spacing.
+**Actually broken / never done:**
+1. **3-level campaign hierarchy**: CampaignDetail only has 2 levels (Campaign > AdGroup). Missing Campaign > AdGroup > ProductAd (3rd level with its own detail page)
+2. **Floating island NOT draggable**: Still has X close button, no GripVertical drag handle
+3. **Toolbar button order wrong**: Current order is `leftContent | Search | ... | Deltas | Columns | Filter | Download | Edit`. Required: `Create | Upload | Search | Delta | Filter | Columns | Export | Edit`
+4. **Create buttons NOT in toolbar**: CampaignManager has Create Campaign as a standalone button ABOVE the toolbar (line 218-223), not inside it
+5. **Upload button missing**: No upload dialog with drag-and-drop anywhere in toolbar
+6. **Edit mode has NO save confirmation**: Pencil toggle just switches mode silently
+7. **Delta toggle not passed to child tables**: Pages pass `showDeltas` to `DataTableToolbar` but NOT to the table components (e.g., CampaignDetail renders `<AdGroupsTable searchQuery={searchQuery} />` without `showDeltas`)
+8. **BrandSOV, KeywordSOV, ProductSOV, CompetitorPricing** pages have NO DataTableToolbar at all — no delta toggle
+9. **Right panels NOT independently scrolling**: CreateSchedulePanel uses `ScrollArea` but the outer `div` with `flex h-full` may not constrain height properly when parent scrolls
+10. **Orders view in profitability**: ProductsPnLTable has orders mode but styling may not match expectations
+11. **Show Impact toggle NOT in chart toolbar**: It's rendered separately, needs to be inside ChartContainer's toolbar on the left of metric selector
 
 ---
 
-### Files Summary (across all phases)
+### Phase 1: Toolbar Contract + Create in Toolbar + Upload Dialog + Edit Confirmation
+
+**Files: `DataTableToolbar.tsx`, `CampaignManager.tsx`, all pages with toolbars**
+
+1. **Reorder toolbar buttons**: `[leftContent(Create/Upload)] | [Search] | [Delta] | [Filter] | [Columns] | [Export] | [Edit]`
+2. **Add `onUpload` prop** to DataTableToolbar — renders Upload icon button that opens new `UploadDialog`
+3. **Create `UploadDialog.tsx`** — modal with drag-and-drop zone, file list, upload/cancel buttons
+4. **Edit save confirmation**: When edit mode toggles OFF, show AlertDialog "Save changes?" with list + Save/Discard buttons
+5. **Move Create Campaign button** into toolbar's `leftContent` in CampaignManager
+6. **Wire `showDeltas` from pages to child table components** on ALL pages (CampaignManager, CampaignDetail, AdGroupDetail, etc.)
+7. **Add DataTableToolbar** to BrandSOV, KeywordSOV, ProductSOV, CompetitorPricing pages with delta toggle
+
+### Phase 2: 3-Level Campaign Hierarchy
+
+**Files: `App.tsx`, `AdGroupDetail.tsx`, new `ProductAdDetail.tsx`**
+
+1. **CampaignDetail** (Level 1): Click campaign row → shows Campaign info, tabs: Ad Groups, Product Ads, Keywords, Search Terms
+2. **AdGroupDetail** (Level 2): Click ad group row → shows AdGroup info, tabs: Product Ads, Keywords, Search Terms. Breadcrumb: Advertising > Campaign > AdGroup
+3. **ProductAdDetail** (Level 3 — NEW): Click product ad row → shows Product Ad info. Breadcrumb: Advertising > Campaign > AdGroup > Product Ad. Add Product Ad button available here
+4. Add route `/advertising/campaigns/:campaignId/ad-groups/:adGroupId/product-ads/:productAdId`
+5. Each level has its own InlineKPIStrip with level-appropriate data and its own edit dialog
+
+### Phase 3: Floating Island Draggable + Show Impact in Chart + Right Panel Independent Scroll
+
+**Files: `FloatingActionIsland.tsx`, `PerformanceChart.tsx`/`ChartContainer.tsx`, panel components**
+
+1. **Floating Island**: Replace X with `GripVertical`. Add `onMouseDown` drag handler, track position with `useState({ x, y })`, apply via `style={{ left, top }}` instead of centering. Remove close/reopen logic entirely
+2. **Show Impact toggle**: Move into `ChartContainer` toolbar, left of metric selector. Remove from standalone position in pages
+3. **Right panel scroll fix**: Ensure all right panels have parent container with `h-full` and panel itself uses `position: sticky` or the flex parent constrains height via `min-h-0 overflow-hidden`
+
+### Phase 4: Full Screen-by-Screen Audit + Verification Report
+
+After implementation, audit every screen:
+
+| Screen | Create in Toolbar | Delta Toggle | Pagination | Upload | Edit Confirm | Panel Scroll |
+|---|---|---|---|---|---|---|
+| Campaign Manager | Create Campaign | yes | yes | yes | yes | yes |
+| Campaign Detail | — | yes→table | yes | — | yes | — |
+| Ad Group Detail | — | yes→table | yes | — | yes | — |
+| Product Ad Detail | Add Product Ad | yes→table | yes | — | — | — |
+| Targeting Actions | Add Keyword | yes | yes | — | — | — |
+| Day Parting Hourly | Create Rule | yes | yes | — | — | yes |
+| Scheduled Jobs | Create Schedule | yes | yes | — | — | yes |
+| Budget Pacing | — | yes | yes | — | — | — |
+| Profitability Dash | — | yes | yes | Upload COGS | — | yes |
+| Profit & Loss | — | yes | yes | — | — | yes |
+| Brand SOV | — | yes | yes | — | — | — |
+| Keyword Tracker | Add Keyword | yes | yes | — | — | — |
+| Keyword/Product SOV | — | yes | yes | — | — | — |
+| Competitor Pricing | — | yes | yes | — | — | — |
+
+Post-implementation: detailed changes report listing every file modified and what was verified.
+
+---
+
+### Files Summary
 
 | File | Phase | Change |
 |---|---|---|
-| `DataTableToolbar.tsx` | 1 | Reorder buttons, redesign delta toggle, redesign filter chips, add upload button, add create slot, edit confirmation |
-| `HourlyData.tsx` | 1 | Add `CreateSchedulePanel` as flex sibling |
-| `ScheduledJobs.tsx` | 1 | Add `CreateSchedulePanel` as flex sibling, move Create into toolbar |
-| `CampaignManager.tsx` | 1,4 | Move Create Campaign into toolbar, add delta toggle, 5 KPIs |
-| `CampaignDetail.tsx` | 2 | Update KPI count to 5, add Campaign Settings dialog |
-| `AdGroupDetail.tsx` | 2 | Update KPI count to 5, add Ad Group Settings dialog |
-| `CampaignInfoCard.tsx` | 2 | Redesign to match image-136, add edit dialog trigger |
-| `AdGroupInfoCard.tsx` | 2 | Redesign to match image-138, add edit dialog trigger |
-| `CampaignSettingsDialog.tsx` | 2 | **NEW** — Campaign edit modal (image-137) |
-| `AdGroupSettingsDialog.tsx` | 2 | **NEW** — Ad Group edit modal (image-139) |
-| `InlineKPIStrip.tsx` | 2 | Support 5 items, add "Prev" subtitle |
-| `ProductsPnLTable.tsx` | 3 | Redesign to match app table style, add pagination |
-| `TablePagination.tsx` | 3 | Rename from CampaignTablePagination, make generic |
-| `AdGroupsTable.tsx` | 3 | Add pagination, delta toggle support |
-| `ProductAdsTable.tsx` | 3 | Add pagination, delta toggle support |
-| `KeywordTargetingTable.tsx` | 3 | Add pagination, delta toggle support |
-| `SearchTermsTable.tsx` | 3 | Add pagination, delta toggle support |
-| `ProductTargetingTable.tsx` | 3 | Add pagination |
-| `PageTypeTable.tsx` | 3 | Add pagination |
-| `PlatformTable.tsx` | 3 | Add pagination |
-| `ScheduledJobsTable.tsx` | 3 | Add pagination |
-| `HistoryTable.tsx` | 3 | Add pagination |
-| `FloatingActionIsland.tsx` | 4 | Replace X with drag handle, implement draggable |
-| `UploadDialog.tsx` | 4 | **NEW** — Drag-drop upload modal |
-| All page files | 1-4 | Wire delta toggle, pagination, toolbar buttons consistently |
+| `DataTableToolbar.tsx` | 1 | Reorder buttons, add onUpload prop, edit save confirmation dialog |
+| `UploadDialog.tsx` | 1 | **NEW** — drag-and-drop upload modal |
+| `CampaignManager.tsx` | 1 | Move Create into toolbar leftContent, pass showDeltas to tables |
+| `CampaignDetail.tsx` | 1,2 | Pass showDeltas to tables, wire AdGroup click to level 2 |
+| `AdGroupDetail.tsx` | 1,2 | Pass showDeltas to tables, wire ProductAd click to level 3 |
+| `ProductAdDetail.tsx` | 2 | **NEW** — Level 3 detail page |
+| `App.tsx` | 2 | Add route for product ad detail |
+| `BrandSOV.tsx` | 1 | Add DataTableToolbar with delta toggle |
+| `KeywordSOV.tsx` | 1 | Add DataTableToolbar with delta toggle |
+| `ProductSOV.tsx` | 1 | Add DataTableToolbar with delta toggle |
+| `CompetitorPricing.tsx` | 1 | Add DataTableToolbar with delta toggle |
+| `FloatingActionIsland.tsx` | 3 | Draggable with GripVertical, remove close logic |
+| `ChartContainer.tsx` | 3 | Add showImpact toggle prop to chart toolbar |
+| `PerformanceChart.tsx` | 3 | Pass showImpact to ChartContainer instead of standalone |
+| `CreateSchedulePanel.tsx` | 3 | Fix independent scroll container |
+| `CreateCampaignPanel.tsx` | 3 | Fix independent scroll container |
+| `ProductDetailPanel.tsx` | 3 | Fix independent scroll container |
+| `PeriodBreakdownPanel.tsx` | 3 | Fix independent scroll container |
+| All table components | 1 | Accept and use showDeltas prop from parent |
 
