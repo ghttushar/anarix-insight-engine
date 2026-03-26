@@ -10,8 +10,6 @@ import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { geographicalData } from "@/data/mockProfitability";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Upload } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const regionLookup: Record<string, typeof geographicalData[0]> = {
   US: geographicalData[0],
