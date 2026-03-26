@@ -34,6 +34,7 @@ export default function AdGroupDetail() {
   const [activeTab, setActiveTab] = useState<TabValue>("product-ads");
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
+  const [showDeltas, setShowDeltas] = useState(false);
 
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
   const adGroup = mockAdGroups.find((ag) => ag.id === adGroupId);
