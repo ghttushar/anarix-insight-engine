@@ -4,19 +4,24 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Download, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { keywordSOVData, sovTrendData } from "@/data/mockBrandSOV";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { TablePagination } from "@/components/tables/TablePagination";
 
 export default function KeywordSOV() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDeltas, setShowDeltas] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const filteredKeywords = keywordSOVData.filter((k) =>
     k.keyword.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const paginatedKeywords = filteredKeywords.slice((page - 1) * pageSize, page * pageSize);
 
   const getTrendIcon = (trend: "up" | "down" | "stable") => {
     switch (trend) {
@@ -29,18 +34,8 @@ export default function KeywordSOV() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader
-          title="Keyword Share of Voice"
-          subtitle="Track SOV performance by keyword"
-        />
-
+        <PageHeader title="Keyword Share of Voice" subtitle="Track SOV performance by keyword" />
         <AppTaskbar />
-
-        <div className="flex items-center justify-end">
-          <Button variant="outline" size="sm" onClick={() => toast.success("Exporting...")}>
-            <Download className="mr-2 h-4 w-4" />Export
-          </Button>
-        </div>
 
         <SOVChart data={sovTrendData} title="Keyword SOV Trend" subtitle="Hourly breakdown" />
 
@@ -51,6 +46,8 @@ export default function KeywordSOV() {
               onSearchChange={setSearchQuery}
               searchPlaceholder="Search keyword..."
               onDownload={() => toast.success("Exporting keyword SOV...")}
+              showDeltas={showDeltas}
+              onShowDeltasChange={setShowDeltas}
             />
           </div>
           <Table>
@@ -65,7 +62,7 @@ export default function KeywordSOV() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredKeywords.map((kw) => (
+              {paginatedKeywords.map((kw) => (
                 <TableRow key={kw.id}>
                   <TableCell className="font-medium">{kw.keyword}</TableCell>
                   <TableCell className="text-right">{kw.searchVolume.toLocaleString()}</TableCell>
@@ -87,6 +84,7 @@ export default function KeywordSOV() {
               )}
             </TableBody>
           </Table>
+          <TablePagination page={page} pageSize={pageSize} totalItems={filteredKeywords.length} onPageChange={setPage} onPageSizeChange={setPageSize} />
         </div>
       </div>
     </AppLayout>
