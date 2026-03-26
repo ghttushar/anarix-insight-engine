@@ -18,7 +18,7 @@ interface AdGroupsTableProps {
   onRowClick?: (adGroup: typeof import("@/data/mockAdGroups").mockAdGroups[0]) => void;
 }
 
-export function AdGroupsTable({ searchQuery = "", showDeltas = false }: AdGroupsTableProps) {
+export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick }: AdGroupsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
