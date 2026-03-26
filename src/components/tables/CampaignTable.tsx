@@ -101,6 +101,7 @@ export function CampaignTable({
   viewMode = "view",
   onRowClick,
   hiddenColumns,
+  showDeltas = false,
 }: CampaignTableProps) {
   const { formatCurrency } = useCurrency();
   const show = (col: string) => !hiddenColumns?.has(col);
