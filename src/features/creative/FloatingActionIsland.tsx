@@ -28,6 +28,7 @@ export function FloatingActionIsland() {
   const { openPanel: openInsights, criticalCount } = useInsights();
 
   const shouldHide = hiddenRoutes.some((route) => location.pathname.startsWith(route));
+
   if (shouldHide) return null;
 
   const actions: ActionItem[] = [
