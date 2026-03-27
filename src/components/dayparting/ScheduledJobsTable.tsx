@@ -49,7 +49,7 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
   };
 
   return (
-    <div className="rounded-lg border border-border">
+    <div className="rounded-lg border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">

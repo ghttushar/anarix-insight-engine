@@ -48,7 +48,7 @@ export function PlatformTable({ searchQuery = "", showDeltas = false }: Platform
   );
 
   return (
-    <div className="rounded-lg border border-border">
+    <div className="rounded-lg border border-border bg-card">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>

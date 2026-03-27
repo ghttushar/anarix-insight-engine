@@ -138,7 +138,7 @@ export function CampaignTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-border">
+      <div className="rounded-lg border border-border bg-card">
         <Table>
           <TableHeader>
               <TableRow className="bg-muted">

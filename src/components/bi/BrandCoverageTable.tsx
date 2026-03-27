@@ -17,7 +17,7 @@ export function BrandCoverageTable({ brands, onViewTrend }: BrandCoverageTablePr
   const paginatedBrands = brands.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
-    <div className="rounded-lg border border-border">
+    <div className="rounded-lg border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">
