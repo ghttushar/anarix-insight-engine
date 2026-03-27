@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2, TrendingUp, Upload } from "lucide-react";
+import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2, TrendingUp, Upload, Pin, PinOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +56,8 @@ interface DataTableToolbarProps {
   showUpload?: boolean;
   uploadAccept?: string;
   uploadTitle?: string;
+  pinnedColumns?: string[];
+  onPinColumn?: (columnId: string) => void;
 }
 
 const OPERATORS = [
@@ -87,6 +89,8 @@ export function DataTableToolbar({
   showUpload = false,
   uploadAccept,
   uploadTitle,
+  pinnedColumns = [],
+  onPinColumn,
 }: DataTableToolbarProps) {
   const [draftFilters, setDraftFilters] = useState<FilterRule[]>(activeFilters);
   const [columnSearch, setColumnSearch] = useState("");
@@ -130,7 +134,6 @@ export function DataTableToolbar({
 
   const handleEditToggle = () => {
     if (viewMode === "edit") {
-      // Turning off edit mode → show confirmation
       setEditConfirmOpen(true);
     } else {
       onViewModeChange?.("edit");
@@ -153,12 +156,11 @@ export function DataTableToolbar({
 
   return (
     <div className="space-y-1.5">
-      {/* Main Toolbar Row — Order: [leftContent | Search] LEFT — [Upload | Delta | Filter | Columns | Export | Edit] RIGHT */}
+      {/* Main Toolbar Row */}
       <div className="flex items-center justify-between gap-2">
-        {/* Left Side: leftContent + Search */}
+        {/* Left Side */}
         <div className="flex items-center gap-2">
           {leftContent}
-
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -170,33 +172,24 @@ export function DataTableToolbar({
           </div>
         </div>
 
-        {/* Right Side: Upload → Delta → Filter → Columns → Export → Edit */}
+        {/* Right Side */}
         <div className="flex items-center gap-1">
           {rightContent}
 
-          {/* Upload Button — right side */}
+          {/* Upload Button */}
           {(showUpload || onUpload) && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 gap-1 text-xs cursor-pointer"
-              onClick={() => setUploadOpen(true)}
-              title={uploadTitle || "Upload files"}
-            >
+            <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" onClick={() => setUploadOpen(true)} title={uploadTitle || "Upload files"}>
               <Upload className="h-3.5 w-3.5" />
               Upload
             </Button>
           )}
 
-          {/* Delta Toggle — icon button */}
+          {/* Delta Toggle */}
           {onShowDeltasChange !== undefined && (
             <Button
               variant="ghost"
               size="sm"
-              className={cn(
-                "h-8 w-8 p-0 cursor-pointer",
-                showDeltas && "bg-primary/10 text-primary"
-              )}
+              className={cn("h-8 w-8 p-0 cursor-pointer", showDeltas && "bg-primary/10 text-primary")}
               onClick={() => onShowDeltasChange(!showDeltas)}
               title={showDeltas ? "Hide deltas" : "Show deltas"}
             >
@@ -208,13 +201,7 @@ export function DataTableToolbar({
           {filterFields.length > 0 && (
             <Popover open={filterOpen} onOpenChange={setFilterOpen}>
               <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1 text-xs cursor-pointer"
-                  onClick={handleOpenFilter}
-                  title="Add or manage filters"
-                >
+                <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" onClick={handleOpenFilter} title="Add or manage filters">
                   <Filter className="h-3.5 w-3.5" />
                   Filter
                   {activeFilters.length > 0 && (
@@ -267,16 +254,21 @@ export function DataTableToolbar({
             </Popover>
           )}
 
-          {/* Columns Dropdown */}
+          {/* Columns Dropdown with Pin Toggle */}
           {columns.length > 0 && onColumnToggle && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" title="Toggle column visibility">
                   <Columns className="h-3.5 w-3.5" />
                   Columns
+                  {pinnedColumns.length > 0 && (
+                    <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary/20 text-[10px] text-primary">
+                      {pinnedColumns.length}
+                    </span>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52 p-0">
+              <DropdownMenuContent align="end" className="w-56 p-0">
                 <div className="p-2 border-b border-border">
                   <div className="relative">
                     <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
@@ -293,16 +285,52 @@ export function DataTableToolbar({
                   <button onClick={onSelectAllColumns} className="text-xs text-primary hover:underline cursor-pointer">Select All</button>
                   <button onClick={onClearAllColumns} className="text-xs text-muted-foreground hover:text-foreground cursor-pointer">Clear All</button>
                 </div>
-                <div className="max-h-[200px] overflow-auto p-1">
-                  {filteredColumns.map((column) => (
-                    <button
+                <div className="max-h-[240px] overflow-auto p-1">
+                  {/* Pinned columns first */}
+                  {pinnedColumns.length > 0 && onPinColumn && (
+                    <>
+                      <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Pinned</div>
+                      {filteredColumns.filter(c => pinnedColumns.includes(c.id)).map((column) => (
+                        <div
+                          key={`pinned-${column.id}`}
+                          className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors"
+                        >
+                          <button onClick={() => onColumnToggle(column.id)} className="flex items-center gap-2 flex-1 cursor-pointer">
+                            <Checkbox checked={column.visible} className="pointer-events-none h-3.5 w-3.5" />
+                            <span className="text-foreground">{column.label}</span>
+                          </button>
+                          <button
+                            onClick={() => onPinColumn(column.id)}
+                            className="p-0.5 rounded hover:bg-primary/10 cursor-pointer"
+                            title="Unpin column"
+                          >
+                            <PinOff className="h-3 w-3 text-primary" />
+                          </button>
+                        </div>
+                      ))}
+                      <div className="h-px bg-border mx-1 my-1" />
+                      <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">All Columns</div>
+                    </>
+                  )}
+                  {filteredColumns.filter(c => !pinnedColumns.includes(c.id)).map((column) => (
+                    <div
                       key={column.id}
-                      onClick={() => onColumnToggle(column.id)}
-                      className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors cursor-pointer"
+                      className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors group"
                     >
-                      <Checkbox checked={column.visible} className="pointer-events-none h-3.5 w-3.5" />
-                      <span className="text-foreground">{column.label}</span>
-                    </button>
+                      <button onClick={() => onColumnToggle(column.id)} className="flex items-center gap-2 flex-1 cursor-pointer">
+                        <Checkbox checked={column.visible} className="pointer-events-none h-3.5 w-3.5" />
+                        <span className="text-foreground">{column.label}</span>
+                      </button>
+                      {onPinColumn && (
+                        <button
+                          onClick={() => onPinColumn(column.id)}
+                          className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-primary/10 cursor-pointer transition-opacity"
+                          title="Pin column"
+                        >
+                          <Pin className="h-3 w-3 text-muted-foreground" />
+                        </button>
+                      )}
+                    </div>
                   ))}
                 </div>
               </DropdownMenuContent>
@@ -317,15 +345,12 @@ export function DataTableToolbar({
             </Button>
           )}
 
-          {/* Edit Mode Toggle — far right, with save confirmation */}
+          {/* Edit Mode Toggle */}
           {showViewToggle && onViewModeChange && (
             <Button
               variant="ghost"
               size="sm"
-              className={cn(
-                "h-8 w-8 p-0 ml-1 cursor-pointer",
-                viewMode === "edit" && "bg-destructive/10 text-destructive"
-              )}
+              className={cn("h-8 w-8 p-0 ml-1 cursor-pointer", viewMode === "edit" && "bg-destructive/10 text-destructive")}
               onClick={handleEditToggle}
               title={viewMode === "edit" ? "Save & exit edit mode" : "Switch to Edit mode"}
             >
@@ -335,22 +360,15 @@ export function DataTableToolbar({
         </div>
       </div>
 
-      {/* Active Filters Display — pill chips */}
+      {/* Active Filters Display */}
       {activeFilters.length > 0 && !filterOpen && (
         <div className="flex flex-wrap items-center gap-1.5">
           {activeFilters.map((filter) => (
-            <Badge
-              key={filter.id}
-              variant="outline"
-              className="gap-1 pr-1 text-[11px] h-6 bg-muted/50 border-border"
-            >
+            <Badge key={filter.id} variant="outline" className="gap-1 pr-1 text-[11px] h-6 bg-muted/50 border-border">
               <span className="font-medium text-foreground">{filter.field}:</span>
               <span className="text-muted-foreground">{filter.operator}</span>
               <span className="text-foreground">{filter.value}</span>
-              <button
-                onClick={() => onFiltersChange?.(activeFilters.filter((f) => f.id !== filter.id))}
-                className="ml-0.5 rounded-full p-0.5 hover:bg-muted-foreground/20 cursor-pointer"
-              >
+              <button onClick={() => onFiltersChange?.(activeFilters.filter((f) => f.id !== filter.id))} className="ml-0.5 rounded-full p-0.5 hover:bg-muted-foreground/20 cursor-pointer">
                 <X className="h-2.5 w-2.5" />
               </button>
             </Badge>
