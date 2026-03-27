@@ -2,7 +2,8 @@ import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { useAan } from "./AanContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, Square, Lightbulb, X } from "lucide-react";
+import { Send, Square, Sparkles, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const isReportRequest = (message: string): boolean => {
   const lower = message.toLowerCase();
@@ -80,23 +81,34 @@ export function AanInput() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestion, setShowSuggestion] = useState(false);
+  const [suggestionVisible, setSuggestionVisible] = useState(false);
   const [suggestionIndex, setSuggestionIndex] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const suggestionTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+      if (suggestionTimerRef.current) clearTimeout(suggestionTimerRef.current);
     };
   }, []);
 
-  // Show suggestion after assistant message
+  // Show suggestion after assistant message with delay
   useEffect(() => {
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant" && !isLoading) {
-      setShowSuggestion(true);
       setSuggestionIndex(Math.floor(Math.random() * PROMPT_SUGGESTIONS.length));
+      // Show after 500ms delay for smooth appearance
+      suggestionTimerRef.current = setTimeout(() => {
+        setShowSuggestion(true);
+        // Trigger animation after mount
+        requestAnimationFrame(() => setSuggestionVisible(true));
+      }, 500);
     }
+    return () => {
+      if (suggestionTimerRef.current) clearTimeout(suggestionTimerRef.current);
+    };
   }, [messages, isLoading]);
 
   const handleStop = () => {
@@ -109,10 +121,10 @@ export function AanInput() {
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
-
     const userMessage = input.trim();
     setInput("");
     setShowSuggestion(false);
+    setSuggestionVisible(false);
     addMessage(userMessage, "user");
 
     if (isReportRequest(userMessage)) {
@@ -120,31 +132,20 @@ export function AanInput() {
       await new Promise((resolve) => setTimeout(resolve, 500));
       addMessage(getReportSummary(), "assistant");
       setIsLoading(false);
-
       setGenerationState(true, "report", 0);
       let progress = 0;
       progressIntervalRef.current = setInterval(() => {
         progress += 100 / 30;
-        if (progress >= 100) {
-          if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-          progress = 100;
-        }
+        if (progress >= 100) { if (progressIntervalRef.current) clearInterval(progressIntervalRef.current); progress = 100; }
         setGenerationState(true, "report", progress);
       }, 1000);
-
       timerRef.current = setTimeout(() => {
         if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
         setGenerationState(false, null, 0);
         addMessage("**Report Ready!** Click below to view the full report with data visualizations.", "assistant", {
-          id: "report-" + Date.now(),
-          type: "report" as const,
-          title: "Last 7 Days Campaign Performance",
+          id: "report-" + Date.now(), type: "report" as const, title: "Last 7 Days Campaign Performance",
           description: "Amazon • Performance overview with data visualizations",
-          changes: [
-            { field: "Total Ad Spend", before: "N/A", after: "$10,973.60" },
-            { field: "Total Ad Sales", before: "N/A", after: "$36,955.24" },
-            { field: "Overall ROAS", before: "N/A", after: "3.37x" },
-          ],
+          changes: [{ field: "Total Ad Spend", before: "N/A", after: "$10,973.60" }, { field: "Total Ad Sales", before: "N/A", after: "$36,955.24" }, { field: "Overall ROAS", before: "N/A", after: "3.37x" }],
           status: "pending" as const,
         });
       }, 30000);
@@ -156,30 +157,20 @@ export function AanInput() {
       await new Promise((resolve) => setTimeout(resolve, 500));
       addMessage(getAuditSummary(), "assistant");
       setIsLoading(false);
-
       setGenerationState(true, "audit", 0);
       let progress = 0;
       progressIntervalRef.current = setInterval(() => {
         progress += 100 / 30;
-        if (progress >= 100) {
-          if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-          progress = 100;
-        }
+        if (progress >= 100) { if (progressIntervalRef.current) clearInterval(progressIntervalRef.current); progress = 100; }
         setGenerationState(true, "audit", progress);
       }, 1000);
-
       timerRef.current = setTimeout(() => {
         if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
         setGenerationState(false, null, 0);
         addMessage("**Audit Complete!** Click below to view the full health report.", "assistant", {
-          id: "audit-" + Date.now(),
-          type: "audit" as const,
-          title: "Account Health Audit",
+          id: "audit-" + Date.now(), type: "audit" as const, title: "Account Health Audit",
           description: "Health Score: 78/100 • Risk Level: Low",
-          changes: [
-            { field: "Health Score", before: "N/A", after: "78/100" },
-            { field: "Wasted Spend", before: "N/A", after: "$2,341 (-15%)" },
-          ],
+          changes: [{ field: "Health Score", before: "N/A", after: "78/100" }, { field: "Wasted Spend", before: "N/A", after: "$2,341 (-15%)" }],
           status: "pending" as const,
         });
       }, 30000);
@@ -194,68 +185,93 @@ export function AanInput() {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
   const handleSuggestionClick = () => {
     setInput(PROMPT_SUGGESTIONS[suggestionIndex]);
     setShowSuggestion(false);
+    setSuggestionVisible(false);
+  };
+
+  const handleDismissSuggestion = () => {
+    setSuggestionVisible(false);
+    setTimeout(() => setShowSuggestion(false), 200);
   };
 
   return (
-    <div className="border-t border-border bg-background shrink-0">
-      {/* Prompt suggestion notch */}
-      {showSuggestion && (
-        <div className="mx-4 mt-2 flex items-center gap-2 rounded-lg border border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5 px-3 py-1.5">
-          <Lightbulb className="h-3.5 w-3.5 text-primary shrink-0" />
-          <button
-            onClick={handleSuggestionClick}
-            className="flex-1 text-left text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            Try: "{PROMPT_SUGGESTIONS[suggestionIndex]}"
-          </button>
-          <button onClick={() => setShowSuggestion(false)} className="p-0.5 rounded hover:bg-muted cursor-pointer">
-            <X className="h-3 w-3 text-muted-foreground" />
-          </button>
-        </div>
-      )}
-
-      <div className="p-4">
-        <div className="flex gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask Aan anything... (try: 'Generate report' or 'Run audit')"
-            className="min-h-[44px] max-h-[120px] resize-none"
-            rows={1}
-            disabled={isLoading}
-          />
-          {isLoading ? (
-            <Button
-              size="icon"
-              variant="destructive"
-              onClick={handleStop}
-              className="shrink-0"
-              title="Stop generation"
+    <div className="shrink-0 bg-background">
+      <div className="px-4 pb-4 pt-2">
+        {/* Input container with suggestion notch */}
+        <div className="relative">
+          {/* Prompt suggestion — emerges from textbox top edge */}
+          {showSuggestion && (
+            <div
+              className={cn(
+                "absolute bottom-full left-0 right-0 mb-0 origin-bottom transition-all duration-200 ease-out",
+                suggestionVisible
+                  ? "opacity-100 translate-y-0 scale-100"
+                  : "opacity-0 translate-y-2 scale-95"
+              )}
             >
-              <Square className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button
-              size="icon"
-              onClick={handleSend}
-              disabled={!input.trim()}
-              className="shrink-0 bg-gradient-to-r from-primary to-accent hover:opacity-90"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
+              <div className="mx-0 mb-1 flex items-center gap-2 rounded-t-lg rounded-b-none border border-b-0 border-primary/20 bg-gradient-to-r from-primary/[0.06] via-accent/[0.04] to-primary/[0.06] px-3 py-2 backdrop-blur-sm">
+                <div className="flex items-center justify-center h-5 w-5 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 shrink-0">
+                  <Sparkles className="h-3 w-3 text-primary" />
+                </div>
+                <button
+                  onClick={handleSuggestionClick}
+                  className="flex-1 text-left text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  <span className="text-primary/70 font-medium">Try: </span>
+                  <span className="italic">"{PROMPT_SUGGESTIONS[suggestionIndex]}"</span>
+                </button>
+                <button
+                  onClick={handleDismissSuggestion}
+                  className="p-0.5 rounded-full hover:bg-muted/80 cursor-pointer transition-colors"
+                >
+                  <X className="h-3 w-3 text-muted-foreground" />
+                </button>
+              </div>
+            </div>
           )}
+
+          {/* Textarea + Send button in same container */}
+          <div className="relative flex items-end gap-0 rounded-lg border border-border bg-card focus-within:border-primary/40 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask Aan anything..."
+              className="min-h-[44px] max-h-[120px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pr-12"
+              rows={1}
+              disabled={isLoading}
+            />
+            <div className="absolute right-2 bottom-2">
+              {isLoading ? (
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  onClick={handleStop}
+                  className="h-8 w-8 rounded-lg"
+                  title="Stop generation"
+                >
+                  <Square className="h-3.5 w-3.5" />
+                </Button>
+              ) : (
+                <Button
+                  size="icon"
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  className="h-8 w-8 rounded-lg bg-gradient-to-r from-primary to-accent hover:opacity-90 disabled:opacity-30"
+                >
+                  <Send className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-        <p className="mt-2 text-xs text-muted-foreground text-center">
+
+        <p className="mt-1.5 text-[10px] text-muted-foreground text-center">
           Aan will explain reasoning and create drafts for your approval
         </p>
       </div>
