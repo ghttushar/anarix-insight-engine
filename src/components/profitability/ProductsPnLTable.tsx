@@ -87,7 +87,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
     }, {} as Record<string, number>);
 
     return (
-      <div className="rounded-lg border border-border">
+      <div className="rounded-lg border border-border bg-card">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -197,7 +197,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
   };
 
   return (
-    <div className="rounded-lg border border-border">
+    <div className="rounded-lg border border-border bg-card">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>

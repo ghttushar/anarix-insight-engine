@@ -122,7 +122,7 @@ export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParame
   };
 
   return (
-    <div className="rounded-lg border border-border overflow-hidden">
+    <div className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="max-h-[70vh] overflow-auto overscroll-contain">
         <Table>
           <TableHeader>
