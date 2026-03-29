@@ -11,7 +11,8 @@ import { mockProductAds, productAdsTotals } from "@/data/mockProductAds";
 import { X } from "lucide-react";
 import { AddProductAdsModal } from "@/components/advertising/AddProductAdsModal";
 import { TablePagination } from "./TablePagination";
-import { SortableTableHead, sortData } from "./SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
+import { cn } from "@/lib/utils";
 
 interface ProductAdsTableProps {
   searchQuery?: string;
@@ -19,6 +20,9 @@ interface ProductAdsTableProps {
   showDeltas?: boolean;
   onRowClick?: (productAd: typeof import("@/data/mockProductAds").mockProductAds[0]) => void;
 }
+
+const PINNABLE = ["adGroupName", "campaignName", "impressions", "clicks", "ctr", "adUnits", "cvr", "cpc", "adSpend", "adSales", "roas", "acos"];
+const FIXED_OFFSET = 436;
 
 export function ProductAdsTable({ searchQuery = "", showAddButton = false, showDeltas = false, onRowClick }: ProductAdsTableProps) {
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -28,8 +32,7 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
   const [activeFilters, setActiveFilters] = useState<string[]>(["Product Ad Status is ENABLED"]);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
-  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
 
   const filteredAds = mockProductAds.filter((ad) =>
     ad.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -99,19 +102,19 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
                   <Checkbox checked={selectedRows.size === paginatedAds.length && paginatedAds.length > 0} onCheckedChange={toggleAll} />
                 </TableHead>
                 <TableHead className="w-24 sticky left-[40px] z-10 bg-muted">Status</TableHead>
-                <SortableTableHead field="productName" {...sp} className="min-w-[300px] sticky left-[136px] z-10 bg-muted">Product Ad</SortableTableHead>
-                <SortableTableHead field="adGroupName" {...sp} className="min-w-[150px]">Ad Group</SortableTableHead>
-                <SortableTableHead field="campaignName" {...sp} className="min-w-[150px]">Campaign</SortableTableHead>
-                <SortableTableHead field="impressions" {...sp} className="text-right" align="right">Impressions</SortableTableHead>
-                <SortableTableHead field="clicks" {...sp} className="text-right" align="right">Clicks</SortableTableHead>
-                <SortableTableHead field="ctr" {...sp} className="text-right" align="right">CTR</SortableTableHead>
-                <SortableTableHead field="adUnits" {...sp} className="text-right" align="right">Ad Units</SortableTableHead>
-                <SortableTableHead field="cvr" {...sp} className="text-right" align="right">CVR</SortableTableHead>
-                <SortableTableHead field="cpc" {...sp} className="text-right" align="right">CPC</SortableTableHead>
-                <SortableTableHead field="adSpend" {...sp} className="text-right" align="right">Ad Spend</SortableTableHead>
-                <SortableTableHead field="adSales" {...sp} className="text-right" align="right">Ad Sales</SortableTableHead>
-                <SortableTableHead field="roas" {...sp} className="text-right" align="right">ROAS</SortableTableHead>
-                <SortableTableHead field="acos" {...sp} className="text-right" align="right">ACOS</SortableTableHead>
+                <SortableTableHead field="productName" {...sp} isFixed className="min-w-[300px] sticky left-[136px] z-10 bg-muted">Product Ad</SortableTableHead>
+                <SortableTableHead field="adGroupName" {...sp} className={cn("min-w-[150px]", pc("adGroupName", true))} style={ps("adGroupName")}>Ad Group</SortableTableHead>
+                <SortableTableHead field="campaignName" {...sp} className={cn("min-w-[150px]", pc("campaignName", true))} style={ps("campaignName")}>Campaign</SortableTableHead>
+                <SortableTableHead field="impressions" {...sp} className={cn("text-right", pc("impressions", true))} style={ps("impressions")} align="right">Impressions</SortableTableHead>
+                <SortableTableHead field="clicks" {...sp} className={cn("text-right", pc("clicks", true))} style={ps("clicks")} align="right">Clicks</SortableTableHead>
+                <SortableTableHead field="ctr" {...sp} className={cn("text-right", pc("ctr", true))} style={ps("ctr")} align="right">CTR</SortableTableHead>
+                <SortableTableHead field="adUnits" {...sp} className={cn("text-right", pc("adUnits", true))} style={ps("adUnits")} align="right">Ad Units</SortableTableHead>
+                <SortableTableHead field="cvr" {...sp} className={cn("text-right", pc("cvr", true))} style={ps("cvr")} align="right">CVR</SortableTableHead>
+                <SortableTableHead field="cpc" {...sp} className={cn("text-right", pc("cpc", true))} style={ps("cpc")} align="right">CPC</SortableTableHead>
+                <SortableTableHead field="adSpend" {...sp} className={cn("text-right", pc("adSpend", true))} style={ps("adSpend")} align="right">Ad Spend</SortableTableHead>
+                <SortableTableHead field="adSales" {...sp} className={cn("text-right", pc("adSales", true))} style={ps("adSales")} align="right">Ad Sales</SortableTableHead>
+                <SortableTableHead field="roas" {...sp} className={cn("text-right", pc("roas", true))} style={ps("roas")} align="right">ROAS</SortableTableHead>
+                <SortableTableHead field="acos" {...sp} className={cn("text-right", pc("acos", true))} style={ps("acos")} align="right">ACOS</SortableTableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -130,18 +133,18 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-foreground">{ad.adGroupName}</TableCell>
-                  <TableCell className="text-foreground">{ad.campaignName}</TableCell>
-                  <TableCell className="text-right"><NumCell formatted={formatNumber(ad.impressions)} id={ad.id} metric="impressions" /></TableCell>
-                  <TableCell className="text-right"><NumCell formatted={formatNumber(ad.clicks)} id={ad.id} metric="clicks" /></TableCell>
-                  <TableCell className="text-right"><NumCell formatted={formatPercent(ad.ctr)} id={ad.id} metric="ctr" /></TableCell>
-                  <TableCell className="text-right"><NumCell formatted={formatNumber(ad.adUnits)} id={ad.id} metric="adUnits" /></TableCell>
-                  <TableCell className="text-right"><NumCell formatted={formatPercent(ad.cvr)} id={ad.id} metric="cvr" /></TableCell>
-                  <TableCell className="text-right"><NumCell formatted={formatCurrency(ad.cpc)} id={ad.id} metric="cpc" /></TableCell>
-                  <TableCell className="text-right"><NumCell formatted={formatCurrency(ad.adSpend)} id={ad.id} metric="adSpend" /></TableCell>
-                  <TableCell className="text-right"><NumCell formatted={formatCurrency(ad.adSpend * 4.2)} id={ad.id} metric="adSales" /></TableCell>
-                  <TableCell className="text-right"><NumCell formatted={(4.2).toFixed(2)} id={ad.id} metric="roas" /></TableCell>
-                  <TableCell className="text-right"><NumCell formatted={formatPercent(23.8)} id={ad.id} metric="acos" /></TableCell>
+                  <TableCell style={ps("adGroupName")} className={cn("text-foreground", pc("adGroupName"))}>{ad.adGroupName}</TableCell>
+                  <TableCell style={ps("campaignName")} className={cn("text-foreground", pc("campaignName"))}>{ad.campaignName}</TableCell>
+                  <TableCell style={ps("impressions")} className={cn("text-right", pc("impressions"))}><NumCell formatted={formatNumber(ad.impressions)} id={ad.id} metric="impressions" /></TableCell>
+                  <TableCell style={ps("clicks")} className={cn("text-right", pc("clicks"))}><NumCell formatted={formatNumber(ad.clicks)} id={ad.id} metric="clicks" /></TableCell>
+                  <TableCell style={ps("ctr")} className={cn("text-right", pc("ctr"))}><NumCell formatted={formatPercent(ad.ctr)} id={ad.id} metric="ctr" /></TableCell>
+                  <TableCell style={ps("adUnits")} className={cn("text-right", pc("adUnits"))}><NumCell formatted={formatNumber(ad.adUnits)} id={ad.id} metric="adUnits" /></TableCell>
+                  <TableCell style={ps("cvr")} className={cn("text-right", pc("cvr"))}><NumCell formatted={formatPercent(ad.cvr)} id={ad.id} metric="cvr" /></TableCell>
+                  <TableCell style={ps("cpc")} className={cn("text-right", pc("cpc"))}><NumCell formatted={formatCurrency(ad.cpc)} id={ad.id} metric="cpc" /></TableCell>
+                  <TableCell style={ps("adSpend")} className={cn("text-right", pc("adSpend"))}><NumCell formatted={formatCurrency(ad.adSpend)} id={ad.id} metric="adSpend" /></TableCell>
+                  <TableCell style={ps("adSales")} className={cn("text-right", pc("adSales"))}><NumCell formatted={formatCurrency(ad.adSpend * 4.2)} id={ad.id} metric="adSales" /></TableCell>
+                  <TableCell style={ps("roas")} className={cn("text-right", pc("roas"))}><NumCell formatted={(4.2).toFixed(2)} id={ad.id} metric="roas" /></TableCell>
+                  <TableCell style={ps("acos")} className={cn("text-right", pc("acos"))}><NumCell formatted={formatPercent(23.8)} id={ad.id} metric="acos" /></TableCell>
                 </TableRow>
               ))}
               <TableRow className="bg-muted font-medium hover:bg-muted">

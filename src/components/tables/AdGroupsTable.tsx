@@ -11,7 +11,7 @@ import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockAdGroups, adGroupsTotals } from "@/data/mockAdGroups";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "./TablePagination";
-import { SortableTableHead, sortData } from "./SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
 
 interface AdGroupsTableProps {
   searchQuery?: string;
@@ -19,16 +19,15 @@ interface AdGroupsTableProps {
   onRowClick?: (adGroup: typeof import("@/data/mockAdGroups").mockAdGroups[0]) => void;
 }
 
+const PINNABLE = ["campaignName", "minBid", "maxBid", "targetRoas", "impressions", "clicks", "ctr", "adUnits", "cvr", "cpc", "adSpend", "adSales", "roas", "acos"];
+const FIXED_OFFSET = 296;
+
 export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick }: AdGroupsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
-
-  const handlePinToggle = (field: string) => {
-    setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; });
-  };
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
 
   const filteredGroups = mockAdGroups.filter((group) =>
     group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -72,22 +71,22 @@ export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
               <TableHead className="w-24 sticky left-0 z-10 bg-muted">Status</TableHead>
-              <SortableTableHead field="name" {...sp} className="min-w-[200px] sticky left-[96px] z-10 bg-muted">Ad Group</SortableTableHead>
-              <SortableTableHead field="campaignName" {...sp} className="min-w-[200px]">Campaign</SortableTableHead>
+              <SortableTableHead field="name" {...sp} isFixed className="min-w-[200px] sticky left-[96px] z-10 bg-muted">Ad Group</SortableTableHead>
+              <SortableTableHead field="campaignName" {...sp} className={cn("min-w-[200px]", pc("campaignName", true))} style={ps("campaignName")}>Campaign</SortableTableHead>
               <TableHead className="text-center">Bid Auto</TableHead>
-              <SortableTableHead field="minBid" {...sp} className="text-right" align="right">Min Bid</SortableTableHead>
-              <SortableTableHead field="maxBid" {...sp} className="text-right" align="right">Max Bid</SortableTableHead>
-              <SortableTableHead field="targetRoas" {...sp} className="text-right" align="right">Target ROAS</SortableTableHead>
-              <SortableTableHead field="impressions" {...sp} className="text-right" align="right">Impressions</SortableTableHead>
-              <SortableTableHead field="clicks" {...sp} className="text-right" align="right">Clicks</SortableTableHead>
-              <SortableTableHead field="ctr" {...sp} className="text-right" align="right">CTR</SortableTableHead>
-              <SortableTableHead field="adUnits" {...sp} className="text-right" align="right">Ad Units</SortableTableHead>
-              <SortableTableHead field="cvr" {...sp} className="text-right" align="right">CVR</SortableTableHead>
-              <SortableTableHead field="cpc" {...sp} className="text-right" align="right">CPC</SortableTableHead>
-              <SortableTableHead field="adSpend" {...sp} className="text-right" align="right">Ad Spend</SortableTableHead>
-              <SortableTableHead field="adSales" {...sp} className="text-right" align="right">Ad Sales</SortableTableHead>
-              <SortableTableHead field="roas" {...sp} className="text-right" align="right">ROAS</SortableTableHead>
-              <SortableTableHead field="acos" {...sp} className="text-right" align="right">ACOS</SortableTableHead>
+              <SortableTableHead field="minBid" {...sp} className={cn("text-right", pc("minBid", true))} style={ps("minBid")} align="right">Min Bid</SortableTableHead>
+              <SortableTableHead field="maxBid" {...sp} className={cn("text-right", pc("maxBid", true))} style={ps("maxBid")} align="right">Max Bid</SortableTableHead>
+              <SortableTableHead field="targetRoas" {...sp} className={cn("text-right", pc("targetRoas", true))} style={ps("targetRoas")} align="right">Target ROAS</SortableTableHead>
+              <SortableTableHead field="impressions" {...sp} className={cn("text-right", pc("impressions", true))} style={ps("impressions")} align="right">Impressions</SortableTableHead>
+              <SortableTableHead field="clicks" {...sp} className={cn("text-right", pc("clicks", true))} style={ps("clicks")} align="right">Clicks</SortableTableHead>
+              <SortableTableHead field="ctr" {...sp} className={cn("text-right", pc("ctr", true))} style={ps("ctr")} align="right">CTR</SortableTableHead>
+              <SortableTableHead field="adUnits" {...sp} className={cn("text-right", pc("adUnits", true))} style={ps("adUnits")} align="right">Ad Units</SortableTableHead>
+              <SortableTableHead field="cvr" {...sp} className={cn("text-right", pc("cvr", true))} style={ps("cvr")} align="right">CVR</SortableTableHead>
+              <SortableTableHead field="cpc" {...sp} className={cn("text-right", pc("cpc", true))} style={ps("cpc")} align="right">CPC</SortableTableHead>
+              <SortableTableHead field="adSpend" {...sp} className={cn("text-right", pc("adSpend", true))} style={ps("adSpend")} align="right">Ad Spend</SortableTableHead>
+              <SortableTableHead field="adSales" {...sp} className={cn("text-right", pc("adSales", true))} style={ps("adSales")} align="right">Ad Sales</SortableTableHead>
+              <SortableTableHead field="roas" {...sp} className={cn("text-right", pc("roas", true))} style={ps("roas")} align="right">ROAS</SortableTableHead>
+              <SortableTableHead field="acos" {...sp} className={cn("text-right", pc("acos", true))} style={ps("acos")} align="right">ACOS</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -95,7 +94,7 @@ export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick
               <TableRow key={group.id} className="group cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => onRowClick?.(group)}>
                 <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={group.status} /></TableCell>
                 <TableCell className="font-medium sticky left-[96px] z-10 bg-background group-hover:bg-muted transition-colors"><span className="text-primary hover:underline">{group.name}</span></TableCell>
-                <TableCell>
+                <TableCell style={ps("campaignName")} className={cn(pc("campaignName"))}>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className={cn("text-xs", group.campaignType === "auto" ? "border-primary/30 bg-primary/5 text-primary" : "border-secondary/30 bg-secondary/5 text-secondary-foreground")}>
                       {group.campaignType === "auto" ? "Auto" : "Manual"}
@@ -104,23 +103,24 @@ export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick
                   </div>
                 </TableCell>
                 <TableCell className="text-center"><Switch checked={group.bidAutomation} disabled /></TableCell>
-                <TableCell className="text-right text-foreground">{formatCurrency(group.minBid)}</TableCell>
-                <TableCell className="text-right text-foreground">{formatCurrency(group.maxBid)}</TableCell>
-                <TableCell className="text-right text-foreground">{group.targetRoas.toFixed(1)}</TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatNumber(group.impressions)} id={group.id} metric="impressions" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatNumber(group.clicks)} id={group.id} metric="clicks" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatPercent(group.ctr)} id={group.id} metric="ctr" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatNumber(group.adUnits)} id={group.id} metric="adUnits" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatPercent(group.cvr)} id={group.id} metric="cvr" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(group.cpc)} id={group.id} metric="cpc" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(group.adSpend)} id={group.id} metric="adSpend" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(group.adSales)} id={group.id} metric="adSales" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={group.roas.toFixed(2)} id={group.id} metric="roas" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatPercent(group.acos)} id={group.id} metric="acos" /></TableCell>
+                <TableCell style={ps("minBid")} className={cn("text-right text-foreground", pc("minBid"))}>{formatCurrency(group.minBid)}</TableCell>
+                <TableCell style={ps("maxBid")} className={cn("text-right text-foreground", pc("maxBid"))}>{formatCurrency(group.maxBid)}</TableCell>
+                <TableCell style={ps("targetRoas")} className={cn("text-right text-foreground", pc("targetRoas"))}>{group.targetRoas.toFixed(1)}</TableCell>
+                <TableCell style={ps("impressions")} className={cn("text-right", pc("impressions"))}><NumCell formatted={formatNumber(group.impressions)} id={group.id} metric="impressions" /></TableCell>
+                <TableCell style={ps("clicks")} className={cn("text-right", pc("clicks"))}><NumCell formatted={formatNumber(group.clicks)} id={group.id} metric="clicks" /></TableCell>
+                <TableCell style={ps("ctr")} className={cn("text-right", pc("ctr"))}><NumCell formatted={formatPercent(group.ctr)} id={group.id} metric="ctr" /></TableCell>
+                <TableCell style={ps("adUnits")} className={cn("text-right", pc("adUnits"))}><NumCell formatted={formatNumber(group.adUnits)} id={group.id} metric="adUnits" /></TableCell>
+                <TableCell style={ps("cvr")} className={cn("text-right", pc("cvr"))}><NumCell formatted={formatPercent(group.cvr)} id={group.id} metric="cvr" /></TableCell>
+                <TableCell style={ps("cpc")} className={cn("text-right", pc("cpc"))}><NumCell formatted={formatCurrency(group.cpc)} id={group.id} metric="cpc" /></TableCell>
+                <TableCell style={ps("adSpend")} className={cn("text-right", pc("adSpend"))}><NumCell formatted={formatCurrency(group.adSpend)} id={group.id} metric="adSpend" /></TableCell>
+                <TableCell style={ps("adSales")} className={cn("text-right", pc("adSales"))}><NumCell formatted={formatCurrency(group.adSales)} id={group.id} metric="adSales" /></TableCell>
+                <TableCell style={ps("roas")} className={cn("text-right", pc("roas"))}><NumCell formatted={group.roas.toFixed(2)} id={group.id} metric="roas" /></TableCell>
+                <TableCell style={ps("acos")} className={cn("text-right", pc("acos"))}><NumCell formatted={formatPercent(group.acos)} id={group.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
             <TableRow className="bg-muted font-medium hover:bg-muted">
-              <TableCell colSpan={7} className="font-semibold">Total ({filteredGroups.length} ad groups)</TableCell>
+              <TableCell colSpan={4} className="font-semibold">Total ({filteredGroups.length} ad groups)</TableCell>
+              <TableCell className="text-right" colSpan={3} />
               <TableCell className="text-right"><TotalCell value={formatNumber(adGroupsTotals.impressions)} metric="impressions" /></TableCell>
               <TableCell className="text-right"><TotalCell value={formatNumber(adGroupsTotals.clicks)} metric="clicks" /></TableCell>
               <TableCell className="text-right"><TotalCell value={formatPercent(adGroupsTotals.ctr)} metric="ctr" /></TableCell>
@@ -135,13 +135,7 @@ export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick
           </TableBody>
         </Table>
       </div>
-      <TablePagination
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={filteredGroups.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      <TablePagination page={currentPage} pageSize={pageSize} totalItems={filteredGroups.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
     </div>
   );
 }
