@@ -137,55 +137,29 @@ export function CampaignTable({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-lg border border-border bg-card">
+    <div className="rounded-lg border border-border bg-card">
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader>
               <TableRow className="bg-muted">
               {isEdit && show("active") && <TableHead className="w-16">Active</TableHead>}
               {show("status") && <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>}
               {show("type") && <TableHead className="w-24">Type</TableHead>}
-              {show("name") && <TableHead className={cn("min-w-[200px] cursor-pointer group/sort sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
-                <div className="flex items-center gap-1">Campaign Name <SortIcon field="name" /></div>
+              {show("name") && <TableHead className={cn("min-w-[200px] sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")}>
+                Campaign Name
               </TableHead>}
-              {show("startDate") && <TableHead className="cursor-pointer" onClick={() => handleSort("startDate")}>
-                <div className="flex items-center gap-1">Start Date <SortIcon field="startDate" /></div>
-              </TableHead>}
-              {show("endDate") && <TableHead className="cursor-pointer" onClick={() => handleSort("endDate")}>
-                <div className="flex items-center gap-1">End Date <SortIcon field="endDate" /></div>
-              </TableHead>}
-              {show("biddingStrategy") && <TableHead className="cursor-pointer" onClick={() => handleSort("biddingStrategy")}>
-                <div className="flex items-center gap-1">Bidding Strategy <SortIcon field="biddingStrategy" /></div>
-              </TableHead>}
-              {show("dailyBudget") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("dailyBudget")}>
-                <div className="flex items-center justify-end gap-1">Budget <SortIcon field="dailyBudget" /></div>
-              </TableHead>}
-              {showTotalBudget && show("totalBudget") && (
-                <TableHead className="cursor-pointer text-right" onClick={() => handleSort("totalBudget")}>
-                  <div className="flex items-center justify-end gap-1">Total Budget <SortIcon field="totalBudget" /></div>
-                </TableHead>
-              )}
-              {show("spend") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("spend")}>
-                <div className="flex items-center justify-end gap-1">Spend <SortIcon field="spend" /></div>
-              </TableHead>}
-              {show("sales") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("sales")}>
-                <div className="flex items-center justify-end gap-1">Sales <SortIcon field="sales" /></div>
-              </TableHead>}
-              {show("roas") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("roas")}>
-                <div className="flex items-center justify-end gap-1">ROAS <SortIcon field="roas" /></div>
-              </TableHead>}
-              {show("impressions") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("impressions")}>
-                <div className="flex items-center justify-end gap-1">Impressions <SortIcon field="impressions" /></div>
-              </TableHead>}
-              {show("clicks") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("clicks")}>
-                <div className="flex items-center justify-end gap-1">Clicks <SortIcon field="clicks" /></div>
-              </TableHead>}
-              {show("ctr") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("ctr")}>
-                <div className="flex items-center justify-end gap-1">CTR <SortIcon field="ctr" /></div>
-              </TableHead>}
-              {show("acos") && <TableHead className="cursor-pointer text-right" onClick={() => handleSort("acos")}>
-                <div className="flex items-center justify-end gap-1">ACOS <SortIcon field="acos" /></div>
-              </TableHead>}
+              {show("startDate") && <TableHead>Start Date</TableHead>}
+              {show("endDate") && <TableHead>End Date</TableHead>}
+              {show("biddingStrategy") && <TableHead>Bidding Strategy</TableHead>}
+              {show("dailyBudget") && <TableHead className="text-right">Budget</TableHead>}
+              {showTotalBudget && show("totalBudget") && <TableHead className="text-right">Total Budget</TableHead>}
+              {show("spend") && <TableHead className="text-right">Spend</TableHead>}
+              {show("sales") && <TableHead className="text-right">Sales</TableHead>}
+              {show("roas") && <TableHead className="text-right">ROAS</TableHead>}
+              {show("impressions") && <TableHead className="text-right">Impressions</TableHead>}
+              {show("clicks") && <TableHead className="text-right">Clicks</TableHead>}
+              {show("ctr") && <TableHead className="text-right">CTR</TableHead>}
+              {show("acos") && <TableHead className="text-right">ACOS</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -321,7 +295,6 @@ export function CampaignTable({
           </TableBody>
         </Table>
       </div>
-
       <CampaignTablePagination
         page={page}
         pageSize={pageSize}
