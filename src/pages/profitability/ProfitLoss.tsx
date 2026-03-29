@@ -28,6 +28,15 @@ const COLUMN_DEFS = [
 
 const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Net Profit", "Units"];
 
+const SORTABLE_FIELDS = [
+  { id: "name", label: "Product Name" },
+  { id: "units", label: "Units" },
+  { id: "gmv", label: "GMV" },
+  { id: "authSales", label: "Auth Sales" },
+  { id: "adSpend", label: "Ad Spend" },
+  { id: "netProfit", label: "Net Profit" },
+];
+
 export default function ProfitLoss() {
   const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
   const weeks = ["Week-05", "Week-04", "Week-02", "Week-01"];
@@ -39,6 +48,8 @@ export default function ProfitLoss() {
   const [showDeltas, setShowDeltas] = useState(false);
   const [catalogue, setCatalogue] = useState("all");
   const [pnlFrequency, setPnlFrequency] = useState("weekly");
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
