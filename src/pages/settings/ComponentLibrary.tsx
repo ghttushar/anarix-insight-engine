@@ -2326,6 +2326,355 @@ function ComponentShowcase() {
 
       </section>
 
+      {/* ==================== APP LEVEL METRIC SELECTOR ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">App Level Metric Selector</h2>
+        <p className="text-xs text-muted-foreground">Inline pill-style controls positioned top-right against the page title inside PageHeader. Contains marketplace, ad type, catalogue, and account selectors. No card wrapper — controls sit naturally in the flex row.</p>
+        
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Default State (Amazon + All Types)</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">Campaign Manager</h3>
+                <p className="text-xs text-muted-foreground">Manage and optimize your campaigns</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5 rounded-md border border-border bg-muted/50 px-3 h-9 text-sm font-medium">
+                  <div className="h-5 w-5 rounded bg-orange-100 flex items-center justify-center">
+                    <Store className="h-3 w-3 text-orange-600" />
+                  </div>
+                  <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-sm">My Store</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">With Children (Ad Type + Catalogue selectors)</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">Profitability Dashboard</h3>
+                <p className="text-xs text-muted-foreground">Track your profit and loss</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Select defaultValue="all">
+                  <SelectTrigger className="h-9 w-[140px] text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Catalogues</SelectItem>
+                    <SelectItem value="home">Home & Garden</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="flex items-center gap-2.5 rounded-md border border-border bg-muted/50 px-3 h-9 text-sm font-medium">
+                  <div className="h-5 w-5 rounded bg-orange-100 flex items-center justify-center">
+                    <Store className="h-3 w-3 text-orange-600" />
+                  </div>
+                  <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-sm">My Store</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== DATA TABLE TOOLBAR (UPDATED) ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">DataTable Toolbar (Updated)</h2>
+        <p className="text-xs text-muted-foreground">Standardized table toolbar with left-side actions (Create, Toggle, Search) and right-side controls (Upload, Delta, Sort, Filter, Columns, Export, Edit). Sort is a 3-state inline toggle — no popover.</p>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Full Toolbar — All Controls Visible</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2">
+              {/* Left side */}
+              <div className="flex items-center gap-2">
+                <Button size="sm" className="gap-1.5"><Plus className="h-3.5 w-3.5" />Create</Button>
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input placeholder="Search..." className="h-8 w-[200px] pl-8 text-xs" readOnly />
+                </div>
+              </div>
+              {/* Right side */}
+              <div className="flex items-center gap-1.5">
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                  <Upload className="h-3.5 w-3.5" />Upload
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                  <BarChart3 className="h-3.5 w-3.5" />Delta
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                  <ArrowUpDown className="h-3.5 w-3.5" />Sort
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                  <Filter className="h-3.5 w-3.5" />Filter
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                  <Columns className="h-3.5 w-3.5" />Columns
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                  <Download className="h-3.5 w-3.5" />Export
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                  <Edit className="h-3.5 w-3.5" />Edit
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Sort Button — 3 States</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center gap-4">
+              <div className="space-y-1 text-center">
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs">
+                  <ArrowUpDown className="h-3.5 w-3.5" />Sort
+                </Button>
+                <p className="text-[10px] text-muted-foreground">Inactive</p>
+              </div>
+              <div className="space-y-1 text-center">
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs bg-primary/10 text-primary border-primary/30">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                  Sort
+                </Button>
+                <p className="text-[10px] text-muted-foreground">Ascending</p>
+              </div>
+              <div className="space-y-1 text-center">
+                <Button variant="outline" size="sm" className="gap-1.5 h-8 text-xs bg-primary/10 text-primary border-primary/30">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  Sort
+                </Button>
+                <p className="text-[10px] text-muted-foreground">Descending</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Active Filter Chips</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex flex-wrap items-center gap-1.5 py-1.5">
+              <div className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs">
+                <span className="text-muted-foreground">Status:</span>
+                <span className="font-medium text-foreground">Live</span>
+                <button className="ml-0.5 text-muted-foreground hover:text-foreground"><X className="h-3 w-3" /></button>
+              </div>
+              <div className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-2.5 py-1 text-xs">
+                <span className="text-muted-foreground">ROAS:</span>
+                <span className="font-medium text-foreground">&gt; 2.0</span>
+                <button className="ml-0.5 text-muted-foreground hover:text-foreground"><X className="h-3 w-3" /></button>
+              </div>
+              <button className="text-xs text-primary hover:underline ml-1">Clear all</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== TABLE WITH COLUMN PINNING ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Table with Column Pinning</h2>
+        <p className="text-xs text-muted-foreground">Each non-fixed column header has a small radio dot (h-2.5). Unpinned dots appear at 50% opacity on hover. Pinned dots show solid primary color. Pinned columns get sticky positioning with opaque backgrounds to prevent bleed-through during horizontal scroll.</p>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Pin Radio States</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-2">
+                <div className="h-2.5 w-2.5 rounded-full border border-muted-foreground/40 opacity-60" />
+                <span className="text-xs text-muted-foreground">Unpinned (hover state)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2.5 w-2.5 rounded-full border border-primary bg-primary" />
+                <span className="text-xs text-foreground font-medium">Pinned (active)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2.5 w-2.5 rounded-full border border-muted-foreground/40 opacity-0" />
+                <span className="text-xs text-muted-foreground">Unpinned (hidden — visible on row hover only)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Table with Pinned Column ("Impressions" pinned)</Label>
+          <div className="rounded-lg border border-border bg-card overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[180px]">Campaign Name</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right bg-muted">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <span>Impressions</span>
+                      <div className="h-2.5 w-2.5 rounded-full border border-primary bg-primary" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <span>Clicks</span>
+                      <div className="h-2.5 w-2.5 rounded-full border border-muted-foreground/40 opacity-60" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <span>Spend</span>
+                      <div className="h-2.5 w-2.5 rounded-full border border-muted-foreground/40 opacity-60" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      <span>ROAS</span>
+                      <div className="h-2.5 w-2.5 rounded-full border border-muted-foreground/40 opacity-60" />
+                    </div>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">Summer Sale Campaign</TableCell>
+                  <TableCell><StatusBadge status="live" /></TableCell>
+                  <TableCell className="text-right bg-background font-medium">125,400</TableCell>
+                  <TableCell className="text-right">2,450</TableCell>
+                  <TableCell className="text-right">$5,000</TableCell>
+                  <TableCell className="text-right">3.24</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Brand Awareness</TableCell>
+                  <TableCell><StatusBadge status="live" /></TableCell>
+                  <TableCell className="text-right bg-background font-medium">89,200</TableCell>
+                  <TableCell className="text-right">1,890</TableCell>
+                  <TableCell className="text-right">$3,200</TableCell>
+                  <TableCell className="text-right">2.87</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+          <p className="text-xs text-muted-foreground">↑ "Impressions" column has solid primary dot and opaque bg-muted header / bg-background cells. Other columns show dots at 60% opacity (hover state shown for demo).</p>
+        </div>
+      </section>
+
+      {/* ==================== PROFITABILITY HERO CARD ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Profitability Hero Card</h2>
+        <p className="text-xs text-muted-foreground">Consolidated profitability card with frequency tabs (Today, Yesterday, This Month, Last Month) and three sub-views: Overview, Sales Mix, Efficiency. Replaces individual period cards.</p>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Overview Tab — Static Anatomy</Label>
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
+            {/* Frequency tabs */}
+            <div className="flex items-center justify-between border-b border-border px-5 py-3">
+              <div className="flex items-center gap-1 rounded-lg bg-muted/50 p-0.5">
+                {["Today", "Yesterday", "This Month", "Last Month"].map((tab, i) => (
+                  <button key={tab} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${i === 0 ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}>{tab}</button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1 rounded-lg bg-muted/50 p-0.5">
+                {["Overview", "Sales Mix", "Efficiency"].map((view, i) => (
+                  <button key={view} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${i === 0 ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}>{view}</button>
+                ))}
+              </div>
+            </div>
+            {/* Hero metric */}
+            <div className="px-5 py-4">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Net Profit</p>
+                  <div className="flex items-baseline gap-3 mt-1">
+                    <span className="text-3xl font-bold text-foreground">$12,450</span>
+                    <DeltaBadge value={14.2} />
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="text-xs">Full Details</Button>
+              </div>
+              {/* KPI tiles */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: "Revenue", value: "$45,200", delta: 8.5 },
+                  { label: "Ad Spend", value: "$12,800", delta: -3.2 },
+                  { label: "COGS", value: "$18,950", delta: 2.1 },
+                  { label: "Margin", value: "27.5%", delta: 4.8 },
+                  { label: "Orders", value: "1,234", delta: 12.3 },
+                  { label: "AOV", value: "$36.63", delta: -1.5 },
+                ].map(({ label, value, delta }) => (
+                  <div key={label} className="rounded-lg bg-muted/40 p-3">
+                    <p className="text-[11px] text-muted-foreground">{label}</p>
+                    <p className="text-base font-semibold text-foreground mt-0.5">{value}</p>
+                    <DeltaBadge value={delta} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== UPLOAD DIALOG ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Upload Dialog</h2>
+        <p className="text-xs text-muted-foreground">Drag-and-drop file upload modal triggered by toolbar Upload button. Supports CSV/XLSX. Shows staged file list with size and remove action.</p>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Dialog Anatomy — With Files Staged</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="border border-border rounded-lg overflow-hidden max-w-md bg-background shadow-lg">
+              {/* Header */}
+              <div className="px-6 pt-6 pb-2">
+                <h4 className="text-lg font-semibold text-foreground">Upload Files</h4>
+                <p className="text-sm text-muted-foreground">Drag and drop files or click to browse</p>
+              </div>
+              {/* Drop zone */}
+              <div className="px-6 py-3">
+                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border p-8">
+                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                  <p className="text-sm text-foreground font-medium">Drop files here</p>
+                  <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
+                </div>
+              </div>
+              {/* File list */}
+              <div className="px-6 py-2 space-y-1.5">
+                {[
+                  { name: "campaign_data_2024.csv", size: "245.3 KB" },
+                  { name: "keyword_bids_update.xlsx", size: "128.7 KB" },
+                ].map((file) => (
+                  <div key={file.name} className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <FileText className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-xs text-foreground truncate">{file.name}</span>
+                      <span className="text-[10px] text-muted-foreground shrink-0">{file.size}</span>
+                    </div>
+                    <button className="p-0.5 hover:bg-muted rounded">
+                      <X className="h-3 w-3 text-muted-foreground" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              {/* Footer */}
+              <div className="px-6 py-4 flex justify-end gap-2">
+                <Button variant="ghost" size="sm">Cancel</Button>
+                <Button size="sm">Upload (2)</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Drop Zone — Drag Active State</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary bg-primary/5 p-8 max-w-md">
+              <Upload className="h-8 w-8 text-primary mb-2" />
+              <p className="text-sm text-foreground font-medium">Drop files here</p>
+              <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
