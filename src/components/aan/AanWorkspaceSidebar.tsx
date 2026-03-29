@@ -25,14 +25,9 @@ export function AanWorkspaceSidebar() {
     conversations, currentConversation, activeFilter, setActiveFilter,
     startNewConversation, selectConversation,
   } = useAan();
-  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const isDark = theme === "dark";
-  const logoFull = isDark ? logoDarkFull : logoLightFull;
-  const logoSymbol = isDark ? logoDarkSymbol : logoLightSymbol;
 
   const filteredConversations = useMemo(() => {
     let filtered = conversations;
