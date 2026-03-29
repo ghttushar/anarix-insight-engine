@@ -21,6 +21,8 @@ export default function ProfitabilityTrends() {
   const [searchValue, setSearchValue] = useState("");
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
   const [catalogue, setCatalogue] = useState("all");
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -74,6 +76,20 @@ export default function ProfitabilityTrends() {
         <ScatterPlotChart data={scatterData} />
 
         <div className="space-y-3">
+          <DataTableToolbar
+            searchValue={searchValue}
+            onSearchChange={(v) => setSearchValue(v)}
+            searchPlaceholder="Search by Product Name / Item ID / SKU..."
+            onDownload={handleDownload}
+            sortableFields={[
+              { id: "name", label: "Product Name" },
+              { id: "gmv", label: "GMV" },
+              { id: "netProfit", label: "Net Profit" },
+            ]}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
+          />
           <div className="rounded-lg border border-border bg-card">
           <div className="overflow-x-auto">
             <Table>

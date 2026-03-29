@@ -23,6 +23,8 @@ export default function ScheduledJobs() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredSchedules = schedules.filter((s) =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -79,6 +81,15 @@ export default function ScheduledJobs() {
             onDownload={() => toast.success("Exporting schedules...")}
             showDeltas={showDeltas}
             onShowDeltasChange={setShowDeltas}
+            sortableFields={[
+              { id: "name", label: "Schedule Name" },
+              { id: "actionType", label: "Action Type" },
+              { id: "nextRun", label: "Next Run" },
+              { id: "status", label: "Status" },
+            ]}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
             leftContent={
               <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createSchedule")}>
                 <Plus className="h-3.5 w-3.5" />Create Schedule

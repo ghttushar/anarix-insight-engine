@@ -11,10 +11,19 @@ import { executionHistory } from "@/data/mockDayParting";
 import { toast } from "sonner";
 import { useFilter } from "@/contexts/FilterContext";
 
+const SORTABLE_FIELDS = [
+  { id: "executedAt", label: "Execution Time" },
+  { id: "scheduleName", label: "Schedule" },
+  { id: "status", label: "Status" },
+  { id: "duration", label: "Duration" },
+];
+
 export default function DayPartingHistory() {
   const { adType, setAdType } = useFilter();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredHistory = executionHistory.filter((h) => {
     const matchesSearch =
@@ -70,6 +79,10 @@ export default function DayPartingHistory() {
           onSearchChange={setSearchQuery}
           searchPlaceholder="Search by schedule or campaign..."
           onDownload={() => toast.success("Exporting history...")}
+          sortableFields={SORTABLE_FIELDS}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
         />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>

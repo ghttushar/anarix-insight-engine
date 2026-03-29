@@ -33,6 +33,14 @@ const COLUMN_DEFS = [
 
 const FILTER_FIELDS = ["Region", "Sales", "Orders", "Stocks"];
 
+const SORTABLE_FIELDS = [
+  { id: "region", label: "Region" },
+  { id: "stocks", label: "Stocks" },
+  { id: "orders", label: "Orders" },
+  { id: "unitsSold", label: "Units Sold" },
+  { id: "sales", label: "Sales" },
+];
+
 export default function Geographical() {
   const [selectedRegionCode, setSelectedRegionCode] = useState<string>("US");
   const [viewLevel, setViewLevel] = useState<"state" | "product">("state");
@@ -41,6 +49,8 @@ export default function Geographical() {
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
   const [showDeltas, setShowDeltas] = useState(false);
   const [catalogue, setCatalogue] = useState("all");
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const selectedRegion = regionLookup[selectedRegionCode] || geographicalData[0];
 
   const handleColumnToggle = (id: string) => {
@@ -105,6 +115,10 @@ export default function Geographical() {
             showUpload
             onUpload={(files) => toast.info(`Uploading ${files[0]?.name}...`)}
             uploadTitle="Upload COGS"
+            sortableFields={SORTABLE_FIELDS}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
           />
 
           <div className="rounded-lg border border-border bg-card">

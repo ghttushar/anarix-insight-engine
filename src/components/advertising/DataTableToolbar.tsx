@@ -111,7 +111,6 @@ export function DataTableToolbar({
   const [filterOpen, setFilterOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editConfirmOpen, setEditConfirmOpen] = useState(false);
-  const [sortOpen, setSortOpen] = useState(false);
 
   const handleOpenFilter = () => {
     setDraftFilters(activeFilters.length > 0 ? [...activeFilters] : [{ id: crypto.randomUUID(), field: filterFields[0] || "", operator: "is", value: "" }]);
@@ -165,29 +164,23 @@ export function DataTableToolbar({
     onViewModeChange?.("view");
   };
 
-  const handleSortSelect = (fieldId: string) => {
-    if (sortField === fieldId) {
-      // Toggle direction or clear
-      if (sortDirection === "desc") {
-        onSortChange?.(null, "asc");
-      } else {
-        onSortChange?.(fieldId, "desc");
-      }
+  // 3-state sort cycle: inactive → asc → desc → inactive
+  const handleSortCycle = () => {
+    if (!sortField && sortableFields.length > 0) {
+      // Inactive → asc (use first sortable field as default)
+      onSortChange?.(sortableFields[0].id, "asc");
+    } else if (sortField && sortDirection === "asc") {
+      // asc → desc
+      onSortChange?.(sortField, "desc");
     } else {
-      onSortChange?.(fieldId, "asc");
+      // desc → inactive
+      onSortChange?.(null, "asc");
     }
-  };
-
-  const clearSort = () => {
-    onSortChange?.(null, "asc");
-    setSortOpen(false);
   };
 
   const filteredColumns = columns.filter((c) =>
     c.label.toLowerCase().includes(columnSearch.toLowerCase())
   );
-
-  const activeSortLabel = sortField ? sortableFields.find(f => f.id === sortField)?.label : null;
 
   return (
     <div className="space-y-1.5">
@@ -233,57 +226,24 @@ export function DataTableToolbar({
             </Button>
           )}
 
-          {/* Sort Button */}
+          {/* Sort Button — 3-state inline toggle: inactive → asc → desc → inactive */}
           {sortableFields.length > 0 && onSortChange && (
-            <Popover open={sortOpen} onOpenChange={setSortOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn("h-8 gap-1 text-xs cursor-pointer", sortField && "bg-primary/10 text-primary")}
-                  title="Sort table data"
-                >
-                  <ArrowUpDown className="h-3.5 w-3.5" />
-                  Sort
-                  {activeSortLabel && (
-                    <span className="ml-0.5 flex items-center gap-0.5 rounded bg-primary/20 px-1 py-0.5 text-[10px] text-primary font-medium">
-                      {activeSortLabel}
-                      {sortDirection === "asc" ? <ArrowUp className="h-2.5 w-2.5" /> : <ArrowDown className="h-2.5 w-2.5" />}
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-[240px] p-2 space-y-1">
-                <div className="flex items-center justify-between pb-1 border-b border-border mb-1">
-                  <span className="text-xs font-medium text-foreground">Sort by</span>
-                  {sortField && (
-                    <button onClick={clearSort} className="text-[11px] text-muted-foreground hover:text-foreground cursor-pointer">Clear</button>
-                  )}
-                </div>
-                <div className="max-h-[240px] overflow-auto space-y-0.5">
-                  {sortableFields.map((sf) => {
-                    const isActive = sortField === sf.id;
-                    return (
-                      <button
-                        key={sf.id}
-                        onClick={() => handleSortSelect(sf.id)}
-                        className={cn(
-                          "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-xs hover:bg-muted transition-colors cursor-pointer",
-                          isActive && "bg-primary/5"
-                        )}
-                      >
-                        <span className={cn("text-foreground", isActive && "font-medium")}>{sf.label}</span>
-                        {isActive && (
-                          <span className="flex items-center text-primary">
-                            {sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </PopoverContent>
-            </Popover>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn("h-8 gap-1 text-xs cursor-pointer", sortField && "bg-primary/10 text-primary")}
+              onClick={handleSortCycle}
+              title="Sort table data"
+            >
+              {!sortField ? (
+                <ArrowUpDown className="h-3.5 w-3.5" />
+              ) : sortDirection === "asc" ? (
+                <ArrowUp className="h-3.5 w-3.5" />
+              ) : (
+                <ArrowDown className="h-3.5 w-3.5" />
+              )}
+              Sort
+            </Button>
           )}
 
           {/* Filter Button */}
@@ -452,7 +412,7 @@ export function DataTableToolbar({
 
       {/* Active Filters Display */}
       {activeFilters.length > 0 && !filterOpen && (
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5 py-1.5">
           {activeFilters.map((filter) => (
             <Badge key={filter.id} variant="outline" className="gap-1 pr-1 text-[11px] h-6 bg-muted/50 border-border">
               <span className="font-medium text-foreground">{filter.field}:</span>

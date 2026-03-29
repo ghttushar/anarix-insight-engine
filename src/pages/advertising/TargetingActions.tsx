@@ -28,6 +28,15 @@ const tabs = [
 
 const FILTER_FIELDS = ["Search Term", "Term Type", "Match Type", "ROAS", "ACOS", "Ad Spend", "Ad Sales", "Impressions", "Clicks"];
 
+const SORTABLE_FIELDS = [
+  { id: "searchTerm", label: "Search Term" },
+  { id: "impressions", label: "Impressions" },
+  { id: "clicks", label: "Clicks" },
+  { id: "adSpend", label: "Ad Spend" },
+  { id: "adSales", label: "Ad Sales" },
+  { id: "roas", label: "ROAS" },
+];
+
 export default function TargetingActions() {
   const [activeTab, setActiveTab] = useState<ActionTab>("keyword-action");
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,6 +45,8 @@ export default function TargetingActions() {
   const [addKeywordsOpen, setAddKeywordsOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<{ id: string; field: string; operator: string; value: string }[]>([]);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredActions = mockTargetingActions.filter((action) => {
     const matchesSearch =
@@ -110,6 +121,10 @@ export default function TargetingActions() {
           onShowDeltasChange={setShowDeltas}
           showViewToggle
           viewMode="view"
+          sortableFields={SORTABLE_FIELDS}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
           rightContent={
             <>
               <Popover>
