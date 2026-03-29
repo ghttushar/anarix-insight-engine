@@ -46,7 +46,7 @@ import {
   Calendar as CalendarIcon, User, Mail, X, Settings, Search, Send, Loader2,
   Sparkles, RefreshCw, Camera, Lightbulb, Maximize2, SlidersHorizontal,
   ChevronDown, Eye, EyeOff, BarChart3, FileText, Zap, Store, ArrowRight,
-  Check, ArrowUpDown, Sun, Moon
+  Check, ArrowUpDown, Sun, Moon, Upload
 } from "lucide-react";
 
 export default function ComponentLibrary() {
