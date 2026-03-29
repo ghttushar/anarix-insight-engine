@@ -79,6 +79,10 @@ export default function DayPartingHistory() {
           onSearchChange={setSearchQuery}
           searchPlaceholder="Search by schedule or campaign..."
           onDownload={() => toast.success("Exporting history...")}
+          sortableFields={SORTABLE_FIELDS}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
         />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>

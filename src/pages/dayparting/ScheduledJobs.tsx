@@ -81,6 +81,15 @@ export default function ScheduledJobs() {
             onDownload={() => toast.success("Exporting schedules...")}
             showDeltas={showDeltas}
             onShowDeltasChange={setShowDeltas}
+            sortableFields={[
+              { id: "name", label: "Schedule Name" },
+              { id: "actionType", label: "Action Type" },
+              { id: "nextRun", label: "Next Run" },
+              { id: "status", label: "Status" },
+            ]}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
             leftContent={
               <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createSchedule")}>
                 <Plus className="h-3.5 w-3.5" />Create Schedule
