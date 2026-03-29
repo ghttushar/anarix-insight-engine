@@ -23,6 +23,8 @@ export default function ScheduledJobs() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredSchedules = schedules.filter((s) =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
