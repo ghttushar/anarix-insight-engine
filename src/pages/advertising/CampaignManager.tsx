@@ -106,6 +106,48 @@ const FILTER_FIELDS: Record<string, string[]> = {
   platform: ["Platform", "Bid Modifier", "ROAS"],
 };
 
+const SORTABLE_FIELDS: Record<string, { id: string; label: string }[]> = {
+  campaigns: [
+    { id: "name", label: "Campaign Name" }, { id: "dailyBudget", label: "Budget" },
+    { id: "spend", label: "Spend" }, { id: "sales", label: "Sales" }, { id: "roas", label: "ROAS" },
+    { id: "impressions", label: "Impressions" }, { id: "clicks", label: "Clicks" },
+    { id: "ctr", label: "CTR" }, { id: "acos", label: "ACOS" },
+  ],
+  "ad-groups": [
+    { id: "name", label: "Ad Group" }, { id: "campaignName", label: "Campaign" },
+    { id: "impressions", label: "Impressions" }, { id: "clicks", label: "Clicks" },
+    { id: "adSpend", label: "Ad Spend" }, { id: "adSales", label: "Ad Sales" },
+    { id: "roas", label: "ROAS" }, { id: "acos", label: "ACOS" },
+  ],
+  "product-ads": [
+    { id: "productName", label: "Product" }, { id: "impressions", label: "Impressions" },
+    { id: "clicks", label: "Clicks" }, { id: "adSpend", label: "Ad Spend" },
+    { id: "roas", label: "ROAS" }, { id: "acos", label: "ACOS" },
+  ],
+  keywords: [
+    { id: "keyword", label: "Keyword" }, { id: "impressions", label: "Impressions" },
+    { id: "clicks", label: "Clicks" }, { id: "adSpend", label: "Ad Spend" },
+    { id: "roas", label: "ROAS" }, { id: "acos", label: "ACOS" },
+  ],
+  "product-targeting": [
+    { id: "targetLabel", label: "Target" }, { id: "impressions", label: "Impressions" },
+    { id: "clicks", label: "Clicks" }, { id: "adSpend", label: "Ad Spend" },
+    { id: "roas", label: "ROAS" }, { id: "acos", label: "ACOS" },
+  ],
+  "search-terms": [
+    { id: "searchTerm", label: "Search Term" }, { id: "impressions", label: "Impressions" },
+    { id: "clicks", label: "Clicks" }, { id: "adSpend", label: "Ad Spend" },
+  ],
+  "page-type": [
+    { id: "pageType", label: "Page Type" }, { id: "impressions", label: "Impressions" },
+    { id: "adSpend", label: "Ad Spend" }, { id: "roas", label: "ROAS" },
+  ],
+  platform: [
+    { id: "platform", label: "Platform" }, { id: "impressions", label: "Impressions" },
+    { id: "adSpend", label: "Ad Spend" }, { id: "roas", label: "ROAS" },
+  ],
+};
+
 const AVAILABLE_METRICS = [
   { key: "impressions", label: "Impressions", format: "number" as const },
   { key: "clicks", label: "Clicks", format: "number" as const },
