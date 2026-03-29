@@ -42,11 +42,21 @@ const impactChartData = mockImpactCampaigns.map((c) => ({
   "Impact Sales": c.impact.adSales,
 }));
 
+const SORTABLE_FIELDS = [
+  { id: "name", label: "Name" },
+  { id: "impactPercentage", label: "Impact %" },
+  { id: "adSpend", label: "Ad Spend" },
+  { id: "adSales", label: "Ad Sales" },
+  { id: "roas", label: "ROAS" },
+];
+
 export default function ImpactAnalysis() {
   const { adType, setAdType } = useFilter();
   const [activeTab, setActiveTab] = useState<ImpactTab>("campaigns");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMetric, setSelectedMetric] = useState("adSpend");
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const getTabData = () => {
     switch (activeTab) {
