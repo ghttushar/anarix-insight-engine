@@ -64,7 +64,7 @@ export function ProductTargetingTable({ searchQuery = "", showDeltas = false }: 
     </div>
   );
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   return (
     <div className="rounded-lg border border-border bg-card">

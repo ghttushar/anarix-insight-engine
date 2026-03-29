@@ -58,7 +58,7 @@ export function PlatformTable({ searchQuery = "", showDeltas = false }: Platform
     </div>
   );
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   return (
     <div className="rounded-lg border border-border bg-card">

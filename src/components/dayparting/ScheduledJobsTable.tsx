@@ -59,7 +59,7 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
     return days.map((d) => dayNames[d]).join(", ");
   };
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   return (
     <div className="rounded-lg border border-border bg-card">

@@ -29,7 +29,7 @@ export function BrandCoverageTable({ brands, onViewTrend }: BrandCoverageTablePr
   const sorted = sortData(brands, sortField, sortDirection);
   const paginatedBrands = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   return (
     <div className="rounded-lg border border-border bg-card">

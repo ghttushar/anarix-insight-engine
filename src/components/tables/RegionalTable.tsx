@@ -58,7 +58,7 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
     </div>
   );
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   const renderRow = (region: GeographicalData, isChild = false) => {
     const hasChildren = region.children && region.children.length > 0;

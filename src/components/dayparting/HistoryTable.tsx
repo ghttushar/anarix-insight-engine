@@ -51,7 +51,7 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
     return `${(ms / 1000).toFixed(1)}s`;
   };
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   return (
     <div className="rounded-lg border border-border bg-card">

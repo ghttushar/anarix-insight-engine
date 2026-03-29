@@ -34,7 +34,7 @@ export function KeywordTrackerTable({ keywords, onStatusChange, onDelete }: Keyw
 
   const formatDate = (dateString: string) => format(new Date(dateString), "MMM dd, yyyy HH:mm");
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   return (
     <div className="rounded-lg border border-border bg-card">
