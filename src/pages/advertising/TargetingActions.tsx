@@ -45,6 +45,8 @@ export default function TargetingActions() {
   const [addKeywordsOpen, setAddKeywordsOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<{ id: string; field: string; operator: string; value: string }[]>([]);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredActions = mockTargetingActions.filter((action) => {
     const matchesSearch =
