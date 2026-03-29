@@ -74,7 +74,7 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
     </div>
   );
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   return (
     <>
