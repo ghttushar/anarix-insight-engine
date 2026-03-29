@@ -21,6 +21,8 @@ export default function ProfitabilityTrends() {
   const [searchValue, setSearchValue] = useState("");
   const [trendsProduct, setTrendsProduct] = useState<ProfitabilityProduct | null>(null);
   const [catalogue, setCatalogue] = useState("all");
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredProducts = profitabilityProducts.filter((p) =>
     p.name.toLowerCase().includes(searchValue.toLowerCase()) ||
