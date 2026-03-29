@@ -28,6 +28,15 @@ const tabs = [
 
 const FILTER_FIELDS = ["Search Term", "Term Type", "Match Type", "ROAS", "ACOS", "Ad Spend", "Ad Sales", "Impressions", "Clicks"];
 
+const SORTABLE_FIELDS = [
+  { id: "searchTerm", label: "Search Term" },
+  { id: "impressions", label: "Impressions" },
+  { id: "clicks", label: "Clicks" },
+  { id: "adSpend", label: "Ad Spend" },
+  { id: "adSales", label: "Ad Sales" },
+  { id: "roas", label: "ROAS" },
+];
+
 export default function TargetingActions() {
   const [activeTab, setActiveTab] = useState<ActionTab>("keyword-action");
   const [searchQuery, setSearchQuery] = useState("");
