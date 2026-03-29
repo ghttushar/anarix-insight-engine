@@ -63,7 +63,7 @@ export function AanWorkspaceSidebar() {
       <aside className="w-14 border-r border-border bg-card flex flex-col h-full shrink-0">
         {/* Collapsed header — centered symbol logo */}
         <div className="flex items-center justify-center h-12 border-b border-border/30 shrink-0">
-          <img src={logoSymbol} alt="Anarix" className="h-6 w-auto" />
+          <Sparkles className="h-5 w-5 aan-gradient-text" />
         </div>
 
         {/* Expand button */}
