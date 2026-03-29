@@ -8,6 +8,7 @@ import { ImpactComparison } from "@/types/advertising";
 import { cn } from "@/lib/utils";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { TablePagination } from "./TablePagination";
+import { SortableTableHead, sortData } from "./SortableTableHead";
 
 interface ImpactTableProps {
   data: ImpactComparison[];
@@ -18,12 +19,22 @@ interface ImpactTableProps {
 export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredData = data.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
+  };
+
+  const sorted = sortData(filteredData, sortField, sortDirection);
+  const paginatedData = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
@@ -38,7 +49,6 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
     const delta = calculateDelta(baseline, impact);
     const isPositive = delta > 0;
     const isNeutral = delta === 0;
-
     return (
       <div className="flex items-center justify-end gap-2">
         <span className="text-muted-foreground">
@@ -56,28 +66,29 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
     );
   };
 
+  const sp = { sortField, sortDirection, onSort: handleSort };
+
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
-              <TableHead className="min-w-[250px] sticky left-0 z-10 bg-muted">Name</TableHead>
-              <TableHead className="w-28 text-center">Impact</TableHead>
-              <TableHead className="min-w-[180px] text-right">Impressions</TableHead>
-              <TableHead className="min-w-[150px] text-right">Clicks</TableHead>
-              <TableHead className="min-w-[140px] text-right">CTR</TableHead>
-              <TableHead className="min-w-[180px] text-right">Ad Spend</TableHead>
-              <TableHead className="min-w-[180px] text-right">Ad Sales</TableHead>
-              <TableHead className="min-w-[140px] text-right">ROAS</TableHead>
-              <TableHead className="min-w-[140px] text-right">ACOS</TableHead>
+              <SortableTableHead field="name" {...sp} className="min-w-[250px] sticky left-0 z-10 bg-muted">Name</SortableTableHead>
+              <SortableTableHead field="impactPercentage" {...sp} className="w-28 text-center" align="center">Impact</SortableTableHead>
+              <SortableTableHead field="impressions" {...sp} className="min-w-[180px] text-right" align="right">Impressions</SortableTableHead>
+              <SortableTableHead field="clicks" {...sp} className="min-w-[150px] text-right" align="right">Clicks</SortableTableHead>
+              <SortableTableHead field="ctr" {...sp} className="min-w-[140px] text-right" align="right">CTR</SortableTableHead>
+              <SortableTableHead field="adSpend" {...sp} className="min-w-[180px] text-right" align="right">Ad Spend</SortableTableHead>
+              <SortableTableHead field="adSales" {...sp} className="min-w-[180px] text-right" align="right">Ad Sales</SortableTableHead>
+              <SortableTableHead field="roas" {...sp} className="min-w-[140px] text-right" align="right">ROAS</SortableTableHead>
+              <SortableTableHead field="acos" {...sp} className="min-w-[140px] text-right" align="right">ACOS</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.map((item) => {
               const isPositive = item.impactPercentage > 0;
               const isNeutral = item.impactPercentage === 0;
-
               return (
                 <TableRow key={item.id} className="group cursor-pointer hover:bg-muted/50 transition-colors">
                   <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors">
@@ -109,13 +120,7 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
           </TableBody>
         </Table>
       </div>
-      <TablePagination
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={filteredData.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      <TablePagination page={currentPage} pageSize={pageSize} totalItems={filteredData.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
     </div>
   );
 }

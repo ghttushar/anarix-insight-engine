@@ -132,8 +132,8 @@ export function CampaignTable({
   const paginatedCampaigns = sortedCampaigns.slice((page - 1) * pageSize, page * pageSize);
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />;
-    return sortDirection === "asc" ? <ArrowUp className="h-4 w-4 text-primary" /> : <ArrowDown className="h-4 w-4 text-primary" />;
+    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover/sort:opacity-40" />;
+    return sortDirection === "asc" ? <ArrowUp className="h-3 w-3 text-primary" /> : <ArrowDown className="h-3 w-3 text-primary" />;
   };
 
   return (
@@ -145,7 +145,7 @@ export function CampaignTable({
               {isEdit && show("active") && <TableHead className="w-16">Active</TableHead>}
               {show("status") && <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>}
               {show("type") && <TableHead className="w-24">Type</TableHead>}
-              {show("name") && <TableHead className={cn("min-w-[200px] cursor-pointer sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
+              {show("name") && <TableHead className={cn("min-w-[200px] cursor-pointer group/sort sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")} onClick={() => handleSort("name")}>
                 <div className="flex items-center gap-1">Campaign Name <SortIcon field="name" /></div>
               </TableHead>}
               {show("startDate") && <TableHead className="cursor-pointer" onClick={() => handleSort("startDate")}>

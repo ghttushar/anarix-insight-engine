@@ -59,7 +59,7 @@ export default function ScheduledJobs() {
             appLevelSelector={
               <AppLevelSelector>
                 <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
-                  <SelectTrigger className="h-8 w-[130px] text-xs border-border">
+                  <SelectTrigger className="h-9 w-[150px] text-sm border-border bg-muted/50 rounded-lg">
                     <SelectValue placeholder="Ad Type" />
                   </SelectTrigger>
                   <SelectContent>

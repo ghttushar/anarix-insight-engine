@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { TrendingUp } from "lucide-react";
 import { Brand } from "@/types/bi";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { SortableTableHead, sortData } from "@/components/tables/SortableTableHead";
 
 interface BrandCoverageTableProps {
   brands: Brand[];
@@ -13,22 +14,34 @@ interface BrandCoverageTableProps {
 export function BrandCoverageTable({ brands, onViewTrend }: BrandCoverageTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const paginatedBrands = brands.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
+  };
+
+  const sorted = sortData(brands, sortField, sortDirection);
+  const paginatedBrands = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const sp = { sortField, sortDirection, onSort: handleSort };
 
   return (
     <div className="rounded-lg border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">
-            <TableHead className="w-[60px]">SI No</TableHead>
-            <TableHead>Brand</TableHead>
-            <TableHead className="text-right">Product Count</TableHead>
-            <TableHead className="text-right">Appearance(%)</TableHead>
-            <TableHead className="text-right">Organic SOV(%)</TableHead>
-            <TableHead className="text-right">Sponsored SOV(%)</TableHead>
-            <TableHead className="text-right">Total SOV(%)</TableHead>
-            <TableHead className="text-center w-[100px]">View Trend</TableHead>
+            <SortableTableHead field="id" {...sp} className="w-[60px]">SI No</SortableTableHead>
+            <SortableTableHead field="name" {...sp}>Brand</SortableTableHead>
+            <SortableTableHead field="productCount" {...sp} className="text-right" align="right">Product Count</SortableTableHead>
+            <SortableTableHead field="appearance" {...sp} className="text-right" align="right">Appearance(%)</SortableTableHead>
+            <SortableTableHead field="organicSOV" {...sp} className="text-right" align="right">Organic SOV(%)</SortableTableHead>
+            <SortableTableHead field="sponsoredSOV" {...sp} className="text-right" align="right">Sponsored SOV(%)</SortableTableHead>
+            <SortableTableHead field="totalSOV" {...sp} className="text-right" align="right">Total SOV(%)</SortableTableHead>
+            <SortableTableHead field="viewTrend" {...sp} className="text-center w-[100px]" align="center">View Trend</SortableTableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -50,13 +63,7 @@ export function BrandCoverageTable({ brands, onViewTrend }: BrandCoverageTablePr
           ))}
         </TableBody>
       </Table>
-      <TablePagination
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={brands.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      <TablePagination page={currentPage} pageSize={pageSize} totalItems={brands.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
     </div>
   );
 }
