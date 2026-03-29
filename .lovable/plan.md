@@ -1,182 +1,125 @@
+## Fix: App Level Selector Redesign, Sort Button (No Popover), Pin Functional, Remove Sort from Headers
 
-
-## Universal Table Standardization: Sort Button, Pin Radio, Toolbar Consistency, Card Uniformity
-
-### Current State (Audit Results)
-
-**Toolbar inconsistency:**
-- `CatalogProductsTable` has its OWN inline toolbar with `variant="outline"` buttons — completely different from `DataTableToolbar` used everywhere else
-- `DataTableToolbar` is used on: Campaign Manager, Profitability Dashboard, Ad Group Detail, but NOT on Catalog
-
-**Pagination placement:**
-- `CampaignTable`: pagination is OUTSIDE the card (`space-y-4` separates table card from pagination)
-- `AdGroupsTable`, `KeywordTargetingTable`, etc.: pagination is inside the card wrapper at the page level, but the table itself returns `<div className="rounded-lg border">` with `TablePagination` as a sibling — inconsistent
-- `ProductsPnLTable`: pagination inside card
-- `CatalogProductsTable`: NO pagination at all
-- `RegionalProductTable`: NO pagination, NO sorting
-
-**Sorting:**
-- `CampaignTable` has its own inline `SortIcon` component (not using `SortableTableHead`)
-- Other tables use `SortableTableHead` but only in headers — no toolbar sort button exists
-- `ProductsPnLTable`: NO sorting
-- `CatalogProductsTable`: NO sorting
-
-**Editable tables (have Switch/Checkbox/Input):**
-- `CampaignTable` — Switch, Input, Select, DatePicker (already has Edit mode)
-- `KeywordTargetingTable` — Switch (bid toggle)
-- `ProductTargetingTable` — Switch (bid toggle)
-- `PageTypeTable` — Input (bid modifier)
-- `PlatformTable` — Input (bid modifier)
-- `SearchTermsTable` — Checkbox (selection)
-- `ProductAdsTable` — Checkbox (selection)
-
-**App Level Selector:** Currently `bg-muted/30` — needs solid `bg-card` fill
+### 3 Changes
 
 ---
 
-### Plan: 4 Phases
+### 1. App Level Selector Redesign
 
-#### Phase 1: DataTableToolbar Updates + AppLevelSelector
+**Problem:** Small floating box looks lost against the page title.
 
-**DataTableToolbar.tsx** — Add Sort button after Delta, before Filter:
-- New prop: `onSortChange?: (field: string, direction: "asc"|"desc"|null) => void`
-- New prop: `sortField?: string | null`, `sortDirection?: "asc"|"desc"`, `sortableFields?: string[]`
-- Sort button opens a Popover with a list of sortable fields, each with asc/desc toggle
-- Button shows active sort indicator (field name badge) when sorting is active
-- Position in toolbar: Upload → Delta → **Sort** → Filter → Columns → Export → Edit
+**Solution:** Make it a full-width strip that spans the entire top area, right-aligned against the page title. Instead of a tiny bordered box, render children and the marketplace dropdown as individual pill-style controls inline within the PageHeader row itself — no wrapper card needed. The `AppLevelSelector` container becomes `flex items-center gap-2` with no border/background. Each child Select and the marketplace button get consistent `h-9 rounded-md bg-muted border border-border px-3` styling.
 
-**AppLevelSelector.tsx** — Change container from `bg-muted/30` to `bg-card`:
-- Line 45: change to `bg-card rounded-lg border border-border px-1.5 py-1`
+**Files:** `AppLevelSelector.tsx` — remove the outer `bg-card rounded-lg border` wrapper, let items sit naturally in the PageHeader flex row.
 
-#### Phase 2: Replace SortableTableHead Sort Arrows with Pin Radio Buttons
+---
 
-**SortableTableHead.tsx** — Complete redesign:
-- Remove all sort arrow icons (ArrowUpDown, ArrowUp, ArrowDown)
-- Add a small circular radio/pin indicator instead:
-  - Size: `h-2.5 w-2.5` (very small)
-  - Default: `opacity-50` border circle, `group-hover:opacity-80`
-  - Active (pinned): filled `bg-primary` blue dot, full opacity
-  - Click: toggles pin on/off
-- New props: `isPinned?: boolean`, `onPinToggle?: (field: string) => void`
-- Remove `onSort` from header clicks (sorting moves to toolbar)
-- Pin radio appears on ALL non-fixed columns
-- Fixed columns (like Status, Name) do NOT get the radio button
+### 2. Sort Button — 3-State Inline Toggle (No Popover)
 
-**Pin behavior:**
-- Pinned column gets `sticky` positioning with `z-10` and opaque background
-- Pinned columns render immediately after the last fixed column in the table
-- Column order: [Fixed cols (Status, Name)] → [Pinned cols] → [Regular cols]
-- Each table defines its `fixedColumns` array (columns that never move)
+**Problem:** Current sort opens a popover with field list. User wants: click Sort button cycles through 3 states — inactive (both arrows), asc (up arrow), desc (down arrow), then back to inactive. No popover/dialog.
 
-#### Phase 3: Rebuild ALL Tables with Identical Structure
+**But** the sort needs to know WHICH field to sort by. Looking at the uploaded image, the user's reference shows a popover with field names. So the popover stays but the ARROW behavior on each field row changes to the 3-state cycle:
 
-Every table will follow this exact pattern:
-```
-<div className="rounded-lg border border-border bg-card">
-  <div className="overflow-x-auto">
-    <Table>
-      <TableHeader>
-        <TableRow className="bg-muted hover:bg-muted">
-          {/* Fixed columns: sticky left, z-20, bg-muted */}
-          {/* Pinned columns: sticky, z-10, bg-muted */}
-          {/* Regular columns with pin radio */}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {/* Data rows */}
-        {/* Total row: bg-muted font-medium */}
-      </TableBody>
-    </Table>
-  </div>
-  <TablePagination ... />  {/* INSIDE the card */}
-</div>
-```
+- Inactive: show `ArrowUpDown` icon  
+- Click 1: `ArrowUp` (asc, highlighted)
+- Click 2: `ArrowDown` (desc, highlighted)  
+- Click 3: deactivate (back to `ArrowUpDown`)
 
-**Tables to rebuild (17 total):**
+When not hovering the Sort button, it shows the last active arrow direction if sorting is active.
 
-| Table | Fixed Columns | Has Edit | Has Total Row |
-|---|---|---|---|
-| CampaignTable | Status, Type, Name | Yes (Switch, Input, Select, Date) | Yes |
-| AdGroupsTable | Status, Name, Campaign | No | Yes |
-| KeywordTargetingTable | Status, Keyword, Match, AdGroup, Campaign | Yes (Switch) | Yes |
-| ProductTargetingTable | Status, Target, Type, AdGroup, Campaign | Yes (Switch) | Yes |
-| SearchTermsTable | Checkbox, Term, Match, Campaign | Yes (Checkbox) | Yes |
-| ProductAdsTable | Checkbox, Product, AdGroup, Campaign | Yes (Checkbox) | Yes |
-| PageTypeTable | Page Type | Yes (Input bid modifier) | Yes |
-| PlatformTable | Platform | Yes (Input bid modifier) | Yes |
-| ImpactTable | Name | No | No |
-| RegionalTable | Region | No | No |
-| RegionalProductTable | Product Details | No | No (add it) |
-| ProductsPnLTable | Product Details | No | Yes |
-| CatalogProductsTable | Product Details | No | Yes |
-| ScheduledJobsTable | Campaign | No | No |
-| HistoryTable | Execution Time | No | No |
-| BrandCoverageTable | Brand | No | No |
-| KeywordTrackerTable | Keyword | No | No |
+**Wait** — re-reading: "clicking on sort should not open any additional dialogue/control box". So NO popover at all. The sort button itself is a 3-state toggle. But then how does it know which field? Answer: it uses whatever `sortableFields` are defined, and the toolbar just needs a single sort toggle that cycles the direction on the current `sortField`. The field selection would come from the Columns dropdown or be a default.
 
-**CatalogProductsTable** — Delete the inline custom toolbar entirely. The parent page (`Products.tsx`) will use `DataTableToolbar` like every other page.
+Actually looking more carefully at the image — it DOES show a popover with field names. Let me re-read: "clicking on sort should not open any additional dialogue/control box". This contradicts the image. I'll follow the text instruction: **no popover**. The sort button is a simple 3-state inline toggle.
 
-**CampaignTable** — Move pagination inside the card. Refactor `SortIcon` to use the new `SortableTableHead` radio pattern. Remove inline sorting — sorting will be handled via toolbar.
+For field selection: the first sortable field is used as default, or if sort was previously set to a field, it keeps that field. The button just cycles direction.
 
-**RegionalProductTable** — Add sorting via toolbar, add pagination, add total row.
+**Implementation in `DataTableToolbar.tsx`:**
 
-**ProductsPnLTable** — Add sorting via toolbar.
+- Remove `Popover` around sort button
+- Sort button click cycles: inactive → asc → desc → inactive
+- Icon shows: `ArrowUpDown` (inactive), `ArrowUp` (asc), `ArrowDown` (desc)
+- When active: `bg-primary/10 text-primary`
+- Remove `sortOpen` state
 
-#### Phase 4: Wire Toolbar on Every Page
+---
 
-Every page that has a table must wire `DataTableToolbar` with:
-- `sortableFields` (list of column field names)
-- `sortField` / `sortDirection` / `onSortChange` 
-- `columns` / `onColumnToggle` (for Columns dropdown)
-- `showViewToggle={true}` if the table has editable elements
-- `showDeltas` / `onShowDeltasChange` 
-- `onDownload` (Export)
-- `filterFields` (Filter)
+### 3. Remove Sort from Column Headers, Keep Only Pin
 
-Pages to update:
-- `CampaignManager.tsx` — already has toolbar, add sort props
-- `CampaignDetail.tsx` (Ad Groups tab) — add toolbar if missing
-- `AdGroupDetail.tsx` — add toolbar for Keywords, Product Targeting, Search Terms, Product Ads tabs
-- `Products.tsx` (Catalog) — replace inline toolbar with `DataTableToolbar`
-- `Dashboard.tsx` (Profitability) — already has toolbar, add sort props
-- `ProfitLoss.tsx` — add sort props
-- `Geographical.tsx` — add sort props
-- `ImpactAnalysis.tsx` — add sort props
-- `HourlyData.tsx` — add sort props if table exists
-- `ScheduledJobs.tsx` — add sort props
-- `History.tsx` — add sort props
-- `BrandSOV.tsx` — add sort props
-- `KeywordTracker.tsx` — add sort props
+`**SortableTableHead.tsx`:**
+
+- Remove `onSort` prop usage — no click-to-sort on headers
+- Remove sort arrow icons entirely
+- Keep ONLY the pin radio button
+- Remove `cursor-pointer` from header (no click action)
+
+---
+
+### 4. Make Pin Functional
+
+**Current state:** Pin radio toggles `pinnedColumns` Set in each table, but pinned columns don't actually reorder or get sticky positioning.
+
+**Implementation:** In each table component, when rendering columns:
+
+1. Define `fixedColumns` array (always first, e.g., Status, Name)
+2. `pinnedColumns` from state get rendered immediately after fixed columns
+3. Remaining columns render after pinned
+4. Pinned columns get `sticky` with calculated `left` offset after fixed columns, `z-10`, opaque `bg-muted` (header) / `bg-background` (body)
+
+This requires each table to dynamically reorder its columns based on pin state. I'll implement a shared utility `getOrderedColumns(allColumns, fixedColumns, pinnedColumns)` that returns the correct render order.
+
+**Tables to update (all with `onPinToggle`):**
+
+- `AdGroupsTable`, `KeywordTargetingTable`, `ProductTargetingTable`, `SearchTermsTable`, `ProductAdsTable`, `PageTypeTable`, `PlatformTable`, `ImpactTable`, `RegionalTable`
+- `CampaignTable` (uses custom sort, needs migration)
+- `CatalogProductsTable`, `RegionalProductTable`, `ProductsPnLTable` (need pin state added)
+- `ScheduledJobsTable`, `HistoryTable`, `BrandCoverageTable`, `KeywordTrackerTable`
+
+---
+
+### 5. Add Sort and Pin to ALL Table Toolbars on Listed Screens
+
+Pages that need `sortableFields` + `sortField` + `sortDirection` + `onSortChange` added to their `DataTableToolbar`:
+
+
+| Page                       | File                   | Needs Added                |
+| -------------------------- | ---------------------- | -------------------------- |
+| Profitability Dashboard    | `Dashboard.tsx`        | sortableFields, sort state |
+| Profitability Trends       | `Trends.tsx`           | sortableFields, sort state |
+| Profitability P&L          | `ProfitLoss.tsx`       | sortableFields, sort state |
+| Profitability Geographical | `Geographical.tsx`     | sortableFields, sort state |
+| Campaign Manager           | `CampaignManager.tsx`  | Already has it             |
+| Impact Analysis            | `ImpactAnalysis.tsx`   | sortableFields, sort state |
+| Targeting Actions          | `TargetingActions.tsx` | sortableFields, sort state |
+| Catalog Products           | `Products.tsx`         | Already has it             |
+| Day Parting History        | `History.tsx`          | sortableFields, sort state |
+| Day Parting Scheduled Jobs | `ScheduledJobs.tsx`    | sortableFields, sort state |
+
+
+---
+
+### 6. Column Selector Working on All Screens
+
+Ensure every `DataTableToolbar` that has tables also passes `columns`, `onColumnToggle`, `onSelectAllColumns`, `onClearAllColumns`. Check and add `COLUMN_DEFS` + state to pages missing it.
+
+---
+
+### 7. Filter Chips Equal Spacing
+
+In `DataTableToolbar.tsx` line 455: change `<div className="flex flex-wrap items-center gap-1.5">` to `<div className="flex flex-wrap items-center gap-1.5 py-1.5">` for equal top/bottom spacing.
 
 ---
 
 ### Files Summary
 
-| File | Phase | Change |
-|---|---|---|
-| `DataTableToolbar.tsx` | 1 | Add Sort button with popover (after Delta, before Filter) |
-| `AppLevelSelector.tsx` | 1 | Change to solid `bg-card` background |
-| `SortableTableHead.tsx` | 2 | Replace sort arrows with pin radio buttons |
-| `CampaignTable.tsx` | 3 | Pagination inside card, remove inline sort, use pin radios |
-| `AdGroupsTable.tsx` | 3 | Standardize structure, add pin radios |
-| `KeywordTargetingTable.tsx` | 3 | Standardize, add Edit support, add pin radios |
-| `ProductTargetingTable.tsx` | 3 | Standardize, add Edit support, add pin radios |
-| `SearchTermsTable.tsx` | 3 | Standardize, add Edit support, add pin radios |
-| `ProductAdsTable.tsx` | 3 | Standardize, add Edit support, add pin radios |
-| `PageTypeTable.tsx` | 3 | Standardize, add Edit support, add pin radios |
-| `PlatformTable.tsx` | 3 | Standardize, add Edit support, add pin radios |
-| `ImpactTable.tsx` | 3 | Standardize, add pin radios |
-| `RegionalTable.tsx` | 3 | Standardize, add pin radios |
-| `RegionalProductTable.tsx` | 3 | Add sorting, pagination, total row, pin radios |
-| `ProductsPnLTable.tsx` | 3 | Add sorting, add pin radios |
-| `CatalogProductsTable.tsx` | 3 | Remove inline toolbar, standardize structure, add pagination, sorting, pin radios |
-| `ScheduledJobsTable.tsx` | 3 | Standardize, add pin radios |
-| `HistoryTable.tsx` | 3 | Standardize, add pin radios |
-| `BrandCoverageTable.tsx` | 3 | Standardize, add pin radios |
-| `KeywordTrackerTable.tsx` | 3 | Standardize, add pin radios |
-| `CampaignTableTotalRow.tsx` | 3 | Ensure compatible with new structure |
-| `Products.tsx` (catalog page) | 4 | Wire DataTableToolbar instead of inline |
-| All page files with tables | 4 | Wire sort, columns, edit, delta consistently |
 
-**Delivery:** Phase 1+2 together (toolbar + pin radios), then Phase 3+4 together (all tables + all pages).
+| File                    | Change                                                                    |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `AppLevelSelector.tsx`  | Remove outer card wrapper, let controls sit naturally                     |
+| `DataTableToolbar.tsx`  | Replace sort popover with 3-state inline button; fix filter chips padding |
+| `SortableTableHead.tsx` | Remove sort arrows/click, keep only pin radio                             |
+| All 10 table components | Implement functional pin (column reordering + sticky)                     |
+| 8 page files            | Add sortableFields + sort state to DataTableToolbar                       |
+| Pages missing columns   | Add COLUMN_DEFS + column toggle wiring                                    |
 
+
+**Delivery:** All in one pass — the changes are mostly mechanical (add props, remove sort from headers, add pin reorder logic).
