@@ -9,6 +9,7 @@ import { GeographicalData } from "@/types/profitability";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { SortableTableHead, sortData } from "@/components/tables/SortableTableHead";
 
 interface RegionalTableProps {
   data: GeographicalData[];
@@ -23,21 +24,30 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
+  };
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
   };
 
   const filteredData = searchValue
     ? data.filter((r) => r.region.toLowerCase().includes(searchValue.toLowerCase()))
     : data;
 
-  const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const sorted = sortData(filteredData, sortField, sortDirection);
+  const paginatedData = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const NumCell = ({ value, formatted, id, metric }: { value: number; formatted: string; id: string; metric: string }) => (
     <div className="flex flex-col items-end">
@@ -46,10 +56,11 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
     </div>
   );
 
+  const sp = { sortField, sortDirection, onSort: handleSort };
+
   const renderRow = (region: GeographicalData, isChild = false) => {
     const hasChildren = region.children && region.children.length > 0;
     const isExpanded = expandedRows.has(region.id);
-
     return (
       <>
         <TableRow key={region.id} className={cn("hover:bg-muted/30 group cursor-pointer transition-colors", isChild && "bg-muted/10")}>
@@ -59,9 +70,7 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
                 <button onClick={() => toggleRow(region.id)} className="p-0.5 hover:bg-muted rounded">
                   {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                 </button>
-              ) : (
-                <span className="w-5" />
-              )}
+              ) : (<span className="w-5" />)}
               {region.flag && <span className="text-lg">{region.flag}</span>}
               <span className="font-medium text-foreground">{region.region}</span>
             </div>
@@ -73,9 +82,7 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
           <TableCell className="text-right"><NumCell value={region.sales} formatted={formatCurrency(region.sales)} id={region.id} metric="sales" /></TableCell>
           <TableCell className="text-right"><NumCell value={region.amazonFees} formatted={formatCurrency(region.amazonFees)} id={region.id} metric="amazonFees" /></TableCell>
           <TableCell className="text-right"><NumCell value={region.sellableReturns} formatted={formatNumber(region.sellableReturns)} id={region.id} metric="sellableReturns" /></TableCell>
-          <TableCell className="text-center">
-            <button className="text-xs text-primary hover:underline">More</button>
-          </TableCell>
+          <TableCell className="text-center"><button className="text-xs text-primary hover:underline">More</button></TableCell>
         </TableRow>
         {hasChildren && isExpanded && region.children!.map((child) => renderRow(child, true))}
       </>
@@ -88,27 +95,21 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
         <Table>
           <TableHeader>
             <TableRow className="bg-muted">
-              <TableHead className="sticky left-0 z-20 bg-muted min-w-[200px] border-r border-border">Region</TableHead>
-              <TableHead className="text-right">Stocks</TableHead>
-              <TableHead className="text-right">Orders</TableHead>
-              <TableHead className="text-right">Units Sold</TableHead>
-              <TableHead className="text-right">Refunds</TableHead>
-              <TableHead className="text-right">Sales</TableHead>
-              <TableHead className="text-right">Amazon Fees</TableHead>
-              <TableHead className="text-right">Sellable Returns</TableHead>
+              <SortableTableHead field="region" {...sp} className="sticky left-0 z-20 bg-muted min-w-[200px] border-r border-border">Region</SortableTableHead>
+              <SortableTableHead field="stocks" {...sp} className="text-right" align="right">Stocks</SortableTableHead>
+              <SortableTableHead field="orders" {...sp} className="text-right" align="right">Orders</SortableTableHead>
+              <SortableTableHead field="unitsSold" {...sp} className="text-right" align="right">Units Sold</SortableTableHead>
+              <SortableTableHead field="refunds" {...sp} className="text-right" align="right">Refunds</SortableTableHead>
+              <SortableTableHead field="sales" {...sp} className="text-right" align="right">Sales</SortableTableHead>
+              <SortableTableHead field="amazonFees" {...sp} className="text-right" align="right">Amazon Fees</SortableTableHead>
+              <SortableTableHead field="sellableReturns" {...sp} className="text-right" align="right">Sellable Returns</SortableTableHead>
               <TableHead className="text-center">Info</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>{paginatedData.map((region) => renderRow(region))}</TableBody>
         </Table>
       </div>
-      <TablePagination
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={filteredData.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      <TablePagination page={currentPage} pageSize={pageSize} totalItems={filteredData.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
     </div>
   );
 }

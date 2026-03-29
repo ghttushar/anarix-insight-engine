@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { SortableTableHead, sortData } from "@/components/tables/SortableTableHead";
 
 interface ScheduledJobsTableProps {
   schedules: DayPartingSchedule[];
@@ -32,8 +33,18 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const paginatedSchedules = schedules.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
+  };
+
+  const sorted = sortData(schedules, sortField, sortDirection);
+  const paginatedSchedules = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const formatNextRun = (nextRun?: string) => {
     if (!nextRun) return "-";
@@ -48,17 +59,19 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
     return days.map((d) => dayNames[d]).join(", ");
   };
 
+  const sp = { sortField, sortDirection, onSort: handleSort };
+
   return (
     <div className="rounded-lg border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">
-            <TableHead>Schedule Name</TableHead>
-            <TableHead>Campaign(s)</TableHead>
-            <TableHead>Action Type</TableHead>
-            <TableHead>Frequency</TableHead>
-            <TableHead>Next Run</TableHead>
-            <TableHead className="text-center">Status</TableHead>
+            <SortableTableHead field="name" {...sp}>Schedule Name</SortableTableHead>
+            <SortableTableHead field="campaignNames" {...sp}>Campaign(s)</SortableTableHead>
+            <SortableTableHead field="actionType" {...sp}>Action Type</SortableTableHead>
+            <SortableTableHead field="repeatType" {...sp}>Frequency</SortableTableHead>
+            <SortableTableHead field="nextRun" {...sp}>Next Run</SortableTableHead>
+            <SortableTableHead field="status" {...sp} className="text-center" align="center">Status</SortableTableHead>
             <TableHead className="text-center w-[120px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -115,13 +128,7 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
           ))}
         </TableBody>
       </Table>
-      <TablePagination
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={schedules.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      <TablePagination page={currentPage} pageSize={pageSize} totalItems={schedules.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
     </div>
   );
 }

@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Input } from "@/components/ui/input";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table, TableBody, TableCell, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockPlatforms, platformsTotals } from "@/data/mockPageTypePlatform";
 import { TablePagination } from "./TablePagination";
+import { SortableTableHead, sortData } from "./SortableTableHead";
 
 interface PlatformTableProps {
   searchQuery?: string;
@@ -17,6 +18,8 @@ interface PlatformTableProps {
 export function PlatformTable({ searchQuery = "", showDeltas = false }: PlatformTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [bidModifiers, setBidModifiers] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
     mockPlatforms.forEach((p) => { initial[p.id] = p.bidModifier; });
@@ -27,7 +30,15 @@ export function PlatformTable({ searchQuery = "", showDeltas = false }: Platform
     p.platform.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const paginatedPlatforms = filteredPlatforms.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
+  };
+
+  const sorted = sortData(filteredPlatforms, sortField, sortDirection);
+  const paginatedPlatforms = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
@@ -47,22 +58,24 @@ export function PlatformTable({ searchQuery = "", showDeltas = false }: Platform
     </div>
   );
 
+  const sp = { sortField, sortDirection, onSort: handleSort };
+
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
-              <TableHead className="min-w-[150px]">Platform</TableHead>
-              <TableHead className="w-32 text-right">Bid Modifier %</TableHead>
-              <TableHead className="text-right">Impressions</TableHead>
-              <TableHead className="text-right">Clicks</TableHead>
-              <TableHead className="text-right">CTR</TableHead>
-              <TableHead className="text-right">CPC</TableHead>
-              <TableHead className="text-right">Ad Spend</TableHead>
-              <TableHead className="text-right">Ad Sales</TableHead>
-              <TableHead className="text-right">ROAS</TableHead>
-              <TableHead className="text-right">ACOS</TableHead>
+              <SortableTableHead field="platform" {...sp} className="min-w-[180px]">Platform</SortableTableHead>
+              <SortableTableHead field="bidModifier" {...sp} className="w-32 text-right" align="right">Bid Modifier %</SortableTableHead>
+              <SortableTableHead field="impressions" {...sp} className="text-right" align="right">Impressions</SortableTableHead>
+              <SortableTableHead field="clicks" {...sp} className="text-right" align="right">Clicks</SortableTableHead>
+              <SortableTableHead field="ctr" {...sp} className="text-right" align="right">CTR</SortableTableHead>
+              <SortableTableHead field="cpc" {...sp} className="text-right" align="right">CPC</SortableTableHead>
+              <SortableTableHead field="adSpend" {...sp} className="text-right" align="right">Ad Spend</SortableTableHead>
+              <SortableTableHead field="adSales" {...sp} className="text-right" align="right">Ad Sales</SortableTableHead>
+              <SortableTableHead field="roas" {...sp} className="text-right" align="right">ROAS</SortableTableHead>
+              <SortableTableHead field="acos" {...sp} className="text-right" align="right">ACOS</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -99,13 +112,7 @@ export function PlatformTable({ searchQuery = "", showDeltas = false }: Platform
           </TableBody>
         </Table>
       </div>
-      <TablePagination
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={filteredPlatforms.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      <TablePagination page={currentPage} pageSize={pageSize} totalItems={filteredPlatforms.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
     </div>
   );
 }

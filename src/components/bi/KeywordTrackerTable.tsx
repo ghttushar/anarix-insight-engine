@@ -6,6 +6,7 @@ import { Trash2, Search as SearchIcon } from "lucide-react";
 import { TrackedKeyword } from "@/types/bi";
 import { format } from "date-fns";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { SortableTableHead, sortData } from "@/components/tables/SortableTableHead";
 
 interface KeywordTrackerTableProps {
   keywords: TrackedKeyword[];
@@ -16,24 +17,34 @@ interface KeywordTrackerTableProps {
 export function KeywordTrackerTable({ keywords, onStatusChange, onDelete }: KeywordTrackerTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const paginatedKeywords = keywords.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "MMM dd, yyyy HH:mm");
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
   };
+
+  const sorted = sortData(keywords, sortField, sortDirection);
+  const paginatedKeywords = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const formatDate = (dateString: string) => format(new Date(dateString), "MMM dd, yyyy HH:mm");
+
+  const sp = { sortField, sortDirection, onSort: handleSort };
 
   return (
     <div className="rounded-lg border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">
-            <TableHead>Keyword</TableHead>
-            <TableHead>Added At</TableHead>
-            <TableHead>Updated At</TableHead>
-            <TableHead className="text-center">Region</TableHead>
+            <SortableTableHead field="keyword" {...sp}>Keyword</SortableTableHead>
+            <SortableTableHead field="addedAt" {...sp}>Added At</SortableTableHead>
+            <SortableTableHead field="updatedAt" {...sp}>Updated At</SortableTableHead>
+            <SortableTableHead field="region" {...sp} className="text-center" align="center">Region</SortableTableHead>
             <TableHead className="text-center">Channels</TableHead>
-            <TableHead className="text-center">Status</TableHead>
+            <SortableTableHead field="status" {...sp} className="text-center" align="center">Status</SortableTableHead>
             <TableHead className="text-center w-[80px]">Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -73,13 +84,7 @@ export function KeywordTrackerTable({ keywords, onStatusChange, onDelete }: Keyw
           ))}
         </TableBody>
       </Table>
-      <TablePagination
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={keywords.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      <TablePagination page={currentPage} pageSize={pageSize} totalItems={keywords.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
     </div>
   );
 }

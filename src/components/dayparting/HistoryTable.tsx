@@ -7,6 +7,7 @@ import { ExecutionHistory } from "@/types/dayparting";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { SortableTableHead, sortData } from "@/components/tables/SortableTableHead";
 
 interface HistoryTableProps {
   history: ExecutionHistory[];
@@ -24,14 +25,23 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const paginatedHistory = history.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
+  };
+
+  const sorted = sortData(history, sortField, sortDirection);
+  const paginatedHistory = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
   };
@@ -41,18 +51,20 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
     return `${(ms / 1000).toFixed(1)}s`;
   };
 
+  const sp = { sortField, sortDirection, onSort: handleSort };
+
   return (
     <div className="rounded-lg border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">
             <TableHead className="w-[40px]"></TableHead>
-            <TableHead>Execution Time</TableHead>
-            <TableHead>Schedule</TableHead>
-            <TableHead>Campaign</TableHead>
-            <TableHead>Action</TableHead>
-            <TableHead className="text-center">Status</TableHead>
-            <TableHead className="text-right">Duration</TableHead>
+            <SortableTableHead field="executedAt" {...sp}>Execution Time</SortableTableHead>
+            <SortableTableHead field="scheduleName" {...sp}>Schedule</SortableTableHead>
+            <SortableTableHead field="campaignName" {...sp}>Campaign</SortableTableHead>
+            <SortableTableHead field="action" {...sp}>Action</SortableTableHead>
+            <SortableTableHead field="status" {...sp} className="text-center" align="center">Status</SortableTableHead>
+            <SortableTableHead field="duration" {...sp} className="text-right" align="right">Duration</SortableTableHead>
             <TableHead className="text-center w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -60,7 +72,6 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
           {paginatedHistory.map((item) => {
             const isExpanded = expandedRows.has(item.id);
             const hasDetails = item.actionDetails || item.errorMessage || item.budgetBefore !== undefined;
-
             return (
               <>
                 <TableRow key={item.id} className="hover:bg-muted/30">
@@ -93,18 +104,11 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
                   <TableRow className="bg-muted/20">
                     <TableCell colSpan={8} className="py-4">
                       <div className="pl-10 space-y-2 text-sm">
-                        {item.actionDetails && (
-                          <div><span className="font-medium text-muted-foreground">Details: </span><span>{item.actionDetails}</span></div>
-                        )}
+                        {item.actionDetails && (<div><span className="font-medium text-muted-foreground">Details: </span><span>{item.actionDetails}</span></div>)}
                         {item.budgetBefore !== undefined && (
-                          <div>
-                            <span className="font-medium text-muted-foreground">Budget: </span>
-                            <span>${item.budgetBefore.toFixed(2)}{item.budgetAfter !== undefined && (<> → ${item.budgetAfter.toFixed(2)}</>)}</span>
-                          </div>
+                          <div><span className="font-medium text-muted-foreground">Budget: </span><span>${item.budgetBefore.toFixed(2)}{item.budgetAfter !== undefined && (<> → ${item.budgetAfter.toFixed(2)}</>)}</span></div>
                         )}
-                        {item.errorMessage && (
-                          <div className="text-destructive"><span className="font-medium">Error: </span><span>{item.errorMessage}</span></div>
-                        )}
+                        {item.errorMessage && (<div className="text-destructive"><span className="font-medium">Error: </span><span>{item.errorMessage}</span></div>)}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -114,13 +118,7 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
           })}
         </TableBody>
       </Table>
-      <TablePagination
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={history.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      <TablePagination page={currentPage} pageSize={pageSize} totalItems={history.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
     </div>
   );
 }
