@@ -115,6 +115,10 @@ export default function Geographical() {
             showUpload
             onUpload={(files) => toast.info(`Uploading ${files[0]?.name}...`)}
             uploadTitle="Upload COGS"
+            sortableFields={SORTABLE_FIELDS}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
           />
 
           <div className="rounded-lg border border-border bg-card">

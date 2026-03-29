@@ -159,6 +159,10 @@ export default function ImpactAnalysis() {
           onSearchChange={setSearchQuery}
           searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
           onDownload={handleDownload}
+          sortableFields={SORTABLE_FIELDS}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
         />
 
         <ImpactTable data={data} searchQuery={searchQuery} showType={showType} />

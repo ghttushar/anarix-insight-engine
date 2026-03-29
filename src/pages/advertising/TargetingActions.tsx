@@ -121,6 +121,10 @@ export default function TargetingActions() {
           onShowDeltasChange={setShowDeltas}
           showViewToggle
           viewMode="view"
+          sortableFields={SORTABLE_FIELDS}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
           rightContent={
             <>
               <Popover>
