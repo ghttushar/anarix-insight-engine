@@ -1,16 +1,11 @@
 import { useState, useMemo } from "react";
-import { FileText, Search, Palette, Bot, Plus, ChevronDown, ChevronRight, PanelLeft } from "lucide-react";
+import { FileText, Search, Palette, Bot, Plus, ChevronDown, ChevronRight, PanelLeft, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAan, FilterType } from "./AanContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { format, isToday, isYesterday, isThisWeek, isThisMonth } from "date-fns";
-import logoLightFull from "@/assets/logo-light-full.svg";
-import logoDarkFull from "@/assets/logo-dark-full.svg";
-import logoLightSymbol from "@/assets/logo-light-symbol.svg";
-import logoDarkSymbol from "@/assets/logo-dark-symbol.svg";
 
 interface FilterSection {
   id: FilterType;
