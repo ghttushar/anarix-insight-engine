@@ -7,7 +7,7 @@ import { ExecutionHistory } from "@/types/dayparting";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "@/components/tables/TablePagination";
-import { SortableTableHead, sortData } from "@/components/tables/SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
 
 interface HistoryTableProps {
   history: ExecutionHistory[];
@@ -21,14 +21,15 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled: "bg-muted text-muted-foreground border-muted",
 };
 
+const PINNABLE = ["executedAt", "scheduleName", "campaignName", "action", "status", "duration"];
+
 export function HistoryTable({ history, onRetry }: HistoryTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
-  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, 40);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -61,12 +62,12 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
         <TableHeader>
           <TableRow className="bg-muted">
             <TableHead className="w-[40px]"></TableHead>
-            <SortableTableHead field="executedAt" {...sp}>Execution Time</SortableTableHead>
-            <SortableTableHead field="scheduleName" {...sp}>Schedule</SortableTableHead>
-            <SortableTableHead field="campaignName" {...sp}>Campaign</SortableTableHead>
-            <SortableTableHead field="action" {...sp}>Action</SortableTableHead>
-            <SortableTableHead field="status" {...sp} className="text-center" align="center">Status</SortableTableHead>
-            <SortableTableHead field="duration" {...sp} className="text-right" align="right">Duration</SortableTableHead>
+            <SortableTableHead field="executedAt" {...sp} className={cn(pc("executedAt", true))} style={ps("executedAt")}>Execution Time</SortableTableHead>
+            <SortableTableHead field="scheduleName" {...sp} className={cn(pc("scheduleName", true))} style={ps("scheduleName")}>Schedule</SortableTableHead>
+            <SortableTableHead field="campaignName" {...sp} className={cn(pc("campaignName", true))} style={ps("campaignName")}>Campaign</SortableTableHead>
+            <SortableTableHead field="action" {...sp} className={cn(pc("action", true))} style={ps("action")}>Action</SortableTableHead>
+            <SortableTableHead field="status" {...sp} className={cn("text-center", pc("status", true))} style={ps("status")} align="center">Status</SortableTableHead>
+            <SortableTableHead field="duration" {...sp} className={cn("text-right", pc("duration", true))} style={ps("duration")} align="right">Duration</SortableTableHead>
             <TableHead className="text-center w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -76,7 +77,7 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
             const hasDetails = item.actionDetails || item.errorMessage || item.budgetBefore !== undefined;
             return (
               <>
-                <TableRow key={item.id} className="hover:bg-muted/30">
+                <TableRow key={item.id} className="hover:bg-muted/30 group">
                   <TableCell>
                     {hasDetails && (
                       <button onClick={() => toggleRow(item.id)} className="p-1 hover:bg-muted rounded">
@@ -84,14 +85,14 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
                       </button>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm">{format(new Date(item.executedAt), "MMM dd, yyyy HH:mm:ss")}</TableCell>
-                  <TableCell className="font-medium">{item.scheduleName}</TableCell>
-                  <TableCell className="text-sm max-w-[200px] truncate">{item.campaignName}</TableCell>
-                  <TableCell className="text-sm capitalize">{item.action.replace("_", " ")}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell style={ps("executedAt")} className={cn("text-sm", pc("executedAt"))}>{format(new Date(item.executedAt), "MMM dd, yyyy HH:mm:ss")}</TableCell>
+                  <TableCell style={ps("scheduleName")} className={cn("font-medium", pc("scheduleName"))}>{item.scheduleName}</TableCell>
+                  <TableCell style={ps("campaignName")} className={cn("text-sm max-w-[200px] truncate", pc("campaignName"))}>{item.campaignName}</TableCell>
+                  <TableCell style={ps("action")} className={cn("text-sm capitalize", pc("action"))}>{item.action.replace("_", " ")}</TableCell>
+                  <TableCell style={ps("status")} className={cn("text-center", pc("status"))}>
                     <Badge variant="outline" className={cn("capitalize", STATUS_STYLES[item.status])}>{item.status}</Badge>
                   </TableCell>
-                  <TableCell className="text-right text-sm text-muted-foreground">{formatDuration(item.duration)}</TableCell>
+                  <TableCell style={ps("duration")} className={cn("text-right text-sm text-muted-foreground", pc("duration"))}>{formatDuration(item.duration)}</TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-1">
                       {item.status === "failed" && (

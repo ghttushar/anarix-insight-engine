@@ -2,15 +2,15 @@ import { useState } from "react";
 import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table, TableBody, TableCell, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { CatalogProduct, ColumnGroup } from "@/types/catalog";
+import { CatalogProduct } from "@/types/catalog";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { TablePagination } from "@/components/tables/TablePagination";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
-import { sortData } from "@/components/tables/SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
 
 interface CatalogProductsTableProps {
   products: CatalogProduct[];
@@ -22,10 +22,14 @@ interface CatalogProductsTableProps {
 
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
 
-export function CatalogProductsTable({ products, searchQuery = "", showDeltas = false, sortField = null, sortDirection = "asc" }: CatalogProductsTableProps) {
+const PINNABLE = ["status", "reviews", "inventoryCount", "inventoryValueCogs", "inventoryValueRetail", "price", "cogs", "totalSales", "gmv", "totalUnits", "refundSales", "cancelledSales", "advertised", "adSpend"];
+const FIXED_OFFSET = 350;
+
+export function CatalogProductsTable({ products, searchQuery = "", showDeltas = false, sortField: extSortField = null, sortDirection: extSortDir = "asc" }: CatalogProductsTableProps) {
   const { formatCurrency } = useCurrency();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
 
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -33,7 +37,7 @@ export function CatalogProductsTable({ products, searchQuery = "", showDeltas = 
     p.sku.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const sorted = sortData(filtered, sortField, sortDirection);
+  const sorted = sortData(filtered, extSortField, extSortDir);
   const paginated = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const getStatusBadge = (status: CatalogProduct["status"]) => {
@@ -67,27 +71,29 @@ export function CatalogProductsTable({ products, searchQuery = "", showDeltas = 
     </div>
   );
 
+  const sp = { pinnedColumns, onPinToggle: handlePinToggle };
+
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
-              <TableHead className="sticky left-0 z-10 bg-muted min-w-[350px]">Product Details</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Reviews</TableHead>
-              <TableHead className="text-right">Inventory</TableHead>
-              <TableHead className="text-right">Value (COGS)</TableHead>
-              <TableHead className="text-right">Value (Retail)</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">COGS</TableHead>
-              <TableHead className="text-right">Total Sales</TableHead>
-              <TableHead className="text-right">GMV</TableHead>
-              <TableHead className="text-right">Units</TableHead>
-              <TableHead className="text-right">Refund Sales</TableHead>
-              <TableHead className="text-right">Cancelled</TableHead>
-              <TableHead className="text-center">Advertised</TableHead>
-              <TableHead className="text-right">Ad Spend</TableHead>
+              <SortableTableHead field="name" {...sp} isFixed className="sticky left-0 z-10 bg-muted min-w-[350px]">Product Details</SortableTableHead>
+              <SortableTableHead field="status" {...sp} className={cn(pc("status", true))} style={ps("status")}>Status</SortableTableHead>
+              <SortableTableHead field="reviews" {...sp} className={cn(pc("reviews", true))} style={ps("reviews")}>Reviews</SortableTableHead>
+              <SortableTableHead field="inventoryCount" {...sp} className={cn("text-right", pc("inventoryCount", true))} style={ps("inventoryCount")} align="right">Inventory</SortableTableHead>
+              <SortableTableHead field="inventoryValueCogs" {...sp} className={cn("text-right", pc("inventoryValueCogs", true))} style={ps("inventoryValueCogs")} align="right">Value (COGS)</SortableTableHead>
+              <SortableTableHead field="inventoryValueRetail" {...sp} className={cn("text-right", pc("inventoryValueRetail", true))} style={ps("inventoryValueRetail")} align="right">Value (Retail)</SortableTableHead>
+              <SortableTableHead field="price" {...sp} className={cn("text-right", pc("price", true))} style={ps("price")} align="right">Price</SortableTableHead>
+              <SortableTableHead field="cogs" {...sp} className={cn("text-right", pc("cogs", true))} style={ps("cogs")} align="right">COGS</SortableTableHead>
+              <SortableTableHead field="totalSales" {...sp} className={cn("text-right", pc("totalSales", true))} style={ps("totalSales")} align="right">Total Sales</SortableTableHead>
+              <SortableTableHead field="gmv" {...sp} className={cn("text-right", pc("gmv", true))} style={ps("gmv")} align="right">GMV</SortableTableHead>
+              <SortableTableHead field="totalUnits" {...sp} className={cn("text-right", pc("totalUnits", true))} style={ps("totalUnits")} align="right">Units</SortableTableHead>
+              <SortableTableHead field="refundSales" {...sp} className={cn("text-right", pc("refundSales", true))} style={ps("refundSales")} align="right">Refund Sales</SortableTableHead>
+              <SortableTableHead field="cancelledSales" {...sp} className={cn("text-right", pc("cancelledSales", true))} style={ps("cancelledSales")} align="right">Cancelled</SortableTableHead>
+              <SortableTableHead field="advertised" {...sp} className={cn("text-center", pc("advertised", true))} style={ps("advertised")} align="center">Advertised</SortableTableHead>
+              <SortableTableHead field="adSpend" {...sp} className={cn("text-right", pc("adSpend", true))} style={ps("adSpend")} align="right">Ad Spend</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -111,30 +117,30 @@ export function CatalogProductsTable({ products, searchQuery = "", showDeltas = 
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>{getStatusBadge(product.status)}</TableCell>
-                <TableCell>
+                <TableCell style={ps("status")} className={cn(pc("status"))}>{getStatusBadge(product.status)}</TableCell>
+                <TableCell style={ps("reviews")} className={cn(pc("reviews"))}>
                   <div className="flex items-center gap-1">
                     <span className="text-sm">{formatNumber(product.reviewCount)}</span>
                     <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                     <span className="text-sm">{product.rating.toFixed(1)}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatNumber(product.inventoryCount)} id={product.id} metric="inventoryCount" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(product.inventoryValueCogs)} id={product.id} metric="inventoryValueCogs" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(product.inventoryValueRetail)} id={product.id} metric="inventoryValueRetail" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(product.price)} id={product.id} metric="price" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(product.cogs)} id={product.id} metric="cogs" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(product.totalSales)} id={product.id} metric="totalSales" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(product.gmv)} id={product.id} metric="gmv" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatNumber(product.totalUnits)} id={product.id} metric="totalUnits" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(product.refundSales)} id={product.id} metric="refundSales" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(product.cancelledSales)} id={product.id} metric="cancelledSales" /></TableCell>
-                <TableCell className="text-center">
+                <TableCell style={ps("inventoryCount")} className={cn("text-right", pc("inventoryCount"))}><NumCell formatted={formatNumber(product.inventoryCount)} id={product.id} metric="inventoryCount" /></TableCell>
+                <TableCell style={ps("inventoryValueCogs")} className={cn("text-right", pc("inventoryValueCogs"))}><NumCell formatted={formatCurrency(product.inventoryValueCogs)} id={product.id} metric="inventoryValueCogs" /></TableCell>
+                <TableCell style={ps("inventoryValueRetail")} className={cn("text-right", pc("inventoryValueRetail"))}><NumCell formatted={formatCurrency(product.inventoryValueRetail)} id={product.id} metric="inventoryValueRetail" /></TableCell>
+                <TableCell style={ps("price")} className={cn("text-right", pc("price"))}><NumCell formatted={formatCurrency(product.price)} id={product.id} metric="price" /></TableCell>
+                <TableCell style={ps("cogs")} className={cn("text-right", pc("cogs"))}><NumCell formatted={formatCurrency(product.cogs)} id={product.id} metric="cogs" /></TableCell>
+                <TableCell style={ps("totalSales")} className={cn("text-right", pc("totalSales"))}><NumCell formatted={formatCurrency(product.totalSales)} id={product.id} metric="totalSales" /></TableCell>
+                <TableCell style={ps("gmv")} className={cn("text-right", pc("gmv"))}><NumCell formatted={formatCurrency(product.gmv)} id={product.id} metric="gmv" /></TableCell>
+                <TableCell style={ps("totalUnits")} className={cn("text-right", pc("totalUnits"))}><NumCell formatted={formatNumber(product.totalUnits)} id={product.id} metric="totalUnits" /></TableCell>
+                <TableCell style={ps("refundSales")} className={cn("text-right", pc("refundSales"))}><NumCell formatted={formatCurrency(product.refundSales)} id={product.id} metric="refundSales" /></TableCell>
+                <TableCell style={ps("cancelledSales")} className={cn("text-right", pc("cancelledSales"))}><NumCell formatted={formatCurrency(product.cancelledSales)} id={product.id} metric="cancelledSales" /></TableCell>
+                <TableCell style={ps("advertised")} className={cn("text-center", pc("advertised"))}>
                   <Badge variant={product.advertised ? "default" : "secondary"} className="text-xs">
                     {product.advertised ? "Yes" : "No"}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(product.adSpend)} id={product.id} metric="adSpend" /></TableCell>
+                <TableCell style={ps("adSpend")} className={cn("text-right", pc("adSpend"))}><NumCell formatted={formatCurrency(product.adSpend)} id={product.id} metric="adSpend" /></TableCell>
               </TableRow>
             ))}
             <TableRow className="bg-muted font-medium hover:bg-muted">
