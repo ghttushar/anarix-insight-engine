@@ -111,7 +111,6 @@ export function DataTableToolbar({
   const [filterOpen, setFilterOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editConfirmOpen, setEditConfirmOpen] = useState(false);
-  const [sortOpen, setSortOpen] = useState(false);
 
   const handleOpenFilter = () => {
     setDraftFilters(activeFilters.length > 0 ? [...activeFilters] : [{ id: crypto.randomUUID(), field: filterFields[0] || "", operator: "is", value: "" }]);
