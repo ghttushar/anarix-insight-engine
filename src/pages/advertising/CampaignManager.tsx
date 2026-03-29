@@ -298,6 +298,10 @@ export default function CampaignManager() {
             onDownload={() => toast.success("Exporting data as CSV...")}
             showDeltas={showDeltas}
             onShowDeltasChange={setShowDeltas}
+            sortableFields={SORTABLE_FIELDS[activeTab] || []}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSortChange={(field, dir) => { setSortField(field); setSortDirection(dir); }}
             leftContent={
               <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createCampaign")}>
                 <Plus className="h-3.5 w-3.5" />Create Campaign
