@@ -11,6 +11,7 @@ import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockAdGroups, adGroupsTotals } from "@/data/mockAdGroups";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "./TablePagination";
+import { SortableTableHead, sortData } from "./SortableTableHead";
 
 interface AdGroupsTableProps {
   searchQuery?: string;
@@ -21,14 +22,23 @@ interface AdGroupsTableProps {
 export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick }: AdGroupsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredGroups = mockAdGroups.filter((group) =>
     group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     group.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredGroups.length / pageSize);
-  const paginatedGroups = filteredGroups.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
+  };
+
+  const sortedGroups = sortData(filteredGroups, sortField, sortDirection);
+  const paginatedGroups = sortedGroups.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
@@ -48,6 +58,8 @@ export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick
     </div>
   );
 
+  const sp = { sortField, sortDirection, onSort: handleSort };
+
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="overflow-x-auto">
@@ -55,22 +67,22 @@ export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
               <TableHead className="w-24 sticky left-0 z-10 bg-muted">Status</TableHead>
-              <TableHead className="min-w-[200px] sticky left-[96px] z-10 bg-muted">Ad Group</TableHead>
-              <TableHead className="min-w-[200px]">Campaign</TableHead>
+              <SortableTableHead field="name" {...sp} className="min-w-[200px] sticky left-[96px] z-10 bg-muted">Ad Group</SortableTableHead>
+              <SortableTableHead field="campaignName" {...sp} className="min-w-[200px]">Campaign</SortableTableHead>
               <TableHead className="text-center">Bid Auto</TableHead>
-              <TableHead className="text-right">Min Bid</TableHead>
-              <TableHead className="text-right">Max Bid</TableHead>
-              <TableHead className="text-right">Target ROAS</TableHead>
-              <TableHead className="text-right">Impressions</TableHead>
-              <TableHead className="text-right">Clicks</TableHead>
-              <TableHead className="text-right">CTR</TableHead>
-              <TableHead className="text-right">Ad Units</TableHead>
-              <TableHead className="text-right">CVR</TableHead>
-              <TableHead className="text-right">CPC</TableHead>
-              <TableHead className="text-right">Ad Spend</TableHead>
-              <TableHead className="text-right">Ad Sales</TableHead>
-              <TableHead className="text-right">ROAS</TableHead>
-              <TableHead className="text-right">ACOS</TableHead>
+              <SortableTableHead field="minBid" {...sp} className="text-right" align="right">Min Bid</SortableTableHead>
+              <SortableTableHead field="maxBid" {...sp} className="text-right" align="right">Max Bid</SortableTableHead>
+              <SortableTableHead field="targetRoas" {...sp} className="text-right" align="right">Target ROAS</SortableTableHead>
+              <SortableTableHead field="impressions" {...sp} className="text-right" align="right">Impressions</SortableTableHead>
+              <SortableTableHead field="clicks" {...sp} className="text-right" align="right">Clicks</SortableTableHead>
+              <SortableTableHead field="ctr" {...sp} className="text-right" align="right">CTR</SortableTableHead>
+              <SortableTableHead field="adUnits" {...sp} className="text-right" align="right">Ad Units</SortableTableHead>
+              <SortableTableHead field="cvr" {...sp} className="text-right" align="right">CVR</SortableTableHead>
+              <SortableTableHead field="cpc" {...sp} className="text-right" align="right">CPC</SortableTableHead>
+              <SortableTableHead field="adSpend" {...sp} className="text-right" align="right">Ad Spend</SortableTableHead>
+              <SortableTableHead field="adSales" {...sp} className="text-right" align="right">Ad Sales</SortableTableHead>
+              <SortableTableHead field="roas" {...sp} className="text-right" align="right">ROAS</SortableTableHead>
+              <SortableTableHead field="acos" {...sp} className="text-right" align="right">ACOS</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -11,6 +11,7 @@ import { mockProductAds, productAdsTotals } from "@/data/mockProductAds";
 import { X } from "lucide-react";
 import { AddProductAdsModal } from "@/components/advertising/AddProductAdsModal";
 import { TablePagination } from "./TablePagination";
+import { SortableTableHead, sortData } from "./SortableTableHead";
 
 interface ProductAdsTableProps {
   searchQuery?: string;
@@ -25,6 +26,8 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [activeFilters, setActiveFilters] = useState<string[]>(["Product Ad Status is ENABLED"]);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const filteredAds = mockProductAds.filter((ad) =>
     ad.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -32,32 +35,28 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
     ad.itemId.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const paginatedAds = filteredAds.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
+  };
+
+  const sorted = sortData(filteredAds, sortField, sortDirection);
+  const paginatedAds = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const { formatCurrency } = useCurrency();
   const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
   const toggleRow = (id: string) => {
-    setSelectedRows((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setSelectedRows((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   };
-
   const toggleAll = () => {
-    if (selectedRows.size === paginatedAds.length) {
-      setSelectedRows(new Set());
-    } else {
-      setSelectedRows(new Set(paginatedAds.map((a) => a.id)));
-    }
+    if (selectedRows.size === paginatedAds.length) setSelectedRows(new Set());
+    else setSelectedRows(new Set(paginatedAds.map((a) => a.id)));
   };
-
-  const removeFilter = (filter: string) => {
-    setActiveFilters((prev) => prev.filter((f) => f !== filter));
-  };
+  const removeFilter = (filter: string) => { setActiveFilters((prev) => prev.filter((f) => f !== filter)); };
 
   const NumCell = ({ formatted, id, metric }: { formatted: string; id: string; metric: string }) => (
     <div className="flex flex-col items-end">
@@ -73,6 +72,8 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
     </div>
   );
 
+  const sp = { sortField, sortDirection, onSort: handleSort };
+
   return (
     <>
       {activeFilters.length > 0 && (
@@ -80,9 +81,7 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
           {activeFilters.map((filter) => (
             <div key={filter} className="flex items-center gap-1.5 rounded-md border border-border bg-muted/40 px-2.5 py-1 text-xs text-foreground">
               {filter}
-              <button onClick={() => removeFilter(filter)} className="text-muted-foreground hover:text-foreground cursor-pointer">
-                <X className="h-3 w-3" />
-              </button>
+              <button onClick={() => removeFilter(filter)} className="text-muted-foreground hover:text-foreground cursor-pointer"><X className="h-3 w-3" /></button>
             </div>
           ))}
           <button onClick={() => setActiveFilters([])} className="text-xs text-muted-foreground hover:text-foreground cursor-pointer">Clear</button>
@@ -98,19 +97,19 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
                   <Checkbox checked={selectedRows.size === paginatedAds.length && paginatedAds.length > 0} onCheckedChange={toggleAll} />
                 </TableHead>
                 <TableHead className="w-24 sticky left-[40px] z-10 bg-muted">Status</TableHead>
-                <TableHead className="min-w-[300px] sticky left-[136px] z-10 bg-muted">Product Ad</TableHead>
-                <TableHead className="min-w-[150px]">Ad Group</TableHead>
-                <TableHead className="min-w-[150px]">Campaign</TableHead>
-                <TableHead className="text-right">Impressions</TableHead>
-                <TableHead className="text-right">Clicks</TableHead>
-                <TableHead className="text-right">CTR</TableHead>
-                <TableHead className="text-right">Ad Units</TableHead>
-                <TableHead className="text-right">CVR</TableHead>
-                <TableHead className="text-right">CPC</TableHead>
-                <TableHead className="text-right">Ad Spend</TableHead>
-                <TableHead className="text-right">Ad Sales</TableHead>
-                <TableHead className="text-right">ROAS</TableHead>
-                <TableHead className="text-right">ACOS</TableHead>
+                <SortableTableHead field="productName" {...sp} className="min-w-[300px] sticky left-[136px] z-10 bg-muted">Product Ad</SortableTableHead>
+                <SortableTableHead field="adGroupName" {...sp} className="min-w-[150px]">Ad Group</SortableTableHead>
+                <SortableTableHead field="campaignName" {...sp} className="min-w-[150px]">Campaign</SortableTableHead>
+                <SortableTableHead field="impressions" {...sp} className="text-right" align="right">Impressions</SortableTableHead>
+                <SortableTableHead field="clicks" {...sp} className="text-right" align="right">Clicks</SortableTableHead>
+                <SortableTableHead field="ctr" {...sp} className="text-right" align="right">CTR</SortableTableHead>
+                <SortableTableHead field="adUnits" {...sp} className="text-right" align="right">Ad Units</SortableTableHead>
+                <SortableTableHead field="cvr" {...sp} className="text-right" align="right">CVR</SortableTableHead>
+                <SortableTableHead field="cpc" {...sp} className="text-right" align="right">CPC</SortableTableHead>
+                <SortableTableHead field="adSpend" {...sp} className="text-right" align="right">Ad Spend</SortableTableHead>
+                <SortableTableHead field="adSales" {...sp} className="text-right" align="right">Ad Sales</SortableTableHead>
+                <SortableTableHead field="roas" {...sp} className="text-right" align="right">ROAS</SortableTableHead>
+                <SortableTableHead field="acos" {...sp} className="text-right" align="right">ACOS</SortableTableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -159,15 +158,8 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
             </TableBody>
           </Table>
         </div>
-        <TablePagination
-          page={currentPage}
-          pageSize={pageSize}
-          totalItems={filteredAds.length}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={setPageSize}
-        />
+        <TablePagination page={currentPage} pageSize={pageSize} totalItems={filteredAds.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
       </div>
-
       <AddProductAdsModal open={addModalOpen} onOpenChange={setAddModalOpen} />
     </>
   );
