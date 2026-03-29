@@ -43,6 +43,15 @@ const COLUMN_DEFS = [
 
 const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Net Profit", "Ad Spend", "Units"];
 
+const SORTABLE_FIELDS = [
+  { id: "name", label: "Product Name" },
+  { id: "units", label: "Units" },
+  { id: "gmv", label: "GMV" },
+  { id: "authSales", label: "Auth Sales" },
+  { id: "adSpend", label: "Ad Spend" },
+  { id: "netProfit", label: "Net Profit" },
+];
+
 export default function ProfitabilityDashboard() {
   const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
   const [selectedPeriod, setSelectedPeriod] = useState<string>("today");
@@ -54,6 +63,8 @@ export default function ProfitabilityDashboard() {
   const [showDeltas, setShowDeltas] = useState(false);
   const [catalogue, setCatalogue] = useState("all");
   const [useNewDesign, setUseNewDesign] = useState(true);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const [cogsProduct, setCogsProduct] = useState<ProfitabilityProduct | null>(null);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
