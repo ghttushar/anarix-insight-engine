@@ -132,8 +132,8 @@ export function CampaignTable({
   const paginatedCampaigns = sortedCampaigns.slice((page - 1) * pageSize, page * pageSize);
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />;
-    return sortDirection === "asc" ? <ArrowUp className="h-4 w-4 text-primary" /> : <ArrowDown className="h-4 w-4 text-primary" />;
+    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover/sort:opacity-40" />;
+    return sortDirection === "asc" ? <ArrowUp className="h-3 w-3 text-primary" /> : <ArrowDown className="h-3 w-3 text-primary" />;
   };
 
   return (
