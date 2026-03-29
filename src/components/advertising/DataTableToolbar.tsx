@@ -412,7 +412,7 @@ export function DataTableToolbar({
 
       {/* Active Filters Display */}
       {activeFilters.length > 0 && !filterOpen && (
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5 py-1.5">
           {activeFilters.map((filter) => (
             <Badge key={filter.id} variant="outline" className="gap-1 pr-1 text-[11px] h-6 bg-muted/50 border-border">
               <span className="font-medium text-foreground">{filter.field}:</span>
