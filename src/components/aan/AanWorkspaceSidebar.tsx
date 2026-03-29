@@ -117,7 +117,10 @@ export function AanWorkspaceSidebar() {
     <aside className="w-64 border-r border-border bg-card flex flex-col h-full shrink-0">
       {/* Header — Logo left, collapse right (matches AppSidebar) */}
       <div className="flex items-center justify-between h-12 px-3 border-b border-border/30 shrink-0">
-        <img src={logoFull} alt="Anarix" className="h-5 w-auto" />
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 aan-gradient-text" />
+          <span className="font-aan text-aan aan-gradient-text font-bold">Aan</span>
+        </div>
         <button
           onClick={() => setIsCollapsed(true)}
           className="flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
