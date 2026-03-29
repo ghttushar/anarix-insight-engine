@@ -1,125 +1,91 @@
-## Fix: App Level Selector Redesign, Sort Button (No Popover), Pin Functional, Remove Sort from Headers
 
-### 3 Changes
 
----
+## Functional Column Pinning + Missing Tables + Component Library Update
 
-### 1. App Level Selector Redesign
+### Problem Summary
 
-**Problem:** Small floating box looks lost against the page title.
-
-**Solution:** Make it a full-width strip that spans the entire top area, right-aligned against the page title. Instead of a tiny bordered box, render children and the marketplace dropdown as individual pill-style controls inline within the PageHeader row itself — no wrapper card needed. The `AppLevelSelector` container becomes `flex items-center gap-2` with no border/background. Each child Select and the marketplace button get consistent `h-9 rounded-md bg-muted border border-border px-3` styling.
-
-**Files:** `AppLevelSelector.tsx` — remove the outer `bg-card rounded-lg border` wrapper, let items sit naturally in the PageHeader flex row.
+1. **Pin radio exists in 13 tables** but is purely visual — clicking it toggles state but columns do not move or become sticky
+2. **4 tables** have no pin at all: `CampaignTable`, `CatalogProductsTable`, `ProductsPnLTable`, `RegionalProductTable`
+3. **Component Library** is missing sections for: AppLevelSelector, DataTableToolbar (updated with Sort button), Table with Pin Radio, ProfitabilityHeroCard, Upload Dialog, Prompt Suggestion Notch
 
 ---
 
-### 2. Sort Button — 3-State Inline Toggle (No Popover)
+### Phase 1: Make Pin Functional in SortableTableHead + All Tables
 
-**Problem:** Current sort opens a popover with field list. User wants: click Sort button cycles through 3 states — inactive (both arrows), asc (up arrow), desc (down arrow), then back to inactive. No popover/dialog.
+**Approach:** Rather than reordering columns (which requires restructuring every table's JSX), pinning will apply `sticky` positioning with `left` offset and opaque background to pinned columns. This is the pragmatic approach — pinned columns freeze in place during horizontal scroll.
 
-**But** the sort needs to know WHICH field to sort by. Looking at the uploaded image, the user's reference shows a popover with field names. So the popover stays but the ARROW behavior on each field row changes to the 3-state cycle:
+**SortableTableHead.tsx changes:**
+- Accept new prop `isPinnedSticky?: boolean` and `stickyLeft?: number`
+- When `isPinnedSticky` is true, apply `sticky` + `left-[Xpx]` + `z-10` + `bg-muted` to the `<TableHead>`
+- Export a helper function `getPinnedStyle(field, pinnedColumns, fixedWidths)` that returns inline style `{ position: 'sticky', left: calculatedOffset, zIndex: 10 }` for use in both header and body cells
 
-- Inactive: show `ArrowUpDown` icon  
-- Click 1: `ArrowUp` (asc, highlighted)
-- Click 2: `ArrowDown` (desc, highlighted)  
-- Click 3: deactivate (back to `ArrowUpDown`)
+**Each table component changes (13 existing + 4 new):**
+- For header: pass `isPinnedSticky` and computed `stickyLeft` to `SortableTableHead`
+- For body cells: apply matching sticky styles when column is pinned using the same offset calculation
+- Pinned columns get opaque `bg-muted` (header) / `bg-background` (body) to prevent bleed-through
 
-When not hovering the Sort button, it shows the last active arrow direction if sorting is active.
+**Tables to ADD pin support to:**
 
-**Wait** — re-reading: "clicking on sort should not open any additional dialogue/control box". So NO popover at all. The sort button itself is a 3-state toggle. But then how does it know which field? Answer: it uses whatever `sortableFields` are defined, and the toolbar just needs a single sort toggle that cycles the direction on the current `sortField`. The field selection would come from the Columns dropdown or be a default.
+| Table | Change |
+|---|---|
+| `CampaignTable.tsx` | Replace custom `SortIcon` headers with `SortableTableHead`, add `pinnedColumns` state, add pin toggle |
+| `CatalogProductsTable.tsx` | Replace plain `TableHead` with `SortableTableHead`, add `pinnedColumns` state |
+| `ProductsPnLTable.tsx` | Replace plain `TableHead` with `SortableTableHead`, add `pinnedColumns` state |
+| `RegionalProductTable.tsx` | Replace plain `TableHead` with `SortableTableHead`, add `pinnedColumns` state |
 
-Actually looking more carefully at the image — it DOES show a popover with field names. Let me re-read: "clicking on sort should not open any additional dialogue/control box". This contradicts the image. I'll follow the text instruction: **no popover**. The sort button is a simple 3-state inline toggle.
+**Pin offset calculation logic (shared utility in SortableTableHead.tsx):**
+```
+function getColumnPinStyle(field, pinnedColumns, columnWidths) {
+  // Fixed columns have predefined left offsets
+  // Pinned columns stack after the last fixed column
+  // Each pinned column's left = sum of fixed widths + sum of preceding pinned widths
+  return { position: 'sticky', left: calculatedLeft, zIndex: 10 }
+}
+```
 
-For field selection: the first sortable field is used as default, or if sort was previously set to a field, it keeps that field. The button just cycles direction.
-
-**Implementation in `DataTableToolbar.tsx`:**
-
-- Remove `Popover` around sort button
-- Sort button click cycles: inactive → asc → desc → inactive
-- Icon shows: `ArrowUpDown` (inactive), `ArrowUp` (asc), `ArrowDown` (desc)
-- When active: `bg-primary/10 text-primary`
-- Remove `sortOpen` state
-
----
-
-### 3. Remove Sort from Column Headers, Keep Only Pin
-
-`**SortableTableHead.tsx`:**
-
-- Remove `onSort` prop usage — no click-to-sort on headers
-- Remove sort arrow icons entirely
-- Keep ONLY the pin radio button
-- Remove `cursor-pointer` from header (no click action)
+Each table defines a `COLUMN_WIDTHS` map (e.g., `{ impressions: 120, clicks: 100 }`) and a `FIXED_COLUMNS` array. The pin style is computed per-render based on current `pinnedColumns` Set.
 
 ---
 
-### 4. Make Pin Functional
+### Phase 2: Component Library Update
 
-**Current state:** Pin radio toggles `pinnedColumns` Set in each table, but pinned columns don't actually reorder or get sticky positioning.
+**New sections to add to `ComponentLibrary.tsx`:**
 
-**Implementation:** In each table component, when rendering columns:
+1. **App Level Metric Selector** — Static render of the inline pill-style selector strip showing marketplace + ad type + account dropdowns
+2. **DataTable Toolbar (Updated)** — Show the current toolbar with Sort (3-state), Delta, Filter, Columns, Export buttons including active states
+3. **Table with Column Pinning** — Static table showing pin radio buttons in headers (unpinned dot at 60% opacity, pinned solid blue dot), with annotation explaining behavior
+4. **Profitability Hero Card** — Static render showing the Overview tab with Net Profit, KPI tiles, and sparkline
+5. **Upload Dialog** — Static anatomy of the drag-and-drop upload dialog with file list
 
-1. Define `fixedColumns` array (always first, e.g., Status, Name)
-2. `pinnedColumns` from state get rendered immediately after fixed columns
-3. Remaining columns render after pinned
-4. Pinned columns get `sticky` with calculated `left` offset after fixed columns, `z-10`, opaque `bg-muted` (header) / `bg-background` (body)
-
-This requires each table to dynamically reorder its columns based on pin state. I'll implement a shared utility `getOrderedColumns(allColumns, fixedColumns, pinnedColumns)` that returns the correct render order.
-
-**Tables to update (all with `onPinToggle`):**
-
-- `AdGroupsTable`, `KeywordTargetingTable`, `ProductTargetingTable`, `SearchTermsTable`, `ProductAdsTable`, `PageTypeTable`, `PlatformTable`, `ImpactTable`, `RegionalTable`
-- `CampaignTable` (uses custom sort, needs migration)
-- `CatalogProductsTable`, `RegionalProductTable`, `ProductsPnLTable` (need pin state added)
-- `ScheduledJobsTable`, `HistoryTable`, `BrandCoverageTable`, `KeywordTrackerTable`
+**Existing sections to update:**
+- **DataTable Toolbar strip** (line ~1560): Add Sort button, Delta button to the toolbar anatomy
+- **Table section** (line ~577): Add pin radio dots to the column headers
 
 ---
 
-### 5. Add Sort and Pin to ALL Table Toolbars on Listed Screens
+### Files to Edit
 
-Pages that need `sortableFields` + `sortField` + `sortDirection` + `onSortChange` added to their `DataTableToolbar`:
+| File | Phase | Change |
+|---|---|---|
+| `SortableTableHead.tsx` | 1 | Add sticky pin styles, export `getColumnPinStyle` utility |
+| `AdGroupsTable.tsx` | 1 | Apply sticky styles to pinned columns in header + body |
+| `KeywordTargetingTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `ProductTargetingTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `SearchTermsTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `ProductAdsTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `PageTypeTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `PlatformTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `ImpactTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `RegionalTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `HistoryTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `ScheduledJobsTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `BrandCoverageTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `KeywordTrackerTable.tsx` | 1 | Apply sticky styles to pinned columns |
+| `CampaignTable.tsx` | 1 | Replace custom headers with SortableTableHead, add pin state + sticky |
+| `CatalogProductsTable.tsx` | 1 | Add SortableTableHead, pin state + sticky |
+| `ProductsPnLTable.tsx` | 1 | Add SortableTableHead, pin state + sticky |
+| `RegionalProductTable.tsx` | 1 | Add SortableTableHead, pin state + sticky |
+| `ComponentLibrary.tsx` | 2 | Add new sections, update existing toolbar/table sections |
 
+**Delivery:** Phase 1 (all tables functional pinning) then Phase 2 (Component Library).
 
-| Page                       | File                   | Needs Added                |
-| -------------------------- | ---------------------- | -------------------------- |
-| Profitability Dashboard    | `Dashboard.tsx`        | sortableFields, sort state |
-| Profitability Trends       | `Trends.tsx`           | sortableFields, sort state |
-| Profitability P&L          | `ProfitLoss.tsx`       | sortableFields, sort state |
-| Profitability Geographical | `Geographical.tsx`     | sortableFields, sort state |
-| Campaign Manager           | `CampaignManager.tsx`  | Already has it             |
-| Impact Analysis            | `ImpactAnalysis.tsx`   | sortableFields, sort state |
-| Targeting Actions          | `TargetingActions.tsx` | sortableFields, sort state |
-| Catalog Products           | `Products.tsx`         | Already has it             |
-| Day Parting History        | `History.tsx`          | sortableFields, sort state |
-| Day Parting Scheduled Jobs | `ScheduledJobs.tsx`    | sortableFields, sort state |
-
-
----
-
-### 6. Column Selector Working on All Screens
-
-Ensure every `DataTableToolbar` that has tables also passes `columns`, `onColumnToggle`, `onSelectAllColumns`, `onClearAllColumns`. Check and add `COLUMN_DEFS` + state to pages missing it.
-
----
-
-### 7. Filter Chips Equal Spacing
-
-In `DataTableToolbar.tsx` line 455: change `<div className="flex flex-wrap items-center gap-1.5">` to `<div className="flex flex-wrap items-center gap-1.5 py-1.5">` for equal top/bottom spacing.
-
----
-
-### Files Summary
-
-
-| File                    | Change                                                                    |
-| ----------------------- | ------------------------------------------------------------------------- |
-| `AppLevelSelector.tsx`  | Remove outer card wrapper, let controls sit naturally                     |
-| `DataTableToolbar.tsx`  | Replace sort popover with 3-state inline button; fix filter chips padding |
-| `SortableTableHead.tsx` | Remove sort arrows/click, keep only pin radio                             |
-| All 10 table components | Implement functional pin (column reordering + sticky)                     |
-| 8 page files            | Add sortableFields + sort state to DataTableToolbar                       |
-| Pages missing columns   | Add COLUMN_DEFS + column toggle wiring                                    |
-
-
-**Delivery:** All in one pass — the changes are mostly mechanical (add props, remove sort from headers, add pin reorder logic).
