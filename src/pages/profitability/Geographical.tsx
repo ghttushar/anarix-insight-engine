@@ -58,7 +58,7 @@ export default function Geographical() {
           appLevelSelector={
             <AppLevelSelector>
               <Select value={catalogue} onValueChange={setCatalogue}>
-                <SelectTrigger className="h-8 w-[120px] text-xs border-border">
+                <SelectTrigger className="h-9 w-[140px] text-sm border-border bg-muted/50 rounded-lg">
                   <SelectValue placeholder="Catalogue" />
                 </SelectTrigger>
                 <SelectContent>
