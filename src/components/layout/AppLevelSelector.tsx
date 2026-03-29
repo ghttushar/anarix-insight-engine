@@ -42,11 +42,11 @@ export function AppLevelSelector({ children }: AppLevelSelectorProps) {
   }, [mergedDropdownOpen]);
 
   return (
-    <div className="flex items-center gap-1.5 bg-card rounded-lg border border-border px-1.5 py-1">
-      {children && <div className="flex items-center gap-1.5 [&_button]:h-9 [&_button]:text-sm">{children}</div>}
+    <div className="flex items-center gap-2">
+      {children && <div className="flex items-center gap-2 [&_button]:h-9 [&_button]:text-sm">{children}</div>}
       <DropdownMenu open={mergedDropdownOpen} onOpenChange={setMergedDropdownOpen}>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/50 px-3 h-9 text-sm font-medium hover:bg-muted transition-colors max-w-[280px] cursor-pointer">
+          <button className="flex items-center gap-2.5 rounded-md border border-border bg-muted/50 px-3 h-9 text-sm font-medium hover:bg-muted transition-colors max-w-[280px] cursor-pointer">
             <img
               src={marketplace === "amazon" ? amazonLogo : walmartLogo}
               alt={marketplace}
