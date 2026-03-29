@@ -1,141 +1,97 @@
+## Fix: Aan Sidebar Logo, Prompt Notch, App Level Selector, Date Picker, Toolbar Icons, Trends Chart
 
+### Issues to Fix
 
-## 3-Bar Architecture Redesign + Table Backgrounds + Column Pinning
-
-### Architecture: 3 Control Bars
-
-The current system uses 2 bars: `AppTaskbar` (page-level filters + marketplace selector) and `DataTableToolbar` (table controls). The user wants 3 distinct bars:
-
-1. **App Level Metric Selector** (NEW) — sits top-right against the page title inside `PageHeader`. Contains global selectors like Marketplace and Ad Type/Catalogue.
-2. **Page Level Metric Selector** — replaces current `AppTaskbar`. Contains page-specific controls (date range, frequency, metrics, run button, search). No marketplace selector here anymore.
-3. **Table Toolbar** — current `DataTableToolbar`, keeps its role but per-page button sets are redefined.
-
-Plus: all tables/charts get `bg-card` background, and tables get a column pin feature.
+1. **Aan sidebar collapsed state** shows full AanLogo (Sparkles + "Aan" text) instead of just the symbol icon like main AppSidebar
+2. **Prompt suggestion notch** needs more polished design
+3. **App Level Metric Selector** too small and not prominent enough
+4. **Date range calendar** needs better design with proper spacing
+5. **Table column sorting/pinning** not visible in table headers
+6. **Delta button** missing label text — only shows icon, while other toolbar buttons show icon + name
+7. **Profitability Trends scatter chart** lacks chart controls (expand, chart type, zoom) that other data visualizations have
 
 ---
 
-### Phase 1: Create App Level Metric Selector + Restructure PageHeader + Refactor AppTaskbar
+### Aan Sidebar + Prompt Notch + Toolbar Delta Label
 
-**New Component: `AppLevelSelector.tsx`**
-- Renders inside `PageHeader` on the right side (where `actions` currently goes)
-- Extracts Marketplace/Store selector FROM `AppTaskbar` INTO this component
-- Accepts `children` for page-specific items (Ad Type, Catalogue selector)
-- Same visual style as current marketplace dropdown but compact
+**AanWorkspaceSidebar.tsx** — Collapsed state (line 62-114):
 
-**Modify `PageHeader.tsx`**
-- Replace `actions` prop with `appLevelSelector` prop (ReactNode)
-- Layout: Title/subtitle LEFT, app level selector RIGHT
+- Replace `<AanLogo>` with the same symbol logo pattern used in AppSidebar: `<img src={logoSymbolSrc}>`
+- Import the 4 logo SVGs and use theme-aware logic identical to AppSidebar
+- Expanded header (line 120): replace `<AanLogo>` with Aan-branded symbol + "Aan" text using same layout as AppSidebar (logo left, PanelLeft right)
 
-**Modify `AppTaskbar.tsx`**
-- Remove marketplace/store selector (moved to app level)
-- Remove `showAdType` (moved to app level)
-- Keep as page-level bar: date range, frequency, and children
-- Rename conceptually to "Page Level Metric Selector"
+**AanInput.tsx** — Redesign the suggestion notch (lines 208-236):
 
-**Per-page app level content:**
+- Add a subtle left-side gradient accent bar (2px wide, primary gradient)
+- Use a softer glass-like background with `bg-card/80 backdrop-blur-sm`
+- Add a subtle shimmer animation on appearance
+- Better typography: "Suggested" label in small caps, prompt in medium weight
+- Smooth slide-up + fade-in animation from text box edge
+- The notch should visually connect to the textbox border (no gap, shared border radius)
 
-| Page | App Level Items |
-|---|---|
-| Profitability Dashboard | Marketplace, Catalogue |
-| Profitability Trends | Marketplace, Catalogue |
-| Profit & Loss | Marketplace, Catalogue |
-| Geographical | Marketplace, Catalogue |
-| Campaign Manager | Marketplace, Ad Type |
-| Impact Analysis | Marketplace, Ad Type |
-| Targeting Actions | Marketplace |
-| Day Parting | Marketplace, Ad Type |
-| History | Marketplace, Ad Type |
-| Scheduled Jobs | Marketplace, Ad Type |
-| Catalog | Marketplace, Account |
-| All BI pages | Marketplace |
+**DataTableToolbar.tsx** — Delta button (lines 188-198):
 
-**Per-page page-level content (AppTaskbar children):**
+- Add "Delta" text label next to the TrendingUp icon, matching all other toolbar buttons (icon + text pattern)
+- Change from `w-8 p-0` to `gap-1 text-xs` like Filter/Export buttons
 
-| Page | Page Level Items |
-|---|---|
-| Prof. Dashboard | Date Range, Run |
-| Prof. Trends | Search, Date Range, Metrics, Run, Export |
-| Profit & Loss | Search, Date Range, Run, Export |
-| Campaign Manager | Frequency, Date Range, Run |
-| Impact Analysis | Baseline vs Impact periods, Metrics, Run |
-| Targeting Actions | Action Type, Date Range, Priority, Fetch |
-| Day Parting | Campaign selector, Metrics, Date Range, Run |
-| History | Search |
-| Scheduled Jobs | (empty — no page-level bar needed) |
-| Catalog | Search, Date Range, Run |
-| Brand SOV | Keyword search, Date Range, Position, Frequency, Run |
-| Keyword/Product SOV, Competitor | (current children stay) |
+**Edit button** (lines 349-359):
 
-### Phase 2: Redefine Table Toolbar Per Page
+- Add "Edit" text label next to Pencil icon, same pattern
 
-Strip each page's `DataTableToolbar` to ONLY the buttons specified:
+###  App Level Selector Redesign + Date Range Calendar
 
-| Page | Left | Right |
-|---|---|---|
-| Prof. Dashboard | Product/Orders, Search | Upload COGS, Delta, Filter, Column, Export |
-| Prof. Trends | (none — no table toolbar, data viz has its own) | — |
-| Profit & Loss | Product/Order, Search | Delta, Filter, Column, Export |
-| Campaign Manager | Search | Create, Delta, Filter, Column, Export, Edit |
-| Impact Analysis | Search | Filter, Column, Export |
-| Targeting Actions | Search | Custom Bid, Create, Archive, Filter, Column, Export, Edit |
-| Day Parting | Search (in campaigns table) | Create Rule (leftContent stays) |
-| Scheduled Jobs | Search | Create Schedule |
-| Catalog | — | Upload COGS, Delta, Filter, Column, Export |
-| Brand SOV | Search | Delta, Export |
-| Keyword SOV | Search | Delta, Export |
-| Product SOV | Search | Delta, Export |
-| Competitor | Search | Delta, Export |
-| Keyword Tracker | Search | Create (Add Keyword), Delta, Export |
+**AppLevelSelector.tsx** — Make it bigger and more visible:
 
-### Phase 3: Table/Chart Backgrounds + Column Pinning
+- Increase trigger button size: `h-9` instead of `py-1.5`, larger text `text-sm` instead of `text-xs`
+- Add a subtle background: `bg-muted/50` with `rounded-lg` 
+- Marketplace logo larger: `h-5` instead of `h-4`
+- Store name in `text-sm font-medium` instead of `text-xs`
+- Status dot slightly larger
+- Dropdown wider: `w-[280px]` instead of `w-[240px]`
+- Children items (Catalogue, Ad Type selects) should also be slightly larger
 
-**Backgrounds:**
-- All `<div className="rounded-lg border border-border">` table wrappers → add `bg-card`
-- All chart containers → add `bg-card` if not already
+**AppTaskbar.tsx** — Date range calendar redesign (lines 131-181):
 
-**Column Pinning:**
-- Add pin icon to table column headers (small `Pin` icon on hover)
-- Pinned columns get `sticky left-[offset]` with `z-10 bg-background`
-- Track pinned columns in state per table
-- Add to `DataTableToolbar` columns dropdown: pin toggle per column
+- Add preset group section headers with proper uppercase styling and spacing (reference image-148)
+- Highlight selected preset with `bg-primary/10 text-primary` 
+- Calendar: increase padding, add month labels more prominently
+- Selected range: use `bg-primary text-primary-foreground` for selected days with `bg-primary/20` for range between
+- Add "Cancel" and "Apply" buttons with proper sizing and primary styling on Apply
+- Overall wider preset panel with clearer visual hierarchy
 
-### Phase 4: Data Visualization Toolbar for Trends
+---
 
-For Profitability Trends scatter chart, add a mini toolbar:
-- Drag selector zoom, +, -, Reset, Full view
-- Similar to ChartContainer expand pattern
+###  Table Header Sort/Pin + Trends Chart Controls
 
-Also for Profit & Loss top PnL table: add Frequency toggle (Daily/Weekly/Monthly)
+**All table components** (CampaignTable, ProductsPnLTable, AdGroupsTable, etc.):
+
+- Add sort indicator icons (ArrowUpDown) on hoverable table headers
+- Add small pin icon on header hover (Pin icon appears on right of header cell)
+- On click: toggle sort direction (asc/desc/none)
+- Pinned columns show filled Pin icon
+
+**ScatterPlotChart.tsx** — Wrap in ChartContainer or add equivalent controls:
+
+- Add chart type selector (Scatter is default, also offer Bar, Line views of same data)
+- Add expand/fullscreen button
+- Add zoom controls (+/- buttons)
+- Add export button for the chart
+- Keep quadrant backgrounds and legend
+
+**Trends.tsx** — Wire the enhanced ScatterPlotChart with ChartContainer wrapper providing metrics toggle, chart type, and expand controls
 
 ---
 
 ### Files Summary
 
-| File | Phase | Change |
-|---|---|---|
-| `AppLevelSelector.tsx` | 1 | **NEW** — Marketplace + page-specific selectors |
-| `PageHeader.tsx` | 1 | Add `appLevelSelector` prop, layout change |
-| `AppTaskbar.tsx` | 1 | Remove marketplace selector, remove showAdType |
-| `Dashboard.tsx` (profitability) | 1,2 | Wire app level + page level + table toolbar |
-| `Trends.tsx` | 1,2 | Wire app level + page level, add data viz toolbar |
-| `ProfitLoss.tsx` | 1,2 | Wire app level + page level + frequency toggle + table toolbar |
-| `Geographical.tsx` | 1,2 | Wire app level + page level + table toolbar |
-| `CampaignManager.tsx` | 1,2 | Wire app level (marketplace+ad type) + page level (freq+date+run) + table toolbar |
-| `ImpactAnalysis.tsx` | 1,2 | Wire app level + page level + table toolbar |
-| `TargetingActions.tsx` | 1,2 | Wire app level + page level + table toolbar |
-| `HourlyData.tsx` | 1,2 | Wire app level + page level + table toolbar |
-| `History.tsx` | 1,2 | Wire app level + page level |
-| `ScheduledJobs.tsx` | 1,2 | Wire app level + table toolbar |
-| `Products.tsx` (catalog) | 1,2 | Wire app level + page level + table toolbar |
-| `BrandSOV.tsx` | 1,2 | Wire app level + page level + table toolbar |
-| `KeywordSOV.tsx` | 1,2 | Wire app level + table toolbar |
-| `ProductSOV.tsx` | 1,2 | Wire app level + table toolbar |
-| `CompetitorPricing.tsx` | 1,2 | Wire app level + table toolbar |
-| `KeywordTracker.tsx` | 1,2 | Wire app level + table toolbar |
-| `UnifiedPnL.tsx` | 1 | Wire app level |
-| `DataTableToolbar.tsx` | 2 | No structural change, just per-page prop cleanup |
-| All table wrappers | 3 | Add `bg-card` |
-| Table column headers | 3 | Add pin feature (hover icon + sticky positioning) |
 
-**Delivery:** Phase 1 + 2 together (app level + page level + table toolbar rewiring for all pages), then Phase 3 (backgrounds + column pinning).
-
+| File                      | Phase | Change                                                                         |
+| ------------------------- | ----- | ------------------------------------------------------------------------------ |
+| `AanWorkspaceSidebar.tsx` | 1     | Use symbol logo in collapsed state, match AppSidebar pattern                   |
+| `AanInput.tsx`            | 1     | Redesign prompt suggestion notch with gradient accent bar and better animation |
+| `DataTableToolbar.tsx`    | 1     | Add "Delta" and "Edit" text labels to their buttons                            |
+| `AppLevelSelector.tsx`    | 2     | Larger, more prominent trigger with bigger logo and text                       |
+| `AppTaskbar.tsx`          | 2     | Redesign date range calendar with better presets and styling                   |
+| `ScatterPlotChart.tsx`    | 3     | Add chart controls (expand, zoom, chart type, export)                          |
+| `Trends.tsx`              | 3     | Wire enhanced chart controls                                                   |
+| Table header components   | 3     | Add visible sort arrows and pin icons on hover                                 |
