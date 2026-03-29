@@ -53,6 +53,7 @@ export default function ProfitabilityDashboard() {
   const [products, setProducts] = useState(profitabilityProducts);
   const [showDeltas, setShowDeltas] = useState(false);
   const [catalogue, setCatalogue] = useState("all");
+  const [useNewDesign, setUseNewDesign] = useState(true);
 
   const [cogsProduct, setCogsProduct] = useState<ProfitabilityProduct | null>(null);
   const [detailProduct, setDetailProduct] = useState<ProfitabilityProduct | null>(null);
