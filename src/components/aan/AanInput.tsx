@@ -204,33 +204,39 @@ export function AanInput() {
       <div className="px-4 pb-4 pt-2">
         {/* Input container with suggestion notch */}
         <div className="relative">
-          {/* Prompt suggestion — emerges from textbox top edge */}
+          {/* Prompt suggestion notch — emerges from textbox */}
           {showSuggestion && (
             <div
               className={cn(
-                "absolute bottom-full left-0 right-0 mb-0 origin-bottom transition-all duration-200 ease-out",
+                "absolute bottom-full left-0 right-0 origin-bottom transition-all duration-300 ease-out",
                 suggestionVisible
                   ? "opacity-100 translate-y-0 scale-100"
-                  : "opacity-0 translate-y-2 scale-95"
+                  : "opacity-0 translate-y-1 scale-[0.98]"
               )}
             >
-              <div className="mx-0 mb-1 flex items-center gap-2 rounded-t-lg rounded-b-none border border-b-0 border-primary/20 bg-gradient-to-r from-primary/[0.06] via-accent/[0.04] to-primary/[0.06] px-3 py-2 backdrop-blur-sm">
-                <div className="flex items-center justify-center h-5 w-5 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 shrink-0">
-                  <Sparkles className="h-3 w-3 text-primary" />
+              <div className="mx-0 flex overflow-hidden rounded-t-lg border border-b-0 border-border bg-card/90 backdrop-blur-sm shadow-sm">
+                {/* Gradient accent bar */}
+                <div className="w-[3px] shrink-0 bg-gradient-to-b from-primary to-accent" />
+                <div className="flex items-center gap-2.5 px-3 py-2.5 flex-1 min-w-0">
+                  <div className="flex items-center justify-center h-6 w-6 rounded-md bg-primary/10 shrink-0">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <button
+                    onClick={handleSuggestionClick}
+                    className="flex-1 text-left min-w-0 cursor-pointer group"
+                  >
+                    <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-0.5">Suggested</span>
+                    <span className="block text-xs font-medium text-foreground/80 group-hover:text-foreground transition-colors truncate">
+                      {PROMPT_SUGGESTIONS[suggestionIndex]}
+                    </span>
+                  </button>
+                  <button
+                    onClick={handleDismissSuggestion}
+                    className="p-1 rounded-md hover:bg-muted cursor-pointer transition-colors shrink-0"
+                  >
+                    <X className="h-3 w-3 text-muted-foreground" />
+                  </button>
                 </div>
-                <button
-                  onClick={handleSuggestionClick}
-                  className="flex-1 text-left text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                >
-                  <span className="text-primary/70 font-medium">Try: </span>
-                  <span className="italic">"{PROMPT_SUGGESTIONS[suggestionIndex]}"</span>
-                </button>
-                <button
-                  onClick={handleDismissSuggestion}
-                  className="p-0.5 rounded-full hover:bg-muted/80 cursor-pointer transition-colors"
-                >
-                  <X className="h-3 w-3 text-muted-foreground" />
-                </button>
               </div>
             </div>
           )}
