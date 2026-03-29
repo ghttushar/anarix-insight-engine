@@ -224,6 +224,10 @@ export default function ProfitabilityDashboard() {
               uploadTitle="Upload COGS"
               uploadAccept=".csv,.xlsx,.xls"
               onDownload={handleDownload}
+              sortableFields={SORTABLE_FIELDS}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
             />
             <div className="rounded-lg border border-border bg-card">
               <ProductsPnLTable

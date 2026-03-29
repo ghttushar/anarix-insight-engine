@@ -131,6 +131,10 @@ export default function ProfitLoss() {
               onDownload={handleDownload}
               showDeltas={showDeltas}
               onShowDeltasChange={setShowDeltas}
+              sortableFields={SORTABLE_FIELDS}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
             />
             <div className="rounded-lg border border-border bg-card">
               <ProductsPnLTable
