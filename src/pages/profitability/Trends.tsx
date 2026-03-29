@@ -76,6 +76,20 @@ export default function ProfitabilityTrends() {
         <ScatterPlotChart data={scatterData} />
 
         <div className="space-y-3">
+          <DataTableToolbar
+            searchValue={searchValue}
+            onSearchChange={(v) => setSearchValue(v)}
+            searchPlaceholder="Search by Product Name / Item ID / SKU..."
+            onDownload={handleDownload}
+            sortableFields={[
+              { id: "name", label: "Product Name" },
+              { id: "gmv", label: "GMV" },
+              { id: "netProfit", label: "Net Profit" },
+            ]}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
+          />
           <div className="rounded-lg border border-border bg-card">
           <div className="overflow-x-auto">
             <Table>
