@@ -28,6 +28,8 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
   const [activeFilters, setActiveFilters] = useState<string[]>(["Product Ad Status is ENABLED"]);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
+  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
 
   const filteredAds = mockProductAds.filter((ad) =>
     ad.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||

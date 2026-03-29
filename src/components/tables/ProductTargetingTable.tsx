@@ -28,6 +28,8 @@ export function ProductTargetingTable({ searchQuery = "", showDeltas = false }: 
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
+  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
 
   const filteredTargets = mockProductTargets.filter((pt) =>
     pt.targetLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
