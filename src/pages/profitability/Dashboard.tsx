@@ -129,32 +129,66 @@ export default function ProfitabilityDashboard() {
           />
           <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} />
 
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-3">
-              {profitabilitySummaries.map((summary, index) => (
-                <div
-                  key={summary.period}
-                  onClick={() => setSelectedPeriod(summary.period)}
-                  className={cn(
-                    "cursor-pointer rounded-lg transition-all",
-                    selectedPeriod === summary.period && "ring-2 ring-primary/50"
-                  )}
-                >
-                  <PeriodSummaryCard
-                    summary={summary}
-                    accentColor={accentColors[index % accentColors.length]}
-                    onViewMore={handleOpenBreakdown}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="h-full">
-              <ProfitabilityTrendChart
-                data={trendDataByPeriod[selectedPeriod] || trendDataByPeriod.this_month}
-                periodLabel={profitabilitySummaries.find((s) => s.period === selectedPeriod)?.dateLabel || ""}
-              />
+          {/* Design toggle */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5">
+              <button
+                onClick={() => setUseNewDesign(true)}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all",
+                  useNewDesign ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Layers className="h-3.5 w-3.5" /> New Design
+              </button>
+              <button
+                onClick={() => setUseNewDesign(false)}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all",
+                  !useNewDesign ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" /> Classic
+              </button>
             </div>
           </div>
+
+          {useNewDesign ? (
+            <ProfitabilityHeroCard
+              summaries={profitabilitySummaries}
+              trendDataByPeriod={trendDataByPeriod}
+              selectedPeriod={selectedPeriod}
+              onPeriodChange={setSelectedPeriod}
+              onViewBreakdown={handleOpenBreakdown}
+            />
+          ) : (
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2 space-y-3">
+                {profitabilitySummaries.map((summary, index) => (
+                  <div
+                    key={summary.period}
+                    onClick={() => setSelectedPeriod(summary.period)}
+                    className={cn(
+                      "cursor-pointer rounded-lg transition-all",
+                      selectedPeriod === summary.period && "ring-2 ring-primary/50"
+                    )}
+                  >
+                    <PeriodSummaryCard
+                      summary={summary}
+                      accentColor={accentColors[index % accentColors.length]}
+                      onViewMore={handleOpenBreakdown}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="h-full">
+                <ProfitabilityTrendChart
+                  data={trendDataByPeriod[selectedPeriod] || trendDataByPeriod.this_month}
+                  periodLabel={profitabilitySummaries.find((s) => s.period === selectedPeriod)?.dateLabel || ""}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="space-y-3">
             <DataTableToolbar
