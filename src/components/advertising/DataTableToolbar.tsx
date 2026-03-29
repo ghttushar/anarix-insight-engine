@@ -164,29 +164,23 @@ export function DataTableToolbar({
     onViewModeChange?.("view");
   };
 
-  const handleSortSelect = (fieldId: string) => {
-    if (sortField === fieldId) {
-      // Toggle direction or clear
-      if (sortDirection === "desc") {
-        onSortChange?.(null, "asc");
-      } else {
-        onSortChange?.(fieldId, "desc");
-      }
+  // 3-state sort cycle: inactive → asc → desc → inactive
+  const handleSortCycle = () => {
+    if (!sortField && sortableFields.length > 0) {
+      // Inactive → asc (use first sortable field as default)
+      onSortChange?.(sortableFields[0].id, "asc");
+    } else if (sortField && sortDirection === "asc") {
+      // asc → desc
+      onSortChange?.(sortField, "desc");
     } else {
-      onSortChange?.(fieldId, "asc");
+      // desc → inactive
+      onSortChange?.(null, "asc");
     }
-  };
-
-  const clearSort = () => {
-    onSortChange?.(null, "asc");
-    setSortOpen(false);
   };
 
   const filteredColumns = columns.filter((c) =>
     c.label.toLowerCase().includes(columnSearch.toLowerCase())
   );
-
-  const activeSortLabel = sortField ? sortableFields.find(f => f.id === sortField)?.label : null;
 
   return (
     <div className="space-y-1.5">
