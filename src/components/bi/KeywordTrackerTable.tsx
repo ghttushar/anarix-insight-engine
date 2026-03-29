@@ -6,7 +6,8 @@ import { Trash2, Search as SearchIcon } from "lucide-react";
 import { TrackedKeyword } from "@/types/bi";
 import { format } from "date-fns";
 import { TablePagination } from "@/components/tables/TablePagination";
-import { SortableTableHead, sortData } from "@/components/tables/SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
+import { cn } from "@/lib/utils";
 
 interface KeywordTrackerTableProps {
   keywords: TrackedKeyword[];
@@ -14,13 +15,14 @@ interface KeywordTrackerTableProps {
   onDelete?: (id: string) => void;
 }
 
+const PINNABLE = ["keyword", "addedAt", "updatedAt", "region", "status"];
+
 export function KeywordTrackerTable({ keywords, onStatusChange, onDelete }: KeywordTrackerTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
-  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, 0);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -41,22 +43,22 @@ export function KeywordTrackerTable({ keywords, onStatusChange, onDelete }: Keyw
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">
-            <SortableTableHead field="keyword" {...sp}>Keyword</SortableTableHead>
-            <SortableTableHead field="addedAt" {...sp}>Added At</SortableTableHead>
-            <SortableTableHead field="updatedAt" {...sp}>Updated At</SortableTableHead>
-            <SortableTableHead field="region" {...sp} className="text-center" align="center">Region</SortableTableHead>
+            <SortableTableHead field="keyword" {...sp} className={cn(pc("keyword", true))} style={ps("keyword")}>Keyword</SortableTableHead>
+            <SortableTableHead field="addedAt" {...sp} className={cn(pc("addedAt", true))} style={ps("addedAt")}>Added At</SortableTableHead>
+            <SortableTableHead field="updatedAt" {...sp} className={cn(pc("updatedAt", true))} style={ps("updatedAt")}>Updated At</SortableTableHead>
+            <SortableTableHead field="region" {...sp} className={cn("text-center", pc("region", true))} style={ps("region")} align="center">Region</SortableTableHead>
             <TableHead className="text-center">Channels</TableHead>
-            <SortableTableHead field="status" {...sp} className="text-center" align="center">Status</SortableTableHead>
+            <SortableTableHead field="status" {...sp} className={cn("text-center", pc("status", true))} style={ps("status")} align="center">Status</SortableTableHead>
             <TableHead className="text-center w-[80px]">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {paginatedKeywords.map((keyword) => (
-            <TableRow key={keyword.id} className="hover:bg-muted/30">
-              <TableCell className="font-medium">{keyword.keyword}</TableCell>
-              <TableCell className="text-muted-foreground text-sm">{formatDate(keyword.addedAt)}</TableCell>
-              <TableCell className="text-muted-foreground text-sm">{formatDate(keyword.updatedAt)}</TableCell>
-              <TableCell className="text-center">
+            <TableRow key={keyword.id} className="hover:bg-muted/30 group">
+              <TableCell style={ps("keyword")} className={cn("font-medium", pc("keyword"))}>{keyword.keyword}</TableCell>
+              <TableCell style={ps("addedAt")} className={cn("text-muted-foreground text-sm", pc("addedAt"))}>{formatDate(keyword.addedAt)}</TableCell>
+              <TableCell style={ps("updatedAt")} className={cn("text-muted-foreground text-sm", pc("updatedAt"))}>{formatDate(keyword.updatedAt)}</TableCell>
+              <TableCell style={ps("region")} className={cn("text-center", pc("region"))}>
                 <span className="flex items-center justify-center gap-1.5">
                   <span>{keyword.regionFlag}</span>
                   <span className="text-sm text-muted-foreground">{keyword.region}</span>
@@ -74,7 +76,7 @@ export function KeywordTrackerTable({ keywords, onStatusChange, onDelete }: Keyw
                   )}
                 </div>
               </TableCell>
-              <TableCell className="text-center">
+              <TableCell style={ps("status")} className={cn("text-center", pc("status"))}>
                 <Switch checked={keyword.status === "active"} onCheckedChange={(checked) => onStatusChange?.(keyword.id, checked ? "active" : "inactive")} />
               </TableCell>
               <TableCell className="text-center">

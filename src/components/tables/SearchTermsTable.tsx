@@ -10,7 +10,7 @@ import { getDelta } from "@/lib/utils/deltaGenerator";
 import { mockSearchTerms, searchTermsTotals } from "@/data/mockSearchTerms";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "./TablePagination";
-import { SortableTableHead, sortData } from "./SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
 
 interface SearchTermsTableProps {
   searchQuery?: string;
@@ -23,14 +23,16 @@ const matchTypeColors: Record<string, string> = {
   phrase: "bg-purple-500/10 text-purple-600 border-purple-500/20",
 };
 
+const PINNABLE = ["keyword", "adGroupName", "campaignName", "impressions", "clicks", "ctr", "adUnits", "cvr", "cpc", "adSpend", "adSales", "roas", "acos"];
+const FIXED_OFFSET = 240;
+
 export function SearchTermsTable({ searchQuery = "", showDeltas = false }: SearchTermsTableProps) {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
-  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
-  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
 
   const filteredTerms = mockSearchTerms.filter((term) =>
     term.searchTerm.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -53,13 +55,8 @@ export function SearchTermsTable({ searchQuery = "", showDeltas = false }: Searc
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
   const toggleRow = (id: string) => {
-    setSelectedRows((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
+    setSelectedRows((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   };
-
   const toggleAll = () => {
     if (selectedRows.size === paginatedTerms.length) setSelectedRows(new Set());
     else setSelectedRows(new Set(paginatedTerms.map((t) => t.id)));
@@ -90,21 +87,21 @@ export function SearchTermsTable({ searchQuery = "", showDeltas = false }: Searc
               <TableHead className="w-10 sticky left-0 z-10 bg-muted">
                 <Checkbox checked={selectedRows.size === paginatedTerms.length && paginatedTerms.length > 0} onCheckedChange={toggleAll} />
               </TableHead>
-              <SortableTableHead field="searchTerm" {...sp} className="min-w-[200px] sticky left-[40px] z-10 bg-muted">Search Term</SortableTableHead>
-              <SortableTableHead field="keyword" {...sp} className="min-w-[150px]">Keyword</SortableTableHead>
+              <SortableTableHead field="searchTerm" {...sp} isFixed className="min-w-[200px] sticky left-[40px] z-10 bg-muted">Search Term</SortableTableHead>
+              <SortableTableHead field="keyword" {...sp} className={cn("min-w-[150px]", pc("keyword", true))} style={ps("keyword")}>Keyword</SortableTableHead>
               <TableHead className="w-24">Match Type</TableHead>
-              <SortableTableHead field="adGroupName" {...sp} className="min-w-[150px]">Ad Group</SortableTableHead>
-              <SortableTableHead field="campaignName" {...sp} className="min-w-[180px]">Campaign</SortableTableHead>
-              <SortableTableHead field="impressions" {...sp} className="text-right" align="right">Impressions</SortableTableHead>
-              <SortableTableHead field="clicks" {...sp} className="text-right" align="right">Clicks</SortableTableHead>
-              <SortableTableHead field="ctr" {...sp} className="text-right" align="right">CTR</SortableTableHead>
-              <SortableTableHead field="adUnits" {...sp} className="text-right" align="right">Ad Units</SortableTableHead>
-              <SortableTableHead field="cvr" {...sp} className="text-right" align="right">CVR</SortableTableHead>
-              <SortableTableHead field="cpc" {...sp} className="text-right" align="right">CPC</SortableTableHead>
-              <SortableTableHead field="adSpend" {...sp} className="text-right" align="right">Ad Spend</SortableTableHead>
-              <SortableTableHead field="adSales" {...sp} className="text-right" align="right">Ad Sales</SortableTableHead>
-              <SortableTableHead field="roas" {...sp} className="text-right" align="right">ROAS</SortableTableHead>
-              <SortableTableHead field="acos" {...sp} className="text-right" align="right">ACOS</SortableTableHead>
+              <SortableTableHead field="adGroupName" {...sp} className={cn("min-w-[150px]", pc("adGroupName", true))} style={ps("adGroupName")}>Ad Group</SortableTableHead>
+              <SortableTableHead field="campaignName" {...sp} className={cn("min-w-[180px]", pc("campaignName", true))} style={ps("campaignName")}>Campaign</SortableTableHead>
+              <SortableTableHead field="impressions" {...sp} className={cn("text-right", pc("impressions", true))} style={ps("impressions")} align="right">Impressions</SortableTableHead>
+              <SortableTableHead field="clicks" {...sp} className={cn("text-right", pc("clicks", true))} style={ps("clicks")} align="right">Clicks</SortableTableHead>
+              <SortableTableHead field="ctr" {...sp} className={cn("text-right", pc("ctr", true))} style={ps("ctr")} align="right">CTR</SortableTableHead>
+              <SortableTableHead field="adUnits" {...sp} className={cn("text-right", pc("adUnits", true))} style={ps("adUnits")} align="right">Ad Units</SortableTableHead>
+              <SortableTableHead field="cvr" {...sp} className={cn("text-right", pc("cvr", true))} style={ps("cvr")} align="right">CVR</SortableTableHead>
+              <SortableTableHead field="cpc" {...sp} className={cn("text-right", pc("cpc", true))} style={ps("cpc")} align="right">CPC</SortableTableHead>
+              <SortableTableHead field="adSpend" {...sp} className={cn("text-right", pc("adSpend", true))} style={ps("adSpend")} align="right">Ad Spend</SortableTableHead>
+              <SortableTableHead field="adSales" {...sp} className={cn("text-right", pc("adSales", true))} style={ps("adSales")} align="right">Ad Sales</SortableTableHead>
+              <SortableTableHead field="roas" {...sp} className={cn("text-right", pc("roas", true))} style={ps("roas")} align="right">ROAS</SortableTableHead>
+              <SortableTableHead field="acos" {...sp} className={cn("text-right", pc("acos", true))} style={ps("acos")} align="right">ACOS</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -114,20 +111,20 @@ export function SearchTermsTable({ searchQuery = "", showDeltas = false }: Searc
                   <Checkbox checked={selectedRows.has(term.id)} onCheckedChange={() => toggleRow(term.id)} />
                 </TableCell>
                 <TableCell className="font-medium text-foreground sticky left-[40px] z-10 bg-background group-hover:bg-muted transition-colors">{term.searchTerm}</TableCell>
-                <TableCell className="text-foreground">{term.keyword}</TableCell>
+                <TableCell style={ps("keyword")} className={cn("text-foreground", pc("keyword"))}>{term.keyword}</TableCell>
                 <TableCell><Badge variant="outline" className={cn("text-xs uppercase", matchTypeColors[term.matchType])}>{term.matchType}</Badge></TableCell>
-                <TableCell className="text-foreground">{term.adGroupName}</TableCell>
-                <TableCell className="text-foreground">{term.campaignName}</TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatNumber(term.impressions)} id={term.id} metric="impressions" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatNumber(term.clicks)} id={term.id} metric="clicks" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatPercent(term.ctr)} id={term.id} metric="ctr" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatNumber(term.adUnits)} id={term.id} metric="adUnits" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatPercent(term.cvr)} id={term.id} metric="cvr" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(term.cpc)} id={term.id} metric="cpc" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(term.adSpend)} id={term.id} metric="adSpend" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatCurrency(term.adSpend * 3.8)} id={term.id} metric="adSales" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={(3.8).toFixed(2)} id={term.id} metric="roas" /></TableCell>
-                <TableCell className="text-right"><NumCell formatted={formatPercent(26.3)} id={term.id} metric="acos" /></TableCell>
+                <TableCell style={ps("adGroupName")} className={cn("text-foreground", pc("adGroupName"))}>{term.adGroupName}</TableCell>
+                <TableCell style={ps("campaignName")} className={cn("text-foreground", pc("campaignName"))}>{term.campaignName}</TableCell>
+                <TableCell style={ps("impressions")} className={cn("text-right", pc("impressions"))}><NumCell formatted={formatNumber(term.impressions)} id={term.id} metric="impressions" /></TableCell>
+                <TableCell style={ps("clicks")} className={cn("text-right", pc("clicks"))}><NumCell formatted={formatNumber(term.clicks)} id={term.id} metric="clicks" /></TableCell>
+                <TableCell style={ps("ctr")} className={cn("text-right", pc("ctr"))}><NumCell formatted={formatPercent(term.ctr)} id={term.id} metric="ctr" /></TableCell>
+                <TableCell style={ps("adUnits")} className={cn("text-right", pc("adUnits"))}><NumCell formatted={formatNumber(term.adUnits)} id={term.id} metric="adUnits" /></TableCell>
+                <TableCell style={ps("cvr")} className={cn("text-right", pc("cvr"))}><NumCell formatted={formatPercent(term.cvr)} id={term.id} metric="cvr" /></TableCell>
+                <TableCell style={ps("cpc")} className={cn("text-right", pc("cpc"))}><NumCell formatted={formatCurrency(term.cpc)} id={term.id} metric="cpc" /></TableCell>
+                <TableCell style={ps("adSpend")} className={cn("text-right", pc("adSpend"))}><NumCell formatted={formatCurrency(term.adSpend)} id={term.id} metric="adSpend" /></TableCell>
+                <TableCell style={ps("adSales")} className={cn("text-right", pc("adSales"))}><NumCell formatted={formatCurrency(term.adSpend * 3.8)} id={term.id} metric="adSales" /></TableCell>
+                <TableCell style={ps("roas")} className={cn("text-right", pc("roas"))}><NumCell formatted={(3.8).toFixed(2)} id={term.id} metric="roas" /></TableCell>
+                <TableCell style={ps("acos")} className={cn("text-right", pc("acos"))}><NumCell formatted={formatPercent(26.3)} id={term.id} metric="acos" /></TableCell>
               </TableRow>
             ))}
             <TableRow className="bg-muted font-medium hover:bg-muted">
@@ -146,13 +143,7 @@ export function SearchTermsTable({ searchQuery = "", showDeltas = false }: Searc
           </TableBody>
         </Table>
       </div>
-      <TablePagination
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={filteredTerms.length}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      <TablePagination page={currentPage} pageSize={pageSize} totalItems={filteredTerms.length} onPageChange={setCurrentPage} onPageSizeChange={setPageSize} />
     </div>
   );
 }

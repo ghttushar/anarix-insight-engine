@@ -8,7 +8,7 @@ import { ImpactComparison } from "@/types/advertising";
 import { cn } from "@/lib/utils";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { TablePagination } from "./TablePagination";
-import { SortableTableHead, sortData } from "./SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
 
 interface ImpactTableProps {
   data: ImpactComparison[];
@@ -16,13 +16,15 @@ interface ImpactTableProps {
   showType?: boolean;
 }
 
+const PINNABLE = ["impactPercentage", "impressions", "clicks", "ctr", "adSpend", "adSales", "roas", "acos"];
+const FIXED_OFFSET = 250;
+
 export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
-  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
 
   const filteredData = data.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -76,15 +78,15 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
         <Table>
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
-              <SortableTableHead field="name" {...sp} className="min-w-[250px] sticky left-0 z-10 bg-muted">Name</SortableTableHead>
-              <SortableTableHead field="impactPercentage" {...sp} className="w-28 text-center" align="center">Impact</SortableTableHead>
-              <SortableTableHead field="impressions" {...sp} className="min-w-[180px] text-right" align="right">Impressions</SortableTableHead>
-              <SortableTableHead field="clicks" {...sp} className="min-w-[150px] text-right" align="right">Clicks</SortableTableHead>
-              <SortableTableHead field="ctr" {...sp} className="min-w-[140px] text-right" align="right">CTR</SortableTableHead>
-              <SortableTableHead field="adSpend" {...sp} className="min-w-[180px] text-right" align="right">Ad Spend</SortableTableHead>
-              <SortableTableHead field="adSales" {...sp} className="min-w-[180px] text-right" align="right">Ad Sales</SortableTableHead>
-              <SortableTableHead field="roas" {...sp} className="min-w-[140px] text-right" align="right">ROAS</SortableTableHead>
-              <SortableTableHead field="acos" {...sp} className="min-w-[140px] text-right" align="right">ACOS</SortableTableHead>
+              <SortableTableHead field="name" {...sp} isFixed className="min-w-[250px] sticky left-0 z-10 bg-muted">Name</SortableTableHead>
+              <SortableTableHead field="impactPercentage" {...sp} className={cn("w-28 text-center", pc("impactPercentage", true))} style={ps("impactPercentage")} align="center">Impact</SortableTableHead>
+              <SortableTableHead field="impressions" {...sp} className={cn("min-w-[180px] text-right", pc("impressions", true))} style={ps("impressions")} align="right">Impressions</SortableTableHead>
+              <SortableTableHead field="clicks" {...sp} className={cn("min-w-[150px] text-right", pc("clicks", true))} style={ps("clicks")} align="right">Clicks</SortableTableHead>
+              <SortableTableHead field="ctr" {...sp} className={cn("min-w-[140px] text-right", pc("ctr", true))} style={ps("ctr")} align="right">CTR</SortableTableHead>
+              <SortableTableHead field="adSpend" {...sp} className={cn("min-w-[180px] text-right", pc("adSpend", true))} style={ps("adSpend")} align="right">Ad Spend</SortableTableHead>
+              <SortableTableHead field="adSales" {...sp} className={cn("min-w-[180px] text-right", pc("adSales", true))} style={ps("adSales")} align="right">Ad Sales</SortableTableHead>
+              <SortableTableHead field="roas" {...sp} className={cn("min-w-[140px] text-right", pc("roas", true))} style={ps("roas")} align="right">ROAS</SortableTableHead>
+              <SortableTableHead field="acos" {...sp} className={cn("min-w-[140px] text-right", pc("acos", true))} style={ps("acos")} align="right">ACOS</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -103,19 +105,19 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
                       <span className="font-medium">{item.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell style={ps("impactPercentage")} className={cn("text-center", pc("impactPercentage"))}>
                     <Badge variant="outline" className={cn("gap-1", isNeutral ? "border-muted bg-muted text-muted-foreground" : isPositive ? "border-success/30 bg-success/10 text-success" : "border-destructive/30 bg-destructive/10 text-destructive")}>
                       {isPositive ? <ArrowUp className="h-3 w-3" /> : !isNeutral ? <ArrowDown className="h-3 w-3" /> : null}
                       {Math.abs(item.impactPercentage).toFixed(1)}%
                     </Badge>
                   </TableCell>
-                  <TableCell><DeltaCell baseline={item.baseline.impressions} impact={item.impact.impressions} /></TableCell>
-                  <TableCell><DeltaCell baseline={item.baseline.clicks} impact={item.impact.clicks} /></TableCell>
-                  <TableCell><DeltaCell baseline={item.baseline.ctr} impact={item.impact.ctr} format="percent" /></TableCell>
-                  <TableCell><DeltaCell baseline={item.baseline.adSpend} impact={item.impact.adSpend} format="currency" /></TableCell>
-                  <TableCell><DeltaCell baseline={item.baseline.adSales} impact={item.impact.adSales} format="currency" /></TableCell>
-                  <TableCell><DeltaCell baseline={item.baseline.roas} impact={item.impact.roas} format="decimal" /></TableCell>
-                  <TableCell><DeltaCell baseline={item.baseline.acos} impact={item.impact.acos} format="percent" /></TableCell>
+                  <TableCell style={ps("impressions")} className={cn(pc("impressions"))}><DeltaCell baseline={item.baseline.impressions} impact={item.impact.impressions} /></TableCell>
+                  <TableCell style={ps("clicks")} className={cn(pc("clicks"))}><DeltaCell baseline={item.baseline.clicks} impact={item.impact.clicks} /></TableCell>
+                  <TableCell style={ps("ctr")} className={cn(pc("ctr"))}><DeltaCell baseline={item.baseline.ctr} impact={item.impact.ctr} format="percent" /></TableCell>
+                  <TableCell style={ps("adSpend")} className={cn(pc("adSpend"))}><DeltaCell baseline={item.baseline.adSpend} impact={item.impact.adSpend} format="currency" /></TableCell>
+                  <TableCell style={ps("adSales")} className={cn(pc("adSales"))}><DeltaCell baseline={item.baseline.adSales} impact={item.impact.adSales} format="currency" /></TableCell>
+                  <TableCell style={ps("roas")} className={cn(pc("roas"))}><DeltaCell baseline={item.baseline.roas} impact={item.impact.roas} format="decimal" /></TableCell>
+                  <TableCell style={ps("acos")} className={cn(pc("acos"))}><DeltaCell baseline={item.baseline.acos} impact={item.impact.acos} format="percent" /></TableCell>
                 </TableRow>
               );
             })}

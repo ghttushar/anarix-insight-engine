@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { TablePagination } from "@/components/tables/TablePagination";
-import { SortableTableHead, sortData } from "@/components/tables/SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
 
 interface ScheduledJobsTableProps {
   schedules: DayPartingSchedule[];
@@ -29,14 +29,15 @@ const STATUS_STYLES: Record<string, string> = {
   draft: "bg-primary/10 text-primary border-primary/30",
 };
 
+const PINNABLE = ["name", "campaignNames", "actionType", "repeatType", "nextRun", "status"];
+
 export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: ScheduledJobsTableProps) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
-  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, 0);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -68,20 +69,20 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
       <Table>
         <TableHeader>
           <TableRow className="bg-muted">
-            <SortableTableHead field="name" {...sp}>Schedule Name</SortableTableHead>
-            <SortableTableHead field="campaignNames" {...sp}>Campaign(s)</SortableTableHead>
-            <SortableTableHead field="actionType" {...sp}>Action Type</SortableTableHead>
-            <SortableTableHead field="repeatType" {...sp}>Frequency</SortableTableHead>
-            <SortableTableHead field="nextRun" {...sp}>Next Run</SortableTableHead>
-            <SortableTableHead field="status" {...sp} className="text-center" align="center">Status</SortableTableHead>
+            <SortableTableHead field="name" {...sp} className={cn(pc("name", true))} style={ps("name")}>Schedule Name</SortableTableHead>
+            <SortableTableHead field="campaignNames" {...sp} className={cn(pc("campaignNames", true))} style={ps("campaignNames")}>Campaign(s)</SortableTableHead>
+            <SortableTableHead field="actionType" {...sp} className={cn(pc("actionType", true))} style={ps("actionType")}>Action Type</SortableTableHead>
+            <SortableTableHead field="repeatType" {...sp} className={cn(pc("repeatType", true))} style={ps("repeatType")}>Frequency</SortableTableHead>
+            <SortableTableHead field="nextRun" {...sp} className={cn(pc("nextRun", true))} style={ps("nextRun")}>Next Run</SortableTableHead>
+            <SortableTableHead field="status" {...sp} className={cn("text-center", pc("status", true))} style={ps("status")} align="center">Status</SortableTableHead>
             <TableHead className="text-center w-[120px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {paginatedSchedules.map((schedule) => (
-            <TableRow key={schedule.id} className="hover:bg-muted/30">
-              <TableCell className="font-medium">{schedule.name}</TableCell>
-              <TableCell>
+            <TableRow key={schedule.id} className="hover:bg-muted/30 group">
+              <TableCell style={ps("name")} className={cn("font-medium", pc("name"))}>{schedule.name}</TableCell>
+              <TableCell style={ps("campaignNames")} className={cn(pc("campaignNames"))}>
                 <div className="max-w-[200px]">
                   {schedule.campaignNames.length === 1 ? (
                     <span className="text-sm">{schedule.campaignNames[0]}</span>
@@ -93,7 +94,7 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
                   )}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell style={ps("actionType")} className={cn(pc("actionType"))}>
                 <div className="flex flex-col">
                   <span className="text-sm">{ACTION_LABELS[schedule.actionType]}</span>
                   {schedule.budgetModifier && (
@@ -101,14 +102,14 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
                   )}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell style={ps("repeatType")} className={cn(pc("repeatType"))}>
                 <div className="flex flex-col text-sm">
                   <span className="capitalize">{schedule.repeatType}</span>
                   <span className="text-xs text-muted-foreground">{getDaysLabel(schedule.daysOfWeek)}</span>
                 </div>
               </TableCell>
-              <TableCell className="text-sm">{formatNextRun(schedule.nextRun)}</TableCell>
-              <TableCell className="text-center">
+              <TableCell style={ps("nextRun")} className={cn("text-sm", pc("nextRun"))}>{formatNextRun(schedule.nextRun)}</TableCell>
+              <TableCell style={ps("status")} className={cn("text-center", pc("status"))}>
                 <Badge variant="outline" className={cn("capitalize", STATUS_STYLES[schedule.status])}>{schedule.status}</Badge>
               </TableCell>
               <TableCell>

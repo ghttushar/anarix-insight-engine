@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table, TableBody, TableCell, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { profitabilityProducts } from "@/data/mockProfitability";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { TablePagination } from "@/components/tables/TablePagination";
-import { sortData } from "@/components/tables/SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
 
 interface RegionalProductTableProps {
   searchValue?: string;
@@ -22,10 +22,14 @@ const regionAssignments = [
   { region: "Mexico", flag: "🇲🇽", products: profitabilityProducts.slice(4, 5) },
 ];
 
-export function RegionalProductTable({ searchValue = "", sortField = null, sortDirection = "asc" }: RegionalProductTableProps) {
+const PINNABLE = ["units", "gmv", "authSales", "adSpend", "netProfit", "margin"];
+const FIXED_OFFSET = 300;
+
+export function RegionalProductTable({ searchValue = "", sortField: externalSortField = null, sortDirection: externalSortDirection = "asc" }: RegionalProductTableProps) {
   const { formatCurrency } = useCurrency();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
 
   const allProducts = regionAssignments.flatMap((ra) =>
     ra.products.map((p) => ({ ...p, regionName: ra.region, regionFlag: ra.flag }))
@@ -37,7 +41,7 @@ export function RegionalProductTable({ searchValue = "", sortField = null, sortD
     p.sku.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  const sorted = sortData(filtered, sortField, sortDirection);
+  const sorted = sortData(filtered, externalSortField, externalSortDirection);
   const paginated = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const totals = filtered.reduce(
@@ -52,19 +56,21 @@ export function RegionalProductTable({ searchValue = "", sortField = null, sortD
   );
   const totalMargin = totals.gmv > 0 ? (totals.netProfit / totals.gmv) * 100 : 0;
 
+  const sp = { pinnedColumns, onPinToggle: handlePinToggle };
+
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
-              <TableHead className="sticky left-0 z-20 bg-muted min-w-[300px] border-r border-border">Product Details</TableHead>
-              <TableHead className="text-right">Units</TableHead>
-              <TableHead className="text-right">GMV</TableHead>
-              <TableHead className="text-right">Auth Sales</TableHead>
-              <TableHead className="text-right">Ad Spend</TableHead>
-              <TableHead className="text-right">Net Profit</TableHead>
-              <TableHead className="text-right">Margin</TableHead>
+              <SortableTableHead field="name" {...sp} isFixed className="sticky left-0 z-20 bg-muted min-w-[300px] border-r border-border">Product Details</SortableTableHead>
+              <SortableTableHead field="units" {...sp} className={cn("text-right", pc("units", true))} style={ps("units")} align="right">Units</SortableTableHead>
+              <SortableTableHead field="gmv" {...sp} className={cn("text-right", pc("gmv", true))} style={ps("gmv")} align="right">GMV</SortableTableHead>
+              <SortableTableHead field="authSales" {...sp} className={cn("text-right", pc("authSales", true))} style={ps("authSales")} align="right">Auth Sales</SortableTableHead>
+              <SortableTableHead field="adSpend" {...sp} className={cn("text-right", pc("adSpend", true))} style={ps("adSpend")} align="right">Ad Spend</SortableTableHead>
+              <SortableTableHead field="netProfit" {...sp} className={cn("text-right", pc("netProfit", true))} style={ps("netProfit")} align="right">Net Profit</SortableTableHead>
+              <SortableTableHead field="margin" {...sp} className={cn("text-right", pc("margin", true))} style={ps("margin")} align="right">Margin</SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -87,12 +93,12 @@ export function RegionalProductTable({ searchValue = "", sortField = null, sortD
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right text-foreground">{formatNumber(product.units)}</TableCell>
-                  <TableCell className="text-right text-foreground">{formatCurrency(product.gmv)}</TableCell>
-                  <TableCell className="text-right text-foreground">{formatCurrency(product.authSales)}</TableCell>
-                  <TableCell className="text-right text-foreground">{formatCurrency(product.adSpend)}</TableCell>
-                  <TableCell className="text-right font-medium text-foreground">{formatCurrency(product.netProfit)}</TableCell>
-                  <TableCell className="text-right text-foreground">{margin.toFixed(1)}%</TableCell>
+                  <TableCell style={ps("units")} className={cn("text-right text-foreground", pc("units"))}>{formatNumber(product.units)}</TableCell>
+                  <TableCell style={ps("gmv")} className={cn("text-right text-foreground", pc("gmv"))}>{formatCurrency(product.gmv)}</TableCell>
+                  <TableCell style={ps("authSales")} className={cn("text-right text-foreground", pc("authSales"))}>{formatCurrency(product.authSales)}</TableCell>
+                  <TableCell style={ps("adSpend")} className={cn("text-right text-foreground", pc("adSpend"))}>{formatCurrency(product.adSpend)}</TableCell>
+                  <TableCell style={ps("netProfit")} className={cn("text-right font-medium text-foreground", pc("netProfit"))}>{formatCurrency(product.netProfit)}</TableCell>
+                  <TableCell style={ps("margin")} className={cn("text-right text-foreground", pc("margin"))}>{margin.toFixed(1)}%</TableCell>
                 </TableRow>
               );
             })}

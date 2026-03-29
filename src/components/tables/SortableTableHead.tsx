@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, CSSProperties, useState } from "react";
 import { TableHead } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,7 @@ interface SortableTableHeadProps {
   className?: string;
   align?: "left" | "right" | "center";
   isFixed?: boolean;
+  style?: CSSProperties;
   // Legacy props kept for compat but not used for sorting
   sortField?: string | null;
   sortDirection?: "asc" | "desc";
@@ -24,11 +25,12 @@ export function SortableTableHead({
   className,
   align = "left",
   isFixed = false,
+  style,
 }: SortableTableHeadProps) {
   const isPinned = pinnedColumns?.has(field) ?? false;
 
   return (
-    <TableHead className={cn("group/sort select-none", className)}>
+    <TableHead className={cn("group/sort select-none", className)} style={style}>
       <div
         className={cn(
           "flex items-center gap-1.5",
@@ -58,6 +60,44 @@ export function SortableTableHead({
       </div>
     </TableHead>
   );
+}
+
+// Shared pin style utility
+export function getPinnedStyle(
+  field: string,
+  pinnedColumns: Set<string>,
+  allFields: string[],
+  fixedOffset: number = 0,
+  columnWidth: number = 150
+): CSSProperties | undefined {
+  if (!pinnedColumns.has(field)) return undefined;
+  const pinnedFields = allFields.filter(f => pinnedColumns.has(f));
+  const index = pinnedFields.indexOf(field);
+  if (index === -1) return undefined;
+  return {
+    position: 'sticky' as const,
+    left: fixedOffset + index * columnWidth,
+    zIndex: 10,
+  };
+}
+
+// Hook for pin state management
+export function usePinning(allFields: string[], fixedOffset: number = 0, columnWidth: number = 150) {
+  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
+  const handlePinToggle = (field: string) => {
+    setPinnedColumns(prev => {
+      const next = new Set(prev);
+      if (next.has(field)) next.delete(field); else next.add(field);
+      return next;
+    });
+  };
+  const ps = (field: string): CSSProperties | undefined =>
+    getPinnedStyle(field, pinnedColumns, allFields, fixedOffset, columnWidth);
+  const pc = (field: string, isHeader: boolean = false): string => {
+    if (!pinnedColumns.has(field)) return "";
+    return isHeader ? "bg-muted" : "bg-background group-hover:bg-muted transition-colors";
+  };
+  return { pinnedColumns, handlePinToggle, ps, pc };
 }
 
 // Reusable sort hook logic

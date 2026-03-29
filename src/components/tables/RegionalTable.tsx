@@ -9,7 +9,7 @@ import { GeographicalData } from "@/types/profitability";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { TablePagination } from "@/components/tables/TablePagination";
-import { SortableTableHead, sortData } from "@/components/tables/SortableTableHead";
+import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
 
 interface RegionalTableProps {
   data: GeographicalData[];
@@ -19,6 +19,9 @@ interface RegionalTableProps {
 
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
 
+const PINNABLE = ["stocks", "orders", "unitsSold", "refunds", "sales", "amazonFees", "sellableReturns"];
+const FIXED_OFFSET = 200;
+
 export function RegionalTable({ data, searchValue = "", showDeltas = false }: RegionalTableProps) {
   const { formatCurrency } = useCurrency();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -26,8 +29,7 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
-  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) => {
@@ -77,13 +79,13 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
               <span className="font-medium text-foreground">{region.region}</span>
             </div>
           </TableCell>
-          <TableCell className="text-right"><NumCell value={region.stocks} formatted={formatNumber(region.stocks)} id={region.id} metric="stocks" /></TableCell>
-          <TableCell className="text-right"><NumCell value={region.orders} formatted={formatNumber(region.orders)} id={region.id} metric="orders" /></TableCell>
-          <TableCell className="text-right"><NumCell value={region.unitsSold} formatted={formatNumber(region.unitsSold)} id={region.id} metric="unitsSold" /></TableCell>
-          <TableCell className="text-right"><NumCell value={region.refunds} formatted={formatNumber(region.refunds)} id={region.id} metric="refunds" /></TableCell>
-          <TableCell className="text-right"><NumCell value={region.sales} formatted={formatCurrency(region.sales)} id={region.id} metric="sales" /></TableCell>
-          <TableCell className="text-right"><NumCell value={region.amazonFees} formatted={formatCurrency(region.amazonFees)} id={region.id} metric="amazonFees" /></TableCell>
-          <TableCell className="text-right"><NumCell value={region.sellableReturns} formatted={formatNumber(region.sellableReturns)} id={region.id} metric="sellableReturns" /></TableCell>
+          <TableCell style={ps("stocks")} className={cn("text-right", pc("stocks"))}><NumCell value={region.stocks} formatted={formatNumber(region.stocks)} id={region.id} metric="stocks" /></TableCell>
+          <TableCell style={ps("orders")} className={cn("text-right", pc("orders"))}><NumCell value={region.orders} formatted={formatNumber(region.orders)} id={region.id} metric="orders" /></TableCell>
+          <TableCell style={ps("unitsSold")} className={cn("text-right", pc("unitsSold"))}><NumCell value={region.unitsSold} formatted={formatNumber(region.unitsSold)} id={region.id} metric="unitsSold" /></TableCell>
+          <TableCell style={ps("refunds")} className={cn("text-right", pc("refunds"))}><NumCell value={region.refunds} formatted={formatNumber(region.refunds)} id={region.id} metric="refunds" /></TableCell>
+          <TableCell style={ps("sales")} className={cn("text-right", pc("sales"))}><NumCell value={region.sales} formatted={formatCurrency(region.sales)} id={region.id} metric="sales" /></TableCell>
+          <TableCell style={ps("amazonFees")} className={cn("text-right", pc("amazonFees"))}><NumCell value={region.amazonFees} formatted={formatCurrency(region.amazonFees)} id={region.id} metric="amazonFees" /></TableCell>
+          <TableCell style={ps("sellableReturns")} className={cn("text-right", pc("sellableReturns"))}><NumCell value={region.sellableReturns} formatted={formatNumber(region.sellableReturns)} id={region.id} metric="sellableReturns" /></TableCell>
           <TableCell className="text-center"><button className="text-xs text-primary hover:underline">More</button></TableCell>
         </TableRow>
         {hasChildren && isExpanded && region.children!.map((child) => renderRow(child, true))}
@@ -97,14 +99,14 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
         <Table>
           <TableHeader>
             <TableRow className="bg-muted">
-              <SortableTableHead field="region" {...sp} className="sticky left-0 z-20 bg-muted min-w-[200px] border-r border-border">Region</SortableTableHead>
-              <SortableTableHead field="stocks" {...sp} className="text-right" align="right">Stocks</SortableTableHead>
-              <SortableTableHead field="orders" {...sp} className="text-right" align="right">Orders</SortableTableHead>
-              <SortableTableHead field="unitsSold" {...sp} className="text-right" align="right">Units Sold</SortableTableHead>
-              <SortableTableHead field="refunds" {...sp} className="text-right" align="right">Refunds</SortableTableHead>
-              <SortableTableHead field="sales" {...sp} className="text-right" align="right">Sales</SortableTableHead>
-              <SortableTableHead field="amazonFees" {...sp} className="text-right" align="right">Amazon Fees</SortableTableHead>
-              <SortableTableHead field="sellableReturns" {...sp} className="text-right" align="right">Sellable Returns</SortableTableHead>
+              <SortableTableHead field="region" {...sp} isFixed className="sticky left-0 z-20 bg-muted min-w-[200px] border-r border-border">Region</SortableTableHead>
+              <SortableTableHead field="stocks" {...sp} className={cn("text-right", pc("stocks", true))} style={ps("stocks")} align="right">Stocks</SortableTableHead>
+              <SortableTableHead field="orders" {...sp} className={cn("text-right", pc("orders", true))} style={ps("orders")} align="right">Orders</SortableTableHead>
+              <SortableTableHead field="unitsSold" {...sp} className={cn("text-right", pc("unitsSold", true))} style={ps("unitsSold")} align="right">Units Sold</SortableTableHead>
+              <SortableTableHead field="refunds" {...sp} className={cn("text-right", pc("refunds", true))} style={ps("refunds")} align="right">Refunds</SortableTableHead>
+              <SortableTableHead field="sales" {...sp} className={cn("text-right", pc("sales", true))} style={ps("sales")} align="right">Sales</SortableTableHead>
+              <SortableTableHead field="amazonFees" {...sp} className={cn("text-right", pc("amazonFees", true))} style={ps("amazonFees")} align="right">Amazon Fees</SortableTableHead>
+              <SortableTableHead field="sellableReturns" {...sp} className={cn("text-right", pc("sellableReturns", true))} style={ps("sellableReturns")} align="right">Sellable Returns</SortableTableHead>
               <TableHead className="text-center">Info</TableHead>
             </TableRow>
           </TableHeader>
