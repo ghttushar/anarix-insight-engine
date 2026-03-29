@@ -176,6 +176,8 @@ export default function CampaignManager() {
   );
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const kpiItems = mockKPIData
