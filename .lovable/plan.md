@@ -1,97 +1,132 @@
-## Fix: Aan Sidebar Logo, Prompt Notch, App Level Selector, Date Picker, Toolbar Icons, Trends Chart
 
-### Issues to Fix
 
-1. **Aan sidebar collapsed state** shows full AanLogo (Sparkles + "Aan" text) instead of just the symbol icon like main AppSidebar
-2. **Prompt suggestion notch** needs more polished design
-3. **App Level Metric Selector** too small and not prominent enough
-4. **Date range calendar** needs better design with proper spacing
-5. **Table column sorting/pinning** not visible in table headers
-6. **Delta button** missing label text — only shows icon, while other toolbar buttons show icon + name
-7. **Profitability Trends scatter chart** lacks chart controls (expand, chart type, zoom) that other data visualizations have
+## Fix: Aan Sidebar Logo, App Level Selector Alignment, Table Sort/Pin Across All Tables
 
----
+### 3 Issues
 
-### Aan Sidebar + Prompt Notch + Toolbar Delta Label
+1. **Aan Workspace Sidebar** — Currently uses Anarix brand logos (`logo-light-full.svg`, `logo-dark-symbol.svg`). User wants the **Aan logo** (Sparkles icon + "Aan" text) when expanded, and just the Sparkles icon when collapsed.
 
-**AanWorkspaceSidebar.tsx** — Collapsed state (line 62-114):
+2. **App Level Selector** — The children items (Catalogue select, Ad Type select) and the marketplace button are different sizes. Need to wrap all items in a uniform container with consistent `h-9` height and `bg-muted/50 rounded-lg border` background on each item.
 
-- Replace `<AanLogo>` with the same symbol logo pattern used in AppSidebar: `<img src={logoSymbolSrc}>`
-- Import the 4 logo SVGs and use theme-aware logic identical to AppSidebar
-- Expanded header (line 120): replace `<AanLogo>` with Aan-branded symbol + "Aan" text using same layout as AppSidebar (logo left, PanelLeft right)
-
-**AanInput.tsx** — Redesign the suggestion notch (lines 208-236):
-
-- Add a subtle left-side gradient accent bar (2px wide, primary gradient)
-- Use a softer glass-like background with `bg-card/80 backdrop-blur-sm`
-- Add a subtle shimmer animation on appearance
-- Better typography: "Suggested" label in small caps, prompt in medium weight
-- Smooth slide-up + fade-in animation from text box edge
-- The notch should visually connect to the textbox border (no gap, shared border radius)
-
-**DataTableToolbar.tsx** — Delta button (lines 188-198):
-
-- Add "Delta" text label next to the TrendingUp icon, matching all other toolbar buttons (icon + text pattern)
-- Change from `w-8 p-0` to `gap-1 text-xs` like Filter/Export buttons
-
-**Edit button** (lines 349-359):
-
-- Add "Edit" text label next to Pencil icon, same pattern
-
-###  App Level Selector Redesign + Date Range Calendar
-
-**AppLevelSelector.tsx** — Make it bigger and more visible:
-
-- Increase trigger button size: `h-9` instead of `py-1.5`, larger text `text-sm` instead of `text-xs`
-- Add a subtle background: `bg-muted/50` with `rounded-lg` 
-- Marketplace logo larger: `h-5` instead of `h-4`
-- Store name in `text-sm font-medium` instead of `text-xs`
-- Status dot slightly larger
-- Dropdown wider: `w-[280px]` instead of `w-[240px]`
-- Children items (Catalogue, Ad Type selects) should also be slightly larger
-
-**AppTaskbar.tsx** — Date range calendar redesign (lines 131-181):
-
-- Add preset group section headers with proper uppercase styling and spacing (reference image-148)
-- Highlight selected preset with `bg-primary/10 text-primary` 
-- Calendar: increase padding, add month labels more prominently
-- Selected range: use `bg-primary text-primary-foreground` for selected days with `bg-primary/20` for range between
-- Add "Cancel" and "Apply" buttons with proper sizing and primary styling on Apply
-- Overall wider preset panel with clearer visual hierarchy
+3. **Table Sorting + Pinning** — Sorting exists ONLY in `CampaignTable.tsx`. No other table has it. Pinning exists only in the `DataTableToolbar` columns dropdown but NOT in table headers. Need to add both to every table across the app.
 
 ---
 
-###  Table Header Sort/Pin + Trends Chart Controls
+### Fix 1: Aan Workspace Sidebar Logo
 
-**All table components** (CampaignTable, ProductsPnLTable, AdGroupsTable, etc.):
+**File:** `AanWorkspaceSidebar.tsx`
 
-- Add sort indicator icons (ArrowUpDown) on hoverable table headers
-- Add small pin icon on header hover (Pin icon appears on right of header cell)
-- On click: toggle sort direction (asc/desc/none)
-- Pinned columns show filled Pin icon
+- Remove imports of `logo-light-full`, `logo-dark-full`, `logo-light-symbol`, `logo-dark-symbol`
+- Import `AanLogo` from `./AanLogo`
+- Import `Sparkles` from lucide-react
+- **Collapsed state (line 76):** Replace `<img src={logoSymbol}>` with `<Sparkles className="h-5 w-5 aan-gradient-text" />`
+- **Expanded state (line 130):** Replace `<img src={logoFull}>` with `<AanLogo showByAnarix={false} />` (shows Sparkles + "Aan" text only)
 
-**ScatterPlotChart.tsx** — Wrap in ChartContainer or add equivalent controls:
+---
 
-- Add chart type selector (Scatter is default, also offer Bar, Line views of same data)
-- Add expand/fullscreen button
-- Add zoom controls (+/- buttons)
-- Add export button for the chart
-- Keep quadrant backgrounds and legend
+### Fix 2: App Level Selector Size Alignment
 
-**Trends.tsx** — Wire the enhanced ScatterPlotChart with ChartContainer wrapper providing metrics toggle, chart type, and expand controls
+**File:** `AppLevelSelector.tsx`
+
+- Wrap the entire `<div className="flex items-center gap-2">` children+dropdown in a container with `bg-muted/30 rounded-lg border border-border/50 px-1.5 py-1 gap-1.5`
+- Ensure all child `<Select>` triggers passed via `children` inherit `h-9` height by wrapping children in a flex container
+- The marketplace trigger already has `h-9` — ensure children selects match by documenting/enforcing `h-9` on all page-level `<SelectTrigger>` elements passed as children (e.g., Catalogue, Ad Type selects in Dashboard, CampaignManager, etc.)
+
+**Files to update children sizing:** All pages that pass children to `AppLevelSelector`:
+- `Dashboard.tsx` (profitability) — Catalogue select trigger → `h-9`
+- `Trends.tsx` — Catalogue select → `h-9`
+- `ProfitLoss.tsx` — Catalogue select → `h-9`
+- `Geographical.tsx` — Catalogue select → `h-9`
+- `CampaignManager.tsx` — Ad Type select → `h-9`
+- `ImpactAnalysis.tsx` — Ad Type select → `h-9`
+- `HourlyData.tsx` — Ad Type select → `h-9`
+- `History.tsx` — Ad Type select → `h-9`
+- `ScheduledJobs.tsx` — Ad Type select → `h-9`
+
+Each child select also gets `bg-muted/50 rounded-lg border border-border` styling to match the marketplace button.
+
+---
+
+### Fix 3: Table Sorting + Pinning — Universal Implementation
+
+**Approach:** Create a reusable `SortableTableHead` component that every table imports. This keeps the logic DRY and ensures consistency.
+
+**New file: `src/components/tables/SortableTableHead.tsx`**
+
+```tsx
+interface SortableTableHeadProps {
+  children: React.ReactNode;
+  field: string;
+  sortField: string | null;
+  sortDirection: "asc" | "desc";
+  onSort: (field: string) => void;
+  className?: string;
+  align?: "left" | "right" | "center";
+}
+```
+
+- Renders `<TableHead>` with click handler calling `onSort(field)`
+- Sort icons: `ArrowUpDown` (unsorted, **opacity-0 group-hover:opacity-40** transition), `ArrowUp`/`ArrowDown` (active sort, full opacity, `text-primary`)
+- The header cell gets `className="group cursor-pointer"` so arrows appear on hover
+- Icons are `h-3 w-3` positioned inline after the label text
+
+**Pin icon in header — Decision: NOT in headers.** Pinning is a column management action, not a per-row action. It belongs in the Columns dropdown (already implemented in `DataTableToolbar`). Adding pin icons to every header would create visual clutter in a data-dense analytical tool. The existing pin/unpin in the Columns dropdown is the correct UX. No change needed here.
+
+**Tables to add sorting to (13 tables):**
+
+Each table needs:
+1. Import `SortableTableHead`
+2. Add `sortField` and `sortDirection` state
+3. Add `handleSort` function
+4. Sort data before pagination
+5. Replace plain `<TableHead>` with `<SortableTableHead>` for all metric columns
+
+| Table File | Sortable Columns |
+|---|---|
+| `AdGroupsTable.tsx` | Ad Group, Campaign, Min Bid, Max Bid, Target ROAS, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend, Ad Sales, ROAS, ACOS |
+| `KeywordTargetingTable.tsx` | Keyword, Ad Group, Campaign, Bid, Impressions, Clicks, CTR, CPC, Spend, Sales, ROAS, ACOS |
+| `ProductTargetingTable.tsx` | Target, Ad Group, Campaign, Bid, Impressions, Clicks, CTR, CPC, Spend, Sales, ROAS, ACOS |
+| `SearchTermsTable.tsx` | Search Term, Campaign, Impressions, Clicks, CTR, CPC, Spend, Sales, ROAS, ACOS |
+| `ProductAdsTable.tsx` | Product Ad, Ad Group, Campaign, Impressions, Clicks, CTR, Ad Units, CVR, CPC, Ad Spend, Ad Sales, ROAS, ACOS |
+| `PageTypeTable.tsx` | Page Type, Bid Modifier, Impressions, Clicks, CTR, CPC, Spend, Sales, ROAS, ACOS |
+| `PlatformTable.tsx` | Platform, Bid Modifier, Impressions, Clicks, CTR, CPC, Spend, Sales, ROAS, ACOS |
+| `ImpactTable.tsx` | Name, Impressions, Clicks, CTR, Spend, Sales, ROAS, ACOS |
+| `RegionalTable.tsx` | Region, Units, GMV, Auth Sales, Ad Spend, Net Profit, Margin |
+| `RegionalProductTable.tsx` | Product, Units, GMV, Auth Sales, Ad Spend, Net Profit, Margin |
+| `ScheduledJobsTable.tsx` | Campaign, Action, Frequency, Next Run, Status |
+| `HistoryTable.tsx` | Execution Time, Schedule, Campaign, Action, Status, Duration |
+| `BrandCoverageTable.tsx` | Brand, Products, SOV values |
+| `KeywordTrackerTable.tsx` | Keyword, Region, Added, Last Updated, Status |
+| `ProductsPnLTable.tsx` | Product, all metric columns |
+
+**Also update `CampaignTable.tsx`:** Change existing sort icons to use the new opacity-on-hover pattern (currently always visible at full opacity when unsorted).
 
 ---
 
 ### Files Summary
 
+| File | Change |
+|---|---|
+| `SortableTableHead.tsx` | **NEW** — Reusable sortable header with hover-opacity arrows |
+| `AanWorkspaceSidebar.tsx` | Use AanLogo/Sparkles instead of Anarix logos |
+| `AppLevelSelector.tsx` | Wrap in unified container with background |
+| `CampaignTable.tsx` | Refactor to use SortableTableHead, add hover opacity |
+| `AdGroupsTable.tsx` | Add sorting with SortableTableHead |
+| `KeywordTargetingTable.tsx` | Add sorting |
+| `ProductTargetingTable.tsx` | Add sorting |
+| `SearchTermsTable.tsx` | Add sorting |
+| `ProductAdsTable.tsx` | Add sorting |
+| `PageTypeTable.tsx` | Add sorting |
+| `PlatformTable.tsx` | Add sorting |
+| `ImpactTable.tsx` | Add sorting |
+| `RegionalTable.tsx` | Add sorting |
+| `RegionalProductTable.tsx` | Add sorting |
+| `ScheduledJobsTable.tsx` | Add sorting |
+| `HistoryTable.tsx` | Add sorting |
+| `BrandCoverageTable.tsx` | Add sorting |
+| `KeywordTrackerTable.tsx` | Add sorting |
+| `ProductsPnLTable.tsx` | Add sorting |
+| 9 page files | Fix child select sizing for AppLevelSelector |
 
-| File                      | Phase | Change                                                                         |
-| ------------------------- | ----- | ------------------------------------------------------------------------------ |
-| `AanWorkspaceSidebar.tsx` | 1     | Use symbol logo in collapsed state, match AppSidebar pattern                   |
-| `AanInput.tsx`            | 1     | Redesign prompt suggestion notch with gradient accent bar and better animation |
-| `DataTableToolbar.tsx`    | 1     | Add "Delta" and "Edit" text labels to their buttons                            |
-| `AppLevelSelector.tsx`    | 2     | Larger, more prominent trigger with bigger logo and text                       |
-| `AppTaskbar.tsx`          | 2     | Redesign date range calendar with better presets and styling                   |
-| `ScatterPlotChart.tsx`    | 3     | Add chart controls (expand, zoom, chart type, export)                          |
-| `Trends.tsx`              | 3     | Wire enhanced chart controls                                                   |
-| Table header components   | 3     | Add visible sort arrows and pin icons on hover                                 |
+**Delivery:** All changes in one pass. The `SortableTableHead` component makes this efficient — each table just swaps `<TableHead>` for `<SortableTableHead>` and adds ~10 lines of sort state/logic.
+
