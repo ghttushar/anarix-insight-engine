@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { PeriodSummaryCard } from "@/components/profitability/PeriodSummaryCard";
+import { ProfitabilityHeroCard } from "@/components/profitability/ProfitabilityHeroCard";
 import { ProfitabilityTrendChart } from "@/components/profitability/ProfitabilityTrendChart";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
 import { COGSEditModal } from "@/components/profitability/COGSEditModal";
@@ -18,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
+import { LayoutGrid, Layers } from "lucide-react";
 
 const accentColors = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
