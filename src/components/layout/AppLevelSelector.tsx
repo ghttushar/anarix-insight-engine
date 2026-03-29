@@ -47,18 +47,18 @@ export function AppLevelSelector({ children }: AppLevelSelectorProps) {
 
       <DropdownMenu open={mergedDropdownOpen} onOpenChange={setMergedDropdownOpen}>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-2 rounded-md border border-border bg-background px-2.5 py-1.5 text-sm font-medium hover:bg-muted transition-colors max-w-[240px] cursor-pointer">
+          <button className="flex items-center gap-2.5 rounded-lg border border-border bg-muted/50 px-3 h-9 text-sm font-medium hover:bg-muted transition-colors max-w-[280px] cursor-pointer">
             <img
               src={marketplace === "amazon" ? amazonLogo : walmartLogo}
               alt={marketplace}
-              className="h-4 w-auto object-contain"
+              className="h-5 w-auto object-contain"
             />
-            <StatusDot status={currentAccount?.status || "connected"} />
-            <span className="truncate text-xs">{displayAccountName}</span>
-            <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
+            <StatusDot status={currentAccount?.status || "connected"} className="h-2.5 w-2.5" />
+            <span className="truncate text-sm font-medium">{displayAccountName}</span>
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[240px] p-0">
+        <DropdownMenuContent align="end" className="w-[280px] p-0">
           <DropdownMenuLabel className="text-xs text-muted-foreground uppercase tracking-wider px-3 py-2">
             Marketplace
           </DropdownMenuLabel>

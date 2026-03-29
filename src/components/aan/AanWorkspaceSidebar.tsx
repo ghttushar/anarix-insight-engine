@@ -4,9 +4,13 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AanLogo } from "./AanLogo";
 import { useAan, FilterType } from "./AanContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { format, isToday, isYesterday, isThisWeek, isThisMonth } from "date-fns";
+import logoLightFull from "@/assets/logo-light-full.svg";
+import logoDarkFull from "@/assets/logo-dark-full.svg";
+import logoLightSymbol from "@/assets/logo-light-symbol.svg";
+import logoDarkSymbol from "@/assets/logo-dark-symbol.svg";
 
 interface FilterSection {
   id: FilterType;
@@ -26,9 +30,14 @@ export function AanWorkspaceSidebar() {
     conversations, currentConversation, activeFilter, setActiveFilter,
     startNewConversation, selectConversation,
   } = useAan();
+  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const isDark = theme === "dark";
+  const logoFull = isDark ? logoDarkFull : logoLightFull;
+  const logoSymbol = isDark ? logoDarkSymbol : logoLightSymbol;
 
   const filteredConversations = useMemo(() => {
     let filtered = conversations;
@@ -62,9 +71,9 @@ export function AanWorkspaceSidebar() {
   if (isCollapsed) {
     return (
       <aside className="w-14 border-r border-border bg-card flex flex-col h-full shrink-0">
-        {/* Collapsed header — centered Aan icon */}
+        {/* Collapsed header — centered symbol logo */}
         <div className="flex items-center justify-center h-12 border-b border-border/30 shrink-0">
-          <AanLogo showByAnarix={false} className="justify-center" />
+          <img src={logoSymbol} alt="Anarix" className="h-6 w-auto" />
         </div>
 
         {/* Expand button */}
@@ -116,9 +125,9 @@ export function AanWorkspaceSidebar() {
 
   return (
     <aside className="w-64 border-r border-border bg-card flex flex-col h-full shrink-0">
-      {/* Header — Logo left, collapse right */}
+      {/* Header — Logo left, collapse right (matches AppSidebar) */}
       <div className="flex items-center justify-between h-12 px-3 border-b border-border/30 shrink-0">
-        <AanLogo showByAnarix={false} />
+        <img src={logoFull} alt="Anarix" className="h-5 w-auto" />
         <button
           onClick={() => setIsCollapsed(true)}
           className="flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"

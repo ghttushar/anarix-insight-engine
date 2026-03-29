@@ -351,11 +351,12 @@ export function DataTableToolbar({
             <Button
               variant="ghost"
               size="sm"
-              className={cn("h-8 w-8 p-0 ml-1 cursor-pointer", viewMode === "edit" && "bg-destructive/10 text-destructive")}
+              className={cn("h-8 gap-1 text-xs ml-1 cursor-pointer", viewMode === "edit" && "bg-destructive/10 text-destructive")}
               onClick={handleEditToggle}
               title={viewMode === "edit" ? "Save & exit edit mode" : "Switch to Edit mode"}
             >
               <Pencil className="h-3.5 w-3.5" />
+              Edit
             </Button>
           )}
         </div>

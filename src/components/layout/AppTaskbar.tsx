@@ -140,22 +140,37 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start" side="bottom">
                 <div className="flex">
-                  <div className="w-[180px] border-r border-border p-2 space-y-3 max-h-[380px] overflow-auto">
+                  {/* Presets panel */}
+                  <div className="w-[200px] border-r border-border py-3 space-y-4 max-h-[420px] overflow-auto bg-muted/30">
                     {DATE_PRESET_GROUPS.map((group) => (
                       <div key={group.label}>
-                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 mb-1">{group.label}</p>
-                        {group.presets.map((preset) => (
-                          <button
-                            key={preset.label}
-                            onClick={() => handlePresetClick(preset)}
-                            className="w-full text-left text-xs px-2 py-1.5 rounded hover:bg-muted transition-colors text-foreground cursor-pointer"
-                          >
-                            {preset.label}
-                          </button>
-                        ))}
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-4 mb-1.5">{group.label}</p>
+                        <div className="space-y-0.5 px-2">
+                          {group.presets.map((preset) => {
+                            const presetRange = preset.getRange();
+                            const isSelected =
+                              draftRange.from.toDateString() === presetRange.from.toDateString() &&
+                              draftRange.to.toDateString() === presetRange.to.toDateString();
+                            return (
+                              <button
+                                key={preset.label}
+                                onClick={() => handlePresetClick(preset)}
+                                className={cn(
+                                  "w-full text-left text-xs px-3 py-2 rounded-md transition-colors cursor-pointer font-medium",
+                                  isSelected
+                                    ? "bg-primary/10 text-primary"
+                                    : "text-foreground hover:bg-muted"
+                                )}
+                              >
+                                {preset.label}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     ))}
                   </div>
+                  {/* Calendar + actions */}
                   <div className="flex flex-col">
                     <Calendar
                       mode="range"
@@ -168,11 +183,16 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
                         }
                       }}
                       numberOfMonths={2}
-                      className="p-3 pointer-events-auto"
+                      className="p-4 pointer-events-auto"
                     />
-                    <div className="flex items-center justify-end gap-2 px-3 pb-3">
-                      <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={handleCancelDateRange}>Cancel</Button>
-                      <Button size="sm" className="h-8 text-xs" onClick={handleApplyDateRange}>Apply</Button>
+                    <div className="flex items-center justify-between px-4 pb-3 border-t border-border pt-3">
+                      <p className="text-xs text-muted-foreground">
+                        {format(draftRange.from, "MMM dd, yyyy")} – {format(draftRange.to, "MMM dd, yyyy")}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" className="h-8 text-xs px-4" onClick={handleCancelDateRange}>Cancel</Button>
+                        <Button size="sm" className="h-8 text-xs px-4" onClick={handleApplyDateRange}>Apply</Button>
+                      </div>
                     </div>
                   </div>
                 </div>
