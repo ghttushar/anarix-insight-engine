@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2, TrendingUp, Upload, Pin, PinOff } from "lucide-react";
+import { Search, Filter, Download, Columns, X, Pencil, Plus, Trash2, TrendingUp, Upload, Pin, PinOff, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +31,11 @@ interface Column {
   visible: boolean;
 }
 
+interface SortableField {
+  id: string;
+  label: string;
+}
+
 interface DataTableToolbarProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
@@ -58,6 +63,11 @@ interface DataTableToolbarProps {
   uploadTitle?: string;
   pinnedColumns?: string[];
   onPinColumn?: (columnId: string) => void;
+  // Sort props
+  sortableFields?: SortableField[];
+  sortField?: string | null;
+  sortDirection?: "asc" | "desc";
+  onSortChange?: (field: string | null, direction: "asc" | "desc") => void;
 }
 
 const OPERATORS = [
@@ -91,12 +101,17 @@ export function DataTableToolbar({
   uploadTitle,
   pinnedColumns = [],
   onPinColumn,
+  sortableFields = [],
+  sortField,
+  sortDirection = "asc",
+  onSortChange,
 }: DataTableToolbarProps) {
   const [draftFilters, setDraftFilters] = useState<FilterRule[]>(activeFilters);
   const [columnSearch, setColumnSearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editConfirmOpen, setEditConfirmOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
 
   const handleOpenFilter = () => {
     setDraftFilters(activeFilters.length > 0 ? [...activeFilters] : [{ id: crypto.randomUUID(), field: filterFields[0] || "", operator: "is", value: "" }]);
@@ -150,9 +165,29 @@ export function DataTableToolbar({
     onViewModeChange?.("view");
   };
 
+  const handleSortSelect = (fieldId: string) => {
+    if (sortField === fieldId) {
+      // Toggle direction or clear
+      if (sortDirection === "desc") {
+        onSortChange?.(null, "asc");
+      } else {
+        onSortChange?.(fieldId, "desc");
+      }
+    } else {
+      onSortChange?.(fieldId, "asc");
+    }
+  };
+
+  const clearSort = () => {
+    onSortChange?.(null, "asc");
+    setSortOpen(false);
+  };
+
   const filteredColumns = columns.filter((c) =>
     c.label.toLowerCase().includes(columnSearch.toLowerCase())
   );
+
+  const activeSortLabel = sortField ? sortableFields.find(f => f.id === sortField)?.label : null;
 
   return (
     <div className="space-y-1.5">
@@ -196,6 +231,59 @@ export function DataTableToolbar({
               <TrendingUp className="h-3.5 w-3.5" />
               Delta
             </Button>
+          )}
+
+          {/* Sort Button */}
+          {sortableFields.length > 0 && onSortChange && (
+            <Popover open={sortOpen} onOpenChange={setSortOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn("h-8 gap-1 text-xs cursor-pointer", sortField && "bg-primary/10 text-primary")}
+                  title="Sort table data"
+                >
+                  <ArrowUpDown className="h-3.5 w-3.5" />
+                  Sort
+                  {activeSortLabel && (
+                    <span className="ml-0.5 flex items-center gap-0.5 rounded bg-primary/20 px-1 py-0.5 text-[10px] text-primary font-medium">
+                      {activeSortLabel}
+                      {sortDirection === "asc" ? <ArrowUp className="h-2.5 w-2.5" /> : <ArrowDown className="h-2.5 w-2.5" />}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[240px] p-2 space-y-1">
+                <div className="flex items-center justify-between pb-1 border-b border-border mb-1">
+                  <span className="text-xs font-medium text-foreground">Sort by</span>
+                  {sortField && (
+                    <button onClick={clearSort} className="text-[11px] text-muted-foreground hover:text-foreground cursor-pointer">Clear</button>
+                  )}
+                </div>
+                <div className="max-h-[240px] overflow-auto space-y-0.5">
+                  {sortableFields.map((sf) => {
+                    const isActive = sortField === sf.id;
+                    return (
+                      <button
+                        key={sf.id}
+                        onClick={() => handleSortSelect(sf.id)}
+                        className={cn(
+                          "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-xs hover:bg-muted transition-colors cursor-pointer",
+                          isActive && "bg-primary/5"
+                        )}
+                      >
+                        <span className={cn("text-foreground", isActive && "font-medium")}>{sf.label}</span>
+                        {isActive && (
+                          <span className="flex items-center text-primary">
+                            {sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
 
           {/* Filter Button */}

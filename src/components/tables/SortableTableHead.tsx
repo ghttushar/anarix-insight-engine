@@ -1,16 +1,18 @@
 import { ReactNode } from "react";
 import { TableHead } from "@/components/ui/table";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SortableTableHeadProps {
   children: ReactNode;
   field: string;
-  sortField: string | null;
-  sortDirection: "asc" | "desc";
-  onSort: (field: string) => void;
+  sortField?: string | null;
+  sortDirection?: "asc" | "desc";
+  onSort?: (field: string) => void;
+  isPinned?: boolean;
+  onPinToggle?: (field: string) => void;
   className?: string;
   align?: "left" | "right" | "center";
+  isFixed?: boolean;
 }
 
 export function SortableTableHead({
@@ -19,32 +21,40 @@ export function SortableTableHead({
   sortField,
   sortDirection,
   onSort,
+  isPinned = false,
+  onPinToggle,
   className,
   align = "left",
+  isFixed = false,
 }: SortableTableHeadProps) {
-  const isActive = sortField === field;
-
   return (
     <TableHead
-      className={cn("group/sort cursor-pointer select-none", className)}
-      onClick={() => onSort(field)}
+      className={cn("group/sort select-none", className)}
     >
       <div
         className={cn(
-          "flex items-center gap-1",
+          "flex items-center gap-1.5",
           align === "right" && "justify-end",
           align === "center" && "justify-center"
         )}
       >
         <span>{children}</span>
-        {isActive ? (
-          sortDirection === "asc" ? (
-            <ArrowUp className="h-3 w-3 text-primary shrink-0" />
-          ) : (
-            <ArrowDown className="h-3 w-3 text-primary shrink-0" />
-          )
-        ) : (
-          <ArrowUpDown className="h-3 w-3 shrink-0 opacity-0 transition-opacity group-hover/sort:opacity-40 text-muted-foreground" />
+        {/* Pin radio button — only on non-fixed columns when onPinToggle is provided */}
+        {!isFixed && onPinToggle && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onPinToggle(field); }}
+            className="shrink-0 cursor-pointer"
+            title={isPinned ? "Unpin column" : "Pin column"}
+          >
+            <div
+              className={cn(
+                "h-2.5 w-2.5 rounded-full border transition-all",
+                isPinned
+                  ? "border-primary bg-primary"
+                  : "border-muted-foreground/40 opacity-50 group-hover/sort:opacity-80"
+              )}
+            />
+          </button>
         )}
       </div>
     </TableHead>

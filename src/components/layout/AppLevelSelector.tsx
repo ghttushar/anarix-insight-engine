@@ -42,7 +42,7 @@ export function AppLevelSelector({ children }: AppLevelSelectorProps) {
   }, [mergedDropdownOpen]);
 
   return (
-    <div className="flex items-center gap-1.5 bg-muted/30 rounded-lg border border-border/50 px-1.5 py-1">
+    <div className="flex items-center gap-1.5 bg-card rounded-lg border border-border px-1.5 py-1">
       {children && <div className="flex items-center gap-1.5 [&_button]:h-9 [&_button]:text-sm">{children}</div>}
       <DropdownMenu open={mergedDropdownOpen} onOpenChange={setMergedDropdownOpen}>
         <DropdownMenuTrigger asChild>
