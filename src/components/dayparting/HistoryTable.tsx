@@ -27,6 +27,8 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
+  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -51,7 +53,7 @@ export function HistoryTable({ history, onRetry }: HistoryTableProps) {
     return `${(ms / 1000).toFixed(1)}s`;
   };
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   return (
     <div className="rounded-lg border border-border bg-card">

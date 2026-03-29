@@ -26,6 +26,8 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
+  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) => {
@@ -56,7 +58,7 @@ export function RegionalTable({ data, searchValue = "", showDeltas = false }: Re
     </div>
   );
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   const renderRow = (region: GeographicalData, isChild = false) => {
     const hasChildren = region.children && region.children.length > 0;

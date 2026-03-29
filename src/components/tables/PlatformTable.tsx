@@ -20,6 +20,8 @@ export function PlatformTable({ searchQuery = "", showDeltas = false }: Platform
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [pinnedColumns, setPinnedColumns] = useState<Set<string>>(new Set());
+  const handlePinToggle = (field: string) => { setPinnedColumns(prev => { const next = new Set(prev); if (next.has(field)) next.delete(field); else next.add(field); return next; }); };
   const [bidModifiers, setBidModifiers] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
     mockPlatforms.forEach((p) => { initial[p.id] = p.bidModifier; });
@@ -58,7 +60,7 @@ export function PlatformTable({ searchQuery = "", showDeltas = false }: Platform
     </div>
   );
 
-  const sp = { sortField, sortDirection, onSort: handleSort };
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
 
   return (
     <div className="rounded-lg border border-border bg-card">
