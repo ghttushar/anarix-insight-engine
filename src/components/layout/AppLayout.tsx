@@ -52,7 +52,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
       <div className="flex flex-1 min-w-0 h-screen overflow-hidden">
         <main
           className={cn(
-            "flex-1 overflow-auto bg-background min-h-0",
+            "flex-1 overflow-auto bg-background min-h-0 min-w-0",
             density === "compact" ? "p-4" : "p-6"
           )}
           onClick={handleMainClick}
