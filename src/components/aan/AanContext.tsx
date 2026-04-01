@@ -251,7 +251,7 @@ export function AanProvider({ children }: { children: ReactNode }) {
       viewingArtifact, viewArtifact, closeArtifactView,
       isGenerating, generationType, generationProgress, setGenerationState,
       conversations, currentConversation, activeFilter, setActiveFilter, startNewConversation, selectConversation,
-      context, setContext,
+      context, setContext, selectedModel, setSelectedModel,
     }}>
       {children}
     </AanContext.Provider>
