@@ -107,7 +107,7 @@ export function FloatingActionIsland() {
         <div
           data-island
           className={cn(
-            "bg-card/95 backdrop-blur-md border-2 border-border rounded-full shadow-lg transition-all duration-300 ease-out",
+            "bg-card/95 backdrop-blur-md border-2 border-primary/60 rounded-full shadow-lg transition-all duration-300 ease-out",
             isExpanded ? "px-2 py-2" : "px-3 py-2",
             isDragging && "cursor-grabbing"
           )}

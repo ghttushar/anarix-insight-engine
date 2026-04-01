@@ -77,6 +77,8 @@ interface AanContextType {
   selectConversation: (id: string) => void;
   context: AanContextInfo;
   setContext: (context: AanContextInfo) => void;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
 }
 
 const AanContext = createContext<AanContextType | undefined>(undefined);
@@ -133,6 +135,7 @@ export function AanProvider({ children }: { children: ReactNode }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationType, setGenerationType] = useState<"report" | "audit" | null>(null);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [selectedModel, setSelectedModel] = useState("gemini-flash");
 
   const currentConversation = useMemo(() => {
     return conversations.find((c) => c.id === currentConversationId) || null;
@@ -248,7 +251,7 @@ export function AanProvider({ children }: { children: ReactNode }) {
       viewingArtifact, viewArtifact, closeArtifactView,
       isGenerating, generationType, generationProgress, setGenerationState,
       conversations, currentConversation, activeFilter, setActiveFilter, startNewConversation, selectConversation,
-      context, setContext,
+      context, setContext, selectedModel, setSelectedModel,
     }}>
       {children}
     </AanContext.Provider>
