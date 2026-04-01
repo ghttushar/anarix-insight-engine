@@ -75,8 +75,8 @@ export default function ProfitLoss() {
 
   return (
     <AppLayout>
-      <div className="flex flex-1 h-full min-h-0">
-        <div className="flex-1 space-y-6 p-0">
+      <div className="flex flex-1 h-full min-h-0 min-w-0">
+        <div className="flex-1 min-w-0 space-y-6 p-0">
           <PageHeader
             title="Profit & Loss"
             subtitle="Detailed P&L breakdown by period"

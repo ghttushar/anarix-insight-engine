@@ -319,7 +319,7 @@ export function ProfitabilityHeroCard({
       {/* Body */}
       <div className="p-4">
         {activeView === "overview" && (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 overflow-hidden">
             <PeriodCard
               summary={primarySummary}
               label={primaryLabel}
