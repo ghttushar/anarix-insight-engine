@@ -135,6 +135,7 @@ export function AanProvider({ children }: { children: ReactNode }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationType, setGenerationType] = useState<"report" | "audit" | null>(null);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [selectedModel, setSelectedModel] = useState("gemini-flash");
 
   const currentConversation = useMemo(() => {
     return conversations.find((c) => c.id === currentConversationId) || null;
