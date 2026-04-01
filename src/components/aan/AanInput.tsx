@@ -97,7 +97,7 @@ function formatFileSize(bytes: number): string {
 }
 
 export function AanInput() {
-  const { addMessage, setGenerationState, messages, selectedModel, setSelectedModel } = useAan();
+  const { addMessage, setGenerationState, messages, selectedModel, setSelectedModel, pendingPrompt, setPendingPrompt } = useAan();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestion, setShowSuggestion] = useState(false);
@@ -131,6 +131,13 @@ export function AanInput() {
     };
   }, [messages, isLoading]);
 
+  // Consume pending prompt from Insights or Ask Aan tooltip
+  useEffect(() => {
+    if (pendingPrompt) {
+      setInput(pendingPrompt);
+      setPendingPrompt(null);
+    }
+  }, [pendingPrompt, setPendingPrompt]);
   const handleStop = () => {
     if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
     if (progressIntervalRef.current) { clearInterval(progressIntervalRef.current); progressIntervalRef.current = null; }
@@ -336,7 +343,7 @@ export function AanInput() {
                 <ChevronDown className="h-3 w-3" />
               </button>
             </PopoverTrigger>
-            <PopoverContent align="start" side="top" className="w-64 p-1.5">
+            <PopoverContent align="start" side="top" className="w-64 p-1.5 z-[70]">
               <div className="space-y-0.5">
                 {AI_MODELS.map((model) => {
                   const Icon = model.icon;

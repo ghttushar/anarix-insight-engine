@@ -54,7 +54,7 @@ export default function ScheduledJobs() {
   return (
     <AppLayout>
       <div className="flex flex-1 min-h-0">
-        <div className="flex-1 space-y-6 overflow-auto">
+        <div className="flex-1 space-y-6">
           <PageHeader
             title="Scheduled Jobs"
             subtitle="Manage your day parting schedules"

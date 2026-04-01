@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 
 interface InsightCardProps {
   insight: Insight;
+  onActionClick?: (actionText: string) => void;
 }
 
 const categoryConfig: Record<
@@ -31,7 +32,7 @@ const categoryConfig: Record<
   },
 };
 
-export function InsightCard({ insight }: InsightCardProps) {
+export function InsightCard({ insight, onActionClick }: InsightCardProps) {
   const config = categoryConfig[insight.category];
   const Icon = config.icon;
 
@@ -58,6 +59,7 @@ export function InsightCard({ insight }: InsightCardProps) {
               variant="ghost"
               size="sm"
               className={cn("mt-2 h-7 px-2 text-xs gap-1", config.colorClass)}
+              onClick={() => onActionClick?.(insight.action!)}
             >
               {insight.action.length > 40
                 ? insight.action.substring(0, 40) + "..."
