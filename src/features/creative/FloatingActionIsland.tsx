@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAan } from "@/components/aan";
 import { useInsights } from "@/components/insights";
 import { toast } from "sonner";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 import html2canvas from "html2canvas";
 
 interface ActionItem {
