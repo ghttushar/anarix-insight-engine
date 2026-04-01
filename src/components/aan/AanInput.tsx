@@ -336,7 +336,7 @@ export function AanInput() {
                 <ChevronDown className="h-3 w-3" />
               </button>
             </PopoverTrigger>
-            <PopoverContent align="start" side="top" className="w-64 p-1.5">
+            <PopoverContent align="start" side="top" className="w-64 p-1.5 z-[70]">
               <div className="space-y-0.5">
                 {AI_MODELS.map((model) => {
                   const Icon = model.icon;

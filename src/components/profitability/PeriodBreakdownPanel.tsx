@@ -74,7 +74,7 @@ export function PeriodBreakdownPanel({ summary, isOpen, onClose }: PeriodBreakdo
       </div>
 
       {/* Content — independent scroll */}
-      <ScrollArea className="flex-1 overflow-hidden">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="space-y-6 p-4">
           {sections.map((section) => (
             <div key={section.title}>
