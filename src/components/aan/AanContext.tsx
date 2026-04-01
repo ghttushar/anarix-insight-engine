@@ -77,6 +77,8 @@ interface AanContextType {
   selectConversation: (id: string) => void;
   context: AanContextInfo;
   setContext: (context: AanContextInfo) => void;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
 }
 
 const AanContext = createContext<AanContextType | undefined>(undefined);
