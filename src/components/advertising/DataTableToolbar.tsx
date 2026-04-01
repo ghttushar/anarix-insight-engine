@@ -111,6 +111,7 @@ export function DataTableToolbar({
   const [filterOpen, setFilterOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editConfirmOpen, setEditConfirmOpen] = useState(false);
+  const [sortPopoverOpen, setSortPopoverOpen] = useState(false);
 
   const handleOpenFilter = () => {
     setDraftFilters(activeFilters.length > 0 ? [...activeFilters] : [{ id: crypto.randomUUID(), field: filterFields[0] || "", operator: "is", value: "" }]);
@@ -164,14 +165,13 @@ export function DataTableToolbar({
     onViewModeChange?.("view");
   };
 
-  // 3-state sort cycle: inactive → asc → desc → inactive
-  const handleSortCycle = () => {
-    if (!sortField && sortableFields.length > 0) {
-      // Inactive → asc (use first sortable field as default)
-      onSortChange?.(sortableFields[0].id, "asc");
-    } else if (sortField && sortDirection === "asc") {
-      // asc → desc
-      onSortChange?.(sortField, "desc");
+  // Sort field toggle: 3-state per field (inactive → asc → desc → inactive)
+  const handleSortFieldToggle = (fieldId: string) => {
+    if (sortField !== fieldId) {
+      // Different field selected → activate with asc
+      onSortChange?.(fieldId, "asc");
+    } else if (sortDirection === "asc") {
+      onSortChange?.(fieldId, "desc");
     } else {
       // desc → inactive
       onSortChange?.(null, "asc");
@@ -226,24 +226,50 @@ export function DataTableToolbar({
             </Button>
           )}
 
-          {/* Sort Button — 3-state inline toggle: inactive → asc → desc → inactive */}
+          {/* Sort Button — opens popover with field list */}
           {sortableFields.length > 0 && onSortChange && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn("h-8 gap-1 text-xs cursor-pointer", sortField && "bg-primary/10 text-primary")}
-              onClick={handleSortCycle}
-              title="Sort table data"
-            >
-              {!sortField ? (
-                <ArrowUpDown className="h-3.5 w-3.5" />
-              ) : sortDirection === "asc" ? (
-                <ArrowUp className="h-3.5 w-3.5" />
-              ) : (
-                <ArrowDown className="h-3.5 w-3.5" />
-              )}
-              Sort
-            </Button>
+            <Popover open={sortPopoverOpen} onOpenChange={setSortPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn("h-8 gap-1 text-xs cursor-pointer", sortField && "bg-primary/10 text-primary")}
+                  title="Sort table data"
+                >
+                  {!sortField ? (
+                    <ArrowUpDown className="h-3.5 w-3.5" />
+                  ) : sortDirection === "asc" ? (
+                    <ArrowUp className="h-3.5 w-3.5" />
+                  ) : (
+                    <ArrowDown className="h-3.5 w-3.5" />
+                  )}
+                  Sort
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[220px] p-2 space-y-0.5">
+                <p className="text-[11px] font-medium text-muted-foreground px-2 pb-1">Sort by</p>
+                {sortableFields.map((field) => {
+                  const isActive = sortField === field.id;
+                  return (
+                    <button
+                      key={field.id}
+                      onClick={() => handleSortFieldToggle(field.id)}
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs transition-colors cursor-pointer",
+                        isActive ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted"
+                      )}
+                    >
+                      <span>{field.label}</span>
+                      {isActive ? (
+                        sortDirection === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+                      ) : (
+                        <ArrowUpDown className="h-3 w-3 opacity-30" />
+                      )}
+                    </button>
+                  );
+                })}
+              </PopoverContent>
+            </Popover>
           )}
 
           {/* Filter Button */}
@@ -335,24 +361,16 @@ export function DataTableToolbar({
                   <button onClick={onClearAllColumns} className="text-xs text-muted-foreground hover:text-foreground cursor-pointer">Clear All</button>
                 </div>
                 <div className="max-h-[240px] overflow-auto p-1">
-                  {/* Pinned columns first */}
                   {pinnedColumns.length > 0 && onPinColumn && (
                     <>
                       <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Pinned</div>
                       {filteredColumns.filter(c => pinnedColumns.includes(c.id)).map((column) => (
-                        <div
-                          key={`pinned-${column.id}`}
-                          className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors"
-                        >
+                        <div key={`pinned-${column.id}`} className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors">
                           <button onClick={() => onColumnToggle(column.id)} className="flex items-center gap-2 flex-1 cursor-pointer">
                             <Checkbox checked={column.visible} className="pointer-events-none h-3.5 w-3.5" />
                             <span className="text-foreground">{column.label}</span>
                           </button>
-                          <button
-                            onClick={() => onPinColumn(column.id)}
-                            className="p-0.5 rounded hover:bg-primary/10 cursor-pointer"
-                            title="Unpin column"
-                          >
+                          <button onClick={() => onPinColumn(column.id)} className="p-0.5 rounded hover:bg-primary/10 cursor-pointer" title="Unpin column">
                             <PinOff className="h-3 w-3 text-primary" />
                           </button>
                         </div>
@@ -362,20 +380,13 @@ export function DataTableToolbar({
                     </>
                   )}
                   {filteredColumns.filter(c => !pinnedColumns.includes(c.id)).map((column) => (
-                    <div
-                      key={column.id}
-                      className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors group"
-                    >
+                    <div key={column.id} className="flex w-full items-center gap-2 rounded-sm px-2 py-1 text-xs hover:bg-muted transition-colors group">
                       <button onClick={() => onColumnToggle(column.id)} className="flex items-center gap-2 flex-1 cursor-pointer">
                         <Checkbox checked={column.visible} className="pointer-events-none h-3.5 w-3.5" />
                         <span className="text-foreground">{column.label}</span>
                       </button>
                       {onPinColumn && (
-                        <button
-                          onClick={() => onPinColumn(column.id)}
-                          className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-primary/10 cursor-pointer transition-opacity"
-                          title="Pin column"
-                        >
+                        <button onClick={() => onPinColumn(column.id)} className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-primary/10 cursor-pointer transition-opacity" title="Pin column">
                           <Pin className="h-3 w-3 text-muted-foreground" />
                         </button>
                       )}

@@ -65,13 +65,13 @@
     --accent: 231 74% 81%; /* #A7AEF2 - Lilac */
     --accent-foreground: 240 53% 9%;
 
-    --destructive: 0 84% 60%; /* #EF4444 - Data viz red */
+    --destructive: 0 65% 48%; /* #C93535 - Muted data viz red */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 45%; /* #22C55E - Data viz green */
+    --success: 142 55% 38%; /* #1E9E4F - Muted data viz green */
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%; /* #F59E0B - Data viz amber */
+    --warning: 38 75% 45%; /* #C98A14 - Muted data viz amber */
     --warning-foreground: 0 0% 100%;
 
     --border: 230 25% 90%;
@@ -124,13 +124,13 @@
     --accent: 231 100% 87%; /* #B8BEFF - Lilac */
     --accent-foreground: 240 53% 9%;
 
-    --destructive: 0 62% 50%;
+    --destructive: 0 60% 52%; /* Muted red for dark mode */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 45%;
+    --success: 142 50% 42%; /* Muted green for dark mode */
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 38 70% 50%; /* Muted amber for dark mode */
     --warning-foreground: 0 0% 100%;
 
     --border: 235 30% 20%;

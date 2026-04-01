@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, lazy, Suspense } from "react";
+import { ReactNode, useEffect, useRef, lazy, Suspense, useCallback } from "react";
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { InsightsPanel } from "@/components/insights/InsightsPanel";
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const AanCopilotPanel = lazy(() => import("@/components/aan/AanCopilotPanel").then(m => ({ default: m.AanCopilotPanel })));
 
 function LayoutInner({ children }: { children: ReactNode }) {
-  const { dataPanel, aiPanel, hasAnyPanel } = useActivePanel();
+  const { dataPanel, aiPanel, hasAnyPanel, closeDataPanel } = useActivePanel();
   const { open, setOpen } = useSidebar();
   const { density } = useDensity();
 
@@ -18,6 +18,15 @@ function LayoutInner({ children }: { children: ReactNode }) {
 
   const showInsights = dataPanel === "insights";
   const showCopilot = aiPanel === "copilot";
+
+  // Close data panels (productDetail, periodBreakdown) when clicking main content
+  const isClosableDataPanel = dataPanel === "productDetail" || dataPanel === "periodBreakdown";
+
+  const handleMainClick = useCallback(() => {
+    if (isClosableDataPanel) {
+      closeDataPanel();
+    }
+  }, [isClosableDataPanel, closeDataPanel]);
 
   useEffect(() => {
     const panelJustOpened = hasAnyPanel && !prevHasPanelRef.current;
@@ -38,10 +47,13 @@ function LayoutInner({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen w-full">
       <AppSidebar />
       <div className="flex flex-1 h-screen overflow-hidden">
-        <main className={cn(
-          "flex-1 overflow-auto bg-background min-h-0",
-          density === "compact" ? "p-4" : "p-6"
-        )}>
+        <main
+          className={cn(
+            "flex-1 overflow-auto bg-background min-h-0",
+            density === "compact" ? "p-4" : "p-6"
+          )}
+          onClick={handleMainClick}
+        >
           {children}
         </main>
         {showInsights && <InsightsPanel />}

@@ -1,5 +1,6 @@
 import { ReactNode, CSSProperties, useState } from "react";
 import { TableHead } from "@/components/ui/table";
+import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SortableTableHeadProps {
@@ -11,7 +12,7 @@ interface SortableTableHeadProps {
   align?: "left" | "right" | "center";
   isFixed?: boolean;
   style?: CSSProperties;
-  // Legacy props kept for compat but not used for sorting
+  // Sort props
   sortField?: string | null;
   sortDirection?: "asc" | "desc";
   onSort?: (field: string) => void;
@@ -26,18 +27,41 @@ export function SortableTableHead({
   align = "left",
   isFixed = false,
   style,
+  sortField,
+  sortDirection,
+  onSort,
 }: SortableTableHeadProps) {
   const isPinned = pinnedColumns?.has(field) ?? false;
+  const isSorted = sortField === field;
 
   return (
     <TableHead className={cn("group/sort select-none", className)} style={style}>
       <div
         className={cn(
-          "flex items-center gap-1.5",
+          "flex items-center gap-1",
           align === "right" && "justify-end",
           align === "center" && "justify-center"
         )}
       >
+        {/* Sort icon — clickable if onSort provided */}
+        {onSort && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onSort(field); }}
+            className="shrink-0 cursor-pointer p-0.5 rounded hover:bg-muted transition-colors"
+            title={isSorted ? (sortDirection === "asc" ? "Sort descending" : "Clear sort") : "Sort ascending"}
+          >
+            {isSorted ? (
+              sortDirection === "asc" ? (
+                <ArrowUp className="h-3 w-3 text-primary" />
+              ) : (
+                <ArrowDown className="h-3 w-3 text-primary" />
+              )
+            ) : (
+              <ArrowUpDown className="h-3 w-3 opacity-0 group-hover/sort:opacity-40 transition-opacity" />
+            )}
+          </button>
+        )}
+
         <span>{children}</span>
 
         {/* Pin radio button — only on non-fixed columns when onPinToggle is provided */}
