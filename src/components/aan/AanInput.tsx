@@ -131,6 +131,13 @@ export function AanInput() {
     };
   }, [messages, isLoading]);
 
+  // Consume pending prompt from Insights or Ask Aan tooltip
+  useEffect(() => {
+    if (pendingPrompt) {
+      setInput(pendingPrompt);
+      setPendingPrompt(null);
+    }
+  }, [pendingPrompt, setPendingPrompt]);
   const handleStop = () => {
     if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
     if (progressIntervalRef.current) { clearInterval(progressIntervalRef.current); progressIntervalRef.current = null; }

@@ -67,9 +67,11 @@ export function FloatingActionIsland() {
     }, 300);
   };
 
+  const { setDataPanel } = useActivePanel();
+
   const actions: ActionItem[] = [
     { icon: Sparkles, label: "Ask Aan", onClick: () => openPanel(), alwaysShowLabel: true },
-    { icon: Bell, label: criticalCount > 0 ? `Alerts (${criticalCount})` : "Alerts", onClick: openInsights, highlight: criticalCount > 0, badge: criticalCount > 0 ? criticalCount : undefined },
+    { icon: Bell, label: criticalCount > 0 ? `Alerts (${criticalCount})` : "Alerts", onClick: () => setDataPanel("notifications"), highlight: criticalCount > 0, badge: criticalCount > 0 ? criticalCount : undefined },
     { icon: Lightbulb, label: "Insights", onClick: openInsights },
     { icon: RefreshCw, label: "Refresh", onClick: () => toast.info("Refreshing data...") },
     { icon: Download, label: "Export", onClick: () => toast.success("Export started") },

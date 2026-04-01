@@ -3,13 +3,21 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useInsights } from "./InsightsContext";
 import { InsightCard } from "./InsightCard";
+import { useAan } from "@/components/aan/AanContext";
 
 export function InsightsPanel() {
   const { isOpen, closePanel, insights, criticalCount, attentionCount, positiveCount } = useInsights();
+  const { openCopilot, setPendingPrompt, setContext } = useAan();
 
   const criticalInsights = insights.filter((i) => i.category === "critical");
   const attentionInsights = insights.filter((i) => i.category === "attention");
   const positiveInsights = insights.filter((i) => i.category === "positive");
+
+  const handleActionClick = (actionText: string) => {
+    setContext({ page: "Insights" });
+    setPendingPrompt(`I want to take action on: ${actionText}`);
+    openCopilot();
+  };
 
   if (!isOpen) return null;
 
@@ -55,7 +63,7 @@ export function InsightsPanel() {
                 <h3 className="text-xs font-semibold text-destructive">Critical Alerts</h3>
               </div>
               <div className="space-y-2">
-                {criticalInsights.map((insight) => <InsightCard key={insight.id} insight={insight} />)}
+                {criticalInsights.map((insight) => <InsightCard key={insight.id} insight={insight} onActionClick={handleActionClick} />)}
               </div>
             </section>
           )}
@@ -66,7 +74,7 @@ export function InsightsPanel() {
                 <h3 className="text-xs font-semibold text-warning">Worth a Look</h3>
               </div>
               <div className="space-y-2">
-                {attentionInsights.map((insight) => <InsightCard key={insight.id} insight={insight} />)}
+                {attentionInsights.map((insight) => <InsightCard key={insight.id} insight={insight} onActionClick={handleActionClick} />)}
               </div>
             </section>
           )}
@@ -77,7 +85,7 @@ export function InsightsPanel() {
                 <h3 className="text-xs font-semibold text-success">Wins & Highlights</h3>
               </div>
               <div className="space-y-2">
-                {positiveInsights.map((insight) => <InsightCard key={insight.id} insight={insight} />)}
+                {positiveInsights.map((insight) => <InsightCard key={insight.id} insight={insight} onActionClick={handleActionClick} />)}
               </div>
             </section>
           )}
