@@ -47,9 +47,9 @@ function LayoutInner({ children }: { children: ReactNode }) {
   }, [hasAnyPanel, open, setOpen]);
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full overflow-x-hidden">
       <AppSidebar />
-      <div className="flex flex-1 h-screen overflow-hidden">
+      <div className="flex flex-1 min-w-0 h-screen overflow-hidden">
         <main
           className={cn(
             "flex-1 overflow-auto bg-background min-h-0",
