@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-export type DataPanelType = "none" | "insights" | "productDetail" | "periodBreakdown" | "createSchedule" | "createCampaign";
+export type DataPanelType = "none" | "insights" | "notifications" | "productDetail" | "periodBreakdown" | "createSchedule" | "createCampaign";
 export type AiPanelType = "none" | "copilot";
 
 // Backward compat alias
