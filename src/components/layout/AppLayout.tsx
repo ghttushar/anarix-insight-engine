@@ -2,11 +2,13 @@ import { ReactNode, useEffect, useRef, lazy, Suspense, useCallback } from "react
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { InsightsPanel } from "@/components/insights/InsightsPanel";
+import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useDensity } from "@/contexts/DensityContext";
 import { cn } from "@/lib/utils";
 
 const AanCopilotPanel = lazy(() => import("@/components/aan/AanCopilotPanel").then(m => ({ default: m.AanCopilotPanel })));
+const AskAanTooltip = lazy(() => import("@/components/aan/AskAanTooltip").then(m => ({ default: m.AskAanTooltip })));
 
 function LayoutInner({ children }: { children: ReactNode }) {
   const { dataPanel, aiPanel, hasAnyPanel, closeDataPanel } = useActivePanel();
@@ -17,6 +19,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
   const prevHasPanelRef = useRef(hasAnyPanel);
 
   const showInsights = dataPanel === "insights";
+  const showNotifications = dataPanel === "notifications";
   const showCopilot = aiPanel === "copilot";
 
   // Close data panels (productDetail, periodBreakdown) when clicking main content
@@ -57,8 +60,10 @@ function LayoutInner({ children }: { children: ReactNode }) {
           {children}
         </main>
         {showInsights && <InsightsPanel />}
+        {showNotifications && <NotificationsPanel />}
         {showCopilot && <Suspense fallback={null}><AanCopilotPanel /></Suspense>}
       </div>
+      <Suspense fallback={null}><AskAanTooltip /></Suspense>
     </div>
   );
 }
