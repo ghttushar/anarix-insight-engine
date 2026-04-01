@@ -97,7 +97,7 @@ function formatFileSize(bytes: number): string {
 }
 
 export function AanInput() {
-  const { addMessage, setGenerationState, messages, selectedModel, setSelectedModel } = useAan();
+  const { addMessage, setGenerationState, messages, selectedModel, setSelectedModel, pendingPrompt, setPendingPrompt } = useAan();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestion, setShowSuggestion] = useState(false);
