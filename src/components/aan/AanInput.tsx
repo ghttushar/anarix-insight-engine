@@ -363,7 +363,7 @@ export function AanInput() {
             </PopoverContent>
           </Popover>
           <p className="text-[10px] text-muted-foreground">
-            Aan creates drafts for your approval
+            Aan can make mistakes. Check important info.
           </p>
         </div>
       </div>
