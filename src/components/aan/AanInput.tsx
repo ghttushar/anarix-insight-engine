@@ -2,8 +2,9 @@ import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { useAan } from "./AanContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Square, Sparkles, X } from "lucide-react";
+import { Send, Square, Sparkles, X, Paperclip, ChevronDown, Check, Zap, Brain, Cpu, Gauge } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const isReportRequest = (message: string): boolean => {
   const lower = message.toLowerCase();
@@ -76,16 +77,38 @@ const PROMPT_SUGGESTIONS = [
   "Find budget reallocation opportunities",
 ];
 
+const AI_MODELS = [
+  { id: "gemini-flash", name: "Gemini 3 Flash", description: "Fast responses, great for most tasks", icon: Zap },
+  { id: "gemini-pro", name: "Gemini 2.5 Pro", description: "Complex reasoning & analysis", icon: Brain },
+  { id: "gpt-5", name: "GPT-5", description: "Powerful all-rounder", icon: Cpu },
+  { id: "gpt-5-mini", name: "GPT-5 Mini", description: "Balanced speed & quality", icon: Gauge },
+];
+
+interface AttachedFile {
+  name: string;
+  size: number;
+  type: string;
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}
+
 export function AanInput() {
-  const { addMessage, setGenerationState, messages } = useAan();
+  const { addMessage, setGenerationState, messages, selectedModel, setSelectedModel } = useAan();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [suggestionVisible, setSuggestionVisible] = useState(false);
   const [suggestionIndex, setSuggestionIndex] = useState(0);
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
+  const [modelOpen, setModelOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const suggestionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     return () => {
@@ -95,14 +118,11 @@ export function AanInput() {
     };
   }, []);
 
-  // Show suggestion after assistant message with delay
   useEffect(() => {
     if (messages.length > 0 && messages[messages.length - 1].role === "assistant" && !isLoading) {
       setSuggestionIndex(Math.floor(Math.random() * PROMPT_SUGGESTIONS.length));
-      // Show after 500ms delay for smooth appearance
       suggestionTimerRef.current = setTimeout(() => {
         setShowSuggestion(true);
-        // Trigger animation after mount
         requestAnimationFrame(() => setSuggestionVisible(true));
       }, 500);
     }
@@ -125,6 +145,7 @@ export function AanInput() {
     setInput("");
     setShowSuggestion(false);
     setSuggestionVisible(false);
+    setAttachedFiles([]);
     addMessage(userMessage, "user");
 
     if (isReportRequest(userMessage)) {
@@ -199,12 +220,25 @@ export function AanInput() {
     setTimeout(() => setShowSuggestion(false), 200);
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const newFiles: AttachedFile[] = Array.from(files).map(f => ({ name: f.name, size: f.size, type: f.type }));
+    setAttachedFiles(prev => [...prev, ...newFiles]);
+    e.target.value = "";
+  };
+
+  const removeFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const currentModel = AI_MODELS.find(m => m.id === selectedModel) || AI_MODELS[0];
+
   return (
     <div className="shrink-0 bg-background">
       <div className="px-4 pb-4 pt-2">
-        {/* Input container with suggestion notch */}
         <div className="relative">
-          {/* Prompt suggestion notch — emerges from textbox */}
+          {/* Prompt suggestion notch */}
           {showSuggestion && (
             <div
               className={cn(
@@ -215,25 +249,18 @@ export function AanInput() {
               )}
             >
               <div className="mx-0 flex overflow-hidden rounded-t-lg border border-b-0 border-border bg-card/90 backdrop-blur-sm shadow-sm">
-                {/* Gradient accent bar */}
                 <div className="w-[3px] shrink-0 bg-gradient-to-b from-primary to-accent" />
                 <div className="flex items-center gap-2.5 px-3 py-2.5 flex-1 min-w-0">
                   <div className="flex items-center justify-center h-6 w-6 rounded-md bg-primary/10 shrink-0">
                     <Sparkles className="h-3.5 w-3.5 text-primary" />
                   </div>
-                  <button
-                    onClick={handleSuggestionClick}
-                    className="flex-1 text-left min-w-0 cursor-pointer group"
-                  >
+                  <button onClick={handleSuggestionClick} className="flex-1 text-left min-w-0 cursor-pointer group">
                     <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-0.5">Suggested</span>
                     <span className="block text-xs font-medium text-foreground/80 group-hover:text-foreground transition-colors truncate">
                       {PROMPT_SUGGESTIONS[suggestionIndex]}
                     </span>
                   </button>
-                  <button
-                    onClick={handleDismissSuggestion}
-                    className="p-1 rounded-md hover:bg-muted cursor-pointer transition-colors shrink-0"
-                  >
+                  <button onClick={handleDismissSuggestion} className="p-1 rounded-md hover:bg-muted cursor-pointer transition-colors shrink-0">
                     <X className="h-3 w-3 text-muted-foreground" />
                   </button>
                 </div>
@@ -241,35 +268,57 @@ export function AanInput() {
             </div>
           )}
 
-          {/* Textarea + Send button in same container */}
+          {/* Attached files chips */}
+          {attachedFiles.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {attachedFiles.map((file, i) => (
+                <span key={i} className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2.5 py-1 text-xs text-foreground">
+                  <Paperclip className="h-3 w-3 text-muted-foreground" />
+                  <span className="max-w-[120px] truncate">{file.name}</span>
+                  <span className="text-muted-foreground">{formatFileSize(file.size)}</span>
+                  <button onClick={() => removeFile(i)} className="p-0.5 rounded hover:bg-foreground/10 transition-colors">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Input container */}
           <div className="relative flex items-end gap-0 rounded-lg border border-border bg-card focus-within:border-primary/40 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+            {/* Attachment button */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="shrink-0 p-2.5 pb-3 text-muted-foreground hover:text-foreground transition-colors"
+              title="Attach files"
+            >
+              <Paperclip className="h-4 w-4" />
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*,.pdf,.csv,.xlsx,.xls,.doc,.docx,.txt,.json"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask Aan anything..."
-              className="min-h-[44px] max-h-[120px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pr-12"
+              className="min-h-[44px] max-h-[120px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pr-12 pl-0"
               rows={1}
               disabled={isLoading}
             />
             <div className="absolute right-2 bottom-2">
               {isLoading ? (
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  onClick={handleStop}
-                  className="h-8 w-8 rounded-lg"
-                  title="Stop generation"
-                >
+                <Button size="icon" variant="destructive" onClick={handleStop} className="h-8 w-8 rounded-lg" title="Stop generation">
                   <Square className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <Button
-                  size="icon"
-                  onClick={handleSend}
-                  disabled={!input.trim()}
-                  className="h-8 w-8 rounded-lg bg-gradient-to-r from-primary to-accent hover:opacity-90 disabled:opacity-30"
-                >
+                <Button size="icon" onClick={handleSend} disabled={!input.trim()} className="h-8 w-8 rounded-lg bg-gradient-to-r from-primary to-accent hover:opacity-90 disabled:opacity-30">
                   <Send className="h-3.5 w-3.5" />
                 </Button>
               )}
@@ -277,9 +326,46 @@ export function AanInput() {
           </div>
         </div>
 
-        <p className="mt-1.5 text-[10px] text-muted-foreground text-center">
-          Aan will explain reasoning and create drafts for your approval
-        </p>
+        {/* Model selector + disclaimer */}
+        <div className="mt-2 flex items-center justify-between">
+          <Popover open={modelOpen} onOpenChange={setModelOpen}>
+            <PopoverTrigger asChild>
+              <button className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors">
+                <currentModel.icon className="h-3 w-3" />
+                <span className="font-medium">{currentModel.name}</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="start" side="top" className="w-64 p-1.5">
+              <div className="space-y-0.5">
+                {AI_MODELS.map((model) => {
+                  const Icon = model.icon;
+                  const isSelected = selectedModel === model.id;
+                  return (
+                    <button
+                      key={model.id}
+                      onClick={() => { setSelectedModel(model.id); setModelOpen(false); }}
+                      className={cn(
+                        "w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-left transition-colors",
+                        isSelected ? "bg-primary/10 text-foreground" : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium">{model.name}</div>
+                        <div className="text-[10px] text-muted-foreground">{model.description}</div>
+                      </div>
+                      {isSelected && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+          <p className="text-[10px] text-muted-foreground">
+            Aan creates drafts for your approval
+          </p>
+        </div>
       </div>
     </div>
   );
