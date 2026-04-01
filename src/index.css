@@ -124,13 +124,13 @@
     --accent: 231 100% 87%; /* #B8BEFF - Lilac */
     --accent-foreground: 240 53% 9%;
 
-    --destructive: 0 62% 50%;
+    --destructive: 0 60% 52%; /* Muted red for dark mode */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 45%;
+    --success: 142 50% 42%; /* Muted green for dark mode */
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 38 70% 50%; /* Muted amber for dark mode */
     --warning-foreground: 0 0% 100%;
 
     --border: 235 30% 20%;

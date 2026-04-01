@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { Sparkles, RefreshCw, Download, Camera, Lightbulb, GripVertical } from "lucide-react";
+import { Sparkles, RefreshCw, Download, Camera, Lightbulb, GripVertical, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAan } from "@/components/aan";
@@ -13,6 +13,8 @@ interface ActionItem {
   label: string;
   onClick: () => void;
   highlight?: boolean;
+  badge?: number;
+  alwaysShowLabel?: boolean;
 }
 
 const hiddenRoutes = ["/login", "/onboarding", "/settings"];
@@ -23,6 +25,7 @@ export function FloatingActionIsland() {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
+  const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const location = useLocation();
   const { openPanel } = useAan();
   const { openPanel: openInsights, criticalCount } = useInsights();
@@ -50,9 +53,24 @@ export function FloatingActionIsland() {
   const shouldHide = hiddenRoutes.some((route) => location.pathname.startsWith(route));
   if (shouldHide) return null;
 
+  const handleMouseEnter = () => {
+    if (collapseTimer.current) {
+      clearTimeout(collapseTimer.current);
+      collapseTimer.current = null;
+    }
+    setIsExpanded(true);
+  };
+
+  const handleMouseLeave = () => {
+    collapseTimer.current = setTimeout(() => {
+      setIsExpanded(false);
+    }, 300);
+  };
+
   const actions: ActionItem[] = [
-    { icon: Sparkles, label: "Ask Aan", onClick: () => openPanel() },
-    { icon: Lightbulb, label: criticalCount > 0 ? `Insights (${criticalCount})` : "Insights", onClick: openInsights, highlight: criticalCount > 0 },
+    { icon: Sparkles, label: "Ask Aan", onClick: () => openPanel(), alwaysShowLabel: true },
+    { icon: Bell, label: criticalCount > 0 ? `Alerts (${criticalCount})` : "Alerts", onClick: openInsights, highlight: criticalCount > 0, badge: criticalCount > 0 ? criticalCount : undefined },
+    { icon: Lightbulb, label: "Insights", onClick: openInsights },
     { icon: RefreshCw, label: "Refresh", onClick: () => toast.info("Refreshing data...") },
     { icon: Download, label: "Export", onClick: () => toast.success("Export started") },
   ];
@@ -79,42 +97,72 @@ export function FloatingActionIsland() {
 
   return (
     <div
-      data-island
-      className={cn(
-        "fixed z-50 bg-card/95 backdrop-blur-md border border-border rounded-full transition-all duration-300 ease-out",
-        isExpanded ? "px-2 py-2" : "px-4 py-2",
-        isDragging && "cursor-grabbing"
-      )}
+      className="fixed z-50"
       style={style}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <div className="flex items-center gap-2">
-        <button
-          onMouseDown={handleDragStart}
-          className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-grab active:cursor-grabbing"
-          title="Drag to reposition"
+      {/* Invisible expanded hit area */}
+      <div className={cn("relative", isExpanded ? "p-4 -m-4" : "")}>
+        <div
+          data-island
+          className={cn(
+            "bg-card/95 backdrop-blur-md border-2 border-border rounded-full shadow-lg transition-all duration-300 ease-out",
+            isExpanded ? "px-2 py-2" : "px-3 py-2",
+            isDragging && "cursor-grabbing"
+          )}
         >
-          <GripVertical className="h-4 w-4" />
-        </button>
-        <div className="h-6 w-px bg-border" />
-        <div className="flex items-center gap-1">
-          {actions.map((action, index) => (
-            <Button key={index} variant="ghost" size="sm" onClick={action.onClick} className={cn("rounded-full transition-all duration-200", isExpanded ? "px-3 gap-2" : "px-2", action.highlight && "text-destructive")}>
-              <action.icon className="h-4 w-4 shrink-0" />
-              {isExpanded && <span className="text-sm whitespace-nowrap animate-in fade-in duration-200">{action.label}</span>}
-            </Button>
-          ))}
-          <Button variant="ghost" size="sm" onClick={takeScreenshot} disabled={isCapturing} className={cn("rounded-full transition-all duration-200", isExpanded ? "px-3 gap-2" : "px-2")}>
-            <Camera className={cn("h-4 w-4 shrink-0", isCapturing && "animate-pulse")} />
-            {isExpanded && <span className="text-sm whitespace-nowrap animate-in fade-in duration-200">{isCapturing ? "Capturing..." : "Screenshot"}</span>}
-          </Button>
-        </div>
-        {isExpanded && (
-          <div className="pl-2 border-l border-border">
-            <span className="text-xs text-muted-foreground"><kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">⌘K</kbd></span>
+          <div className="flex items-center gap-1.5">
+            <button
+              onMouseDown={handleDragStart}
+              className="h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-grab active:cursor-grabbing shrink-0"
+              title="Drag to reposition"
+            >
+              <GripVertical className="h-3.5 w-3.5" />
+            </button>
+            <div className="h-5 w-px bg-border" />
+            <div className="flex items-center gap-0.5">
+              {actions.map((action, index) => (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  size="sm"
+                  onClick={action.onClick}
+                  className={cn(
+                    "rounded-full transition-all duration-200 relative h-8",
+                    (isExpanded || action.alwaysShowLabel) ? "px-3 gap-1.5" : "px-2",
+                    action.highlight && "text-destructive"
+                  )}
+                >
+                  <action.icon className="h-3.5 w-3.5 shrink-0" />
+                  {(isExpanded || action.alwaysShowLabel) && (
+                    <span className="text-xs whitespace-nowrap animate-in fade-in duration-200">{action.label}</span>
+                  )}
+                  {action.badge && action.badge > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
+                      {action.badge}
+                    </span>
+                  )}
+                </Button>
+              ))}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={takeScreenshot}
+                disabled={isCapturing}
+                className={cn("rounded-full transition-all duration-200 h-8", isExpanded ? "px-3 gap-1.5" : "px-2")}
+              >
+                <Camera className={cn("h-3.5 w-3.5 shrink-0", isCapturing && "animate-pulse")} />
+                {isExpanded && <span className="text-xs whitespace-nowrap animate-in fade-in duration-200">{isCapturing ? "Capturing..." : "Screenshot"}</span>}
+              </Button>
+            </div>
+            {isExpanded && (
+              <div className="pl-1.5 border-l border-border">
+                <span className="text-xs text-muted-foreground"><kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">⌘K</kbd></span>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
