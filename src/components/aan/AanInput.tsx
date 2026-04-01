@@ -362,8 +362,8 @@ export function AanInput() {
               </div>
             </PopoverContent>
           </Popover>
-          <p className="text-[10px] text-muted-foreground">
-            Aan can make mistakes. Check important info.
+          <p className="text-[10px] text-muted-foreground font-thin mx-0">
+            Aan can make mistakes.
           </p>
         </div>
       </div>
