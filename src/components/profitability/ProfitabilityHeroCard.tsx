@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import {
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  AreaChart, Area, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import {
@@ -14,7 +14,7 @@ import { MorphingNumber } from "@/features/creative/MorphingNumber";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { format, subDays, subMonths, startOfMonth, endOfMonth } from "date-fns";
+import { format, subDays, subMonths } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface ProfitabilityHeroCardProps {
@@ -49,18 +49,6 @@ function DeltaIndicator({ value, trend, className }: { value: number; trend: str
   );
 }
 
-function MiniSparkline({ data, dataKey, color }: { data: TrendDataPoint[]; dataKey: string; color: string }) {
-  return (
-    <div className="h-8 w-20">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
-          <Area type="monotone" dataKey={dataKey} stroke={color} fill={color} fillOpacity={0.15} strokeWidth={1.5} dot={false} />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
-
 interface KPITileProps {
   label: string;
   value: number;
@@ -91,18 +79,76 @@ function KPITile({ label, value, prev, format: fmt, icon: Icon, highlight, forma
   );
 }
 
+/* ── Per-Card Date Picker (inline in card header) ── */
+function CardDatePicker({
+  frequency,
+  date,
+  onDateChange,
+}: {
+  frequency: "daily" | "monthly";
+  date: Date;
+  onDateChange: (d: Date) => void;
+}) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground">
+          <CalendarIcon className="h-3 w-3" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        {frequency === "daily" ? (
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(d) => d && onDateChange(d)}
+            className="p-3 pointer-events-auto"
+          />
+        ) : (
+          <div className="p-4 space-y-3">
+            <p className="text-xs font-medium text-muted-foreground">Select Month</p>
+            <div className="grid grid-cols-3 gap-2">
+              {Array.from({ length: 12 }, (_, i) => {
+                const isSelected = i === date.getMonth();
+                return (
+                  <button
+                    key={i}
+                    onClick={() => onDateChange(new Date(date.getFullYear(), i, 1))}
+                    className={cn(
+                      "px-3 py-2 text-xs rounded-md transition-colors",
+                      isSelected ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground"
+                    )}
+                  >
+                    {format(new Date(2024, i, 1), "MMM")}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 function PeriodCard({
   summary,
   label,
   compareTo,
   trendData,
   formatCurrency,
+  frequency,
+  date,
+  onDateChange,
 }: {
   summary: ProfitabilitySummary;
   label: string;
   compareTo: ProfitabilitySummary;
   trendData: TrendDataPoint[];
   formatCurrency: (v: number) => string;
+  frequency: "daily" | "monthly";
+  date: Date;
+  onDateChange: (d: Date) => void;
 }) {
   const profitMargin = summary.gmv > 0 ? (summary.netProfit / summary.gmv) * 100 : 0;
 
@@ -116,13 +162,16 @@ function PeriodCard({
   ];
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+    <div className="rounded-lg border border-border bg-card p-4 space-y-3 min-w-0">
       <div className="flex items-center justify-between">
-        <div>
-          <h4 className="text-sm font-semibold text-foreground">{label}</h4>
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5">
+            <h4 className="text-sm font-semibold text-foreground truncate">{label}</h4>
+            <CardDatePicker frequency={frequency} date={date} onDateChange={onDateChange} />
+          </div>
           <p className="text-[11px] text-muted-foreground">{summary.dateRange}</p>
         </div>
-        <div className="text-right">
+        <div className="text-right shrink-0">
           <div className="text-lg font-semibold text-foreground">{formatCurrency(summary.netProfit)}</div>
           <div className="flex items-center justify-end gap-1">
             <span className="text-[11px] text-muted-foreground">Margin:</span>
@@ -142,28 +191,25 @@ function PeriodCard({
 }
 
 function ComparisonChart({
-  data1,
-  data2,
-  label1,
-  label2,
+  datasets,
 }: {
-  data1: TrendDataPoint[];
-  data2: TrendDataPoint[];
-  label1: string;
-  label2: string;
+  datasets: { data: TrendDataPoint[]; label: string; color: string }[];
 }) {
-  const combined = data1.map((d, i) => ({
-    label: d.week,
-    [label1 + " Orders"]: d.orders,
-    [label1 + " Units"]: d.units,
-    [label2 + " Orders"]: data2[i]?.orders ?? 0,
-    [label2 + " Units"]: data2[i]?.units ?? 0,
-  }));
+  const maxLen = Math.max(...datasets.map(d => d.data.length));
+  const combined = Array.from({ length: maxLen }, (_, i) => {
+    const row: Record<string, any> = { label: datasets[0]?.data[i]?.week ?? `W${i + 1}` };
+    datasets.forEach(ds => {
+      row[ds.label + " Orders"] = ds.data[i]?.orders ?? 0;
+    });
+    return row;
+  });
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 flex flex-col h-full">
+    <div className="rounded-lg border border-border bg-card p-4 flex flex-col h-full min-w-0">
       <h4 className="text-sm font-semibold text-foreground mb-1">Comparison</h4>
-      <p className="text-[11px] text-muted-foreground mb-3">{label1} vs {label2}</p>
+      <p className="text-[11px] text-muted-foreground mb-3">
+        {datasets.map(d => d.label).join(" vs ")}
+      </p>
       <div className="flex-1 min-h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={combined} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
@@ -171,8 +217,18 @@ function ComparisonChart({
             <XAxis dataKey="label" tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
             <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
             <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }} />
-            <Area type="monotone" dataKey={label1 + " Orders"} stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.15} strokeWidth={2} />
-            <Area type="monotone" dataKey={label2 + " Orders"} stroke="hsl(var(--chart-2))" fill="hsl(var(--chart-2))" fillOpacity={0.15} strokeWidth={2} strokeDasharray="5 3" />
+            {datasets.map((ds, i) => (
+              <Area
+                key={ds.label}
+                type="monotone"
+                dataKey={ds.label + " Orders"}
+                stroke={ds.color}
+                fill={ds.color}
+                fillOpacity={0.1}
+                strokeWidth={2}
+                strokeDasharray={i > 0 ? "5 3" : undefined}
+              />
+            ))}
             <Legend wrapperStyle={{ fontSize: "11px" }} />
           </AreaChart>
         </ResponsiveContainer>
@@ -186,22 +242,32 @@ export function ProfitabilityHeroCard({
 }: ProfitabilityHeroCardProps) {
   const { formatCurrency } = useCurrency();
   const [frequency, setFrequency] = useState<"daily" | "monthly">("daily");
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
   const [activeView, setActiveView] = useState<"overview" | "breakdown" | "efficiency">("overview");
 
-  // Map frequency to period keys
-  const periodPair = frequency === "daily"
-    ? { primary: "today", secondary: "yesterday" }
-    : { primary: "this_month", secondary: "last_month" };
+  // Per-card dates
+  const [card1Date, setCard1Date] = useState<Date>(new Date());
+  const [card2Date, setCard2Date] = useState<Date>(() => subDays(new Date(), 1));
+  const [card3Date, setCard3Date] = useState<Date>(() => subDays(new Date(), 2));
 
-  const primarySummary = summaries.find(s => s.period === periodPair.primary) || summaries[0];
-  const secondarySummary = summaries.find(s => s.period === periodPair.secondary) || summaries[1];
-  const primaryTrend = trendDataByPeriod[periodPair.primary] || trendDataByPeriod.this_month;
-  const secondaryTrend = trendDataByPeriod[periodPair.secondary] || trendDataByPeriod.last_month;
+  // Period keys mapping
+  const periodKeys = frequency === "daily"
+    ? ["today", "yesterday", "this_month"]
+    : ["this_month", "last_month", "yesterday"];
 
-  const primaryLabel = frequency === "daily" ? format(selectedDate, "MMM dd, yyyy") : format(selectedMonth, "MMMM yyyy");
-  const secondaryLabel = frequency === "daily" ? format(subDays(selectedDate, 1), "MMM dd, yyyy") : format(subMonths(selectedMonth, 1), "MMMM yyyy");
+  const card1Summary = summaries.find(s => s.period === periodKeys[0]) || summaries[0];
+  const card2Summary = summaries.find(s => s.period === periodKeys[1]) || summaries[1];
+  const card3Summary = summaries.find(s => s.period === periodKeys[2]) || summaries[2] || summaries[0];
+
+  const card1Trend = trendDataByPeriod[periodKeys[0]] || trendDataByPeriod.this_month;
+  const card2Trend = trendDataByPeriod[periodKeys[1]] || trendDataByPeriod.last_month;
+  const card3Trend = trendDataByPeriod[periodKeys[2]] || trendDataByPeriod.this_month;
+
+  const card1Label = frequency === "daily" ? format(card1Date, "MMM dd, yyyy") : format(card1Date, "MMMM yyyy");
+  const card2Label = frequency === "daily" ? format(card2Date, "MMM dd, yyyy") : format(card2Date, "MMMM yyyy");
+  const card3Label = frequency === "daily" ? format(card3Date, "MMM dd, yyyy") : format(card3Date, "MMMM yyyy");
+
+  const primarySummary = card1Summary;
+  const secondarySummary = card2Summary;
 
   const profitMargin = primarySummary.gmv > 0 ? (primarySummary.netProfit / primarySummary.gmv) * 100 : 0;
   const prevMargin = secondarySummary.gmv > 0 ? (secondarySummary.netProfit / secondarySummary.gmv) * 100 : 0;
@@ -230,7 +296,12 @@ export function ProfitabilityHeroCard({
           {/* Frequency toggle */}
           <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5">
             <button
-              onClick={() => setFrequency("daily")}
+              onClick={() => {
+                setFrequency("daily");
+                setCard1Date(new Date());
+                setCard2Date(subDays(new Date(), 1));
+                setCard3Date(subDays(new Date(), 2));
+              }}
               className={cn(
                 "px-3 py-1.5 text-xs font-medium rounded-md transition-all",
                 frequency === "daily" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
@@ -239,7 +310,12 @@ export function ProfitabilityHeroCard({
               Daily
             </button>
             <button
-              onClick={() => setFrequency("monthly")}
+              onClick={() => {
+                setFrequency("monthly");
+                setCard1Date(new Date());
+                setCard2Date(subMonths(new Date(), 1));
+                setCard3Date(subMonths(new Date(), 2));
+              }}
               className={cn(
                 "px-3 py-1.5 text-xs font-medium rounded-md transition-all",
                 frequency === "monthly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
@@ -248,48 +324,6 @@ export function ProfitabilityHeroCard({
               Monthly
             </button>
           </div>
-
-          {/* Date/Month Picker */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-                <CalendarIcon className="h-3 w-3" />
-                {frequency === "daily" ? format(selectedDate, "MMM dd, yyyy") : format(selectedMonth, "MMMM yyyy")}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              {frequency === "daily" ? (
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(d) => d && setSelectedDate(d)}
-                  className="p-3 pointer-events-auto"
-                />
-              ) : (
-                <div className="p-4 space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground">Select Month</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {Array.from({ length: 12 }, (_, i) => {
-                      const d = new Date(selectedMonth.getFullYear(), i, 1);
-                      const isSelected = d.getMonth() === selectedMonth.getMonth();
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => setSelectedMonth(d)}
-                          className={cn(
-                            "px-3 py-2 text-xs rounded-md transition-colors",
-                            isSelected ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground"
-                          )}
-                        >
-                          {format(d, "MMM")}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </PopoverContent>
-          </Popover>
         </div>
 
         <div className="flex items-center gap-3">
@@ -319,26 +353,43 @@ export function ProfitabilityHeroCard({
       {/* Body */}
       <div className="p-4">
         {activeView === "overview" && (
-          <div className="grid grid-cols-3 gap-4 overflow-hidden">
+          <div className="grid grid-cols-4 gap-4 overflow-hidden">
             <PeriodCard
-              summary={primarySummary}
-              label={primaryLabel}
-              compareTo={secondarySummary}
-              trendData={primaryTrend}
+              summary={card1Summary}
+              label={card1Label}
+              compareTo={card2Summary}
+              trendData={card1Trend}
               formatCurrency={formatCurrency}
+              frequency={frequency}
+              date={card1Date}
+              onDateChange={setCard1Date}
             />
             <PeriodCard
-              summary={secondarySummary}
-              label={secondaryLabel}
-              compareTo={primarySummary}
-              trendData={secondaryTrend}
+              summary={card2Summary}
+              label={card2Label}
+              compareTo={card1Summary}
+              trendData={card2Trend}
               formatCurrency={formatCurrency}
+              frequency={frequency}
+              date={card2Date}
+              onDateChange={setCard2Date}
+            />
+            <PeriodCard
+              summary={card3Summary}
+              label={card3Label}
+              compareTo={card1Summary}
+              trendData={card3Trend}
+              formatCurrency={formatCurrency}
+              frequency={frequency}
+              date={card3Date}
+              onDateChange={setCard3Date}
             />
             <ComparisonChart
-              data1={primaryTrend}
-              data2={secondaryTrend}
-              label1={frequency === "daily" ? "Today" : "This Month"}
-              label2={frequency === "daily" ? "Yesterday" : "Last Month"}
+              datasets={[
+                { data: card1Trend, label: card1Label, color: "hsl(var(--primary))" },
+                { data: card2Trend, label: card2Label, color: "hsl(var(--chart-2))" },
+                { data: card3Trend, label: card3Label, color: "hsl(var(--chart-3))" },
+              ]}
             />
           </div>
         )}

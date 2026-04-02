@@ -1,8 +1,10 @@
 import { useState, useEffect, ReactNode } from "react";
-import { CalendarIcon, Play } from "lucide-react";
+import { CalendarIcon, Play, Sparkles, Bell, Lightbulb } from "lucide-react";
 import { format, subDays, startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useFilter } from "@/contexts/FilterContext";
+import { useVisualEffects } from "@/contexts/VisualEffectsContext";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -67,6 +69,9 @@ interface AppTaskbarProps {
 
 export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, showRunButton = false, onRun, children }: AppTaskbarProps) {
   const { adType, setAdType, frequency, setFrequency, dateRange, setDateRange } = useFilter();
+  const { effects } = useVisualEffects();
+  const { setAiPanel, setDataPanel } = useActivePanel();
+  const islandOff = !effects.floatingIsland;
 
   const [draftRange, setDraftRange] = useState<{ from: Date; to: Date }>(dateRange);
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
@@ -209,6 +214,36 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
           </Button>
         )}
       </div>
+
+      {/* Fallback controls when floating island is off */}
+      {islandOff && (
+        <div className="flex items-center gap-1 ml-auto">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setAiPanel("copilot")}>
+                <Sparkles className="h-4 w-4 text-primary" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Ask Aan</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setDataPanel("notifications")}>
+                <Bell className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Notifications</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setDataPanel("insights")}>
+                <Lightbulb className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Insights</TooltipContent>
+          </Tooltip>
+        </div>
+      )}
     </div>
   );
 }
