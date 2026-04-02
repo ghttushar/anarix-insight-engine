@@ -214,6 +214,36 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
           </Button>
         )}
       </div>
+
+      {/* Fallback controls when floating island is off */}
+      {islandOff && (
+        <div className="flex items-center gap-1 ml-auto">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setAiPanel("copilot")}>
+                <Sparkles className="h-4 w-4 text-primary" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Ask Aan</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setDataPanel("notifications")}>
+                <Bell className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Notifications</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setDataPanel("insights")}>
+                <Lightbulb className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Insights</TooltipContent>
+          </Tooltip>
+        </div>
+      )}
     </div>
   );
 }
