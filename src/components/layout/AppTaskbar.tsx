@@ -69,6 +69,9 @@ interface AppTaskbarProps {
 
 export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, showRunButton = false, onRun, children }: AppTaskbarProps) {
   const { adType, setAdType, frequency, setFrequency, dateRange, setDateRange } = useFilter();
+  const { effects } = useVisualEffects();
+  const { setAiPanel, setDataPanel } = useActivePanel();
+  const islandOff = !effects.floatingIsland;
 
   const [draftRange, setDraftRange] = useState<{ from: Date; to: Date }>(dateRange);
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
