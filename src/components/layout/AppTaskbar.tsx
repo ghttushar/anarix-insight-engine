@@ -1,8 +1,10 @@
 import { useState, useEffect, ReactNode } from "react";
-import { CalendarIcon, Play } from "lucide-react";
+import { CalendarIcon, Play, Sparkles, Bell, Lightbulb } from "lucide-react";
 import { format, subDays, startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useFilter } from "@/contexts/FilterContext";
+import { useVisualEffects } from "@/contexts/VisualEffectsContext";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
