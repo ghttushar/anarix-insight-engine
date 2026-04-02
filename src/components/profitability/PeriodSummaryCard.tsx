@@ -1,15 +1,25 @@
-import { ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { ChevronRight, CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProfitabilitySummary } from "@/types/profitability";
 import { MorphingNumber } from "@/features/creative/MorphingNumber";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 
 interface PeriodSummaryCardProps {
   summary: ProfitabilitySummary;
   accentColor?: string;
   onViewMore?: (summary: ProfitabilitySummary) => void;
+  frequency?: "daily" | "monthly";
+  onDateChange?: (date: Date) => void;
 }
 
-export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))", onViewMore }: PeriodSummaryCardProps) {
+export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))", onViewMore, frequency = "daily", onDateChange }: PeriodSummaryCardProps) {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+
   const metrics = [
     { label: "GMV", value: summary.gmv, format: "currency" as const },
     { label: "Auth Sales", value: summary.authSales, format: "currency" as const },
@@ -17,6 +27,18 @@ export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))"
     { label: "Ad Cost", value: summary.adCost, format: "currency" as const },
     { label: "Net Profit", value: summary.netProfit, format: "currency" as const, highlight: true },
   ];
+
+  const handleDateSelect = (d: Date | undefined) => {
+    if (!d) return;
+    setSelectedDate(d);
+    onDateChange?.(d);
+  };
+
+  const handleMonthSelect = (monthIndex: number) => {
+    const d = new Date(selectedMonth.getFullYear(), monthIndex, 1);
+    setSelectedMonth(d);
+    onDateChange?.(d);
+  };
 
   return (
     <div
@@ -32,7 +54,47 @@ export function PeriodSummaryCard({ summary, accentColor = "hsl(var(--primary))"
       />
 
       <div className="min-w-[120px] pl-3">
-        <div className="font-medium text-foreground">{summary.dateLabel}</div>
+        <div className="flex items-center gap-1.5">
+          <div className="font-medium text-foreground">{summary.dateLabel}</div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground">
+                <CalendarIcon className="h-3 w-3" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              {frequency === "daily" ? (
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={handleDateSelect}
+                  className="p-3 pointer-events-auto"
+                />
+              ) : (
+                <div className="p-4 space-y-3">
+                  <p className="text-xs font-medium text-muted-foreground">Select Month</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const isSelected = i === selectedMonth.getMonth();
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => handleMonthSelect(i)}
+                          className={cn(
+                            "px-3 py-2 text-xs rounded-md transition-colors",
+                            isSelected ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground"
+                          )}
+                        >
+                          {format(new Date(2024, i, 1), "MMM")}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+        </div>
         <div className="text-xs text-muted-foreground">{summary.dateRange}</div>
       </div>
 
