@@ -15,6 +15,7 @@ import { Plus, Copy, Trash2, ChevronDown, ChevronRight, Info, Home, ArrowRight, 
 import { ruleTemplates, metricOptions, operatorOptions, actionOptions, lookbackOptions, frequencyOptions, type RuleCriteria, type RuleCondition } from "@/data/mockRules";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 function generateId() {
   return Math.random().toString(36).slice(2, 9);
@@ -34,6 +35,11 @@ function createCriteria(priority: number): RuleCriteria {
   };
 }
 
+
+const breadcrumbItems = [
+  { label: "Rules", href: "/advertising/rules/create" },
+  { label: "Rule Creation" },
+];
 export default function RuleCreation() {
   const navigate = useNavigate();
   const { templateId, ruleId } = useParams();
@@ -235,7 +241,9 @@ export default function RuleCreation() {
           </Button>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }
 

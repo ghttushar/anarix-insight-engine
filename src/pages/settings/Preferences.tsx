@@ -13,6 +13,7 @@ import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import { cn } from "@/lib/utils";
 import { Pencil, RotateCcw, Globe, Palette } from "lucide-react";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const CUSTOM_SHORTCUTS_KEY = "anarix-custom-shortcuts";
 
@@ -141,6 +142,11 @@ function ShortcutRow({ shortcut, customKeys, onEdit, isEditing, onCaptured }: {
   );
 }
 
+
+const breadcrumbItems = [
+  { label: "Settings", href: "/settings/appearance" },
+  { label: "Preferences" },
+];
 export default function Preferences() {
   const { density, setDensity } = useDensity();
   const { displayCurrency, setDisplayCurrency, exchangeRate, lastUpdated } = useCurrency();
@@ -433,6 +439,8 @@ export default function Preferences() {
           </div>
         </section>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

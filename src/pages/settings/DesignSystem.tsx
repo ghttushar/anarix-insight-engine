@@ -20,6 +20,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
+
+const breadcrumbItems = [
+  { label: "Settings", href: "/settings/design-system" },
+  { label: "Design System" },
+];
 export default function DesignSystem() {
   return (
     <AppLayout>
@@ -1138,6 +1143,7 @@ import { Label } from "@/components/ui/label";
           <CodeBlock code={`// Typical page structure
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 export default function MyPage() {
   return (
@@ -1150,7 +1156,9 @@ export default function MyPage() {
       <div className="p-6 space-y-6">
         {/* Page content */}
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }`} />
 

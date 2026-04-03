@@ -11,9 +11,15 @@ import { cn } from "@/lib/utils";
 import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const isMarginRow = (label: string) => label.toLowerCase().includes("margin");
 
+
+const breadcrumbItems = [
+  { label: "Profitability", href: "/profitability/unified-pnl" },
+  { label: "Unified P&L" },
+];
 export default function UnifiedPnL() {
   const { formatCurrency } = useCurrency();
   const netProfit = mockUnifiedPnL.find((r) => r.label === "Net Profit");
@@ -88,6 +94,8 @@ export default function UnifiedPnL() {
           </Table>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

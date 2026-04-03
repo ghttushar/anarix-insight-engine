@@ -10,6 +10,7 @@ import { mockAnomalyAlerts, type AnomalyAlert } from "@/data/mockAnomalyAlerts";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const severityStyles: Record<string, string> = {
   critical: "border-l-destructive bg-destructive/5",
@@ -23,6 +24,11 @@ const severityBadge: Record<string, string> = {
   info: "bg-primary/10 text-primary border-primary/20",
 };
 
+
+const breadcrumbItems = [
+  { label: "Advertising", href: "/advertising/anomaly-alerts" },
+  { label: "Anomaly Alerts" },
+];
 export default function AnomalyAlerts() {
   const [alerts, setAlerts] = useState(mockAnomalyAlerts);
   const [showAcknowledged, setShowAcknowledged] = useState(false);
@@ -95,7 +101,9 @@ export default function AnomalyAlerts() {
           )}
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }
 

@@ -14,7 +14,13 @@ import { DayPartingSchedule } from "@/types/dayparting";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useFilter } from "@/contexts/FilterContext";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
+
+const breadcrumbItems = [
+  { label: "Day Parting", href: "/dayparting/scheduled" },
+  { label: "Scheduled Jobs" },
+];
 export default function ScheduledJobs() {
   const { adType, setAdType } = useFilter();
   const { setDataPanel } = useActivePanel();
@@ -125,6 +131,8 @@ export default function ScheduledJobs() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

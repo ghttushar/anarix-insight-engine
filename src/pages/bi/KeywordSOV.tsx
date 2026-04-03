@@ -10,7 +10,13 @@ import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
+
+const breadcrumbItems = [
+  { label: "Business Intelligence", href: "/bi/keyword-sov" },
+  { label: "Keyword SOV" },
+];
 export default function KeywordSOV() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeltas, setShowDeltas] = useState(false);
@@ -90,6 +96,8 @@ export default function KeywordSOV() {
           <TablePagination page={page} pageSize={pageSize} totalItems={filteredKeywords.length} onPageChange={setPage} onPageSizeChange={setPageSize} />
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

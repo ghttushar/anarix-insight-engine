@@ -23,6 +23,7 @@ import {
   mockImpactKeywords,
   mockImpactSearchTerms,
 } from "@/data/mockImpactData";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 type ImpactTab = "campaigns" | "ad-groups" | "products" | "keywords" | "search-terms";
 
@@ -50,6 +51,11 @@ const SORTABLE_FIELDS = [
   { id: "roas", label: "ROAS" },
 ];
 
+
+const breadcrumbItems = [
+  { label: "Advertising", href: "/advertising/impact" },
+  { label: "Impact Analysis" },
+];
 export default function ImpactAnalysis() {
   const { adType, setAdType } = useFilter();
   const [activeTab, setActiveTab] = useState<ImpactTab>("campaigns");
@@ -167,6 +173,8 @@ export default function ImpactAnalysis() {
 
         <ImpactTable data={data} searchQuery={searchQuery} showType={showType} />
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

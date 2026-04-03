@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 type TabValue = "product-ads" | "keywords" | "search-terms";
 
@@ -28,6 +29,11 @@ const tabs = [
   { value: "search-terms", label: "Search Terms" },
 ];
 
+
+const breadcrumbItems = [
+  { label: "Advertising", href: "/advertising/campaigns" },
+  { label: "Ad Group Detail" },
+];
 export default function AdGroupDetail() {
   const { campaignId, adGroupId } = useParams();
   const navigate = useNavigate();
@@ -127,6 +133,8 @@ export default function AdGroupDetail() {
         {renderTable()}
       </div>
       <AddProductAdsModal open={addProductAdOpen} onOpenChange={setAddProductAdOpen} />
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

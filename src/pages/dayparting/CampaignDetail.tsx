@@ -10,6 +10,7 @@ import { dayPartingCampaigns, schedules, calculateHourlySummary } from "@/data/m
 import { cn } from "@/lib/utils";
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 function HourlyPerformanceChart({ data }: { data: { hour: string; roas: number; spend: number }[] }) {
   const [chartType, setChartType] = useState<ChartType>("line");
@@ -79,6 +80,11 @@ function HourlyPerformanceChart({ data }: { data: { hour: string; roas: number; 
   );
 }
 
+
+const breadcrumbItems = [
+  { label: "Day Parting", href: "/dayparting/campaigns" },
+  { label: "Campaign Detail" },
+];
 export default function CampaignDetail() {
   const { campaignId } = useParams();
   const navigate = useNavigate();
@@ -174,6 +180,8 @@ export default function CampaignDetail() {
           </Card>
         )}
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

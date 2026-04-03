@@ -9,6 +9,7 @@ import { TrendingUp, TrendingDown, Minus, RefreshCw } from "lucide-react";
 import { mockHealthScore, type HealthDimension } from "@/data/mockHealthScore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const statusColors: Record<string, string> = {
   good: "text-success",
@@ -28,6 +29,11 @@ const getScoreColor = (score: number) => {
   return "text-destructive";
 };
 
+
+const breadcrumbItems = [
+  { label: "Workspace", href: "/workspace/health-score" },
+  { label: "Health Score" },
+];
 export default function HealthScore() {
   const { compositeScore, previousScore, trend, dimensions } = mockHealthScore;
   const delta = compositeScore - previousScore;
@@ -99,7 +105,9 @@ export default function HealthScore() {
           </div>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }
 

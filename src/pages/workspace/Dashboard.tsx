@@ -6,6 +6,7 @@ import { AddWidgetModal } from "@/components/workspace/AddWidgetModal";
 import { Button } from "@/components/ui/button";
 import { Plus, RotateCcw, Pencil, FilePlus } from "lucide-react";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 export type WidgetType = "metric" | "chart" | "table" | "annotation" | "task";
 
@@ -51,6 +52,11 @@ function saveDashboards(dashboards: SandboxDashboard[]) {
   window.dispatchEvent(new CustomEvent("sandbox-dashboards-updated"));
 }
 
+
+const breadcrumbItems = [
+  { label: "Workspace", href: "/workspace" },
+  { label: "Dashboard Builder" },
+];
 export default function WorkspaceDashboard() {
   const { dashboardId } = useParams<{ dashboardId: string }>();
   const navigate = useNavigate();
@@ -174,6 +180,8 @@ export default function WorkspaceDashboard() {
         onClose={() => setShowAddModal(false)}
         onAdd={addWidget}
       />
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

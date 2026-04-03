@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { mockAudiences } from "@/data/mockAMC";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const statusColors: Record<string, string> = {
   ready: "bg-success/10 text-success",
@@ -13,6 +14,11 @@ const statusColors: Record<string, string> = {
   expired: "bg-muted text-muted-foreground",
 };
 
+
+const breadcrumbItems = [
+  { label: "AMC", href: "/amc/audiences" },
+  { label: "Audiences" },
+];
 export default function AMCAudiences() {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -62,6 +68,8 @@ export default function AMCAudiences() {
           </Table>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

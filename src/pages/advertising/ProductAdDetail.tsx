@@ -19,7 +19,13 @@ import { Play, Pencil, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
+
+const breadcrumbItems = [
+  { label: "Advertising", href: "/advertising/campaigns" },
+  { label: "Product Ad Detail" },
+];
 export default function ProductAdDetail() {
   const { campaignId, adGroupId, productAdId } = useParams();
   const navigate = useNavigate();
@@ -137,6 +143,8 @@ export default function ProductAdDetail() {
       </div>
 
       <AddProductAdsModal open={addProductAdOpen} onOpenChange={setAddProductAdOpen} />
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

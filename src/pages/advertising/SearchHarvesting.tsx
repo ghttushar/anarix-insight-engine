@@ -10,6 +10,7 @@ import { mockHarvestCandidates, type HarvestCandidate } from "@/data/mockSearchH
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const matchColors: Record<string, string> = {
   exact: "bg-primary/10 text-primary border-primary/20",
@@ -17,6 +18,11 @@ const matchColors: Record<string, string> = {
   broad: "bg-muted text-muted-foreground border-muted",
 };
 
+
+const breadcrumbItems = [
+  { label: "Advertising", href: "/advertising/search-harvesting" },
+  { label: "Search Harvesting" },
+];
 export default function SearchHarvesting() {
   const { formatCurrency } = useCurrency();
   const [candidates, setCandidates] = useState(mockHarvestCandidates);
@@ -127,6 +133,8 @@ export default function SearchHarvesting() {
           )}
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

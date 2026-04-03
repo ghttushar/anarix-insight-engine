@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Eye, EyeOff, Copy, Search } from "lucide-react";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const mockLogs = [
   { id: "l1", timestamp: "2025-12-02 09:15:32", user: "John Smith", action: "Login", module: "Auth", details: "Successful login from 192.168.1.1" },
@@ -30,6 +31,11 @@ const moduleColors: Record<string, string> = {
   System: "bg-success/10 text-success",
 };
 
+
+const breadcrumbItems = [
+  { label: "Settings", href: "/settings/system" },
+  { label: "System" },
+];
 export default function System() {
   const [defaultMarketplace, setDefaultMarketplace] = useState("amazon");
   const [defaultDateRange, setDefaultDateRange] = useState("last30");
@@ -165,6 +171,8 @@ export default function System() {
           </div>
         </section>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

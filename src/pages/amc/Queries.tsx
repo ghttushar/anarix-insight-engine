@@ -14,6 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const statusColors: Record<string, string> = {
   active: "bg-success/10 text-success",
@@ -23,6 +24,11 @@ const statusColors: Record<string, string> = {
 
 type QueryTab = "default" | "custom";
 
+
+const breadcrumbItems = [
+  { label: "AMC", href: "/amc/queries" },
+  { label: "Queries" },
+];
 export default function AMCQueries() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<QueryTab>("default");
@@ -271,6 +277,8 @@ export default function AMCQueries() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

@@ -15,6 +15,7 @@ import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, Cartesia
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 function PriceHistoryChart({ selected }: { selected: CompetitorProduct }) {
   const { formatCurrency } = useCurrency();
@@ -71,6 +72,11 @@ function PriceHistoryChart({ selected }: { selected: CompetitorProduct }) {
   );
 }
 
+
+const breadcrumbItems = [
+  { label: "Business Intelligence", href: "/bi/competitor-pricing" },
+  { label: "Competitor Pricing" },
+];
 export default function CompetitorPricing() {
   const { formatCurrency } = useCurrency();
   const [selected, setSelected] = useState<CompetitorProduct | null>(mockCompetitorProducts[0]);
@@ -191,6 +197,8 @@ export default function CompetitorPricing() {
           <TablePagination page={page} pageSize={pageSize} totalItems={filteredProducts.length} onPageChange={setPage} onPageSizeChange={setPageSize} />
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

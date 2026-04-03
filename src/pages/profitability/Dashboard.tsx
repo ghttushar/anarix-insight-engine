@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { LayoutGrid, Layers } from "lucide-react";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const accentColors = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
@@ -52,6 +53,11 @@ const SORTABLE_FIELDS = [
   { id: "netProfit", label: "Net Profit" },
 ];
 
+
+const breadcrumbItems = [
+  { label: "Profitability", href: "/profitability/dashboard" },
+  { label: "Dashboard" },
+];
 export default function ProfitabilityDashboard() {
   const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
   const [selectedPeriod, setSelectedPeriod] = useState<string>("today");
@@ -263,6 +269,8 @@ export default function ProfitabilityDashboard() {
         isOpen={!!trendsProduct}
         onClose={() => setTrendsProduct(null)}
       />
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

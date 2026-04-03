@@ -11,7 +11,13 @@ import { Plus } from "lucide-react";
 import { trackedKeywords as initialKeywords } from "@/data/mockBrandSOV";
 import { TrackedKeyword } from "@/types/bi";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
+
+const breadcrumbItems = [
+  { label: "Business Intelligence", href: "/bi/keyword-tracker" },
+  { label: "Keyword Tracker" },
+];
 export default function KeywordTracker() {
   const [keywords, setKeywords] = useState<TrackedKeyword[]>(initialKeywords);
   const [searchQuery, setSearchQuery] = useState("");
@@ -75,6 +81,8 @@ export default function KeywordTracker() {
         )}
       </div>
       <AddKeywordModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onAdd={handleAddKeyword} />
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

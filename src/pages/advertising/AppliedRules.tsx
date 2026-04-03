@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Edit, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { appliedRules, type AppliedRule } from "@/data/mockRules";
 import { cn } from "@/lib/utils";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const statusStyles: Record<string, string> = {
   active: "bg-success/10 text-success border-success/20",
@@ -27,6 +28,11 @@ const statusTabs = [
 
 type SortKey = "name" | "ruleType" | "entitiesCount" | "frequency" | "lastRun" | "status";
 
+
+const breadcrumbItems = [
+  { label: "Rules", href: "/advertising/rules/applied" },
+  { label: "Applied Rules" },
+];
 export default function AppliedRules() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -187,6 +193,8 @@ export default function AppliedRules() {
           </div>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

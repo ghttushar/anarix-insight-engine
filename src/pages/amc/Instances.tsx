@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { mockInstances } from "@/data/mockAMC";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const statusColors: Record<string, string> = {
   active: "bg-success/10 text-success",
@@ -13,6 +14,11 @@ const statusColors: Record<string, string> = {
   provisioning: "bg-warning/10 text-warning",
 };
 
+
+const breadcrumbItems = [
+  { label: "AMC", href: "/amc/instances" },
+  { label: "Instances" },
+];
 export default function AMCInstances() {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -62,6 +68,8 @@ export default function AMCInstances() {
           </Table>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

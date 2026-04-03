@@ -48,7 +48,13 @@ import {
   ChevronDown, Eye, EyeOff, BarChart3, FileText, Zap, Store, ArrowRight,
   Check, ArrowUpDown, Sun, Moon, Upload
 } from "lucide-react";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
+
+const breadcrumbItems = [
+  { label: "Settings", href: "/settings/component-library" },
+  { label: "Component Library" },
+];
 export default function ComponentLibrary() {
   const [searchParams] = useSearchParams();
   const theme = searchParams.get('theme') || 'light';
@@ -94,7 +100,9 @@ export default function ComponentLibrary() {
           <ComponentShowcase />
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }
 

@@ -13,7 +13,13 @@ import { Search, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { brands, sovTrendData, sovMetrics } from "@/data/mockBrandSOV";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
+
+const breadcrumbItems = [
+  { label: "Business Intelligence", href: "/bi/brand-sov" },
+  { label: "Brand SOV" },
+];
 export default function BrandSOV() {
   const [keyword, setKeyword] = useState("memory foam mattress");
   const [dateRange, setDateRange] = useState("today");
@@ -89,6 +95,8 @@ export default function BrandSOV() {
           <BrandCoverageTable brands={brands} onViewTrend={(brandId) => console.log("View trend for brand:", brandId)} />
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }
