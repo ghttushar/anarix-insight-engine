@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -40,15 +41,24 @@ import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { TableSkeleton, CardSkeleton, ChartSkeleton, MetricSkeleton } from "@/components/ui/loading-skeletons";
 import { AanLogo } from "@/components/aan/AanLogo";
 import { ArtifactCard } from "@/components/aan/ArtifactCard";
+import { SortableTableHead, usePinning } from "@/components/tables/SortableTableHead";
+import { TablePagination } from "@/components/tables/TablePagination";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { 
   AlertCircle, AlertTriangle, Info, CheckCircle, CheckCircle2, XCircle, Home, 
   Plus, Edit, Trash2, Download, Bold, Italic, Underline, Filter, Columns,
   Calendar as CalendarIcon, User, Mail, X, Settings, Search, Send, Loader2,
   Sparkles, RefreshCw, Camera, Lightbulb, Maximize2, SlidersHorizontal,
   ChevronDown, Eye, EyeOff, BarChart3, FileText, Zap, Store, ArrowRight,
-  Check, ArrowUpDown, Sun, Moon, Upload
+  Check, ArrowUpDown, ArrowUp, ArrowDown, Pin, Sun, Moon, Upload
 } from "lucide-react";
 
+
+const breadcrumbItems = [
+  { label: "Settings", href: "/settings/component-library" },
+  { label: "Component Library" },
+];
 export default function ComponentLibrary() {
   const [searchParams] = useSearchParams();
   const theme = searchParams.get('theme') || 'light';
@@ -94,7 +104,9 @@ export default function ComponentLibrary() {
           <ComponentShowcase />
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }
 
@@ -2670,6 +2682,152 @@ function ComponentShowcase() {
               <Upload className="h-8 w-8 text-primary mb-2" />
               <p className="text-sm text-foreground font-medium">Drop files here</p>
               <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== PIN ICON TABLE HEADER ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Table Header — Pin Icon + Sort</h2>
+        <p className="text-sm text-muted-foreground">Column headers now use a Pin icon (4 states: hidden, hover, active, hover-highlight) instead of radio buttons. Sort arrows are also larger and more visible.</p>
+        
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Pin Icon States</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center gap-6">
+              {/* State 1: Hidden (default) */}
+              <div className="text-center space-y-1">
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />
+                  <span>Column A</span>
+                  <Pin className="h-3.5 w-3.5 opacity-0" />
+                </div>
+                <p className="text-[10px] text-muted-foreground">Default (hidden)</p>
+              </div>
+              {/* State 2: Hover visible */}
+              <div className="text-center space-y-1">
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />
+                  <span>Column B</span>
+                  <Pin className="h-3.5 w-3.5 opacity-40 text-muted-foreground" />
+                </div>
+                <p className="text-[10px] text-muted-foreground">Hover (40% opacity)</p>
+              </div>
+              {/* State 3: Active pinned */}
+              <div className="text-center space-y-1">
+                <div className="flex items-center gap-1.5 text-sm text-foreground">
+                  <ArrowUp className="h-3.5 w-3.5 text-primary" />
+                  <span>Column C</span>
+                  <Pin className="h-3.5 w-3.5 text-primary fill-primary" />
+                </div>
+                <p className="text-[10px] text-muted-foreground">Pinned + Sorted Asc</p>
+              </div>
+              {/* State 4: Sort desc */}
+              <div className="text-center space-y-1">
+                <div className="flex items-center gap-1.5 text-sm text-foreground">
+                  <ArrowDown className="h-3.5 w-3.5 text-primary" />
+                  <span>Column D</span>
+                  <Pin className="h-3.5 w-3.5 opacity-0" />
+                </div>
+                <p className="text-[10px] text-muted-foreground">Sorted Desc (no pin)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== GROUP BY TOOLBAR ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">DataTableToolbar — Group By</h2>
+        <p className="text-sm text-muted-foreground">The "Sort" button is now renamed to "Group By". Same 3-state toggle logic (inactive → asc → desc → inactive) per field.</p>
+        
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Group By Button</Label>
+          <div className="p-4 rounded-lg border border-border bg-card flex items-center gap-3">
+            <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs">
+              <ArrowUpDown className="h-3.5 w-3.5" />
+              Group By
+            </Button>
+            <span className="text-xs text-muted-foreground">→</span>
+            <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs bg-primary/10 text-primary">
+              <ArrowUp className="h-3.5 w-3.5" />
+              Group By
+            </Button>
+            <span className="text-xs text-muted-foreground">(active with asc field)</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== BREADCRUMB SIZES ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Breadcrumb — Updated Size + Footer</h2>
+        <p className="text-sm text-muted-foreground">Breadcrumbs are now text-xs with h-3 w-3 chevrons. A bottom breadcrumb (PageFooterBar) is placed at the end of every page.</p>
+        
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Top Breadcrumb (text-xs)</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <PageBreadcrumb items={[
+              { label: "Profitability", href: "/profitability/dashboard" },
+              { label: "Dashboard" },
+            ]} />
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Bottom Footer Bar</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <PageFooterBar breadcrumbItems={[
+              { label: "Advertising", href: "/advertising/campaigns" },
+              { label: "Campaign Manager" },
+            ]} />
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== PAGINATION LAYOUT ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">TablePagination — Updated Layout</h2>
+        <p className="text-sm text-muted-foreground">Rows per page now sits on the right side adjacent to pagination arrows. Count label on the left.</p>
+        
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">New Layout: [count left] ... [rows-per-page | arrows right]</Label>
+          <div className="rounded-lg border border-border bg-card overflow-hidden">
+            <TablePagination
+              page={2}
+              pageSize={25}
+              totalItems={142}
+              onPageChange={() => {}}
+              onPageSizeChange={() => {}}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== METRIC DROPDOWN BOX ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Day Parting — Metric Dropdown Box</h2>
+        <p className="text-sm text-muted-foreground">Each hero metric box has a dropdown selector to swap the displayed metric independently.</p>
+        
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Metric Box with Dropdown</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="grid grid-cols-3 gap-3 max-w-md">
+              {[
+                { label: "Spend", value: "$12,450.00" },
+                { label: "ROAS", value: "3.42x" },
+                { label: "Orders", value: "1,245" },
+              ].map((item) => (
+                <div key={item.label} className="rounded-md border border-border bg-card px-3 py-2">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[10px] font-medium text-muted-foreground uppercase flex items-center gap-0.5">
+                      {item.label}
+                      <ChevronDown className="h-2.5 w-2.5" />
+                    </span>
+                  </div>
+                  <p className="text-lg font-semibold text-foreground">{item.value}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

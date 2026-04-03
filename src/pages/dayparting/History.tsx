@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { executionHistory } from "@/data/mockDayParting";
 import { toast } from "sonner";
 import { useFilter } from "@/contexts/FilterContext";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const SORTABLE_FIELDS = [
   { id: "executedAt", label: "Execution Time" },
@@ -18,6 +19,11 @@ const SORTABLE_FIELDS = [
   { id: "duration", label: "Duration" },
 ];
 
+
+const breadcrumbItems = [
+  { label: "Day Parting", href: "/dayparting/history" },
+  { label: "History" },
+];
 export default function DayPartingHistory() {
   const { adType, setAdType } = useFilter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -104,6 +110,8 @@ export default function DayPartingHistory() {
           </TabsContent>
         </Tabs>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

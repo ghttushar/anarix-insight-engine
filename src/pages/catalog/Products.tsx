@@ -7,6 +7,7 @@ import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { CatalogProductsTable } from "@/components/catalog/CatalogProductsTable";
 import { catalogProducts } from "@/data/mockCatalog";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const COLUMN_DEFS = [
   { id: "status", label: "Status", visible: true },
@@ -38,6 +39,11 @@ const SORTABLE_FIELDS = [
 
 const FILTER_FIELDS = ["Product Name", "Item ID", "SKU", "Status", "Price", "COGS"];
 
+
+const breadcrumbItems = [
+  { label: "Catalog", href: "/catalog/products" },
+  { label: "Products" },
+];
 export default function CatalogProducts() {
   const [searchQuery, setSearchQuery] = useState("");
   const [columns, setColumns] = useState(COLUMN_DEFS);
@@ -87,6 +93,8 @@ export default function CatalogProducts() {
           sortDirection={sortDirection}
         />
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { useAccounts, ConnectedAccount } from "@/contexts/AccountContext";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 // Walmart logo
 const WalmartLogo = ({ className }: { className?: string }) => (
@@ -129,6 +130,11 @@ function AccountCard({ account, onSync, onRemove }: {
   );
 }
 
+
+const breadcrumbItems = [
+  { label: "Settings", href: "/settings/accounts" },
+  { label: "Accounts" },
+];
 export default function Accounts() {
   const navigate = useNavigate();
   const { accounts, removeAccount, updateAccount } = useAccounts();
@@ -274,6 +280,8 @@ export default function Accounts() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

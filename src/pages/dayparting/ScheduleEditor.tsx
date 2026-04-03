@@ -13,7 +13,13 @@ import { Save, Play, Clock } from "lucide-react";
 import { dayPartingCampaigns, schedules } from "@/data/mockDayParting";
 import { DayPartingSchedule } from "@/types/dayparting";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
+
+const breadcrumbItems = [
+  { label: "Day Parting", href: "/dayparting/scheduled" },
+  { label: "Schedule Editor" },
+];
 export default function ScheduleEditor() {
   const navigate = useNavigate();
   const { scheduleId } = useParams();
@@ -225,6 +231,8 @@ export default function ScheduleEditor() {
           </div>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

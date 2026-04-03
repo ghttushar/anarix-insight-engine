@@ -13,6 +13,7 @@ import { pnlData, profitabilityProducts } from "@/data/mockProfitability";
 import { ProfitabilityProduct } from "@/types/profitability";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },
@@ -37,6 +38,11 @@ const SORTABLE_FIELDS = [
   { id: "netProfit", label: "Net Profit" },
 ];
 
+
+const breadcrumbItems = [
+  { label: "Profitability", href: "/profitability/pnl" },
+  { label: "Profit & Loss" },
+];
 export default function ProfitLoss() {
   const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
   const weeks = ["Week-05", "Week-04", "Week-02", "Week-01"];
@@ -151,6 +157,8 @@ export default function ProfitLoss() {
           <ProductDetailPanel product={detailProduct} isOpen={true} onClose={handleCloseDetail} />
         )}
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

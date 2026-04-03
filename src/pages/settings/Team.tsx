@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { UserPlus, Send } from "lucide-react";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const mockUsers = [
   { id: "u1", name: "John Smith", email: "john@company.com", role: "Admin", status: "active", lastLogin: "2025-12-02 09:15" },
@@ -29,6 +30,11 @@ const userStatusColors: Record<string, string> = { active: "bg-success/10 text-s
 const roleColors: Record<string, string> = { Admin: "bg-primary/10 text-primary", Analyst: "bg-accent/20 text-accent-foreground", Viewer: "bg-muted text-muted-foreground" };
 const inviteStatusColors: Record<string, string> = { pending: "bg-warning/10 text-warning", accepted: "bg-success/10 text-success", expired: "bg-muted text-muted-foreground" };
 
+
+const breadcrumbItems = [
+  { label: "Settings", href: "/settings/team" },
+  { label: "Team" },
+];
 export default function Team() {
   const [showAddUser, setShowAddUser] = useState(false);
   const [newName, setNewName] = useState("");
@@ -160,6 +166,8 @@ export default function Team() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

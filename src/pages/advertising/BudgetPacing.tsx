@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const statusConfig: Record<string, { label: string; class: string }> = {
   on_track: { label: "On Track", class: "bg-success/10 text-success border-success/20" },
@@ -86,6 +87,11 @@ function HourlySpendChart({ selectedCampaign, chartData }: { selectedCampaign: P
   );
 }
 
+
+const breadcrumbItems = [
+  { label: "Advertising", href: "/advertising/budget-pacing" },
+  { label: "Budget Pacing" },
+];
 export default function BudgetPacing() {
   const { formatCurrency } = useCurrency();
   const [selectedCampaign, setSelectedCampaign] = useState<PacingCampaign | null>(mockPacingCampaigns[0]);
@@ -219,6 +225,8 @@ export default function BudgetPacing() {
           </Table>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

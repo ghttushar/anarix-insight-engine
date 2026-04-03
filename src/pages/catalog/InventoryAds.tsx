@@ -9,6 +9,7 @@ import { mockInventoryProducts } from "@/data/mockInventoryAds";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const stockColors: Record<string, string> = {
   healthy: "bg-success/10 text-success border-success/20",
@@ -24,6 +25,11 @@ const actionIcons: Record<string, React.ReactNode> = {
   pause: <Pause className="h-3 w-3 text-destructive" />,
 };
 
+
+const breadcrumbItems = [
+  { label: "Catalog", href: "/catalog/inventory-ads" },
+  { label: "Inventory & Ads" },
+];
 export default function InventoryAds() {
   const { formatCurrency } = useCurrency();
   const criticalCount = mockInventoryProducts.filter((p) => p.stockStatus === "critical").length;
@@ -124,6 +130,8 @@ export default function InventoryAds() {
           </Table>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

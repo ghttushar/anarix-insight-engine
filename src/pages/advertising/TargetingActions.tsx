@@ -17,6 +17,7 @@ import { mockTargetingActions, mockTargetCampaigns, mockTargetAdGroups } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 type ActionTab = "keyword-action" | "history" | "archive";
 
@@ -37,6 +38,11 @@ const SORTABLE_FIELDS = [
   { id: "roas", label: "ROAS" },
 ];
 
+
+const breadcrumbItems = [
+  { label: "Advertising", href: "/advertising/targeting" },
+  { label: "Targeting Actions" },
+];
 export default function TargetingActions() {
   const [activeTab, setActiveTab] = useState<ActionTab>("keyword-action");
   const [searchQuery, setSearchQuery] = useState("");
@@ -259,6 +265,8 @@ export default function TargetingActions() {
       </div>
 
       <AddKeywordTargetModal isOpen={addKeywordsOpen} onClose={() => setAddKeywordsOpen(false)} onAdd={handleAddKeywords} />
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

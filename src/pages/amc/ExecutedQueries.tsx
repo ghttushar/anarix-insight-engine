@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { mockExecutedQueries } from "@/data/mockAMC";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const statusColors: Record<string, string> = {
   completed: "bg-success/10 text-success",
@@ -14,6 +15,11 @@ const statusColors: Record<string, string> = {
   running: "bg-primary/10 text-primary",
 };
 
+
+const breadcrumbItems = [
+  { label: "AMC", href: "/amc/executed" },
+  { label: "Executed Queries" },
+];
 export default function AMCExecutedQueries() {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -67,6 +73,8 @@ export default function AMCExecutedQueries() {
           </Table>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

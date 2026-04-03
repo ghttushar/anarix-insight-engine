@@ -8,12 +8,18 @@ import { Badge } from "@/components/ui/badge";
 import { mockSchedules } from "@/data/mockAMC";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const statusColors: Record<string, string> = {
   active: "bg-success/10 text-success",
   paused: "bg-muted text-muted-foreground",
 };
 
+
+const breadcrumbItems = [
+  { label: "AMC", href: "/amc/schedules" },
+  { label: "Schedules" },
+];
 export default function AMCSchedules() {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -67,6 +73,8 @@ export default function AMCSchedules() {
           </Table>
         </div>
       </div>
-    </AppLayout>
+    
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
+</AppLayout>
   );
 }

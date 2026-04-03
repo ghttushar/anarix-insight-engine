@@ -11,6 +11,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import logoFull from "@/assets/logo-light-full.svg";
 import logoWhite from "@/assets/logo-dark-full.svg";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 const connectionOptions = [
   {
@@ -42,6 +43,11 @@ const connectionOptions = [
   },
 ];
 
+
+const breadcrumbItems = [
+  { label: "Settings", href: "/settings/accounts" },
+  { label: "Connect Amazon" },
+];
 export default function ConnectAmazon() {
   const navigate = useNavigate();
   const { addAccount, isOnboarding } = useAccounts();

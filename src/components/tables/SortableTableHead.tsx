@@ -1,6 +1,6 @@
 import { ReactNode, CSSProperties, useState } from "react";
 import { TableHead } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { ArrowUp, ArrowDown, ArrowUpDown, Pin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SortableTableHeadProps {
@@ -12,7 +12,6 @@ interface SortableTableHeadProps {
   align?: "left" | "right" | "center";
   isFixed?: boolean;
   style?: CSSProperties;
-  // Sort props
   sortField?: string | null;
   sortDirection?: "asc" | "desc";
   onSort?: (field: string) => void;
@@ -38,47 +37,48 @@ export function SortableTableHead({
     <TableHead className={cn("group/sort select-none", className)} style={style}>
       <div
         className={cn(
-          "flex items-center gap-1",
+          "flex items-center gap-1.5",
           align === "right" && "justify-end",
           align === "center" && "justify-center"
         )}
       >
-        {/* Sort icon — clickable if onSort provided */}
+        {/* Sort icon */}
         {onSort && (
           <button
             onClick={(e) => { e.stopPropagation(); onSort(field); }}
-            className="shrink-0 cursor-pointer p-0.5 rounded hover:bg-muted transition-colors"
+            className={cn(
+              "shrink-0 cursor-pointer p-0.5 rounded hover:bg-muted transition-colors",
+              isSorted ? "opacity-100" : "opacity-0 group-hover/sort:opacity-40"
+            )}
             title={isSorted ? (sortDirection === "asc" ? "Sort descending" : "Clear sort") : "Sort ascending"}
           >
             {isSorted ? (
               sortDirection === "asc" ? (
-                <ArrowUp className="h-3 w-3 text-primary" />
+                <ArrowUp className="h-3.5 w-3.5 text-primary" />
               ) : (
-                <ArrowDown className="h-3 w-3 text-primary" />
+                <ArrowDown className="h-3.5 w-3.5 text-primary" />
               )
             ) : (
-              <ArrowUpDown className="h-3 w-3 opacity-0 group-hover/sort:opacity-40 transition-opacity" />
+              <ArrowUpDown className="h-3.5 w-3.5" />
             )}
           </button>
         )}
 
         <span>{children}</span>
 
-        {/* Pin radio button — only on non-fixed columns when onPinToggle is provided */}
+        {/* Pin icon — only on non-fixed columns when onPinToggle is provided */}
         {!isFixed && onPinToggle && (
           <button
             onClick={(e) => { e.stopPropagation(); onPinToggle(field); }}
-            className="shrink-0 cursor-pointer"
+            className={cn(
+              "shrink-0 cursor-pointer p-0.5 rounded transition-all",
+              isPinned
+                ? "text-primary opacity-100 hover:bg-primary/10"
+                : "opacity-0 group-hover/sort:opacity-40 hover:!opacity-70 hover:bg-muted text-muted-foreground"
+            )}
             title={isPinned ? "Unpin column" : "Pin column"}
           >
-            <div
-              className={cn(
-                "h-2.5 w-2.5 rounded-full border transition-all",
-                isPinned
-                  ? "border-primary bg-primary"
-                  : "border-muted-foreground/40 opacity-0 group-hover/sort:opacity-60"
-              )}
-            />
+            <Pin className={cn("h-3.5 w-3.5", isPinned && "fill-primary")} />
           </button>
         )}
       </div>
