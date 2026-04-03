@@ -8,6 +8,7 @@ import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { PerformanceChart } from "@/components/charts/PerformanceChart";
 import { CampaignInfoCard } from "@/components/advertising/CampaignInfoCard";
+import { CampaignSettingsPanel } from "@/components/advertising/CampaignSettingsPanel";
 import { AdGroupsTable } from "@/components/tables/AdGroupsTable";
 import { ProductAdsTable } from "@/components/tables/ProductAdsTable";
 import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable";
