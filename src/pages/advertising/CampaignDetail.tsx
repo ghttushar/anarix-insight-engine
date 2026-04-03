@@ -68,58 +68,62 @@ export default function CampaignDetail() {
 
   return (
     <AppLayout>
-      <div className="space-y-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <span className="text-foreground font-medium">{campaignName}</span>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+      <div className="flex flex-1 min-h-0 min-w-0">
+        <div className="flex-1 min-w-0 space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <span className="text-foreground font-medium">{campaignName}</span>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-        <PageHeader title="Advertising" />
+          <PageHeader title="Advertising" />
 
-        <AppTaskbar showFrequency showDateRange>
-          <Button size="sm" className="gap-1.5 ml-2">
-            <Play className="h-3.5 w-3.5" />Run
-          </Button>
-        </AppTaskbar>
+          <AppTaskbar showFrequency showDateRange>
+            <Button size="sm" className="gap-1.5 ml-2">
+              <Play className="h-3.5 w-3.5" />Run
+            </Button>
+          </AppTaskbar>
 
-        {campaign && <CampaignInfoCard campaign={campaign} />}
+          {campaign && <CampaignInfoCard campaign={campaign} />}
 
-        <div className="space-y-3">
-          <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
-          <InlineKPIStrip items={kpiItems} />
-          <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+          <div className="space-y-3">
+            <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
+            <InlineKPIStrip items={kpiItems} />
+            <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+          </div>
+
+          <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
+
+          <DataTableToolbar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
+            onDownload={() => toast.success("Exporting data as CSV...")}
+            showDeltas={showDeltas}
+            onShowDeltasChange={setShowDeltas}
+          />
+
+          {renderTable()}
+
+          <PageFooterBar breadcrumbItems={breadcrumbItems} />
         </div>
 
-        <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
-
-        <DataTableToolbar
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
-          onDownload={() => toast.success("Exporting data as CSV...")}
-          showDeltas={showDeltas}
-          onShowDeltasChange={setShowDeltas}
-        />
-
-        {renderTable()}
+        {campaign && <CampaignSettingsPanel campaign={campaign} />}
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
-</AppLayout>
+    </AppLayout>
   );
 }
