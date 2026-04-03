@@ -252,9 +252,9 @@ export default function ClientPortal() {
                       {report.name}
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground" style={ps("clientName")} className={cn("text-muted-foreground", pc("clientName"))}>{report.clientName}</TableCell>
-                  <TableCell className="text-muted-foreground" style={ps("period")} className={cn("text-muted-foreground", pc("period"))}>{report.period}</TableCell>
-                  <TableCell className="text-center" style={ps("status")} className={cn("text-center", pc("status"))}>
+                  <TableCell style={ps("clientName")} className={cn("text-muted-foreground", pc("clientName"))}>{report.clientName}</TableCell>
+                  <TableCell style={ps("period")} className={cn("text-muted-foreground", pc("period"))}>{report.period}</TableCell>
+                  <TableCell style={ps("status")} className={cn("text-center", pc("status"))}>
                     <Badge variant="outline" className={statusStyles[report.status]}>{report.status}</Badge>
                   </TableCell>
                   <TableCell style={ps("sections")} className={cn(pc("sections"))}>
