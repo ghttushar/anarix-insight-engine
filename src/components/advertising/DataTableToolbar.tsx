@@ -243,7 +243,7 @@ export function DataTableToolbar({
                   ) : (
                     <ArrowDown className="h-3.5 w-3.5" />
                   )}
-                  Sort
+                  Group By
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-[220px] p-2 space-y-0.5">
