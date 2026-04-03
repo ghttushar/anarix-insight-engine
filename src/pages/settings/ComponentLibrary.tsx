@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -40,15 +41,18 @@ import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { TableSkeleton, CardSkeleton, ChartSkeleton, MetricSkeleton } from "@/components/ui/loading-skeletons";
 import { AanLogo } from "@/components/aan/AanLogo";
 import { ArtifactCard } from "@/components/aan/ArtifactCard";
+import { SortableTableHead, usePinning } from "@/components/tables/SortableTableHead";
+import { TablePagination } from "@/components/tables/TablePagination";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { 
   AlertCircle, AlertTriangle, Info, CheckCircle, CheckCircle2, XCircle, Home, 
   Plus, Edit, Trash2, Download, Bold, Italic, Underline, Filter, Columns,
   Calendar as CalendarIcon, User, Mail, X, Settings, Search, Send, Loader2,
   Sparkles, RefreshCw, Camera, Lightbulb, Maximize2, SlidersHorizontal,
   ChevronDown, Eye, EyeOff, BarChart3, FileText, Zap, Store, ArrowRight,
-  Check, ArrowUpDown, Sun, Moon, Upload
+  Check, ArrowUpDown, ArrowUp, ArrowDown, Pin, Sun, Moon, Upload
 } from "lucide-react";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
 
 const breadcrumbItems = [
