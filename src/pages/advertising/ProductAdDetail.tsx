@@ -7,7 +7,7 @@ import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { PerformanceChart } from "@/components/charts/PerformanceChart";
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
-import { AddProductAdsModal } from "@/components/advertising/AddProductAdsModal";
+import { AddProductAdsPanel } from "@/components/advertising/AddProductAdsPanel";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { mockAdGroups } from "@/data/mockAdGroups";
 import { mockProductAds } from "@/data/mockProductAds";
@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/status/StatusBadge";
 import { Play, Pencil, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
@@ -31,10 +32,10 @@ export default function ProductAdDetail() {
   const navigate = useNavigate();
   const { adType } = useFilter();
   const { formatCurrency } = useCurrency();
+  const { setDataPanel } = useActivePanel();
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
-  const [addProductAdOpen, setAddProductAdOpen] = useState(false);
 
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
   const adGroup = mockAdGroups.find((ag) => ag.id === adGroupId);
@@ -54,97 +55,97 @@ export default function ProductAdDetail() {
 
   return (
     <AppLayout>
-      <div className="space-y-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button onClick={() => navigate(`/advertising/campaigns/${campaignId}`)} className="text-primary hover:underline cursor-pointer">{campaignName}</button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button onClick={() => navigate(`/advertising/campaigns/${campaignId}/${adGroupId}`)} className="text-primary hover:underline cursor-pointer">{adGroupName}</button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <span className="text-foreground font-medium">{productAdName}</span>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+      <div className="flex flex-1 min-h-0 min-w-0">
+        <div className="flex-1 min-w-0 space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={() => navigate(`/advertising/campaigns/${campaignId}`)} className="text-primary hover:underline cursor-pointer">{campaignName}</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={() => navigate(`/advertising/campaigns/${campaignId}/${adGroupId}`)} className="text-primary hover:underline cursor-pointer">{adGroupName}</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <span className="text-foreground font-medium">{productAdName}</span>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-        <PageHeader title="Advertising" />
+          <PageHeader title="Advertising" />
 
-        <AppTaskbar showFrequency showDateRange>
-          <Button size="sm" className="gap-1.5 ml-2">
-            <Play className="h-3.5 w-3.5" />Run
-          </Button>
-        </AppTaskbar>
+          <AppTaskbar showFrequency showDateRange>
+            <Button size="sm" className="gap-1.5 ml-2">
+              <Play className="h-3.5 w-3.5" />Run
+            </Button>
+          </AppTaskbar>
 
-        {/* Product Ad Info Card */}
-        {productAd && (
-          <div className="rounded-lg border border-border bg-card p-4">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-4">
-                <img src={productAd.productImage} alt={productAd.productName} className="h-16 w-16 rounded-lg object-cover border border-border" />
-                <div className="space-y-1.5">
-                  <h3 className="text-sm font-semibold text-foreground">{productAd.productName}</h3>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <StatusBadge status={productAd.status} />
-                    <Badge variant="outline" className="text-xs">{productAd.itemId}</Badge>
-                    <Badge variant="outline" className="text-xs">SKU: {productAd.sku}</Badge>
-                    <span className="text-xs text-muted-foreground">Bid: {formatCurrency(productAd.productBid)}</span>
-                    <span className="text-xs text-muted-foreground">Min: {formatCurrency(productAd.minBid)} · Max: {formatCurrency(productAd.maxBid)}</span>
+          {productAd && (
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-4">
+                  <img src={productAd.productImage} alt={productAd.productName} className="h-16 w-16 rounded-lg object-cover border border-border" />
+                  <div className="space-y-1.5">
+                    <h3 className="text-sm font-semibold text-foreground">{productAd.productName}</h3>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <StatusBadge status={productAd.status} />
+                      <Badge variant="outline" className="text-xs">{productAd.itemId}</Badge>
+                      <Badge variant="outline" className="text-xs">SKU: {productAd.sku}</Badge>
+                      <span className="text-xs text-muted-foreground">Bid: {formatCurrency(productAd.productBid)}</span>
+                      <span className="text-xs text-muted-foreground">Min: {formatCurrency(productAd.minBid)} · Max: {formatCurrency(productAd.maxBid)}</span>
+                    </div>
                   </div>
                 </div>
+                <Button variant="ghost" size="sm" className="gap-1.5 text-xs" onClick={() => toast.info("Product Ad settings coming soon")}>
+                  <Pencil className="h-3.5 w-3.5" />Edit
+                </Button>
               </div>
-              <Button variant="ghost" size="sm" className="gap-1.5 text-xs" onClick={() => toast.info("Product Ad settings coming soon")}>
-                <Pencil className="h-3.5 w-3.5" />Edit
-              </Button>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="space-y-3">
-          <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
-          <InlineKPIStrip items={kpiItems} />
-          <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+          <div className="space-y-3">
+            <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
+            <InlineKPIStrip items={kpiItems} />
+            <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+          </div>
+
+          <DataTableToolbar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search search terms..."
+            onDownload={() => toast.success("Exporting data as CSV...")}
+            showDeltas={showDeltas}
+            onShowDeltasChange={setShowDeltas}
+            leftContent={
+              <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("addProductAd")}>
+                <Plus className="h-3.5 w-3.5" />Add Product Ad
+              </Button>
+            }
+          />
+
+          <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />
+          <PageFooterBar breadcrumbItems={breadcrumbItems} />
         </div>
 
-        <DataTableToolbar
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search search terms..."
-          onDownload={() => toast.success("Exporting data as CSV...")}
-          showDeltas={showDeltas}
-          onShowDeltasChange={setShowDeltas}
-          leftContent={
-            <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setAddProductAdOpen(true)}>
-              <Plus className="h-3.5 w-3.5" />Add Product Ad
-            </Button>
-          }
-        />
-
-        <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />
+        <AddProductAdsPanel />
       </div>
-
-      <AddProductAdsModal open={addProductAdOpen} onOpenChange={setAddProductAdOpen} />
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
-</AppLayout>
+    </AppLayout>
   );
 }
