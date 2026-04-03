@@ -70,72 +70,75 @@ export default function AdGroupDetail() {
 
   return (
     <AppLayout>
-      <div className="space-y-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <button onClick={() => navigate(`/advertising/campaigns/${campaignId}`)} className="text-primary hover:underline cursor-pointer">{campaignName}</button>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <span className="text-foreground font-medium">{adGroupName}</span>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+      <div className="flex flex-1 min-h-0 min-w-0">
+        <div className="flex-1 min-w-0 space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <button onClick={() => navigate(`/advertising/campaigns/${campaignId}`)} className="text-primary hover:underline cursor-pointer">{campaignName}</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <span className="text-foreground font-medium">{adGroupName}</span>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-        <PageHeader title="Advertising" />
+          <PageHeader title="Advertising" />
 
-        <AppTaskbar showFrequency showDateRange>
-          <Button size="sm" className="gap-1.5 ml-2">
-            <Play className="h-3.5 w-3.5" />Run
-          </Button>
-        </AppTaskbar>
+          <AppTaskbar showFrequency showDateRange>
+            <Button size="sm" className="gap-1.5 ml-2">
+              <Play className="h-3.5 w-3.5" />Run
+            </Button>
+          </AppTaskbar>
 
-        {adGroup && <AdGroupInfoCard adGroup={adGroup} />}
+          {adGroup && <AdGroupInfoCard adGroup={adGroup} />}
 
-        <div className="space-y-3">
-          <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
-          <InlineKPIStrip items={kpiItems} />
-          <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+          <div className="space-y-3">
+            <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
+            <InlineKPIStrip items={kpiItems} />
+            <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+          </div>
+
+          <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
+
+          <DataTableToolbar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
+            onDownload={() => toast.success("Exporting data as CSV...")}
+            showDeltas={showDeltas}
+            onShowDeltasChange={setShowDeltas}
+            leftContent={
+              activeTab === "product-ads" ? (
+                <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setAddProductAdOpen(true)}>
+                  <Plus className="h-3.5 w-3.5" />Add Product Ad
+                </Button>
+              ) : undefined
+            }
+          />
+
+          {renderTable()}
+          <PageFooterBar breadcrumbItems={breadcrumbItems} />
         </div>
 
-        <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />
-
-        <DataTableToolbar
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
-          onDownload={() => toast.success("Exporting data as CSV...")}
-          showDeltas={showDeltas}
-          onShowDeltasChange={setShowDeltas}
-          leftContent={
-            activeTab === "product-ads" ? (
-              <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setAddProductAdOpen(true)}>
-                <Plus className="h-3.5 w-3.5" />Add Product Ad
-              </Button>
-            ) : undefined
-          }
-        />
-
-        {renderTable()}
+        {adGroup && <AdGroupSettingsPanel adGroup={adGroup} />}
       </div>
       <AddProductAdsModal open={addProductAdOpen} onOpenChange={setAddProductAdOpen} />
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
-</AppLayout>
+    </AppLayout>
   );
 }
