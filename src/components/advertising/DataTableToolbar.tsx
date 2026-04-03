@@ -247,7 +247,7 @@ export function DataTableToolbar({
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-[220px] p-2 space-y-0.5">
-                <p className="text-[11px] font-medium text-muted-foreground px-2 pb-1">Sort by</p>
+                <p className="text-[11px] font-medium text-muted-foreground px-2 pb-1">Group by</p>
                 {sortableFields.map((field) => {
                   const isActive = sortField === field.id;
                   return (

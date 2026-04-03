@@ -31,6 +31,10 @@ export function TablePagination({
 
   return (
     <div className="flex items-center justify-between border-t border-border px-4 py-2">
+      <div className="text-sm text-muted-foreground">
+        <span>{startItem}-{endItem} of {totalItems}</span>
+      </div>
+
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <span>Rows per page</span>
         <Select
@@ -51,10 +55,6 @@ export function TablePagination({
             ))}
           </SelectContent>
         </Select>
-      </div>
-
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span>{startItem}-{endItem} of {totalItems}</span>
         <Button
           variant="ghost"
           size="icon"

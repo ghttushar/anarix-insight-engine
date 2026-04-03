@@ -14,14 +14,14 @@ interface PageBreadcrumbProps {
 
 export function PageBreadcrumb({ items, className }: PageBreadcrumbProps) {
   return (
-    <nav className={cn("flex items-center gap-1 text-sm", className)}>
+    <nav className={cn("flex items-center gap-0.5 text-xs", className)}>
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
         
         return (
-          <div key={index} className="flex items-center gap-1">
+          <div key={index} className="flex items-center gap-0.5">
             {index > 0 && (
-              <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+              <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
             )}
             {item.href && !isLast ? (
               <Link
