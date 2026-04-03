@@ -220,7 +220,7 @@ export default function HourlyData() {
                           {campaign.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right" style={ps("budget")} className={cn("text-right", pc("budget"))}>{formatCurrency(campaign.budget)}</TableCell>
+                      <TableCell style={ps("budget")} className={cn("text-right", pc("budget"))}>{formatCurrency(campaign.budget)}</TableCell>
                       <TableCell style={ps("spend")} className={cn("text-right", pc("spend"))}>{formatCurrency(campaign.spend)}</TableCell>
                       <TableCell style={ps("revenue")} className={cn("text-right", pc("revenue"))}>{formatCurrency(campaign.revenue)}</TableCell>
                       <TableCell style={ps("roas")} className={cn("text-right", pc("roas"))}>
