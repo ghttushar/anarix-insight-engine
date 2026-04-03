@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { AddProductAdsModal } from "@/components/advertising/AddProductAdsModal";
+import { AddProductAdsPanel } from "@/components/advertising/AddProductAdsPanel";
 import { AdGroupSettingsPanel } from "@/components/advertising/AdGroupSettingsPanel";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -19,6 +19,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { Button } from "@/components/ui/button";
 import { Play, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
 
@@ -39,11 +40,11 @@ export default function AdGroupDetail() {
   const { campaignId, adGroupId } = useParams();
   const navigate = useNavigate();
   const { adType } = useFilter();
+  const { setDataPanel } = useActivePanel();
   const [activeTab, setActiveTab] = useState<TabValue>("product-ads");
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
-  const [addProductAdOpen, setAddProductAdOpen] = useState(false);
 
   const campaign = mockCampaigns.find((c) => c.id === campaignId);
   const adGroup = mockAdGroups.find((ag) => ag.id === adGroupId);
@@ -125,7 +126,7 @@ export default function AdGroupDetail() {
             onShowDeltasChange={setShowDeltas}
             leftContent={
               activeTab === "product-ads" ? (
-                <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setAddProductAdOpen(true)}>
+                <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("addProductAd")}>
                   <Plus className="h-3.5 w-3.5" />Add Product Ad
                 </Button>
               ) : undefined
@@ -137,8 +138,8 @@ export default function AdGroupDetail() {
         </div>
 
         {adGroup && <AdGroupSettingsPanel adGroup={adGroup} />}
+        <AddProductAdsPanel />
       </div>
-      <AddProductAdsModal open={addProductAdOpen} onOpenChange={setAddProductAdOpen} />
     </AppLayout>
   );
 }
