@@ -16,8 +16,9 @@ const draftCount = appliedRules.filter((r) => r.status === "draft").length;
 
 
 const breadcrumbItems = [
+  { label: "Advertising", href: "/advertising" },
   { label: "Rules", href: "/advertising/rules/agents" },
-  { label: "Rule Agents" },
+  { label: "Agents" },
 ];
 export default function RuleAgents() {
   const navigate = useNavigate();
