@@ -100,7 +100,6 @@ export default function CompetitorPricing() {
         <PageHeader
           title="Competitor Price Tracking"
           subtitle="Track competitor pricing over time and correlate with your sales and conversion changes"
-          appLevelSelector={<AppLevelSelector />}
           actions={
             <Button variant="outline" size="sm" onClick={() => toast.info("Refreshing competitor data...")}><RefreshCw className="mr-2 h-4 w-4" />Refresh</Button>
           }

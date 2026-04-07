@@ -49,7 +49,6 @@ export default function KeywordTracker() {
         <PageHeader
           title="Keyword Tracker"
           subtitle="Manage keywords for share of voice tracking"
-          appLevelSelector={<AppLevelSelector />}
         />
 
         <DataTableToolbar

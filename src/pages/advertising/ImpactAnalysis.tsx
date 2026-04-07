@@ -89,21 +89,6 @@ export default function ImpactAnalysis() {
         <PageHeader
           title="Impact Analysis"
           subtitle="Compare performance across time periods to measure campaign impact"
-          appLevelSelector={
-            <AppLevelSelector>
-              <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
-                <SelectTrigger className="h-9 w-[150px] text-sm border-border bg-muted/50 rounded-lg">
-                  <SelectValue placeholder="Ad Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All" className="text-xs">All Types</SelectItem>
-                  <SelectItem value="SP" className="text-xs">Sponsored Products</SelectItem>
-                  <SelectItem value="SB" className="text-xs">Sponsored Brands</SelectItem>
-                  <SelectItem value="SD" className="text-xs">Sponsored Display</SelectItem>
-                </SelectContent>
-              </Select>
-            </AppLevelSelector>
-          }
         />
         <AppTaskbar showRunButton onRun={() => toast.info("Analyzing impact comparison...")}>
           <div className="flex items-center gap-2">

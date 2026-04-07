@@ -36,7 +36,6 @@ export default function ProductSOV() {
         <PageHeader
           title="Product Share of Voice"
           subtitle="Track SOV performance by product"
-          appLevelSelector={<AppLevelSelector />}
         />
 
         <SOVChart data={sovTrendData} title="Product SOV Trend" subtitle="Hourly breakdown" />

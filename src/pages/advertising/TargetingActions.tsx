@@ -85,7 +85,6 @@ export default function TargetingActions() {
         <PageHeader
           title="Targeting Actions"
           subtitle="Convert search terms into keyword targets across your campaigns"
-          appLevelSelector={<AppLevelSelector />}
         />
         <AppTaskbar>
           <div className="flex items-center gap-2">

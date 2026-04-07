@@ -35,7 +35,6 @@ export default function UnifiedPnL() {
         <PageHeader
           title="Cross-Marketplace Unified P&L"
           subtitle="Combined Amazon + Walmart profitability in a single view"
-          appLevelSelector={<AppLevelSelector />}
           actions={
             <Button variant="outline" size="sm" onClick={() => toast.success("Exporting unified P&L...")}><Download className="mr-2 h-4 w-4" />Export PDF</Button>
           }

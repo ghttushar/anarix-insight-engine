@@ -36,7 +36,6 @@ export default function BrandSOV() {
         <PageHeader
           title="Brand Share of Voice"
           subtitle="Track brand visibility across search results"
-          appLevelSelector={<AppLevelSelector />}
         />
 
         <AppTaskbar showRunButton onRun={() => toast.info("Running SOV analysis...")}>

@@ -45,7 +45,6 @@ export default function KeywordSOV() {
         <PageHeader
           title="Keyword Share of Voice"
           subtitle="Track SOV performance by keyword"
-          appLevelSelector={<AppLevelSelector />}
         />
 
         <SOVChart data={sovTrendData} title="Keyword SOV Trend" subtitle="Hourly breakdown" />

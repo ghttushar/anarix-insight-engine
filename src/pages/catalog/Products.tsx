@@ -60,7 +60,6 @@ export default function CatalogProducts() {
         <PageHeader
           title="Products Catalog"
           subtitle="Manage your product catalog and inventory"
-          appLevelSelector={<AppLevelSelector />}
         />
         <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing catalog...")} />
 
