@@ -4,10 +4,15 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import {
+  LineChart as LineChartIcon, BarChart as BarChartIcon,
   TrendingUp, TrendingDown, DollarSign, ShoppingCart, Package,
   BarChart3, Eye, ChevronRight, ArrowUpRight, ArrowDownRight,
   Minus, Target, Percent, Layers, CalendarIcon, Sparkles,
+  Maximize2, Minimize2, Download,
 } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { BarChart, Bar, LineChart, Line } from "recharts";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ProfitabilitySummary, TrendDataPoint } from "@/types/profitability";
 import { MorphingNumber } from "@/features/creative/MorphingNumber";
@@ -256,6 +261,9 @@ function ComparisonChart({
 }: {
   datasets: { data: TrendDataPoint[]; label: string; color: string; dashed?: boolean }[];
 }) {
+  const [chartView, setChartView] = useState<"area" | "bar" | "line">("area");
+  const [expanded, setExpanded] = useState(false);
+
   const maxLen = Math.max(...datasets.map(d => d.data.length));
   const combined = Array.from({ length: maxLen }, (_, i) => {
     const row: Record<string, any> = { label: datasets[0]?.data[i]?.week ?? `W${i + 1}` };
@@ -265,33 +273,90 @@ function ComparisonChart({
     return row;
   });
 
-  return (
-    <div className="rounded-lg border border-border bg-card p-3 min-w-0">
-      <h4 className="text-xs font-semibold text-foreground mb-2">Trend Comparison</h4>
-      <div className="h-[160px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={combined} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-border" opacity={0.5} />
-            <XAxis dataKey="label" tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
-            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "11px" }} />
-            {datasets.map((ds) => (
-              <Area
-                key={ds.label}
-                type="monotone"
-                dataKey={ds.label}
-                stroke={ds.color}
-                fill={ds.color}
-                fillOpacity={0.06}
-                strokeWidth={1.5}
-                strokeDasharray={ds.dashed ? "5 3" : undefined}
-              />
-            ))}
-            <Legend wrapperStyle={{ fontSize: "10px" }} />
-          </AreaChart>
-        </ResponsiveContainer>
+  const tooltipStyle = { backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "11px" };
+
+  const renderChart = (height: number) => (
+    <ResponsiveContainer width="100%" height={height}>
+      {chartView === "bar" ? (
+        <BarChart data={combined} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" opacity={0.5} />
+          <XAxis dataKey="label" tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+          <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+          <Tooltip contentStyle={tooltipStyle} />
+          {datasets.map((ds) => (
+            <Bar key={ds.label} dataKey={ds.label} fill={ds.color} radius={[2, 2, 0, 0]} opacity={ds.dashed ? 0.5 : 1} />
+          ))}
+          <Legend wrapperStyle={{ fontSize: "10px" }} />
+        </BarChart>
+      ) : chartView === "line" ? (
+        <LineChart data={combined} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" opacity={0.5} />
+          <XAxis dataKey="label" tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+          <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+          <Tooltip contentStyle={tooltipStyle} />
+          {datasets.map((ds) => (
+            <Line key={ds.label} type="monotone" dataKey={ds.label} stroke={ds.color} strokeWidth={1.5} strokeDasharray={ds.dashed ? "5 3" : undefined} dot={false} />
+          ))}
+          <Legend wrapperStyle={{ fontSize: "10px" }} />
+        </LineChart>
+      ) : (
+        <AreaChart data={combined} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" opacity={0.5} />
+          <XAxis dataKey="label" tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+          <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+          <Tooltip contentStyle={tooltipStyle} />
+          {datasets.map((ds) => (
+            <Area key={ds.label} type="monotone" dataKey={ds.label} stroke={ds.color} fill={ds.color} fillOpacity={0.06} strokeWidth={1.5} strokeDasharray={ds.dashed ? "5 3" : undefined} />
+          ))}
+          <Legend wrapperStyle={{ fontSize: "10px" }} />
+        </AreaChart>
+      )}
+    </ResponsiveContainer>
+  );
+
+  const toolbar = (
+    <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5 rounded-md border border-border p-0.5">
+        <Button variant={chartView === "area" ? "secondary" : "ghost"} size="sm" className="h-6 w-6 p-0" onClick={() => setChartView("area")} title="Area chart">
+          <TrendingUp className="h-3 w-3" />
+        </Button>
+        <Button variant={chartView === "bar" ? "secondary" : "ghost"} size="sm" className="h-6 w-6 p-0" onClick={() => setChartView("bar")} title="Bar chart">
+          <BarChartIcon className="h-3 w-3" />
+        </Button>
+        <Button variant={chartView === "line" ? "secondary" : "ghost"} size="sm" className="h-6 w-6 p-0" onClick={() => setChartView("line")} title="Line chart">
+          <LineChartIcon className="h-3 w-3" />
+        </Button>
       </div>
+      <div className="w-px h-4 bg-border mx-0.5" />
+      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => toast.success("Exporting chart...")} title="Export chart">
+        <Download className="h-3.5 w-3.5" />
+      </Button>
+      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setExpanded(!expanded)} title="Expand">
+        {expanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+      </Button>
     </div>
+  );
+
+  return (
+    <>
+      <div className="rounded-lg border border-border bg-card p-3 min-w-0">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="text-xs font-semibold text-foreground">Trend Comparison</h4>
+          {toolbar}
+        </div>
+        {renderChart(160)}
+      </div>
+
+      <Dialog open={expanded} onOpenChange={setExpanded}>
+        <DialogContent className="max-w-4xl w-[90vw]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-foreground">Trend Comparison</h3>
+            {toolbar}
+          </div>
+          {renderChart(400)}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
