@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { ScatterPlotChart } from "@/components/profitability/ScatterPlotChart";
 import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModal";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -50,22 +49,21 @@ export default function ProfitabilityTrends() {
         <PageHeader
           title="Profitability Trends"
           subtitle="Analyze product performance quadrants"
-          appLevelSelector={
-            <AppLevelSelector>
-              <Select value={catalogue} onValueChange={setCatalogue}>
-                <SelectTrigger className="h-9 w-[140px] text-sm border-border bg-muted/50 rounded-lg">
-                  <SelectValue placeholder="Catalogue" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all" className="text-xs">All Catalogues</SelectItem>
-                  <SelectItem value="electronics" className="text-xs">Electronics</SelectItem>
-                  <SelectItem value="home" className="text-xs">Home & Garden</SelectItem>
-                </SelectContent>
-              </Select>
-            </AppLevelSelector>
-          }
         />
         <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
+          <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Catalogue</span>
+            <Select value={catalogue} onValueChange={setCatalogue}>
+              <SelectTrigger className="h-8 w-[120px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
+                <SelectValue placeholder="Catalogue" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-xs cursor-pointer">All Catalogues</SelectItem>
+                <SelectItem value="electronics" className="text-xs cursor-pointer">Electronics</SelectItem>
+                <SelectItem value="home" className="text-xs cursor-pointer">Home & Garden</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
             <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Metrics</span>
             <Select value={selectedMetric} onValueChange={setSelectedMetric}>

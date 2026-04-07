@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { SOVKPIStrip } from "@/components/bi/SOVKPIStrip";
 import { BrandCoverageTable } from "@/components/bi/BrandCoverageTable";
@@ -36,7 +35,6 @@ export default function BrandSOV() {
         <PageHeader
           title="Brand Share of Voice"
           subtitle="Track brand visibility across search results"
-          appLevelSelector={<AppLevelSelector />}
         />
 
         <AppTaskbar showRunButton onRun={() => toast.info("Running SOV analysis...")}>

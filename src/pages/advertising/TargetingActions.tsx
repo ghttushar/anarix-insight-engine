@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { AddKeywordTargetModal } from "@/components/advertising/AddKeywordTargetModal";
@@ -85,7 +84,6 @@ export default function TargetingActions() {
         <PageHeader
           title="Targeting Actions"
           subtitle="Convert search terms into keyword targets across your campaigns"
-          appLevelSelector={<AppLevelSelector />}
         />
         <AppTaskbar>
           <div className="flex items-center gap-2">

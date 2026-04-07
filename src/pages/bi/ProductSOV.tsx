@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -36,7 +35,6 @@ export default function ProductSOV() {
         <PageHeader
           title="Product Share of Voice"
           subtitle="Track SOV performance by product"
-          appLevelSelector={<AppLevelSelector />}
         />
 
         <SOVChart data={sovTrendData} title="Product SOV Trend" subtitle="Hourly breakdown" />

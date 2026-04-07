@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { PnLParameterTable } from "@/components/profitability/PnLParameterTable";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
 import { ProductDetailPanel } from "@/components/profitability/ProductDetailPanel";
@@ -88,22 +87,22 @@ export default function ProfitLoss() {
           <PageHeader
             title="Profit & Loss"
             subtitle="Detailed P&L breakdown by period"
-            appLevelSelector={
-              <AppLevelSelector>
-                <Select value={catalogue} onValueChange={setCatalogue}>
-                  <SelectTrigger className="h-9 w-[140px] text-sm border-border bg-muted/50 rounded-lg">
-                    <SelectValue placeholder="Catalogue" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all" className="text-xs">All Catalogues</SelectItem>
-                    <SelectItem value="electronics" className="text-xs">Electronics</SelectItem>
-                    <SelectItem value="home" className="text-xs">Home & Garden</SelectItem>
-                  </SelectContent>
-                </Select>
-              </AppLevelSelector>
-            }
           />
-          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} />
+          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Catalogue</span>
+              <Select value={catalogue} onValueChange={setCatalogue}>
+                <SelectTrigger className="h-8 w-[120px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
+                  <SelectValue placeholder="Catalogue" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="text-xs cursor-pointer">All Catalogues</SelectItem>
+                  <SelectItem value="electronics" className="text-xs cursor-pointer">Electronics</SelectItem>
+                  <SelectItem value="home" className="text-xs cursor-pointer">Home & Garden</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </AppTaskbar>
 
           {/* P&L Frequency Toggle */}
           <div className="flex items-center gap-2">

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -266,24 +265,24 @@ export default function CampaignManager() {
           <PageHeader
             title="Campaign Manager"
             subtitle="Manage and optimize your advertising campaigns"
-            appLevelSelector={
-              <AppLevelSelector>
-                <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
-                  <SelectTrigger className="h-9 w-[150px] text-sm border-border bg-muted/50 rounded-lg">
-                    <SelectValue placeholder="Ad Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="All" className="text-xs">All Types</SelectItem>
-                    <SelectItem value="SP" className="text-xs">Sponsored Products</SelectItem>
-                    <SelectItem value="SB" className="text-xs">Sponsored Brands</SelectItem>
-                    <SelectItem value="SD" className="text-xs">Sponsored Display</SelectItem>
-                    <SelectItem value="SV" className="text-xs">Sponsored Video</SelectItem>
-                  </SelectContent>
-                </Select>
-              </AppLevelSelector>
-            }
           />
-          <AppTaskbar showFrequency showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} />
+          <AppTaskbar showFrequency showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
+              <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
+                <SelectTrigger className="h-8 w-[130px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
+                  <SelectValue placeholder="Ad Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All" className="text-xs cursor-pointer">All Types</SelectItem>
+                  <SelectItem value="SP" className="text-xs cursor-pointer">Sponsored Products</SelectItem>
+                  <SelectItem value="SB" className="text-xs cursor-pointer">Sponsored Brands</SelectItem>
+                  <SelectItem value="SD" className="text-xs cursor-pointer">Sponsored Display</SelectItem>
+                  <SelectItem value="SV" className="text-xs cursor-pointer">Sponsored Video</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </AppTaskbar>
 
           <InlineKPIStrip items={kpiItems} availableMetrics={AVAILABLE_METRICS} onMetricChange={handleKPISwap} />
           <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
