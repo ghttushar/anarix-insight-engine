@@ -17,10 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
-import { LayoutGrid, Layers } from "lucide-react";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
-const accentColors = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },
