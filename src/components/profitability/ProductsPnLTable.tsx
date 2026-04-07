@@ -92,7 +92,8 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
 
   // Products mode
   if (mode === "products") {
-    const paginatedProducts = products.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    const sortedProducts = sortData(products, sortField, sortDirection);
+    const paginatedProducts = sortedProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     const totals = products.reduce((acc, p) => {
       ALL_COLUMNS.forEach((col) => {
