@@ -53,7 +53,7 @@ export default function RuleCreation() {
   const [frequency, setFrequency] = useState("daily");
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [criteria, setCriteria] = useState<RuleCriteria[]>([createCriteria(1)]);
-
+  const [step, setStep] = useState<"builder" | "campaigns">("builder");
   const addCriteria = () => {
     setCriteria((prev) => [...prev, createCriteria(prev.length + 1)]);
   };
