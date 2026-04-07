@@ -80,7 +80,6 @@ export default function TargetingActions() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Targeting Actions"
           subtitle="Convert search terms into keyword targets across your campaigns"
