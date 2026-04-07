@@ -149,6 +149,7 @@ const breadcrumbItems = [
   { label: "Preferences" },
 ];
 export default function Preferences() {
+  // Top breadcrumb will be added in return
   const { density, setDensity } = useDensity();
   const { displayCurrency, setDisplayCurrency, exchangeRate, lastUpdated } = useCurrency();
   const { effects, toggle } = useVisualEffects();
