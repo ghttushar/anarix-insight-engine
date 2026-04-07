@@ -180,6 +180,7 @@ export default function Preferences() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-3xl space-y-8">
+        <PageBreadcrumb items={breadcrumbItems} />
         <div>
           <h1 className="font-heading text-2xl font-semibold text-foreground">Preferences</h1>
           <p className="text-sm text-muted-foreground">Customize how Anarix looks and behaves</p>
