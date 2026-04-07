@@ -120,7 +120,7 @@ interface AppTaskbarProps {
 export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, showRunButton = false, onRun, children, breadcrumbItems }: AppTaskbarProps) {
   const { adType, setAdType, frequency, setFrequency, dateRange, setDateRange } = useFilter();
   const { effects } = useVisualEffects();
-  const { setDataPanel } = useActivePanel();
+  const { setDataPanel, hasAnyPanel } = useActivePanel();
   const { marketplace } = useMarketplace();
   const { currentAccount } = useAccounts();
   const { openPanel: openAan } = useAan();
@@ -228,7 +228,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
       {/* Row 2: Filters/children left, island-off actions + bell right */}
       {hasRow2 && (
         <div className="flex items-center px-4 py-2 gap-3">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-3 flex-1 min-w-0 flex-wrap">
             {showAdType && (
               <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
                 <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
@@ -346,18 +346,49 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
           {/* Right: island-off actions + bell */}
           {islandOff && (
             <div className="flex items-center gap-0.5 ml-auto shrink-0">
-              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openAan()}>
-                <Sparkles className="h-3 w-3 text-primary" />
-                <span className="text-[11px]">Ask Aan</span>
-              </Button>
-              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openInsights()}>
-                <Lightbulb className="h-3 w-3" />
-                <span className="text-[11px]">Insights</span>
-              </Button>
-              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => toast.info("Refreshing data...")}>
-                <RefreshCw className="h-3 w-3" />
-                <span className="text-[11px]">Refresh</span>
-              </Button>
+              {hasAnyPanel ? (
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => openAan()}>
+                        <Sparkles className="h-3 w-3 text-primary" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom"><p>Ask Aan</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => openInsights()}>
+                        <Lightbulb className="h-3 w-3" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom"><p>Insights</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => toast.info("Refreshing data...")}>
+                        <RefreshCw className="h-3 w-3" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom"><p>Refresh</p></TooltipContent>
+                  </Tooltip>
+                </>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openAan()}>
+                    <Sparkles className="h-3 w-3 text-primary" />
+                    <span className="text-[11px]">Ask Aan</span>
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openInsights()}>
+                    <Lightbulb className="h-3 w-3" />
+                    <span className="text-[11px]">Insights</span>
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => toast.info("Refreshing data...")}>
+                    <RefreshCw className="h-3 w-3" />
+                    <span className="text-[11px]">Refresh</span>
+                  </Button>
+                </>
+              )}
               <div className="pl-2 border-l border-border ml-1">
                 <Tooltip>
                   <TooltipTrigger asChild>

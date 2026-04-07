@@ -159,27 +159,29 @@ function SummaryCard({
       </div>
 
       <div className="px-3 pb-2">
-        <div className="flex items-baseline gap-2">
-          <span className="text-lg font-semibold text-foreground">
-            <MorphingNumber value={summary.netProfit} format="currency" decimals={0} />
-          </span>
-          <DeltaIndicator value={netDelta.value} trend={netDelta.trend} />
-        </div>
-        <div className="flex items-center gap-1 mt-0.5">
-          <span className="text-[10px] text-muted-foreground">Margin</span>
-          <span className={cn("text-[10px] font-medium", profitMargin > 20 ? "text-success" : profitMargin > 10 ? "text-foreground" : "text-destructive")}>
-            {profitMargin.toFixed(1)}%
-          </span>
+        <div className="rounded-md bg-muted/30 px-3 py-2">
+          <div className="flex items-baseline gap-2">
+            <span className="text-lg font-semibold text-foreground">
+              <MorphingNumber value={summary.netProfit} format="currency" decimals={0} />
+            </span>
+            <DeltaIndicator value={netDelta.value} trend={netDelta.trend} />
+          </div>
+          <div className="flex items-center gap-1 mt-0.5">
+            <span className="text-[10px] text-muted-foreground">Margin</span>
+            <span className={cn("text-[10px] font-medium", profitMargin > 20 ? "text-success" : profitMargin > 10 ? "text-foreground" : "text-destructive")}>
+              {profitMargin.toFixed(1)}%
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 px-3 pb-2 border-t border-border/50 pt-2">
+      <div className="grid grid-cols-2 gap-2 px-3 pb-3 border-t border-border/50 pt-2">
         {metrics.map((m) => (
-          <div key={m.label} className="flex items-baseline justify-between">
-            <span className="text-[10px] text-muted-foreground">{m.label}</span>
-            <span className="text-[11px] font-medium text-foreground">
+          <div key={m.label} className="rounded-md border border-border/50 px-2.5 py-2">
+            <p className="text-[10px] text-muted-foreground">{m.label}</p>
+            <p className="text-[11px] font-semibold text-foreground mt-0.5">
               {m.fmt === "currency" ? formatCurrency(m.value) : m.value.toLocaleString()}
-            </span>
+            </p>
           </div>
         ))}
       </div>
@@ -237,11 +239,11 @@ function ForecastCard({
         <span className="text-[10px] text-muted-foreground">Est. Net Profit</span>
       </div>
 
-      <div className="grid grid-cols-1 gap-y-1.5 px-3 pb-2 border-t border-border/50 pt-2">
+      <div className="grid grid-cols-1 gap-2 px-3 pb-3 border-t border-border/50 pt-2">
         {metrics.map((m) => (
-          <div key={m.label} className="flex items-baseline justify-between">
-            <span className="text-[10px] text-muted-foreground">{m.label}</span>
-            <span className="text-[11px] font-medium text-foreground">{m.value}</span>
+          <div key={m.label} className="rounded-md border border-border/50 px-2.5 py-2">
+            <p className="text-[10px] text-muted-foreground">{m.label}</p>
+            <p className="text-[11px] font-semibold text-foreground mt-0.5">{m.value}</p>
           </div>
         ))}
       </div>
@@ -452,7 +454,7 @@ export function ProfitabilityHeroCard({
         {activeView === "overview" && (
           <>
             {/* 5 cards */}
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-5 xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 gap-3">
               {cardConfigs.map((cfg, i) => (
                 <SummaryCard
                   key={i}
