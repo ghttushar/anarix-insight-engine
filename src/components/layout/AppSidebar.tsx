@@ -110,9 +110,7 @@ const navigationGroups: NavGroup[] = [{
   label: "Day Parting",
   icon: Clock,
   items: [
-    { title: "Day Parting", url: "/dayparting/hourly", icon: Clock },
-    { title: "History", url: "/dayparting/history", icon: History },
-    { title: "Scheduled Jobs", url: "/dayparting/scheduled", icon: ListTodo },
+    { title: "Day Parting", url: "/dayparting", icon: Clock },
   ]
 }, {
   label: "Reports",
