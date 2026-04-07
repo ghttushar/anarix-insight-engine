@@ -9,6 +9,7 @@ import { mockSchedules } from "@/data/mockAMC";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusColors: Record<string, string> = {
   active: "bg-success/10 text-success",
@@ -31,6 +32,7 @@ export default function AMCSchedules() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="AMC Schedules"
           subtitle="Manage automated query execution schedules"

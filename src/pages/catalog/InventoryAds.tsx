@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const stockColors: Record<string, string> = {
   healthy: "bg-success/10 text-success border-success/20",
@@ -39,6 +40,7 @@ export default function InventoryAds() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Inventory-Aware Ad Optimization"
           subtitle="Automatically adjust ad spend based on stock levels — reduce spend on stockouts, increase on overstock"

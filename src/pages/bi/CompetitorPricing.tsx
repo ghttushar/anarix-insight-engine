@@ -16,6 +16,7 @@ import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/Char
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { TablePagination } from "@/components/tables/TablePagination";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 function PriceHistoryChart({ selected }: { selected: CompetitorProduct }) {
   const { formatCurrency } = useCurrency();
@@ -95,6 +96,7 @@ export default function CompetitorPricing() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Competitor Price Tracking"
           subtitle="Track competitor pricing over time and correlate with your sales and conversion changes"

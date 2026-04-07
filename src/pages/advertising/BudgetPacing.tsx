@@ -13,6 +13,7 @@ import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, Cartesia
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusConfig: Record<string, { label: string; class: string }> = {
   on_track: { label: "On Track", class: "bg-success/10 text-success border-success/20" },
@@ -112,6 +113,7 @@ export default function BudgetPacing() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Budget Pacing"
           subtitle="Real-time burn rate visualization with projected overspend/underspend alerts"

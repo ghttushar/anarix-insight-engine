@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const matchColors: Record<string, string> = {
   exact: "bg-primary/10 text-primary border-primary/20",
@@ -46,6 +47,7 @@ export default function SearchHarvesting() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Search Term Harvesting"
           subtitle="High-performing search terms surfaced for keyword targeting with Aan AI recommendations"

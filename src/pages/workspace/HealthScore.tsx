@@ -10,6 +10,7 @@ import { mockHealthScore, type HealthDimension } from "@/data/mockHealthScore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusColors: Record<string, string> = {
   good: "text-success",
@@ -41,6 +42,7 @@ export default function HealthScore() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Marketplace Health Score"
           subtitle="Composite account health metric weighing profitability, ad efficiency, inventory, keyword coverage, and buy box"

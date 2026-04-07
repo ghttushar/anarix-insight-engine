@@ -8,6 +8,7 @@ import { CatalogProductsTable } from "@/components/catalog/CatalogProductsTable"
 import { catalogProducts } from "@/data/mockCatalog";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const COLUMN_DEFS = [
   { id: "status", label: "Status", visible: true },
@@ -55,6 +56,7 @@ export default function CatalogProducts() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Products Catalog"
           subtitle="Manage your product catalog and inventory"

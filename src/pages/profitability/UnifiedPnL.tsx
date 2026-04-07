@@ -12,6 +12,7 @@ import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const isMarginRow = (label: string) => label.toLowerCase().includes("margin");
 
@@ -30,6 +31,7 @@ export default function UnifiedPnL() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Cross-Marketplace Unified P&L"
           subtitle="Combined Amazon + Walmart profitability in a single view"

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Eye, EyeOff, Copy, Search } from "lucide-react";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const mockLogs = [
   { id: "l1", timestamp: "2025-12-02 09:15:32", user: "John Smith", action: "Login", module: "Auth", details: "Successful login from 192.168.1.1" },
