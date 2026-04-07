@@ -11,7 +11,7 @@ import { AddProductAdsPanel } from "@/components/advertising/AddProductAdsPanel"
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { mockAdGroups } from "@/data/mockAdGroups";
 import { mockProductAds } from "@/data/mockProductAds";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/status/StatusBadge";

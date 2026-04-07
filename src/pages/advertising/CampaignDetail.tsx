@@ -14,7 +14,7 @@ import { ProductAdsTable } from "@/components/tables/ProductAdsTable";
 import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable";
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
