@@ -50,20 +50,6 @@ export default function ProfitabilityTrends() {
         <PageHeader
           title="Profitability Trends"
           subtitle="Analyze product performance quadrants"
-          appLevelSelector={
-            <AppLevelSelector>
-              <Select value={catalogue} onValueChange={setCatalogue}>
-                <SelectTrigger className="h-9 w-[140px] text-sm border-border bg-muted/50 rounded-lg">
-                  <SelectValue placeholder="Catalogue" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all" className="text-xs">All Catalogues</SelectItem>
-                  <SelectItem value="electronics" className="text-xs">Electronics</SelectItem>
-                  <SelectItem value="home" className="text-xs">Home & Garden</SelectItem>
-                </SelectContent>
-              </Select>
-            </AppLevelSelector>
-          }
         />
         <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
           <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">

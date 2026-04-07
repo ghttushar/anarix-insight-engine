@@ -192,23 +192,22 @@ export default function HourlyData() {
           <PageHeader
             title="Day Parting"
             subtitle="Analyze hourly performance and manage campaign schedules"
-            appLevelSelector={
-              <AppLevelSelector>
-                <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
-                  <SelectTrigger className="h-9 w-[150px] text-sm border-border bg-muted/50 rounded-lg">
-                    <SelectValue placeholder="Ad Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="All" className="text-xs">All Types</SelectItem>
-                    <SelectItem value="SP" className="text-xs">Sponsored Products</SelectItem>
-                    <SelectItem value="SB" className="text-xs">Sponsored Brands</SelectItem>
-                    <SelectItem value="SD" className="text-xs">Sponsored Display</SelectItem>
-                  </SelectContent>
-                </Select>
-              </AppLevelSelector>
-            }
           />
           <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
+            <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
+              <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
+                <SelectTrigger className="h-8 w-[130px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
+                  <SelectValue placeholder="Ad Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All" className="text-xs cursor-pointer">All Types</SelectItem>
+                  <SelectItem value="SP" className="text-xs cursor-pointer">Sponsored Products</SelectItem>
+                  <SelectItem value="SB" className="text-xs cursor-pointer">Sponsored Brands</SelectItem>
+                  <SelectItem value="SD" className="text-xs cursor-pointer">Sponsored Display</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Campaign</span>
               <Select value={selectedCampaigns[0]} onValueChange={(v) => setSelectedCampaigns([v])}>
