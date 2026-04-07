@@ -287,7 +287,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                       {cols.map((col) => {
                         const colDef = ALL_COLUMNS.find((c) => c.id === col.id);
                         return (
-                          <TableCell key={col.id} className="text-right text-xs">
+                          <TableCell key={col.id} className={cn("text-right text-xs", pc(col.id))} style={ps(col.id)}>
                             {colDef ? colDef.getValue(product) : "-"}
                           </TableCell>
                         );
