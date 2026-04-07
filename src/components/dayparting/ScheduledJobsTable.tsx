@@ -113,9 +113,6 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
               </TableCell>
               <TableCell>
                 <div className="flex items-center justify-center gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/dayparting/scheduled/${schedule.id}/edit`)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
                   {schedule.status !== "draft" && (
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onPauseResume?.(schedule.id)}>
                       {schedule.status === "active" ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
