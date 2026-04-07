@@ -1,39 +1,42 @@
 
 
-## Restructure AppTaskbar Into 2-Row Layout
+## Responsive Taskbar Actions + Profitability Hero Card Enhancement
 
-### Problem
-Currently everything is on a single row: breadcrumb, filters, account info, actions. The user wants breadcrumbs **above** the metric selectors, with account/sync info on the opposite side of that top row, and island-off actions below on the second row.
+### 3 Changes
 
-### New Layout
+---
 
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│ Row 1: Breadcrumb trail                    🟠 Amazon · Acme · Synced│
-├─────────────────────────────────────────────────────────────────────┤
-│ Row 2: [Ad Type] [Freq] [Date] [children]   Ask Aan  Insights  ↻ 🔔│
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-- **Row 1 (top)**: Breadcrumb left, marketplace logo + account name + status dot + "Last synced: time" right
-- **Row 2 (bottom)**: All filters/selectors/children left, island-off actions (Ask Aan, Insights, Refresh) + bell icon far right
-- If no breadcrumb, row 1 still shows account/sync on the right (single visible row behavior)
-- Bell icon always far right on row 2 when island is off
-
-### Changes
+### 1. Taskbar: Shrink island-off actions to icon-only when panels are open
 
 **File: `src/components/layout/AppTaskbar.tsx`**
 
-1. Change outer container from single `flex` row to `flex flex-col` with two inner rows
-2. **Row 1**: `flex items-center justify-between` — breadcrumb left, account+sync right
-3. **Row 2**: `flex items-center` — filters/children left, island-off actions + bell right
-4. Conditionally hide row 1 if no breadcrumb AND no account info (always show account, so row 1 always visible)
-5. Add a subtle `border-b border-border/30` between rows if both are visible
-6. Adjust outer height from fixed `h-14` to `py-2` auto-height to accommodate 2 rows
+- Import `useActivePanel` (already imported via `setDataPanel`) and read `hasAnyPanel`
+- When `hasAnyPanel` is true AND `islandOff` is true, render Ask Aan / Insights / Refresh as icon-only tooltip buttons (no text labels) — same as the bell icon pattern
+- When no panels are open, keep the current icon + label layout
+- This reduces the right-side width when space is constrained by open panels
+
+### 2. Taskbar: Make filter row responsive with overflow handling
+
+**File: `src/components/layout/AppTaskbar.tsx`**
+
+- Add `flex-wrap` to Row 2's left-side filter container so selectors wrap instead of overflowing
+- Reduce selector label font sizes and padding slightly when space is tight
+- Add `overflow-hidden` on the outer container to prevent horizontal bleed
+
+### 3. Profitability Hero Card: Better metric visibility with proper boxes
+
+**File: `src/components/profitability/ProfitabilityHeroCard.tsx`**
+
+- **SummaryCard**: Replace the inline `grid grid-cols-2` metric layout (lines 176-184) with individually bordered metric boxes — each metric (GMV, Orders, Auth Sales, Ad Cost) gets its own `rounded-md border border-border/50 px-2.5 py-2` container with label on top and value below, making values more scannable
+- **Increase card height**: Remove the cramped `gap-y-1.5` spacing, use `gap-2` for the metric grid and increase vertical padding (`pb-3` instead of `pb-2`)
+- **Main profit display**: Add a subtle background box around the Net Profit + Margin section (`rounded-md bg-muted/30 px-3 py-2`)
+- **Responsive grid**: Change `grid-cols-5` to `grid-cols-5 xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2` so cards reflow on smaller viewports instead of getting crushed
+- **ForecastCard**: Match the same metric box pattern for consistency
 
 ### Files Summary
 
 | File | Change |
 |---|---|
-| `AppTaskbar.tsx` | Split into 2-row layout: breadcrumb+account top, filters+actions bottom |
+| `AppTaskbar.tsx` | Icon-only actions when panels open; flex-wrap on filter row |
+| `ProfitabilityHeroCard.tsx` | Boxed metrics, increased height/spacing, responsive grid |
 
