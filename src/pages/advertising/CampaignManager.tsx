@@ -27,7 +27,6 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 

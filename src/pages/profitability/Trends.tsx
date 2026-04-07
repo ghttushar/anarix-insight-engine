@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 
 const breadcrumbItems = [

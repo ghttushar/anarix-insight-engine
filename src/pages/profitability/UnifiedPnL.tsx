@@ -12,7 +12,6 @@ import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const isMarginRow = (label: string) => label.toLowerCase().includes("margin");
 

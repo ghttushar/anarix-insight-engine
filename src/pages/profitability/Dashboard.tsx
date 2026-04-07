@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },

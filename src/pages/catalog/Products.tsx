@@ -7,7 +7,6 @@ import { CatalogProductsTable } from "@/components/catalog/CatalogProductsTable"
 import { catalogProducts } from "@/data/mockCatalog";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const COLUMN_DEFS = [
   { id: "status", label: "Status", visible: true },

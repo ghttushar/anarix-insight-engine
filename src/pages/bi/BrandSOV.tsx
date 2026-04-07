@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { brands, sovTrendData, sovMetrics } from "@/data/mockBrandSOV";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 
 const breadcrumbItems = [

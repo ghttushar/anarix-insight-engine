@@ -23,7 +23,6 @@ import {
   mockImpactSearchTerms,
 } from "@/data/mockImpactData";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 type ImpactTab = "campaigns" | "ad-groups" | "products" | "keywords" | "search-terms";
 
