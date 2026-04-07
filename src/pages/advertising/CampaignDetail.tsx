@@ -31,7 +31,7 @@ const tabs = [
 ];
 
 
-const breadcrumbItems = [
+const staticBreadcrumbItems = [
   { label: "Advertising", href: "/advertising/campaigns" },
   { label: "Campaign Detail" },
 ];
