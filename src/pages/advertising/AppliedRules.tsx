@@ -30,7 +30,8 @@ type SortKey = "name" | "ruleType" | "entitiesCount" | "frequency" | "lastRun" |
 
 
 const breadcrumbItems = [
-  { label: "Rules", href: "/advertising/rules/applied" },
+  { label: "Advertising", href: "/advertising" },
+  { label: "Rules", href: "/advertising/rules/agents" },
   { label: "Applied Rules" },
 ];
 export default function AppliedRules() {
