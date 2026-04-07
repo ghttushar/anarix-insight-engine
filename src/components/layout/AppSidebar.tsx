@@ -256,6 +256,11 @@ export function AppSidebar() {
 
         <div className="mx-3 border-t border-border/30" />
 
+        {/* Marketplace Selector */}
+        <MarketplaceSelector />
+
+        <div className="mx-3 border-t border-border/30" />
+
         {/* Navigation Groups */}
         <div className="flex-1 overflow-auto py-1">
           {filteredGroups.map(group => (
