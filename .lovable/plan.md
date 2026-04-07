@@ -1,81 +1,64 @@
 
 
-## Add Marketplace Section to Sidebar (After Aan)
+## Restructure App-Level Selector and Page-Level Taskbar
 
-### What Changes
-
-Add a new "Marketplace" section in the left sidebar, positioned right after the Aan button and before the navigation groups. It shows 4 marketplace options (Amazon, Walmart, Shopify, TikTok) — always visible, not a dropdown. The selected marketplace uses its original brand color. Hovering any marketplace shows a popup listing connected accounts for that marketplace.
+### Problem
+The `AppLevelSelector` in the top-right of `PageHeader` contains marketplace switching + store selection. Since marketplace selection now lives in the sidebar, this component is redundant for marketplace switching. The user wants:
+1. Remove marketplace from `AppLevelSelector` (it's now in sidebar)
+2. Move remaining controls (catalogue, store selectors passed as children) into the `AppTaskbar`
+3. Add to taskbar right side: current marketplace + account indicator, data last refreshed timestamp, and full floating island actions (with icons + labels) when island is off
 
 ### Layout
 
 ```text
-┌──────────────────────┐
-│ Logo        [Toggle]  │
-├──────────────────────┤
-│ [Ask Aan pill]        │
-├──────────────────────┤
-│ Marketplace           │  ← NEW SECTION
-│  🟠 Amazon            │  ← selected = orange brand color
-│  🔵 Walmart           │
-│  🟢 Shopify           │
-│  ⚫ TikTok            │
-├──────────────────────┤
-│ Workspace ▾           │
-│ Profitability ▾       │
-│ ...                   │
-└──────────────────────┘
+┌─ AppTaskbar ──────────────────────────────────────────────────────────────────────┐
+│ [Ad Type ▾] [Frequency ▾] [Date Range 📅] [children...]                          │
+│                                                                                   │
+│                    ── right side ──                                                │
+│  🟠 Amazon · Acme Corp  │  Last synced: Apr 7, 3:42 PM  │  ✨ Ask Aan  🔔 Alerts │
+│                                                          │  💡 Insights  ↻ Refresh │
+│                                                          │  ⬇ Export  📷 Screenshot│
+└───────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Hover on any marketplace item → popup appears to the right showing connected accounts for that marketplace (similar to the reference image's "Dashboards" popup pattern), using the existing `SidebarHoverPopup` portal pattern.
+### Changes
 
-### Brand Colors
+**File: `src/components/layout/AppTaskbar.tsx`**
+1. Import `useMarketplace`, `useAccounts`, marketplace logos
+2. Add right-side section (always visible, pushed right with `ml-auto`):
+   - **Marketplace + Account indicator**: Small marketplace logo (16px) + status dot + account name as a read-only pill (no dropdown — selection happens in sidebar)
+   - **Last synced**: `Clock` icon + `lastSync` from `currentAccount` or mock timestamp like "Apr 7, 3:42 PM" — muted text, small font
+3. **Island-off fallback**: Expand current 3-button fallback to include all 6 island actions (Ask Aan, Alerts, Insights, Refresh, Export, Screenshot) — each as a labeled button with icon + text label (not just icon-only tooltips). Use `gap-2` layout, `text-xs` labels beside icons.
 
-| Marketplace | Selected Color | Logo |
-|---|---|---|
-| Amazon | `#FF9900` | Existing `amazon-logo.png` |
-| Walmart | `#0071CE` | Existing `walmart-logo.png` |
-| Shopify | `#96BF48` | Inline SVG (bag icon) |
-| TikTok | `#000000` (light) / `#FFFFFF` (dark) | Inline SVG (note icon) |
+**File: `src/components/layout/AppLevelSelector.tsx`**
+- Remove the entire marketplace dropdown section (Amazon/Walmart selector)
+- Remove the store search/selection dropdown
+- Keep only the `children` pass-through (for catalogue, ad-type selectors that some pages pass in)
+- Simplify to just render `{children}` wrapped in a flex container
+- OR delete entirely if children can be passed directly into AppTaskbar
 
-### Technical Changes
+**File: `src/components/layout/PageHeader.tsx`**
+- Remove `appLevelSelector` prop entirely
+- PageHeader becomes: title + subtitle on left, actions on right (no marketplace)
 
-**File: `src/contexts/MarketplaceContext.tsx`**
-- Extend `Marketplace` type to include `"shopify" | "tiktok"`
-- Persist selected marketplace to localStorage
+**File: ~15 page files** (CampaignManager, Products, ProfitLoss, etc.)
+- Remove `appLevelSelector={<AppLevelSelector>...</AppLevelSelector>}` from `PageHeader`
+- Move any children that were inside `<AppLevelSelector>` (like catalogue Select, ad-type Select) into `<AppTaskbar>` as children instead
 
-**File: `src/components/layout/MarketplaceSelector.tsx` (new)**
-- Renders 4 marketplace items vertically under a "Marketplace" label
-- Each item: brand logo (small SVG/img, 16px) + name
-- Selected item text + icon in brand color, others in `text-muted-foreground`
-- On click: calls `setMarketplace()`
-- On hover: shows a popup (portal) listing accounts from `useAccounts()` filtered by that marketplace
-- Collapsed sidebar: show only the 4 logos stacked, hover popup still works
+### Right-Side Taskbar Detail
 
-**File: `src/components/layout/MarketplaceHoverPopup.tsx` (new)**
-- Similar to `SidebarHoverPopup` but shows account cards instead of nav links
-- Header: marketplace name
-- Body: list of connected accounts with status dot + merchant name
-- Empty state: "No accounts connected" + link to Settings > Accounts
-- Uses `createPortal` to `document.body`, positioned relative to trigger
+The right side shows 3 zones separated by subtle `border-l border-border` dividers:
 
-**File: `src/components/layout/AppSidebar.tsx`**
-- Import and render `<MarketplaceSelector />` between the Aan button divider and the navigation groups `<div>`
-- Add a bottom divider after the marketplace section
-
-**File: `src/assets/`**
-- Add Shopify and TikTok SVG logo files (inline SVGs in component if small enough)
-
-### Collapsed Sidebar Behavior
-- Show only the 4 marketplace logo icons stacked vertically (no text)
-- Selected marketplace icon in brand color
-- Hover shows the same account popup to the right
+1. **Zone 1 — Context**: Marketplace logo + status dot + account name (read-only display)
+2. **Zone 2 — Freshness**: Clock icon + "Last synced: {time}" in muted text
+3. **Zone 3 — Actions** (only when floating island is off): 6 labeled buttons in a compact row — `Ask Aan`, `Alerts`, `Insights`, `Refresh`, `Export`, `Screenshot` — each with icon + label text
 
 ### Files Summary
 
 | File | Change |
 |---|---|
-| `MarketplaceContext.tsx` | Add `"shopify" \| "tiktok"` to type, persist to localStorage |
-| `MarketplaceSelector.tsx` (new) | Sidebar marketplace section with 4 always-visible items |
-| `MarketplaceHoverPopup.tsx` (new) | Hover popup showing connected accounts per marketplace |
-| `AppSidebar.tsx` | Insert `<MarketplaceSelector />` after Aan, before nav groups |
+| `AppTaskbar.tsx` | Add marketplace/account indicator, last synced timestamp, expand island-off fallback to all 6 actions with labels |
+| `AppLevelSelector.tsx` | Strip down to children-only passthrough or delete |
+| `PageHeader.tsx` | Remove `appLevelSelector` prop |
+| ~15 page files | Remove `appLevelSelector` from PageHeader, move child selectors into AppTaskbar children |
 
