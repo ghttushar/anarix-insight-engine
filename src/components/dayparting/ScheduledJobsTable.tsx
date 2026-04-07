@@ -32,7 +32,6 @@ const STATUS_STYLES: Record<string, string> = {
 const PINNABLE = ["name", "campaignNames", "actionType", "repeatType", "nextRun", "status"];
 
 export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: ScheduledJobsTableProps) {
-  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
