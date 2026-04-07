@@ -147,7 +147,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                     </div>
                   </TableCell>
                   {cols.map((col) => (
-                    <TableCell key={col.id} className="text-right">
+                    <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
                       <div className="flex flex-col items-end">
                         <span className="text-foreground text-sm">{col.getValue(product)}</span>
                         {showDeltas && <DeltaBadge value={getDelta(product.id, col.id)} />}
