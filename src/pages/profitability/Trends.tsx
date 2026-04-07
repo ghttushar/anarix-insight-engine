@@ -45,7 +45,6 @@ export default function ProfitabilityTrends() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Profitability Trends"
           subtitle="Analyze product performance quadrants"
