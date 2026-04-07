@@ -68,6 +68,12 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
 
   const cols = visibleColumns ? ALL_COLUMNS.filter((c) => visibleColumns.includes(c.id)) : ALL_COLUMNS;
 
+  const PINNABLE_FIELDS = cols.map(c => c.id);
+  const FIXED_OFFSET = 280;
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE_FIELDS, FIXED_OFFSET);
+
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
+
   const toggleOrderExpand = (orderId: string) => {
     setExpandedOrders((prev) => {
       const next = new Set(prev);
