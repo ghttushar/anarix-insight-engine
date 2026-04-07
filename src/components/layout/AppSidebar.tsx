@@ -17,6 +17,7 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { SidebarHoverPopup } from "./SidebarHoverPopup";
+import { MarketplaceSelector } from "./MarketplaceSelector";
 import { useAan } from "@/components/aan";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
@@ -252,6 +253,11 @@ export function AppSidebar() {
             </Tooltip>
           )}
         </div>
+
+        <div className="mx-3 border-t border-border/30" />
+
+        {/* Marketplace Selector */}
+        <MarketplaceSelector />
 
         <div className="mx-3 border-t border-border/30" />
 

@@ -1,15 +1,19 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
-export type Marketplace = "walmart" | "amazon";
+export type Marketplace = "amazon" | "walmart" | "shopify" | "tiktok";
 
 interface MarketplaceContextType {
   marketplace: Marketplace;
   setMarketplace: (marketplace: Marketplace) => void;
   isWalmart: boolean;
   isAmazon: boolean;
+  isShopify: boolean;
+  isTikTok: boolean;
 }
 
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
+
+const STORAGE_KEY = "anarix_marketplace";
 
 interface MarketplaceProviderProps {
   children: ReactNode;
@@ -18,15 +22,31 @@ interface MarketplaceProviderProps {
 
 export function MarketplaceProvider({ 
   children, 
-  defaultMarketplace = "walmart" 
+  defaultMarketplace = "amazon" 
 }: MarketplaceProviderProps) {
-  const [marketplace, setMarketplace] = useState<Marketplace>(defaultMarketplace);
+  const [marketplace, setMarketplaceState] = useState<Marketplace>(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored && ["amazon", "walmart", "shopify", "tiktok"].includes(stored)) {
+      return stored as Marketplace;
+    }
+    return defaultMarketplace;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, marketplace);
+  }, [marketplace]);
+
+  const setMarketplace = (mp: Marketplace) => {
+    setMarketplaceState(mp);
+  };
 
   const value: MarketplaceContextType = {
     marketplace,
     setMarketplace,
     isWalmart: marketplace === "walmart",
     isAmazon: marketplace === "amazon",
+    isShopify: marketplace === "shopify",
+    isTikTok: marketplace === "tiktok",
   };
 
   return (
