@@ -1,42 +1,81 @@
 
 
-## Fix Breadcrumbs: Standardize Top + Bottom, Fix Positioning
+## Add Marketplace Section to Sidebar (After Aan)
 
-### Problem
-The `PageFooterBar` breadcrumb appears inside table cards or in awkward positions (overlapping/behind content). Some pages use the radix `Breadcrumb` component at the top while using `PageBreadcrumb` at the bottom — two different components for the same purpose. The user wants one simple pattern: the same breadcrumb at the top of the page, duplicated at the very bottom.
+### What Changes
 
-### Solution
+Add a new "Marketplace" section in the left sidebar, positioned right after the Aan button and before the navigation groups. It shows 4 marketplace options (Amazon, Walmart, Shopify, TikTok) — always visible, not a dropdown. The selected marketplace uses its original brand color. Hovering any marketplace shows a popup listing connected accounts for that marketplace.
 
-**1. Standardize all pages to use `PageBreadcrumb` at both top and bottom**
+### Layout
 
-Replace the radix `Breadcrumb` component usage in drill-down pages (CampaignDetail, AdGroupDetail, ProductAdDetail) with `PageBreadcrumb` — same component used everywhere else.
+```text
+┌──────────────────────┐
+│ Logo        [Toggle]  │
+├──────────────────────┤
+│ [Ask Aan pill]        │
+├──────────────────────┤
+│ Marketplace           │  ← NEW SECTION
+│  🟠 Amazon            │  ← selected = orange brand color
+│  🔵 Walmart           │
+│  🟢 Shopify           │
+│  ⚫ TikTok            │
+├──────────────────────┤
+│ Workspace ▾           │
+│ Profitability ▾       │
+│ ...                   │
+└──────────────────────┘
+```
 
-**2. Fix `PageFooterBar` positioning**
+Hover on any marketplace item → popup appears to the right showing connected accounts for that marketplace (similar to the reference image's "Dashboards" popup pattern), using the existing `SidebarHoverPopup` portal pattern.
 
-Update `PageFooterBar` to render with a top border separator so it's clearly outside any card. Ensure it's always the last element before `</AppLayout>`, never inside a card or flex container.
+### Brand Colors
 
-**3. Add top `PageBreadcrumb` to all pages that only have bottom breadcrumbs**
+| Marketplace | Selected Color | Logo |
+|---|---|---|
+| Amazon | `#FF9900` | Existing `amazon-logo.png` |
+| Walmart | `#0071CE` | Existing `walmart-logo.png` |
+| Shopify | `#96BF48` | Inline SVG (bag icon) |
+| TikTok | `#000000` (light) / `#FFFFFF` (dark) | Inline SVG (note icon) |
 
-Most first-level pages (CampaignManager, Profitability Dashboard, etc.) only show breadcrumbs at the bottom. Add `PageBreadcrumb` at the top of these pages too (right before `PageHeader`), so top and bottom match.
+### Technical Changes
 
-**4. Fix pages where `PageFooterBar` is inside nested flex containers**
+**File: `src/contexts/MarketplaceContext.tsx`**
+- Extend `Marketplace` type to include `"shopify" | "tiktok"`
+- Persist selected marketplace to localStorage
 
-In pages like `ProfitabilityDashboard`, `CampaignDetail`, `AdGroupDetail`, `ProductAdDetail` — the footer bar is inside inner `div` containers that sit alongside right panels. Move it outside so it's at the true page bottom.
+**File: `src/components/layout/MarketplaceSelector.tsx` (new)**
+- Renders 4 marketplace items vertically under a "Marketplace" label
+- Each item: brand logo (small SVG/img, 16px) + name
+- Selected item text + icon in brand color, others in `text-muted-foreground`
+- On click: calls `setMarketplace()`
+- On hover: shows a popup (portal) listing accounts from `useAccounts()` filtered by that marketplace
+- Collapsed sidebar: show only the 4 logos stacked, hover popup still works
 
-### Files to Change
+**File: `src/components/layout/MarketplaceHoverPopup.tsx` (new)**
+- Similar to `SidebarHoverPopup` but shows account cards instead of nav links
+- Header: marketplace name
+- Body: list of connected accounts with status dot + merchant name
+- Empty state: "No accounts connected" + link to Settings > Accounts
+- Uses `createPortal` to `document.body`, positioned relative to trigger
+
+**File: `src/components/layout/AppSidebar.tsx`**
+- Import and render `<MarketplaceSelector />` between the Aan button divider and the navigation groups `<div>`
+- Add a bottom divider after the marketplace section
+
+**File: `src/assets/`**
+- Add Shopify and TikTok SVG logo files (inline SVGs in component if small enough)
+
+### Collapsed Sidebar Behavior
+- Show only the 4 marketplace logo icons stacked vertically (no text)
+- Selected marketplace icon in brand color
+- Hover shows the same account popup to the right
+
+### Files Summary
 
 | File | Change |
 |---|---|
-| `PageFooterBar.tsx` | Add `border-t border-border` for visual separation, ensure clean spacing |
-| `CampaignDetail.tsx` | Replace radix `Breadcrumb` with `PageBreadcrumb`, move `PageFooterBar` outside flex wrapper |
-| `AdGroupDetail.tsx` | Same as above |
-| `ProductAdDetail.tsx` | Same as above |
-| `Accounts.tsx` (settings) | Replace radix `Breadcrumb` with `PageBreadcrumb` if used |
-| ~40 page files | Ensure `PageBreadcrumb` at top + `PageFooterBar` at bottom, both outside cards/flex wrappers, using same `breadcrumbItems` |
-| `ProfitabilityDashboard.tsx` | Move `PageFooterBar` outside the inner flex container, add top breadcrumb |
-| All pages with missing top breadcrumb | Add `PageBreadcrumb items={breadcrumbItems}` before `PageHeader` |
-
-### Buttons & Calendar Check
-- Audit all pages for non-functional buttons — ensure toast feedback on placeholder actions
-- Verify calendar/date picker components use the same `Calendar` component from `ui/calendar.tsx` consistently across all pages (AppTaskbar date range, ProfitabilityHeroCard date pickers, Reports schedule builder)
+| `MarketplaceContext.tsx` | Add `"shopify" \| "tiktok"` to type, persist to localStorage |
+| `MarketplaceSelector.tsx` (new) | Sidebar marketplace section with 4 always-visible items |
+| `MarketplaceHoverPopup.tsx` (new) | Hover popup showing connected accounts per marketplace |
+| `AppSidebar.tsx` | Insert `<MarketplaceSelector />` after Aan, before nav groups |
 
