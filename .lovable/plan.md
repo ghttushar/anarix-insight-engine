@@ -1,97 +1,69 @@
 
 
-## Merge Profitability Hero Card: Classic Cleanliness + New Design Richness + Forecast Card
+## Profitability Hero Card: 5 Fixed Cards + Chart — Full Redesign
 
-### Problem
+### What Changes
 
-Two separate designs exist — "New Design" (4-col grid, cramped, rich info) and "Classic" (stacked rows, clean, minimalistic). User wants one unified view combining the best of both, plus a 5th Prediction/Forecast card.
-
-### Merged Design
-
-Remove the design toggle entirely. Replace with a single unified layout:
-
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│ [Daily / Monthly toggle]                    [Full Details →]        │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ │
-│  │  Today    │ │Yesterday │ │Day Before│ │ Forecast │ │Comparison│ │
-│  │  📅      │ │  📅      │ │  📅      │ │ 🔮       │ │  Chart   │ │
-│  │          │ │          │ │          │ │          │ │          │ │
-│  │ Net Prof │ │ Net Prof │ │ Net Prof │ │ Est Prof │ │ 4-series │ │
-│  │ Margin%  │ │ Margin%  │ │ Margin%  │ │ Est GMV  │ │ overlay  │ │
-│  │          │ │          │ │          │ │          │ │          │ │
-│  │ GMV  Ord │ │ GMV  Ord │ │ GMV  Ord │ │ Est Ord  │ │          │ │
-│  │ Sales Ad │ │ Sales Ad │ │ Sales Ad │ │ Conf %   │ │          │ │
-│  │          │ │          │ │          │ │          │ │          │ │
-│  │[View More│ │[View More│ │[View More│ │          │ │          │ │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘ │
-│                                                                     │
-│  [Overview]  [Sales Mix]  [Efficiency]   ← sub-view tabs below     │
-│  ┌─────────────────────────────────────────────────────────────────┐│
-│  │ Sub-view content (breakdown / efficiency)                       ││
-│  └─────────────────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-### Design Principles (Merging Classic + New)
-
-**From Classic (keep):**
-- Clean horizontal card layout — each card is a compact row-style card with accent color left border
-- Metrics displayed inline as label + MorphingNumber pairs (not cramped 2×3 grids)
-- Each card has a "View More" link opening the breakdown panel
-- Per-card date picker (calendar icon)
-- Light, airy spacing
-
-**From New Design (keep):**
-- Frequency toggle (Daily/Monthly) in the header
-- Sub-view tabs (Overview / Sales Mix / Efficiency) — but moved below the cards row
-- Comparison chart as the last card
-- Delta indicators on key metrics
-
-**New: Forecast Card (5th card)**
-- Label: "Forecast" with a `TrendingUp` or `Sparkles` icon
-- Shows projected values based on current period trajectory
-- Metrics: Est. Net Profit, Est. GMV, Est. Orders, Confidence %
-- Computed: `(currentPeriodValue / daysElapsed) * totalDaysInPeriod`
-- Styled with a subtle dashed border or `border-dashed` to distinguish from actuals
-- No date picker (auto-computed)
+Remove the Daily/Monthly frequency toggle entirely. Show **all 5 cards always**: Today, Yesterday, This Month, Last Month, and Forecast. The comparison chart moves below the cards row as a full-width section for better readability.
 
 ### Layout
 
-- 5 cards in a single row: `grid grid-cols-5 gap-3`
-- Each metric card is compact: accent left border, header with label + date picker, 2–3 key metrics inline, "View More" link
-- Forecast card: dashed border, forecast icon, projected metrics
-- Comparison chart: last column, overlays all 4 series (3 actuals + forecast)
-- Below the cards row: sub-view tabs (Overview/Sales Mix/Efficiency) expand into a detail section
+```text
+┌─────────────────────────────────────────────────────────────────────────┐
+│  [Overview]  [Sales Mix]  [Efficiency]              [Full Details →]    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌─ ─ ─ ─ ─ ┐   │
+│  │  Today    │ │Yesterday │ │This Month│ │Last Month│ │ Forecast  │   │
+│  │  📅      │ │  📅      │ │  📅      │ │  📅      │ │ ✨        │   │
+│  │          │ │          │ │          │ │          │ │           │   │
+│  │ $1,245   │ │ $1,567   │ │ $23,456  │ │ $28,901  │ │ $39,173  │   │
+│  │ Margin%  │ │ Margin%  │ │ Margin%  │ │ Margin%  │ │ Est Prof  │   │
+│  │          │ │          │ │          │ │          │ │           │   │
+│  │ GMV  Ord │ │ GMV  Ord │ │ GMV  Ord │ │ GMV  Ord │ │ GMV  Ord  │   │
+│  │ Auth  Ad │ │ Auth  Ad │ │ Auth  Ad │ │ Auth  Ad │ │ Conf %    │   │
+│  │          │ │          │ │          │ │          │ │           │   │
+│  │[View More│ │[View More│ │[View More│ │[View More│ └─ ─ ─ ─ ─ ┘   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘                   │
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │  Comparison Chart — 5-series area overlay (full width)          │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Design Details
+
+**5 Metric Cards** — `grid grid-cols-5 gap-3`
+- Cards 1-2 (Today, Yesterday): calendar date picker for daily dates
+- Cards 3-4 (This Month, Last Month): month picker
+- Card 5 (Forecast): dashed border, Sparkles icon, no date picker, projected values
+- Each card: left accent border, Net Profit as primary metric with delta, margin %, 2x2 grid of secondary metrics (GMV, Orders, Auth Sales, Ad Cost), "View More" link
+- Accent colors: primary, chart-2, chart-3, chart-4, chart-5
+
+**Comparison Chart** — full-width below cards
+- Area chart with 5 overlaid series (4 actuals + forecast dashed)
+- Much more readable at full width vs crammed into 1/5 column
+- Height ~160px
+
+**Sub-view tabs** (Overview/Sales Mix/Efficiency) stay in header, same logic as now but Overview shows the 5-card grid + chart below.
 
 ### Changes
 
-**File: `ProfitabilityHeroCard.tsx`** — Full rewrite
-- Remove the existing `PeriodCard` (cramped 2×3 grid style)
-- Create new `SummaryCard` — classic-inspired compact card with accent border, inline metrics, date picker, "View More"
-- Create `ForecastCard` — dashed border, projected values from mock computation
-- Keep `ComparisonChart` but add 4th forecast series
-- Move sub-view tabs (Sales Mix, Efficiency) below the card row as expandable sections
-- 5-column grid layout
+**File: `ProfitabilityHeroCard.tsx`** — Rewrite
+- Remove `frequency` state and Daily/Monthly toggle
+- Always show 5 cards: map summaries by period keys `["today", "yesterday", "this_month", "last_month"]` + forecast
+- Cards 1-2 get `CardDatePicker` with `frequency="daily"`, cards 3-4 get `frequency="monthly"`
+- Move `ComparisonChart` to full-width row below the 5-card grid
+- Add 5th accent color
+- ComparisonChart gets 5 datasets (4 actuals + forecast)
 
-**File: `Dashboard.tsx`**
-- Remove the design toggle (New/Classic) entirely
-- Remove the classic `PeriodSummaryCard` rendering block
-- Render only the unified `ProfitabilityHeroCard`
-- Remove `useNewDesign` state
-
-**File: `mockProfitability.ts`**
-- No changes needed — forecast is computed from existing data
-
-**File: `PeriodSummaryCard.tsx`**
-- Keep file (may be used elsewhere) but it's no longer rendered in Dashboard
+**File: `Dashboard.tsx`** — No changes needed (already clean from last rewrite)
 
 ### Files Summary
 
 | File | Change |
 |---|---|
-| `ProfitabilityHeroCard.tsx` | Full rewrite — unified 5-card layout (3 actuals + forecast + chart), classic-clean card style, sub-view tabs below |
-| `Dashboard.tsx` | Remove design toggle, render only unified hero card |
+| `ProfitabilityHeroCard.tsx` | Remove frequency toggle, show 5 fixed cards (Today/Yesterday/This Month/Last Month/Forecast) + full-width chart below |
 
