@@ -67,11 +67,6 @@ import AMCInstances from "./pages/amc/Instances";
 
 // Day Parting
 import HourlyData from "./pages/dayparting/HourlyData";
-import DayPartingCampaigns from "./pages/dayparting/Campaigns";
-import CampaignDetail from "./pages/dayparting/CampaignDetail";
-import DayPartingHistory from "./pages/dayparting/History";
-import ScheduledJobs from "./pages/dayparting/ScheduledJobs";
-import ScheduleEditor from "./pages/dayparting/ScheduleEditor";
 import WorkspaceDashboard from "./pages/workspace/Dashboard";
 import HealthScore from "./pages/workspace/HealthScore";
 import ClientPortal from "./pages/reports/ClientPortal";
@@ -182,13 +177,13 @@ function AppRoutes() {
       <Route path="/amc/instances" element={<AMCInstances />} />
 
       {/* Day Parting */}
-      <Route path="/dayparting/hourly" element={<HourlyData />} />
-      <Route path="/dayparting/campaigns" element={<DayPartingCampaigns />} />
-      <Route path="/dayparting/campaigns/:campaignId" element={<CampaignDetail />} />
-      <Route path="/dayparting/history" element={<DayPartingHistory />} />
-      <Route path="/dayparting/scheduled" element={<ScheduledJobs />} />
-      <Route path="/dayparting/scheduled/new" element={<ScheduleEditor />} />
-      <Route path="/dayparting/scheduled/:scheduleId/edit" element={<ScheduleEditor />} />
+      <Route path="/dayparting" element={<HourlyData />} />
+      <Route path="/dayparting/hourly" element={<Navigate to="/dayparting" replace />} />
+      <Route path="/dayparting/campaigns" element={<Navigate to="/dayparting" replace />} />
+      <Route path="/dayparting/campaigns/:campaignId" element={<Navigate to="/dayparting" replace />} />
+      <Route path="/dayparting/history" element={<Navigate to="/dayparting" replace />} />
+      <Route path="/dayparting/scheduled" element={<Navigate to="/dayparting" replace />} />
+      <Route path="/dayparting/scheduled/*" element={<Navigate to="/dayparting" replace />} />
 
       {/* Reports */}
       <Route path="/reports/client-portal" element={<ClientPortal />} />

@@ -2,11 +2,10 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Pause, Play, Trash2 } from "lucide-react";
+import { Pause, Play, Trash2 } from "lucide-react";
 import { DayPartingSchedule } from "@/types/dayparting";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
 import { TablePagination } from "@/components/tables/TablePagination";
 import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
 
@@ -32,7 +31,6 @@ const STATUS_STYLES: Record<string, string> = {
 const PINNABLE = ["name", "campaignNames", "actionType", "repeatType", "nextRun", "status"];
 
 export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: ScheduledJobsTableProps) {
-  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
@@ -114,9 +112,6 @@ export function ScheduledJobsTable({ schedules, onPauseResume, onDelete }: Sched
               </TableCell>
               <TableCell>
                 <div className="flex items-center justify-center gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/dayparting/scheduled/${schedule.id}/edit`)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
                   {schedule.status !== "draft" && (
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onPauseResume?.(schedule.id)}>
                       {schedule.status === "active" ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
