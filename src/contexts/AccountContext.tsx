@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 
 export interface ConnectedAccount {
   id: string;
-  marketplace: "amazon" | "walmart";
+  marketplace: "amazon" | "walmart" | "shopify" | "tiktok";
   accountType: "seller" | "vendor" | "ads" | "connect" | "marketplace";
   merchantName: string;
   merchantId: string;
