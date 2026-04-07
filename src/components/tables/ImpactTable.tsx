@@ -58,15 +58,9 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
     const isNeutral = delta === 0;
     return (
       <div className="flex items-center justify-end gap-1.5">
-        <span className="text-muted-foreground">
-          <span className="text-[10px] uppercase tracking-wide opacity-60">Base: </span>
-          {fmtVal(baseline, format)}
-        </span>
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">vs</span>
-        <span className="font-medium text-foreground">
-          <span className="text-[10px] uppercase tracking-wide opacity-60">Impact: </span>
-          {fmtVal(impact, format)}
-        </span>
+        <span className="text-muted-foreground">{fmtVal(baseline, format)}</span>
+        <span className="text-[10px] text-muted-foreground/40">→</span>
+        <span className="font-medium text-foreground">{fmtVal(impact, format)}</span>
         <span className={cn(
           "inline-flex items-center gap-0.5 text-xs font-medium rounded-full px-1.5 py-0.5",
           isNeutral ? "text-muted-foreground bg-muted" : isPositive ? "text-success bg-success/10" : "text-destructive bg-destructive/10"
