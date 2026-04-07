@@ -31,7 +31,6 @@ export default function BrandSOV() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Brand Share of Voice"
           subtitle="Track brand visibility across search results"
