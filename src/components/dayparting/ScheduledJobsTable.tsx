@@ -6,7 +6,7 @@ import { Edit, Pause, Play, Trash2 } from "lucide-react";
 import { DayPartingSchedule } from "@/types/dayparting";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import { TablePagination } from "@/components/tables/TablePagination";
 import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
 
