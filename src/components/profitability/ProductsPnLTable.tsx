@@ -305,7 +305,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                 const val = (orderTotals as any)[col.id] || 0;
                 const colDef = ALL_COLUMNS.find((c) => c.id === col.id);
                 return (
-                  <TableCell key={col.id} className="text-right">
+                  <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
                     <TotalCell value={colDef?.isUnit ? formatNumber(val) : formatCurrency(val)} metric={col.id} />
                   </TableCell>
                 );
