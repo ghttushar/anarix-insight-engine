@@ -89,13 +89,6 @@ export default function AppliedRules() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb
-          items={[
-            { label: "Advertising", href: "/advertising" },
-            { label: "Rules", href: "/advertising/rules/agents" },
-            { label: "Applied Rules" },
-          ]}
-        />
         <PageHeader
             breadcrumbItems={breadcrumbItems}
             title="Applied Rules"
