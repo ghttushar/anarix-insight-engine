@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Badge } from "@/components/ui/badge";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
 
 interface ProductsPnLTableProps {
   products: ProfitabilityProduct[];
@@ -37,6 +38,15 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
+  };
 
   const ALL_COLUMNS = [
     { id: "units", label: "Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.units), isUnit: true },
@@ -58,6 +68,12 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
 
   const cols = visibleColumns ? ALL_COLUMNS.filter((c) => visibleColumns.includes(c.id)) : ALL_COLUMNS;
 
+  const PINNABLE_FIELDS = cols.map(c => c.id);
+  const FIXED_OFFSET = 280;
+  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE_FIELDS, FIXED_OFFSET);
+
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
+
   const toggleOrderExpand = (orderId: string) => {
     setExpandedOrders((prev) => {
       const next = new Set(prev);
@@ -76,7 +92,8 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
 
   // Products mode
   if (mode === "products") {
-    const paginatedProducts = products.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    const sortedProducts = sortData(products, sortField, sortDirection);
+    const paginatedProducts = sortedProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     const totals = products.reduce((acc, p) => {
       ALL_COLUMNS.forEach((col) => {
@@ -92,9 +109,9 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
           <Table>
             <TableHeader>
               <TableRow className="bg-muted hover:bg-muted">
-                <TableHead className="sticky left-0 z-20 bg-muted min-w-[280px] border-r border-border">Product Details</TableHead>
+                <SortableTableHead field="name" {...sp} isFixed className="sticky left-0 z-20 bg-muted min-w-[280px] border-r border-border">Product Details</SortableTableHead>
                 {cols.map((col) => (
-                  <TableHead key={col.id} className="text-right">{col.label}</TableHead>
+                  <SortableTableHead key={col.id} field={col.id} {...sp} className={cn("text-right", pc(col.id, true))} style={ps(col.id)} align="right">{col.label}</SortableTableHead>
                 ))}
                 <TableHead className="text-center w-[80px]">Info</TableHead>
               </TableRow>
@@ -130,7 +147,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                     </div>
                   </TableCell>
                   {cols.map((col) => (
-                    <TableCell key={col.id} className="text-right">
+                    <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
                       <div className="flex flex-col items-end">
                         <span className="text-foreground text-sm">{col.getValue(product)}</span>
                         {showDeltas && <DeltaBadge value={getDelta(product.id, col.id)} />}
@@ -152,7 +169,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                 {cols.map((col) => {
                   const val = totals[col.id] || 0;
                   return (
-                    <TableCell key={col.id} className="text-right">
+                    <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
                       <TotalCell value={col.isUnit ? formatNumber(val) : formatCurrency(val)} metric={col.id} />
                     </TableCell>
                   );
@@ -173,8 +190,8 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
     );
   }
 
-  // Orders mode
-  const paginatedOrders = orders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const sortedOrders = sortData(orders, sortField, sortDirection);
+  const paginatedOrders = sortedOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const orderTotals = orders.reduce(
     (acc, o) => {
@@ -202,9 +219,9 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
         <Table>
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
-              <TableHead className="sticky left-0 z-20 bg-muted min-w-[300px] border-r border-border">Order Details</TableHead>
+              <SortableTableHead field="orderId" {...sp} isFixed className="sticky left-0 z-20 bg-muted min-w-[300px] border-r border-border">Order Details</SortableTableHead>
               {cols.map((col) => (
-                <TableHead key={col.id} className="text-right">{col.label}</TableHead>
+                <SortableTableHead key={col.id} field={col.id} {...sp} className={cn("text-right", pc(col.id, true))} style={ps(col.id)} align="right">{col.label}</SortableTableHead>
               ))}
               <TableHead className="text-center w-[80px]">Info</TableHead>
             </TableRow>
@@ -240,7 +257,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                       </div>
                     </TableCell>
                     {cols.map((col) => (
-                      <TableCell key={col.id} className="text-right">
+                      <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
                         <div className="flex flex-col items-end">
                           <span className="text-sm">{getOrderColumnValue(order, col.id)}</span>
                           {showDeltas && <DeltaBadge value={getDelta(order.id, col.id)} />}
@@ -270,7 +287,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                       {cols.map((col) => {
                         const colDef = ALL_COLUMNS.find((c) => c.id === col.id);
                         return (
-                          <TableCell key={col.id} className="text-right text-xs">
+                          <TableCell key={col.id} className={cn("text-right text-xs", pc(col.id))} style={ps(col.id)}>
                             {colDef ? colDef.getValue(product) : "-"}
                           </TableCell>
                         );
@@ -288,7 +305,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                 const val = (orderTotals as any)[col.id] || 0;
                 const colDef = ALL_COLUMNS.find((c) => c.id === col.id);
                 return (
-                  <TableCell key={col.id} className="text-right">
+                  <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
                     <TotalCell value={colDef?.isUnit ? formatNumber(val) : formatCurrency(val)} metric={col.id} />
                   </TableCell>
                 );
