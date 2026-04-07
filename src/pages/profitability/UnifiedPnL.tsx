@@ -30,6 +30,7 @@ export default function UnifiedPnL() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
         <PageHeader
           title="Cross-Marketplace Unified P&L"
           subtitle="Combined Amazon + Walmart profitability in a single view"
