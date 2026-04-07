@@ -116,7 +116,7 @@ const navigationGroups: NavGroup[] = [{
   label: "Reports",
   icon: FileText,
   items: [
-    { title: "Client Portal", url: "/reports/client-portal", icon: Send, isNewFeature: true },
+    { title: "Automated Reports", url: "/reports/client-portal", icon: Send, isNewFeature: true },
   ]
 }];
 
