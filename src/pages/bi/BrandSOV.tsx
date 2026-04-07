@@ -36,7 +36,7 @@ export default function BrandSOV() {
           subtitle="Track brand visibility across search results"
         />
 
-        <AppTaskbar showRunButton onRun={() => toast.info("Running SOV analysis...")}>
+        <AppTaskbar showRunButton onRun={() => toast.info("Running SOV analysis...")} breadcrumbItems={breadcrumbItems}>
           <div className="relative min-w-[180px] max-w-[240px]">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder="Search keyword..." value={keyword} onChange={(e) => setKeyword(e.target.value)} className="pl-8 h-8 text-xs" />

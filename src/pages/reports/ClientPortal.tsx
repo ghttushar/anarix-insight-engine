@@ -104,7 +104,7 @@ export default function ClientPortal() {
           }
         />
 
-        <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing reports...")} />
+        <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing reports...")} breadcrumbItems={breadcrumbItems} />
 
         {/* Summary KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

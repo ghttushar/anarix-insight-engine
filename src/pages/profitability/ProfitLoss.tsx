@@ -87,7 +87,7 @@ export default function ProfitLoss() {
             title="Profit & Loss"
             subtitle="Detailed P&L breakdown by period"
           />
-          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
+          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} breadcrumbItems={breadcrumbItems}>
             <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Catalogue</span>
               <Select value={catalogue} onValueChange={setCatalogue}>

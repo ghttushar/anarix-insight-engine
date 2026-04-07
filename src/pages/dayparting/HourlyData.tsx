@@ -191,7 +191,7 @@ export default function HourlyData() {
             title="Day Parting"
             subtitle="Analyze hourly performance and manage campaign schedules"
           />
-          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
+          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} breadcrumbItems={breadcrumbItems}>
             <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
               <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
