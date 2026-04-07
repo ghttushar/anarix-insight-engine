@@ -84,7 +84,7 @@ export default function TargetingActions() {
           title="Targeting Actions"
           subtitle="Convert search terms into keyword targets across your campaigns"
         />
-        <AppTaskbar>
+        <AppTaskbar breadcrumbItems={breadcrumbItems}>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Action Type</span>
