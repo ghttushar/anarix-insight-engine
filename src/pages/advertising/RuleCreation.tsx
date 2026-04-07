@@ -123,7 +123,6 @@ export default function RuleCreation() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
             breadcrumbItems={breadcrumbItems}
             title={isEdit ? "Edit Rule" : "Create Rule"}
