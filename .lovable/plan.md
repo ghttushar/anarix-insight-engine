@@ -1,65 +1,42 @@
 
 
-## Merge Day Parting Into a Single Screen With Tabs
+## Fix Breadcrumbs: Standardize Top + Bottom, Fix Positioning
 
 ### Problem
-Day Parting currently has 3 separate pages (Hourly Data, History, Scheduled Jobs) plus a drill-down campaign detail view. User wants everything on one screen with no drill-down navigation — just tabs.
+The `PageFooterBar` breadcrumb appears inside table cards or in awkward positions (overlapping/behind content). Some pages use the radix `Breadcrumb` component at the top while using `PageBreadcrumb` at the bottom — two different components for the same purpose. The user wants one simple pattern: the same breadcrumb at the top of the page, duplicated at the very bottom.
 
-### Design
+### Solution
 
-Single page at `/dayparting` with tabs:
+**1. Standardize all pages to use `PageBreadcrumb` at both top and bottom**
 
-```text
-┌──────────────────────────────────────────────────┐
-│ Page Header: Day Parting                         │
-│ AppTaskbar (campaign selector, metric selector)  │
-├──────────────────────────────────────────────────┤
-│ [Campaigns & Schedules] [History] [Analytics]    │
-├──────────────────────────────────────────────────┤
-│ Tab content (scrollable)                         │
-└──────────────────────────────────────────────────┘
-```
+Replace the radix `Breadcrumb` component usage in drill-down pages (CampaignDetail, AdGroupDetail, ProductAdDetail) with `PageBreadcrumb` — same component used everywhere else.
 
-**Tab 1 — Campaigns & Schedules (default):** Merges current HourlyData page content (hero metrics, heatmap, campaigns table) with ScheduledJobs content (schedules table with pause/resume/delete). Two sections stacked: first the hourly trends + heatmap, then below it a campaigns table and a schedules table side by side or stacked.
+**2. Fix `PageFooterBar` positioning**
 
-**Tab 2 — History:** The execution history table (currently its own page).
+Update `PageFooterBar` to render with a top border separator so it's clearly outside any card. Ensure it's always the last element before `</AppLayout>`, never inside a card or flex container.
 
-**Tab 3 — Analytics:** The heatmap in larger view with day/hour breakdown — a dedicated analysis view for deeper hourly patterns.
+**3. Add top `PageBreadcrumb` to all pages that only have bottom breadcrumbs**
 
-### Changes
+Most first-level pages (CampaignManager, Profitability Dashboard, etc.) only show breadcrumbs at the bottom. Add `PageBreadcrumb` at the top of these pages too (right before `PageHeader`), so top and bottom match.
 
-**File: `src/pages/dayparting/HourlyData.tsx`**
-- Rename to the single Day Parting screen
-- Add `Tabs` component with 3 tabs
-- Tab 1: Keep existing hero metrics + heatmap + campaigns table. Add schedules table below (import `ScheduledJobsTable`, schedules data, pause/resume/delete logic from ScheduledJobs page). Add delete confirmation `AlertDialog`.
-- Tab 2: Import `HistoryTable` and `executionHistory`, render with search filter and status tabs (from History page).
-- Tab 3: Larger heatmap with additional day/metric selectors for deep analysis.
-- Remove `navigate(`/dayparting/campaigns/${id}`)` from campaign row clicks — no drill-down. Instead, clicking a campaign row could select it for the heatmap filter or open the schedule panel.
-- Remove the "View" button column from campaigns table.
+**4. Fix pages where `PageFooterBar` is inside nested flex containers**
 
-**File: `src/App.tsx`**
-- Change `/dayparting/hourly` to `/dayparting`
-- Add redirect: `/dayparting/hourly` → `/dayparting`, `/dayparting/scheduled` → `/dayparting`, `/dayparting/history` → `/dayparting`
-- Remove routes for `/dayparting/campaigns/:campaignId`, `/dayparting/scheduled/new`, `/dayparting/scheduled/:scheduleId/edit`
+In pages like `ProfitabilityDashboard`, `CampaignDetail`, `AdGroupDetail`, `ProductAdDetail` — the footer bar is inside inner `div` containers that sit alongside right panels. Move it outside so it's at the true page bottom.
 
-**File: `src/components/layout/AppSidebar.tsx`**
-- Replace 3 Day Parting nav items with single item: `{ title: "Day Parting", url: "/dayparting", icon: Clock }`
-
-**Files to delete (now unused):**
-- `src/pages/dayparting/Campaigns.tsx`
-- `src/pages/dayparting/History.tsx`
-- `src/pages/dayparting/ScheduledJobs.tsx`
-- `src/pages/dayparting/CampaignDetail.tsx`
-- `src/pages/dayparting/ScheduleEditor.tsx`
-
-**Breadcrumb:** Update to just `[{ label: "Day Parting" }]`
-
-### Files Summary
+### Files to Change
 
 | File | Change |
 |---|---|
-| `HourlyData.tsx` | Merge all 3 pages into tabbed single screen, remove drill-down |
-| `App.tsx` | Consolidate routes, add redirects |
-| `AppSidebar.tsx` | Single nav item for Day Parting |
-| `Campaigns.tsx`, `History.tsx`, `ScheduledJobs.tsx`, `CampaignDetail.tsx`, `ScheduleEditor.tsx` | Delete |
+| `PageFooterBar.tsx` | Add `border-t border-border` for visual separation, ensure clean spacing |
+| `CampaignDetail.tsx` | Replace radix `Breadcrumb` with `PageBreadcrumb`, move `PageFooterBar` outside flex wrapper |
+| `AdGroupDetail.tsx` | Same as above |
+| `ProductAdDetail.tsx` | Same as above |
+| `Accounts.tsx` (settings) | Replace radix `Breadcrumb` with `PageBreadcrumb` if used |
+| ~40 page files | Ensure `PageBreadcrumb` at top + `PageFooterBar` at bottom, both outside cards/flex wrappers, using same `breadcrumbItems` |
+| `ProfitabilityDashboard.tsx` | Move `PageFooterBar` outside the inner flex container, add top breadcrumb |
+| All pages with missing top breadcrumb | Add `PageBreadcrumb items={breadcrumbItems}` before `PageHeader` |
+
+### Buttons & Calendar Check
+- Audit all pages for non-functional buttons — ensure toast feedback on placeholder actions
+- Verify calendar/date picker components use the same `Calendar` component from `ui/calendar.tsx` consistently across all pages (AppTaskbar date range, ProfitabilityHeroCard date pickers, Reports schedule builder)
 
