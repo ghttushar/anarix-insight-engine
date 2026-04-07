@@ -39,13 +39,6 @@ export default function RuleAgents() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb
-          items={[
-            { label: "Advertising", href: "/advertising" },
-            { label: "Rules", href: "/advertising/rules/agents" },
-            { label: "Agents" },
-          ]}
-        />
         <PageHeader
             breadcrumbItems={breadcrumbItems}
             title="Rule Agents"
