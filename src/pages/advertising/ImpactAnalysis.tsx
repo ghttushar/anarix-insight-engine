@@ -23,7 +23,6 @@ import {
   mockImpactSearchTerms,
 } from "@/data/mockImpactData";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 type ImpactTab = "campaigns" | "ad-groups" | "products" | "keywords" | "search-terms";
 
@@ -84,12 +83,11 @@ export default function ImpactAnalysis() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Impact Analysis"
           subtitle="Compare performance across time periods to measure campaign impact"
         />
-        <AppTaskbar showRunButton onRun={() => toast.info("Analyzing impact comparison...")}>
+        <AppTaskbar showRunButton onRun={() => toast.info("Analyzing impact comparison...")} breadcrumbItems={breadcrumbItems}>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Baseline</span>

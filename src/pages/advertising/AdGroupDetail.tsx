@@ -15,7 +15,6 @@ import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { mockAdGroups } from "@/data/mockAdGroups";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Play, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
@@ -73,16 +72,14 @@ export default function AdGroupDetail() {
     <AppLayout>
       <div className="flex flex-1 min-h-0 min-w-0">
         <div className="flex-1 min-w-0 space-y-4">
-          <PageBreadcrumb items={[
+          <PageHeader title="Advertising" />
+
+          <AppTaskbar showFrequency showDateRange breadcrumbItems={[
             { label: "Advertising", href: "/advertising/campaigns" },
             { label: adTypeLabel, href: "/advertising/campaigns" },
             { label: campaignName, href: `/advertising/campaigns/${campaignId}` },
             { label: adGroupName },
-          ]} />
-
-          <PageHeader title="Advertising" />
-
-          <AppTaskbar showFrequency showDateRange>
+          ]}>
             <Button size="sm" className="gap-1.5 ml-2">
               <Play className="h-3.5 w-3.5" />Run
             </Button>

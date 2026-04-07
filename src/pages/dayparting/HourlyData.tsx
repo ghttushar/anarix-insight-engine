@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { HourlyHeatmap } from "@/components/dayparting/HourlyHeatmap";
 import { HistoryTable } from "@/components/dayparting/HistoryTable";
@@ -187,12 +186,11 @@ export default function HourlyData() {
     <AppLayout>
       <div className="flex flex-1 min-h-0 min-w-0">
         <div className="flex-1 min-w-0 space-y-6 overflow-auto">
-          <PageBreadcrumb items={breadcrumbItems} />
           <PageHeader
             title="Day Parting"
             subtitle="Analyze hourly performance and manage campaign schedules"
           />
-          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
+          <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} breadcrumbItems={breadcrumbItems}>
             <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
               <Select value={adType} onValueChange={(v) => setAdType(v as any)}>

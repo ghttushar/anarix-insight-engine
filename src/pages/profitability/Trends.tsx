@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 
 const breadcrumbItems = [
@@ -45,12 +44,11 @@ export default function ProfitabilityTrends() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Profitability Trends"
           subtitle="Analyze product performance quadrants"
         />
-        <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")}>
+        <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} breadcrumbItems={breadcrumbItems}>
           <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
             <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Catalogue</span>
             <Select value={catalogue} onValueChange={setCatalogue}>
