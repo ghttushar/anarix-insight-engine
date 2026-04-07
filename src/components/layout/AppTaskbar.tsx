@@ -120,7 +120,7 @@ interface AppTaskbarProps {
 export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, showRunButton = false, onRun, children, breadcrumbItems }: AppTaskbarProps) {
   const { adType, setAdType, frequency, setFrequency, dateRange, setDateRange } = useFilter();
   const { effects } = useVisualEffects();
-  const { setDataPanel } = useActivePanel();
+  const { setDataPanel, hasAnyPanel } = useActivePanel();
   const { marketplace } = useMarketplace();
   const { currentAccount } = useAccounts();
   const { openPanel: openAan } = useAan();
