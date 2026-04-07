@@ -90,6 +90,17 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
               <SortableTableHead field="roas" {...sp} className={cn("min-w-[140px] text-right", pc("roas", true))} style={ps("roas")} align="right">ROAS</SortableTableHead>
               <SortableTableHead field="acos" {...sp} className={cn("min-w-[140px] text-right", pc("acos", true))} style={ps("acos")} align="right">ACOS</SortableTableHead>
             </TableRow>
+            <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border">
+              <TableHead className="sticky left-0 z-10 bg-muted/50 h-6" />
+              <TableHead className="h-6" />
+              {["impressions", "clicks", "ctr", "adSpend", "adSales", "roas", "acos"].map((field) => (
+                <TableHead key={field} className={cn("h-6 text-center", pc(field, true))} style={ps(field)}>
+                  <span className="text-[10px] text-muted-foreground">base</span>
+                  <span className="text-[10px] text-muted-foreground/40 mx-1">→</span>
+                  <span className="text-[10px] text-foreground">impact</span>
+                </TableHead>
+              ))}
+            </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.map((item) => {
