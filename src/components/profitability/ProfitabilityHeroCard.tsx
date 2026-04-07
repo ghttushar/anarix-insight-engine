@@ -454,7 +454,7 @@ export function ProfitabilityHeroCard({
         {activeView === "overview" && (
           <>
             {/* 5 cards */}
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-5 xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 gap-3">
               {cardConfigs.map((cfg, i) => (
                 <SummaryCard
                   key={i}
