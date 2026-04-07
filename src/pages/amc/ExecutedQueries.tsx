@@ -30,7 +30,7 @@ export default function AMCExecutedQueries() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="Executed Queries" subtitle="View query execution history and results" />
+        <PageHeader breadcrumbItems={breadcrumbItems} title="Executed Queries" subtitle="View query execution history and results" />
 
         <div className="rounded-lg border border-border bg-card">
           <div className="border-b border-border p-4">

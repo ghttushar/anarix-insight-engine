@@ -69,7 +69,8 @@ export default function Geographical() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Geographical Data"
+            breadcrumbItems={breadcrumbItems}
+            title="Geographical Data"
           subtitle="Regional performance breakdown across markets"
           appLevelSelector={
             <AppLevelSelector>

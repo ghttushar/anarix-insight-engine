@@ -66,7 +66,8 @@ export default function ComponentLibrary() {
   return (
     <AppLayout>
       <PageHeader
-        title="Component Library"
+            breadcrumbItems={breadcrumbItems}
+            title="Component Library"
         subtitle="Static Figma-ready reference — all states visible, no interactions required"
       />
 

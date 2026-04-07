@@ -47,7 +47,8 @@ export default function SearchHarvesting() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Search Term Harvesting"
+            breadcrumbItems={breadcrumbItems}
+            title="Search Term Harvesting"
           subtitle="High-performing search terms surfaced for keyword targeting with Aan AI recommendations"
           actions={
             <Button variant="outline" size="sm" onClick={() => toast.success("Exporting harvest data...")}><Download className="mr-2 h-4 w-4" />Export</Button>

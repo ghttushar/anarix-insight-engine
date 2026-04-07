@@ -24,7 +24,8 @@ export default function CreativeAnalyzer() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Creative Performance Analyzer"
+            breadcrumbItems={breadcrumbItems}
+            title="Creative Performance Analyzer"
           subtitle="Analyze which visual elements correlate with higher CTR and CVR across your ad creatives"
           actions={
             <div className="flex gap-2">

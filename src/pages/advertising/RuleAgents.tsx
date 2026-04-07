@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,8 +16,9 @@ const draftCount = appliedRules.filter((r) => r.status === "draft").length;
 
 
 const breadcrumbItems = [
+  { label: "Advertising", href: "/advertising" },
   { label: "Rules", href: "/advertising/rules/agents" },
-  { label: "Rule Agents" },
+  { label: "Agents" },
 ];
 export default function RuleAgents() {
   const navigate = useNavigate();
@@ -38,15 +39,9 @@ export default function RuleAgents() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb
-          items={[
-            { label: "Advertising", href: "/advertising" },
-            { label: "Rules", href: "/advertising/rules/agents" },
-            { label: "Agents" },
-          ]}
-        />
         <PageHeader
-          title="Rule Agents"
+            breadcrumbItems={breadcrumbItems}
+            title="Rule Agents"
           subtitle="Create automation rules from templates or with AI assistance"
           actions={
             draftCount > 0 ? (

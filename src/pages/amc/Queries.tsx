@@ -82,6 +82,7 @@ export default function AMCQueries() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <PageHeader
+            breadcrumbItems={breadcrumbItems}
             title="Queries"
             subtitle="Create and manage Amazon Marketing Cloud queries"
           />

@@ -113,7 +113,8 @@ export default function BudgetPacing() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Budget Pacing"
+            breadcrumbItems={breadcrumbItems}
+            title="Budget Pacing"
           subtitle="Real-time burn rate visualization with projected overspend/underspend alerts"
           actions={
             <div className="flex gap-2">
