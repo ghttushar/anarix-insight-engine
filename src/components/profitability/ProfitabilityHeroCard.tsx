@@ -159,17 +159,19 @@ function SummaryCard({
       </div>
 
       <div className="px-3 pb-2">
-        <div className="flex items-baseline gap-2">
-          <span className="text-lg font-semibold text-foreground">
-            <MorphingNumber value={summary.netProfit} format="currency" decimals={0} />
-          </span>
-          <DeltaIndicator value={netDelta.value} trend={netDelta.trend} />
-        </div>
-        <div className="flex items-center gap-1 mt-0.5">
-          <span className="text-[10px] text-muted-foreground">Margin</span>
-          <span className={cn("text-[10px] font-medium", profitMargin > 20 ? "text-success" : profitMargin > 10 ? "text-foreground" : "text-destructive")}>
-            {profitMargin.toFixed(1)}%
-          </span>
+        <div className="rounded-md bg-muted/30 px-3 py-2">
+          <div className="flex items-baseline gap-2">
+            <span className="text-lg font-semibold text-foreground">
+              <MorphingNumber value={summary.netProfit} format="currency" decimals={0} />
+            </span>
+            <DeltaIndicator value={netDelta.value} trend={netDelta.trend} />
+          </div>
+          <div className="flex items-center gap-1 mt-0.5">
+            <span className="text-[10px] text-muted-foreground">Margin</span>
+            <span className={cn("text-[10px] font-medium", profitMargin > 20 ? "text-success" : profitMargin > 10 ? "text-foreground" : "text-destructive")}>
+              {profitMargin.toFixed(1)}%
+            </span>
+          </div>
         </div>
       </div>
 
