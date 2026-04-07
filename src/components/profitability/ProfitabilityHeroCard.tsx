@@ -14,7 +14,7 @@ import { MorphingNumber } from "@/features/creative/MorphingNumber";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { format, subDays, subMonths } from "date-fns";
+import { format } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface ProfitabilityHeroCardProps {
@@ -36,6 +36,8 @@ const ACCENT_COLORS = [
   "hsl(var(--primary))",
   "hsl(var(--chart-2))",
   "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5, var(--primary)))",
 ];
 
 /* ── Helpers ── */
@@ -107,7 +109,7 @@ function CardDatePicker({
   );
 }
 
-/* ── Summary Card (Classic-inspired, compact) ── */
+/* ── Summary Card ── */
 function SummaryCard({
   summary,
   label,
@@ -140,8 +142,7 @@ function SummaryCard({
   ];
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden flex flex-col" style={{ borderLeftWidth: 3, borderLeftColor: accentColor }}>
-      {/* Header */}
+    <div className="rounded-lg border border-border bg-card overflow-hidden flex flex-col min-w-0" style={{ borderLeftWidth: 3, borderLeftColor: accentColor }}>
       <div className="px-3 pt-3 pb-2">
         <div className="flex items-center gap-1.5">
           <h4 className="text-xs font-semibold text-foreground truncate">{label}</h4>
@@ -152,7 +153,6 @@ function SummaryCard({
         )}
       </div>
 
-      {/* Primary metric */}
       <div className="px-3 pb-2">
         <div className="flex items-baseline gap-2">
           <span className="text-lg font-semibold text-foreground">
@@ -168,7 +168,6 @@ function SummaryCard({
         </div>
       </div>
 
-      {/* Inline metrics grid */}
       <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 px-3 pb-2 border-t border-border/50 pt-2">
         {metrics.map((m) => (
           <div key={m.label} className="flex items-baseline justify-between">
@@ -180,7 +179,6 @@ function SummaryCard({
         ))}
       </div>
 
-      {/* View More */}
       {onViewMore && (
         <div className="mt-auto border-t border-border/50 px-3 py-1.5">
           <button
@@ -203,7 +201,6 @@ function ForecastCard({
   baseSummary: ProfitabilitySummary;
   formatCurrency: (v: number) => string;
 }) {
-  // Simple projection: assume current period is ~60% through, project to 100%
   const projectionMultiplier = 1.67;
   const estProfit = baseSummary.netProfit * projectionMultiplier;
   const estGMV = baseSummary.gmv * projectionMultiplier;
@@ -217,8 +214,7 @@ function ForecastCard({
   ];
 
   return (
-    <div className="rounded-lg border border-dashed border-border bg-card/50 overflow-hidden flex flex-col">
-      {/* Header */}
+    <div className="rounded-lg border border-dashed border-border bg-card/50 overflow-hidden flex flex-col min-w-0">
       <div className="px-3 pt-3 pb-2">
         <div className="flex items-center gap-1.5">
           <Sparkles className="h-3 w-3 text-primary" />
@@ -227,7 +223,6 @@ function ForecastCard({
         <p className="text-[10px] text-muted-foreground mt-0.5">Projected end-of-period</p>
       </div>
 
-      {/* Primary metric */}
       <div className="px-3 pb-2">
         <div className="flex items-baseline gap-2">
           <span className="text-lg font-semibold text-foreground">
@@ -237,7 +232,6 @@ function ForecastCard({
         <span className="text-[10px] text-muted-foreground">Est. Net Profit</span>
       </div>
 
-      {/* Metrics */}
       <div className="grid grid-cols-1 gap-y-1.5 px-3 pb-2 border-t border-border/50 pt-2">
         {metrics.map((m) => (
           <div key={m.label} className="flex items-baseline justify-between">
@@ -247,7 +241,6 @@ function ForecastCard({
         ))}
       </div>
 
-      {/* Confidence bar */}
       <div className="mt-auto px-3 pb-3 pt-1">
         <div className="h-1 bg-muted rounded-full overflow-hidden">
           <div className="h-full rounded-full bg-primary/60 transition-all" style={{ width: `${confidence}%` }} />
@@ -257,7 +250,7 @@ function ForecastCard({
   );
 }
 
-/* ── Comparison Chart ── */
+/* ── Comparison Chart (full-width) ── */
 function ComparisonChart({
   datasets,
 }: {
@@ -273,14 +266,14 @@ function ComparisonChart({
   });
 
   return (
-    <div className="rounded-lg border border-border bg-card p-3 flex flex-col min-w-0">
-      <h4 className="text-xs font-semibold text-foreground mb-1">Comparison</h4>
-      <div className="flex-1 min-h-[140px]">
+    <div className="rounded-lg border border-border bg-card p-3 min-w-0">
+      <h4 className="text-xs font-semibold text-foreground mb-2">Trend Comparison</h4>
+      <div className="h-[160px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={combined} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <AreaChart data={combined} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-border" opacity={0.5} />
-            <XAxis dataKey="label" tick={{ fontSize: 9 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontSize: 9 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+            <XAxis dataKey="label" tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+            <YAxis tick={{ fontSize: 10 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
             <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "11px" }} />
             {datasets.map((ds) => (
               <Area
@@ -289,7 +282,7 @@ function ComparisonChart({
                 dataKey={ds.label}
                 stroke={ds.color}
                 fill={ds.color}
-                fillOpacity={0.08}
+                fillOpacity={0.06}
                 strokeWidth={1.5}
                 strokeDasharray={ds.dashed ? "5 3" : undefined}
               />
@@ -307,39 +300,38 @@ export function ProfitabilityHeroCard({
   summaries, trendDataByPeriod, selectedPeriod, onPeriodChange, onViewBreakdown,
 }: ProfitabilityHeroCardProps) {
   const { formatCurrency } = useCurrency();
-  const [frequency, setFrequency] = useState<"daily" | "monthly">("daily");
   const [activeView, setActiveView] = useState<"overview" | "breakdown" | "efficiency">("overview");
 
-  const [card1Date, setCard1Date] = useState<Date>(new Date());
-  const [card2Date, setCard2Date] = useState<Date>(() => subDays(new Date(), 1));
-  const [card3Date, setCard3Date] = useState<Date>(() => subDays(new Date(), 2));
+  // Per-card dates
+  const [todayDate, setTodayDate] = useState<Date>(new Date());
+  const [yesterdayDate, setYesterdayDate] = useState<Date>(() => new Date(Date.now() - 86400000));
+  const [thisMonthDate, setThisMonthDate] = useState<Date>(new Date());
+  const [lastMonthDate, setLastMonthDate] = useState<Date>(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return d;
+  });
 
-  const periodKeys = frequency === "daily"
-    ? ["today", "yesterday", "this_month"]
-    : ["this_month", "last_month", "yesterday"];
+  // Fixed period mapping
+  const todaySummary = summaries.find(s => s.period === "today") || summaries[0];
+  const yesterdaySummary = summaries.find(s => s.period === "yesterday") || summaries[1] || summaries[0];
+  const thisMonthSummary = summaries.find(s => s.period === "this_month") || summaries[2] || summaries[0];
+  const lastMonthSummary = summaries.find(s => s.period === "last_month") || summaries[3] || summaries[0];
 
-  const card1Summary = summaries.find(s => s.period === periodKeys[0]) || summaries[0];
-  const card2Summary = summaries.find(s => s.period === periodKeys[1]) || summaries[1];
-  const card3Summary = summaries.find(s => s.period === periodKeys[2]) || summaries[2] || summaries[0];
+  const todayTrend = trendDataByPeriod["today"] || trendDataByPeriod["this_month"] || [];
+  const yesterdayTrend = trendDataByPeriod["yesterday"] || trendDataByPeriod["last_month"] || [];
+  const thisMonthTrend = trendDataByPeriod["this_month"] || [];
+  const lastMonthTrend = trendDataByPeriod["last_month"] || trendDataByPeriod["this_month"] || [];
 
-  const card1Trend = trendDataByPeriod[periodKeys[0]] || trendDataByPeriod.this_month;
-  const card2Trend = trendDataByPeriod[periodKeys[1]] || trendDataByPeriod.last_month;
-  const card3Trend = trendDataByPeriod[periodKeys[2]] || trendDataByPeriod.this_month;
+  const forecastTrend = useMemo(() => {
+    return thisMonthTrend.map(d => ({ ...d, orders: Math.round(d.orders * 1.67), units: Math.round(d.units * 1.67) }));
+  }, [thisMonthTrend]);
 
-  const card1Label = frequency === "daily" ? format(card1Date, "MMM dd, yyyy") : format(card1Date, "MMMM yyyy");
-  const card2Label = frequency === "daily" ? format(card2Date, "MMM dd, yyyy") : format(card2Date, "MMMM yyyy");
-  const card3Label = frequency === "daily" ? format(card3Date, "MMM dd, yyyy") : format(card3Date, "MMMM yyyy");
-
-  const primarySummary = card1Summary;
-  const secondarySummary = card2Summary;
+  const primarySummary = todaySummary;
+  const secondarySummary = yesterdaySummary;
 
   const profitMargin = primarySummary.gmv > 0 ? (primarySummary.netProfit / primarySummary.gmv) * 100 : 0;
   const prevMargin = secondarySummary.gmv > 0 ? (secondarySummary.netProfit / secondarySummary.gmv) * 100 : 0;
-
-  // Forecast trend data (projected from card1)
-  const forecastTrend = useMemo(() => {
-    return card1Trend.map(d => ({ ...d, orders: Math.round(d.orders * 1.67), units: Math.round(d.units * 1.67) }));
-  }, [card1Trend]);
 
   const salesBreakdown = useMemo(() => [
     { name: "Organic", value: primarySummary.breakdown.organic },
@@ -357,117 +349,73 @@ export function ProfitabilityHeroCard({
     { key: "efficiency", label: "Efficiency" },
   ];
 
+  const cardConfigs = [
+    { summary: todaySummary, label: format(todayDate, "MMM dd, yyyy"), compareTo: yesterdaySummary, accent: ACCENT_COLORS[0], freq: "daily" as const, date: todayDate, setDate: setTodayDate },
+    { summary: yesterdaySummary, label: format(yesterdayDate, "MMM dd, yyyy"), compareTo: todaySummary, accent: ACCENT_COLORS[1], freq: "daily" as const, date: yesterdayDate, setDate: setYesterdayDate },
+    { summary: thisMonthSummary, label: format(thisMonthDate, "MMMM yyyy"), compareTo: lastMonthSummary, accent: ACCENT_COLORS[2], freq: "monthly" as const, date: thisMonthDate, setDate: setThisMonthDate },
+    { summary: lastMonthSummary, label: format(lastMonthDate, "MMMM yyyy"), compareTo: thisMonthSummary, accent: ACCENT_COLORS[3], freq: "monthly" as const, date: lastMonthDate, setDate: setLastMonthDate },
+  ];
+
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border px-4 py-2">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5">
+        <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5">
+          {views.map((v) => (
             <button
-              onClick={() => {
-                setFrequency("daily");
-                setCard1Date(new Date());
-                setCard2Date(subDays(new Date(), 1));
-                setCard3Date(subDays(new Date(), 2));
-              }}
+              key={v.key}
+              onClick={() => setActiveView(v.key as typeof activeView)}
               className={cn(
-                "px-2.5 py-1 text-xs font-medium rounded-md transition-all",
-                frequency === "daily" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                "px-2 py-1 text-[11px] font-medium rounded transition-all",
+                activeView === v.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
               )}
             >
-              Daily
+              {v.label}
             </button>
-            <button
-              onClick={() => {
-                setFrequency("monthly");
-                setCard1Date(new Date());
-                setCard2Date(subMonths(new Date(), 1));
-                setCard3Date(subMonths(new Date(), 2));
-              }}
-              className={cn(
-                "px-2.5 py-1 text-xs font-medium rounded-md transition-all",
-                frequency === "monthly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Monthly
-            </button>
-          </div>
+          ))}
         </div>
-
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5">
-            {views.map((v) => (
-              <button
-                key={v.key}
-                onClick={() => setActiveView(v.key as typeof activeView)}
-                className={cn(
-                  "px-2 py-1 text-[11px] font-medium rounded transition-all",
-                  activeView === v.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {v.label}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => onViewBreakdown?.(primarySummary)}
-            className="flex items-center gap-0.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
-          >
-            Full Details <ChevronRight className="h-3 w-3" />
-          </button>
-        </div>
+        <button
+          onClick={() => onViewBreakdown?.(primarySummary)}
+          className="flex items-center gap-0.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+        >
+          Full Details <ChevronRight className="h-3 w-3" />
+        </button>
       </div>
 
       {/* Body */}
-      <div className="p-3">
+      <div className="p-3 space-y-3">
         {activeView === "overview" && (
-          <div className="grid grid-cols-5 gap-3 overflow-hidden">
-            <SummaryCard
-              summary={card1Summary}
-              label={card1Label}
-              compareTo={card2Summary}
-              accentColor={ACCENT_COLORS[0]}
-              formatCurrency={formatCurrency}
-              frequency={frequency}
-              date={card1Date}
-              onDateChange={setCard1Date}
-              onViewMore={() => onViewBreakdown?.(card1Summary)}
-            />
-            <SummaryCard
-              summary={card2Summary}
-              label={card2Label}
-              compareTo={card1Summary}
-              accentColor={ACCENT_COLORS[1]}
-              formatCurrency={formatCurrency}
-              frequency={frequency}
-              date={card2Date}
-              onDateChange={setCard2Date}
-              onViewMore={() => onViewBreakdown?.(card2Summary)}
-            />
-            <SummaryCard
-              summary={card3Summary}
-              label={card3Label}
-              compareTo={card1Summary}
-              accentColor={ACCENT_COLORS[2]}
-              formatCurrency={formatCurrency}
-              frequency={frequency}
-              date={card3Date}
-              onDateChange={setCard3Date}
-              onViewMore={() => onViewBreakdown?.(card3Summary)}
-            />
-            <ForecastCard
-              baseSummary={primarySummary}
-              formatCurrency={formatCurrency}
-            />
+          <>
+            {/* 5 cards */}
+            <div className="grid grid-cols-5 gap-3">
+              {cardConfigs.map((cfg, i) => (
+                <SummaryCard
+                  key={i}
+                  summary={cfg.summary}
+                  label={cfg.label}
+                  compareTo={cfg.compareTo}
+                  accentColor={cfg.accent}
+                  formatCurrency={formatCurrency}
+                  frequency={cfg.freq}
+                  date={cfg.date}
+                  onDateChange={cfg.setDate}
+                  onViewMore={() => onViewBreakdown?.(cfg.summary)}
+                />
+              ))}
+              <ForecastCard baseSummary={thisMonthSummary} formatCurrency={formatCurrency} />
+            </div>
+
+            {/* Full-width chart */}
             <ComparisonChart
               datasets={[
-                { data: card1Trend, label: card1Label, color: "hsl(var(--primary))" },
-                { data: card2Trend, label: card2Label, color: "hsl(var(--chart-2))" },
-                { data: card3Trend, label: card3Label, color: "hsl(var(--chart-3))" },
-                { data: forecastTrend, label: "Forecast", color: "hsl(var(--chart-4))", dashed: true },
+                { data: todayTrend, label: "Today", color: ACCENT_COLORS[0] },
+                { data: yesterdayTrend, label: "Yesterday", color: ACCENT_COLORS[1] },
+                { data: thisMonthTrend, label: "This Month", color: ACCENT_COLORS[2] },
+                { data: lastMonthTrend, label: "Last Month", color: ACCENT_COLORS[3] },
+                { data: forecastTrend, label: "Forecast", color: ACCENT_COLORS[4], dashed: true },
               ]}
             />
-          </div>
+          </>
         )}
 
         {activeView === "breakdown" && (
