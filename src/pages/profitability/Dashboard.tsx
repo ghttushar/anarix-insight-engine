@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { ProfitabilityHeroCard } from "@/components/profitability/ProfitabilityHeroCard";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
 import { COGSEditModal } from "@/components/profitability/COGSEditModal";

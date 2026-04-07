@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { PnLParameterTable } from "@/components/profitability/PnLParameterTable";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
 import { ProductDetailPanel } from "@/components/profitability/ProductDetailPanel";

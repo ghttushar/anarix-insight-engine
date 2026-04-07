@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { CatalogProductsTable } from "@/components/catalog/CatalogProductsTable";

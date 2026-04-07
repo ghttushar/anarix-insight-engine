@@ -4,7 +4,6 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { HourlyHeatmap } from "@/components/dayparting/HourlyHeatmap";
 import { HistoryTable } from "@/components/dayparting/HistoryTable";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";

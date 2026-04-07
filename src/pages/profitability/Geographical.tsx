@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { GeographyMap } from "@/components/profitability/GeographyMap";
 import { RegionStatsPanel } from "@/components/profitability/RegionStatsPanel";
 import { RegionalTable } from "@/components/tables/RegionalTable";

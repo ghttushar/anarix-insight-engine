@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { SOVKPIStrip } from "@/components/bi/SOVKPIStrip";
 import { BrandCoverageTable } from "@/components/bi/BrandCoverageTable";
