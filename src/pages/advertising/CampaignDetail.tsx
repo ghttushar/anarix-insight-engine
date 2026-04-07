@@ -105,7 +105,7 @@ export default function CampaignDetail() {
 
           {renderTable()}
 
-          <PageFooterBar breadcrumbItems={breadcrumbItems} />
+          <PageFooterBar breadcrumbItems={staticBreadcrumbItems} />
         </div>
 
         {campaign && <CampaignSettingsPanel campaign={campaign} />}
