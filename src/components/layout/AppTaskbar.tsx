@@ -196,179 +196,182 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
     );
   };
 
+  const hasRow1 = true; // always show account/sync info
+  const hasRow2 = showAdType || showFrequency || showDateRange || showRunButton || children || islandOff;
+
   return (
-    <div className="flex h-14 items-center rounded-lg border bg-card px-4 shrink-0 sticky top-0 z-30 border-primary gap-3">
-      {/* Left: Breadcrumb + filters + children */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        {renderBreadcrumb()}
-
-        {breadcrumbItems && breadcrumbItems.length > 0 && (showAdType || showFrequency || showDateRange || children) && (
-          <div className="h-5 w-px bg-border shrink-0" />
-        )}
-
-        {showAdType && (
-          <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
-            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
-            <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
-              <SelectTrigger className="h-8 w-[110px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All" className="text-xs cursor-pointer">All Types</SelectItem>
-                <SelectItem value="SP" className="text-xs cursor-pointer">Sponsored Products</SelectItem>
-                <SelectItem value="SB" className="text-xs cursor-pointer">Sponsored Brands</SelectItem>
-                <SelectItem value="SD" className="text-xs cursor-pointer">Sponsored Display</SelectItem>
-                <SelectItem value="SV" className="text-xs cursor-pointer">Sponsored Video</SelectItem>
-              </SelectContent>
-            </Select>
+    <div className="flex flex-col rounded-lg border bg-card shrink-0 sticky top-0 z-30 border-primary">
+      {/* Row 1: Breadcrumb left, Account + Sync right */}
+      {hasRow1 && (
+        <div className={cn(
+          "flex items-center justify-between px-4 py-2",
+          hasRow2 && "border-b border-border/30"
+        )}>
+          <div className="flex items-center gap-2 min-w-0">
+            {renderBreadcrumb()}
           </div>
-        )}
-
-        {showFrequency && (
-          <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
-            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Frequency</span>
-            <Select value={frequency} onValueChange={(v) => setFrequency(v as any)}>
-              <SelectTrigger className="h-8 w-[90px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {["Daily", "Weekly", "Monthly"].map((f) => (
-                  <SelectItem key={f} value={f} className="text-xs cursor-pointer">{f}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Marketplace + Account */}
+            <div className="flex items-center gap-1.5" style={{ color: marketplaceColor }}>
+              {renderMarketplaceLogo()}
+            </div>
+            <StatusDot status={accountStatus} className="h-1.5 w-1.5" />
+            <span className="text-xs font-medium text-foreground truncate max-w-[120px]">{accountName}</span>
+            <div className="h-3.5 w-px bg-border" />
+            {/* Last synced */}
+            <Clock className="h-3 w-3 text-muted-foreground" />
+            <span className="text-[11px] text-muted-foreground whitespace-nowrap">Last synced: {lastSyncTime}</span>
           </div>
-        )}
+        </div>
+      )}
 
-        {showDateRange && (
-          <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
-            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Date Range</span>
-            <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-sm font-normal px-1.5 cursor-pointer">
-                  <CalendarIcon className="h-3 w-3" />
-                  {format(dateRange.from, "MMM dd")} – {format(dateRange.to, "MMM dd, yyyy")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start" side="bottom">
-                <div className="flex">
-                  <div className="w-[200px] border-r border-border py-3 space-y-4 max-h-[420px] overflow-auto bg-muted/30">
-                    {DATE_PRESET_GROUPS.map((group) => (
-                      <div key={group.label}>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-4 mb-1.5">{group.label}</p>
-                        <div className="space-y-0.5 px-2">
-                          {group.presets.map((preset) => {
-                            const presetRange = preset.getRange();
-                            const isSelected =
-                              draftRange.from.toDateString() === presetRange.from.toDateString() &&
-                              draftRange.to.toDateString() === presetRange.to.toDateString();
-                            return (
-                              <button
-                                key={preset.label}
-                                onClick={() => handlePresetClick(preset)}
-                                className={cn(
-                                  "w-full text-left text-xs px-3 py-2 rounded-md transition-colors cursor-pointer font-medium",
-                                  isSelected
-                                    ? "bg-primary/10 text-primary"
-                                    : "text-foreground hover:bg-muted"
-                                )}
-                              >
-                                {preset.label}
-                              </button>
-                            );
-                          })}
+      {/* Row 2: Filters/children left, island-off actions + bell right */}
+      {hasRow2 && (
+        <div className="flex items-center px-4 py-2 gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {showAdType && (
+              <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+                <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
+                <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
+                  <SelectTrigger className="h-8 w-[110px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All" className="text-xs cursor-pointer">All Types</SelectItem>
+                    <SelectItem value="SP" className="text-xs cursor-pointer">Sponsored Products</SelectItem>
+                    <SelectItem value="SB" className="text-xs cursor-pointer">Sponsored Brands</SelectItem>
+                    <SelectItem value="SD" className="text-xs cursor-pointer">Sponsored Display</SelectItem>
+                    <SelectItem value="SV" className="text-xs cursor-pointer">Sponsored Video</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {showFrequency && (
+              <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+                <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Frequency</span>
+                <Select value={frequency} onValueChange={(v) => setFrequency(v as any)}>
+                  <SelectTrigger className="h-8 w-[90px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["Daily", "Weekly", "Monthly"].map((f) => (
+                      <SelectItem key={f} value={f} className="text-xs cursor-pointer">{f}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {showDateRange && (
+              <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+                <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Date Range</span>
+                <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-sm font-normal px-1.5 cursor-pointer">
+                      <CalendarIcon className="h-3 w-3" />
+                      {format(dateRange.from, "MMM dd")} – {format(dateRange.to, "MMM dd, yyyy")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start" side="bottom">
+                    <div className="flex">
+                      <div className="w-[200px] border-r border-border py-3 space-y-4 max-h-[420px] overflow-auto bg-muted/30">
+                        {DATE_PRESET_GROUPS.map((group) => (
+                          <div key={group.label}>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-4 mb-1.5">{group.label}</p>
+                            <div className="space-y-0.5 px-2">
+                              {group.presets.map((preset) => {
+                                const presetRange = preset.getRange();
+                                const isSelected =
+                                  draftRange.from.toDateString() === presetRange.from.toDateString() &&
+                                  draftRange.to.toDateString() === presetRange.to.toDateString();
+                                return (
+                                  <button
+                                    key={preset.label}
+                                    onClick={() => handlePresetClick(preset)}
+                                    className={cn(
+                                      "w-full text-left text-xs px-3 py-2 rounded-md transition-colors cursor-pointer font-medium",
+                                      isSelected
+                                        ? "bg-primary/10 text-primary"
+                                        : "text-foreground hover:bg-muted"
+                                    )}
+                                  >
+                                    {preset.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex flex-col">
+                        <Calendar
+                          mode="range"
+                          selected={{ from: draftRange.from, to: draftRange.to }}
+                          onSelect={(range) => {
+                            if (range?.from && range?.to) {
+                              setDraftRange({ from: range.from, to: range.to });
+                            } else if (range?.from) {
+                              setDraftRange({ from: range.from, to: range.from });
+                            }
+                          }}
+                          numberOfMonths={2}
+                          className="p-4 pointer-events-auto"
+                        />
+                        <div className="flex items-center justify-between px-4 pb-3 border-t border-border pt-3">
+                          <p className="text-xs text-muted-foreground">
+                            {format(draftRange.from, "MMM dd, yyyy")} – {format(draftRange.to, "MMM dd, yyyy")}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" className="h-8 text-xs px-4" onClick={handleCancelDateRange}>Cancel</Button>
+                            <Button size="sm" className="h-8 text-xs px-4" onClick={handleApplyDateRange}>Apply</Button>
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                  <div className="flex flex-col">
-                    <Calendar
-                      mode="range"
-                      selected={{ from: draftRange.from, to: draftRange.to }}
-                      onSelect={(range) => {
-                        if (range?.from && range?.to) {
-                          setDraftRange({ from: range.from, to: range.to });
-                        } else if (range?.from) {
-                          setDraftRange({ from: range.from, to: range.from });
-                        }
-                      }}
-                      numberOfMonths={2}
-                      className="p-4 pointer-events-auto"
-                    />
-                    <div className="flex items-center justify-between px-4 pb-3 border-t border-border pt-3">
-                      <p className="text-xs text-muted-foreground">
-                        {format(draftRange.from, "MMM dd, yyyy")} – {format(draftRange.to, "MMM dd, yyyy")}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" className="h-8 text-xs px-4" onClick={handleCancelDateRange}>Cancel</Button>
-                        <Button size="sm" className="h-8 text-xs px-4" onClick={handleApplyDateRange}>Apply</Button>
-                      </div>
                     </div>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
+
+            {children}
+
+            {showRunButton && (
+              <Button size="sm" className="gap-1.5 h-8" onClick={onRun}>
+                <Play className="h-3.5 w-3.5" />Run
+              </Button>
+            )}
           </div>
-        )}
 
-        {children}
-
-        {showRunButton && (
-          <Button size="sm" className="gap-1.5 h-8" onClick={onRun}>
-            <Play className="h-3.5 w-3.5" />Run
-          </Button>
-        )}
-      </div>
-
-      {/* Right side: context + sync + actions + alerts */}
-      <div className="flex items-center gap-0 ml-auto shrink-0">
-        {/* Zone 1 — Marketplace + Account */}
-        <div className="flex items-center gap-2 px-3">
-          <div className="flex items-center gap-1.5" style={{ color: marketplaceColor }}>
-            {renderMarketplaceLogo()}
-          </div>
-          <StatusDot status={accountStatus} className="h-1.5 w-1.5" />
-          <span className="text-xs font-medium text-foreground truncate max-w-[120px]">{accountName}</span>
+          {/* Right: island-off actions + bell */}
+          {islandOff && (
+            <div className="flex items-center gap-0.5 ml-auto shrink-0">
+              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openAan()}>
+                <Sparkles className="h-3 w-3 text-primary" />
+                <span className="text-[11px]">Ask Aan</span>
+              </Button>
+              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openInsights()}>
+                <Lightbulb className="h-3 w-3" />
+                <span className="text-[11px]">Insights</span>
+              </Button>
+              <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => toast.info("Refreshing data...")}>
+                <RefreshCw className="h-3 w-3" />
+                <span className="text-[11px]">Refresh</span>
+              </Button>
+              <div className="pl-2 border-l border-border ml-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDataPanel("notifications")}>
+                      <Bell className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom"><p>Alerts</p></TooltipContent>
+                </Tooltip>
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Zone 2 — Last synced */}
-        <div className="flex items-center gap-1.5 px-3 border-l border-border">
-          <Clock className="h-3 w-3 text-muted-foreground" />
-          <span className="text-[11px] text-muted-foreground whitespace-nowrap">Last synced: {lastSyncTime}</span>
-        </div>
-
-        {/* Zone 3 — Island-off fallback actions (no Export/Screenshot) */}
-        {islandOff && (
-          <div className="flex items-center gap-0.5 pl-3 border-l border-border">
-            <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openAan()}>
-              <Sparkles className="h-3 w-3 text-primary" />
-              <span className="text-[11px]">Ask Aan</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openInsights()}>
-              <Lightbulb className="h-3 w-3" />
-              <span className="text-[11px]">Insights</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => toast.info("Refreshing data...")}>
-              <RefreshCw className="h-3 w-3" />
-              <span className="text-[11px]">Refresh</span>
-            </Button>
-          </div>
-        )}
-
-        {/* Zone 4 — Alerts bell (icon only, far right) */}
-        {islandOff && (
-          <div className="pl-3 border-l border-border">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDataPanel("notifications")}>
-                  <Bell className="h-3.5 w-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom"><p>Alerts</p></TooltipContent>
-            </Tooltip>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
