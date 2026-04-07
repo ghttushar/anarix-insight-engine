@@ -117,11 +117,12 @@ export default function ProductAdDetail() {
           />
 
           <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />
-          <PageFooterBar breadcrumbItems={breadcrumbItems} />
         </div>
 
         <AddProductAdsPanel />
       </div>
+
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
     </AppLayout>
   );
 }

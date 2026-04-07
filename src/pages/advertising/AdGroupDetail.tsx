@@ -115,12 +115,13 @@ export default function AdGroupDetail() {
           />
 
           {renderTable()}
-          <PageFooterBar breadcrumbItems={breadcrumbItems} />
         </div>
 
         {adGroup && <AdGroupSettingsPanel adGroup={adGroup} />}
         <AddProductAdsPanel />
       </div>
+
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
     </AppLayout>
   );
 }
