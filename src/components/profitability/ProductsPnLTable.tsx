@@ -219,9 +219,9 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
         <Table>
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
-              <TableHead className="sticky left-0 z-20 bg-muted min-w-[300px] border-r border-border">Order Details</TableHead>
+              <SortableTableHead field="orderId" {...sp} isFixed className="sticky left-0 z-20 bg-muted min-w-[300px] border-r border-border">Order Details</SortableTableHead>
               {cols.map((col) => (
-                <TableHead key={col.id} className="text-right">{col.label}</TableHead>
+                <SortableTableHead key={col.id} field={col.id} {...sp} className={cn("text-right", pc(col.id, true))} style={ps(col.id)} align="right">{col.label}</SortableTableHead>
               ))}
               <TableHead className="text-center w-[80px]">Info</TableHead>
             </TableRow>
