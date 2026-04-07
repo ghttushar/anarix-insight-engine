@@ -1,5 +1,6 @@
 import { useState, useEffect, ReactNode } from "react";
-import { CalendarIcon, Play, Sparkles, Bell, Lightbulb, RefreshCw, Download, Camera, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CalendarIcon, Play, Sparkles, Bell, Lightbulb, RefreshCw, Clock, ChevronRight } from "lucide-react";
 import { format, subDays, startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useFilter } from "@/contexts/FilterContext";
@@ -19,9 +20,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import html2canvas from "html2canvas";
 import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
 
 interface DatePreset {
   label: string;
@@ -109,12 +114,13 @@ interface AppTaskbarProps {
   showRunButton?: boolean;
   onRun?: () => void;
   children?: ReactNode;
+  breadcrumbItems?: BreadcrumbItem[];
 }
 
-export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, showRunButton = false, onRun, children }: AppTaskbarProps) {
+export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, showRunButton = false, onRun, children, breadcrumbItems }: AppTaskbarProps) {
   const { adType, setAdType, frequency, setFrequency, dateRange, setDateRange } = useFilter();
   const { effects } = useVisualEffects();
-  const { setAiPanel, setDataPanel } = useActivePanel();
+  const { setDataPanel } = useActivePanel();
   const { marketplace } = useMarketplace();
   const { currentAccount } = useAccounts();
   const { openPanel: openAan } = useAan();
@@ -123,7 +129,6 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
 
   const [draftRange, setDraftRange] = useState<{ from: Date; to: Date }>(dateRange);
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
-  const [isCapturing, setIsCapturing] = useState(false);
 
   useEffect(() => {
     if (datePopoverOpen) {
@@ -143,22 +148,6 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
   const handlePresetClick = (preset: DatePreset) => {
     const range = preset.getRange();
     setDraftRange(range);
-  };
-
-  const takeScreenshot = async () => {
-    setIsCapturing(true);
-    try {
-      const canvas = await html2canvas(document.body, { useCORS: true, allowTaint: true, backgroundColor: null });
-      const link = document.createElement("a");
-      link.download = `anarix-screenshot-${Date.now()}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-      toast.success("Screenshot saved!");
-    } catch {
-      toast.error("Failed to capture screenshot");
-    } finally {
-      setIsCapturing(false);
-    }
   };
 
   const marketplaceLogo = MARKETPLACE_LOGOS[marketplace];
@@ -182,9 +171,41 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
     return null;
   };
 
+  const renderBreadcrumb = () => {
+    if (!breadcrumbItems || breadcrumbItems.length === 0) return null;
+    return (
+      <nav className="flex items-center gap-0.5 text-xs shrink-0">
+        {breadcrumbItems.map((item, index) => {
+          const isLast = index === breadcrumbItems.length - 1;
+          return (
+            <div key={index} className="flex items-center gap-0.5">
+              {index > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/50" />}
+              {item.href && !isLast ? (
+                <Link to={item.href} className="text-muted-foreground hover:text-foreground transition-colors">
+                  {item.label}
+                </Link>
+              ) : (
+                <span className={cn(isLast ? "font-medium text-foreground" : "text-muted-foreground")}>
+                  {item.label}
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </nav>
+    );
+  };
+
   return (
-    <div className="flex h-14 items-center rounded-lg border bg-card px-4 shrink-0 sticky top-0 z-30 border-primary">
+    <div className="flex h-14 items-center rounded-lg border bg-card px-4 shrink-0 sticky top-0 z-30 border-primary gap-3">
+      {/* Left: Breadcrumb + filters + children */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
+        {renderBreadcrumb()}
+
+        {breadcrumbItems && breadcrumbItems.length > 0 && (showAdType || showFrequency || showDateRange || children) && (
+          <div className="h-5 w-px bg-border shrink-0" />
+        )}
+
         {showAdType && (
           <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
             <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
@@ -299,7 +320,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
         )}
       </div>
 
-      {/* Right side: context + sync + actions */}
+      {/* Right side: context + sync + actions + alerts */}
       <div className="flex items-center gap-0 ml-auto shrink-0">
         {/* Zone 1 — Marketplace + Account */}
         <div className="flex items-center gap-2 px-3">
@@ -316,16 +337,12 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
           <span className="text-[11px] text-muted-foreground whitespace-nowrap">Last synced: {lastSyncTime}</span>
         </div>
 
-        {/* Zone 3 — Island-off fallback actions */}
+        {/* Zone 3 — Island-off fallback actions (no Export/Screenshot) */}
         {islandOff && (
           <div className="flex items-center gap-0.5 pl-3 border-l border-border">
             <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openAan()}>
               <Sparkles className="h-3 w-3 text-primary" />
               <span className="text-[11px]">Ask Aan</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => setDataPanel("notifications")}>
-              <Bell className="h-3 w-3" />
-              <span className="text-[11px]">Alerts</span>
             </Button>
             <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openInsights()}>
               <Lightbulb className="h-3 w-3" />
@@ -335,14 +352,20 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
               <RefreshCw className="h-3 w-3" />
               <span className="text-[11px]">Refresh</span>
             </Button>
-            <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => toast.success("Export started")}>
-              <Download className="h-3 w-3" />
-              <span className="text-[11px]">Export</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={takeScreenshot} disabled={isCapturing}>
-              <Camera className={cn("h-3 w-3", isCapturing && "animate-pulse")} />
-              <span className="text-[11px]">{isCapturing ? "..." : "Screenshot"}</span>
-            </Button>
+          </div>
+        )}
+
+        {/* Zone 4 — Alerts bell (icon only, far right) */}
+        {islandOff && (
+          <div className="pl-3 border-l border-border">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDataPanel("notifications")}>
+                  <Bell className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom"><p>Alerts</p></TooltipContent>
+            </Tooltip>
           </div>
         )}
       </div>
