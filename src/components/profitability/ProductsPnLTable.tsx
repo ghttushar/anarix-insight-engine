@@ -38,6 +38,15 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      if (sortDirection === "desc") { setSortField(null); setSortDirection("asc"); }
+      else setSortDirection("desc");
+    } else { setSortField(field); setSortDirection("asc"); }
+  };
 
   const ALL_COLUMNS = [
     { id: "units", label: "Units", getValue: (p: ProfitabilityProduct) => formatNumber(p.units), isUnit: true },
