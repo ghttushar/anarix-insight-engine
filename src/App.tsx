@@ -67,11 +67,6 @@ import AMCInstances from "./pages/amc/Instances";
 
 // Day Parting
 import HourlyData from "./pages/dayparting/HourlyData";
-import DayPartingCampaigns from "./pages/dayparting/Campaigns";
-import CampaignDetail from "./pages/dayparting/CampaignDetail";
-import DayPartingHistory from "./pages/dayparting/History";
-import ScheduledJobs from "./pages/dayparting/ScheduledJobs";
-import ScheduleEditor from "./pages/dayparting/ScheduleEditor";
 import WorkspaceDashboard from "./pages/workspace/Dashboard";
 import HealthScore from "./pages/workspace/HealthScore";
 import ClientPortal from "./pages/reports/ClientPortal";
