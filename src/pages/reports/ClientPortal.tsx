@@ -94,7 +94,6 @@ export default function ClientPortal() {
   return (
     <AppLayout>
       <div className="space-y-6 min-w-0">
-        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Reports"
           subtitle="Generate, schedule, and share branded reports"
