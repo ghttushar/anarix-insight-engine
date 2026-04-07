@@ -16,6 +16,7 @@ import { ruleTemplates, metricOptions, operatorOptions, actionOptions, lookbackO
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { RuleCampaignSelector } from "@/components/advertising/RuleCampaignSelector";
 
 function generateId() {
   return Math.random().toString(36).slice(2, 9);
