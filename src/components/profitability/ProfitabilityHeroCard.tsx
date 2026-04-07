@@ -4,10 +4,15 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import {
+  LineChart as LineChartIcon, BarChart as BarChartIcon,
   TrendingUp, TrendingDown, DollarSign, ShoppingCart, Package,
   BarChart3, Eye, ChevronRight, ArrowUpRight, ArrowDownRight,
   Minus, Target, Percent, Layers, CalendarIcon, Sparkles,
+  Maximize2, Minimize2, Download,
 } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { BarChart, Bar, LineChart, Line } from "recharts";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ProfitabilitySummary, TrendDataPoint } from "@/types/profitability";
 import { MorphingNumber } from "@/features/creative/MorphingNumber";
