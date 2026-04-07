@@ -90,7 +90,7 @@ export default function CampaignDetail() {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <PageHeader title="Advertising" />
+          <PageHeader breadcrumbItems={breadcrumbItems} title="Advertising" />
 
           <AppTaskbar showFrequency showDateRange>
             <Button size="sm" className="gap-1.5 ml-2">

@@ -30,7 +30,7 @@ export default function AMCAudiences() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader title="AMC Audiences" subtitle="Audiences generated from AMC query results" />
+        <PageHeader breadcrumbItems={breadcrumbItems} title="AMC Audiences" subtitle="Audiences generated from AMC query results" />
 
         <div className="rounded-lg border border-border bg-card">
           <div className="border-b border-border p-4">
