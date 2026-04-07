@@ -190,8 +190,8 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
     );
   }
 
-  // Orders mode
-  const paginatedOrders = orders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const sortedOrders = sortData(orders, sortField, sortDirection);
+  const paginatedOrders = sortedOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const orderTotals = orders.reduce(
     (acc, o) => {
