@@ -97,7 +97,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
   };
 
   return (
-    <div className="flex h-14 items-center rounded-lg border border-border bg-card px-4 shrink-0 sticky top-0 z-30">
+    <div className="flex h-14 items-center rounded-lg border bg-card px-4 shrink-0 sticky top-0 z-30 border-primary">
       <div className="flex items-center gap-3 flex-1">
         {showAdType && (
           <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
