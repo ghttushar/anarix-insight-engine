@@ -261,8 +261,7 @@ export default function CampaignManager() {
     <AppLayout>
       <div className="flex flex-1 min-h-0 min-w-0">
         <div className="flex-1 min-w-0 space-y-6">
-          <PageBreadcrumb items={breadcrumbItems} />
-          <PageHeader
+        <PageHeader
             title="Campaign Manager"
             subtitle="Manage and optimize your advertising campaigns"
           />
