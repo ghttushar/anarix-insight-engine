@@ -70,25 +70,11 @@ export default function CampaignDetail() {
     <AppLayout>
       <div className="flex flex-1 min-h-0 min-w-0">
         <div className="flex-1 min-w-0 space-y-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <span className="text-foreground font-medium">{campaignName}</span>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <PageBreadcrumb items={[
+            { label: "Advertising", href: "/advertising/campaigns" },
+            { label: adTypeLabel, href: "/advertising/campaigns" },
+            { label: campaignName },
+          ]} />
 
           <PageHeader title="Advertising" />
 
