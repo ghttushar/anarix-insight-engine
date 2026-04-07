@@ -6,7 +6,6 @@ import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
 import { HourlyHeatmap } from "@/components/dayparting/HourlyHeatmap";
 import { HistoryTable } from "@/components/dayparting/HistoryTable";
-import { ScheduledJobsTable } from "@/components/dayparting/ScheduledJobsTable";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { CreateSchedulePanel } from "@/components/panels/CreateSchedulePanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Calendar, Plus } from "lucide-react";
+import { Calendar, Plus, Pause, Play, Trash2 } from "lucide-react";
 import { hourlyData, calculateHourlySummary, dayPartingCampaigns, schedules as initialSchedules, executionHistory } from "@/data/mockDayParting";
 import { MetricType, DayPartingSchedule } from "@/types/dayparting";
 import { cn } from "@/lib/utils";
@@ -24,6 +23,7 @@ import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useFilter } from "@/contexts/FilterContext";
 import { SortableTableHead, usePinning, sortData, getSortHandler } from "@/components/tables/SortableTableHead";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { format } from "date-fns";
 
 const AVAILABLE_METRICS = [
   { key: "spend", label: "Spend", format: (v: number) => `$${v.toLocaleString("en-US", { minimumFractionDigits: 2 })}` },
@@ -45,21 +45,27 @@ const METRIC_VALUES: Record<string, number> = {
   clicks: 12450, impressions: 345000, ctr: 3.61, cpc: 0.82, cvr: 4.2, adSales: 0,
 };
 
-const PINNABLE_FIELDS = ["name", "status", "budget", "spend", "revenue", "roas", "scheduleCount"];
+const PINNABLE_FIELDS = ["name", "status", "budget", "spend", "revenue", "roas", "action", "nextRun"];
+
+const ACTION_LABELS: Record<string, string> = {
+  pause: "Pause",
+  reduce_budget: "Reduce Budget",
+  increase_budget: "Increase Budget",
+};
 
 const breadcrumbItems = [{ label: "Day Parting" }];
 
 export default function HourlyData() {
   const { adType, setAdType } = useFilter();
   const { setDataPanel } = useActivePanel();
-  const [activeTab, setActiveTab] = useState("campaigns");
+  const [activeTab, setActiveTab] = useState("dayparting");
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>(["camp-1"]);
   const [metric, setMetric] = useState<MetricType>("roas");
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeltas, setShowDeltas] = useState(false);
   const [boxMetrics, setBoxMetrics] = useState<string[]>(["spend", "revenue", "roas", "acos", "orders", "units"]);
 
-  // Campaigns table sort/pin
+  // Table sort/pin
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,7 +75,6 @@ export default function HourlyData() {
 
   // Schedules state
   const [schedules, setSchedules] = useState<DayPartingSchedule[]>(initialSchedules);
-  const [scheduleSearch, setScheduleSearch] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null);
 
@@ -95,28 +100,55 @@ export default function HourlyData() {
     setBoxMetrics(prev => { const next = [...prev]; next[index] = newMetric; return next; });
   };
 
-  // Campaigns filtering
-  const filteredCampaigns = dayPartingCampaigns.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const sorted = sortData(filteredCampaigns, sortField, sortDirection);
-  const paginatedCampaigns = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
-
-  // Schedules filtering
-  const filteredSchedules = schedules.filter((s) =>
-    s.name.toLowerCase().includes(scheduleSearch.toLowerCase()) ||
-    s.campaignNames.some((c) => c.toLowerCase().includes(scheduleSearch.toLowerCase()))
-  );
-
-  const handlePauseResume = (id: string) => {
-    setSchedules((prev) =>
-      prev.map((s) => s.id === id ? { ...s, status: s.status === "active" ? "paused" : "active", updatedAt: new Date().toISOString() } : s)
-    );
+  // Build unified rows: each campaign merged with its schedule info
+  type UnifiedRow = {
+    id: string;
+    name: string;
+    status: string;
+    budget: number;
+    spend: number;
+    revenue: number;
+    roas: number;
+    action: string;
+    scheduleStatus: string;
+    nextRun: string;
+    scheduleId: string | null;
   };
 
-  const handleDeleteClick = (id: string) => {
-    setScheduleToDelete(id);
+  const unifiedRows: UnifiedRow[] = dayPartingCampaigns.map((campaign) => {
+    const campSchedules = schedules.filter((s) => s.campaignIds.includes(campaign.id));
+    const activeSchedule = campSchedules.find((s) => s.status === "active") || campSchedules[0];
+    return {
+      id: campaign.id,
+      name: campaign.name,
+      status: campaign.status,
+      budget: campaign.budget,
+      spend: campaign.spend,
+      revenue: campaign.revenue,
+      roas: campaign.roas,
+      action: activeSchedule ? ACTION_LABELS[activeSchedule.actionType] || activeSchedule.actionType : "—",
+      scheduleStatus: activeSchedule?.status || "none",
+      nextRun: activeSchedule?.nextRun || "",
+      scheduleId: activeSchedule?.id || null,
+    };
+  });
+
+  const filteredRows = unifiedRows.filter((r) =>
+    r.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const sorted = sortData(filteredRows, sortField, sortDirection);
+  const paginatedRows = sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const sp = { sortField, sortDirection, onSort: handleSort, pinnedColumns, onPinToggle: handlePinToggle };
+
+  const handlePauseResume = (scheduleId: string) => {
+    setSchedules((prev) =>
+      prev.map((s) => s.id === scheduleId ? { ...s, status: s.status === "active" ? "paused" : "active", updatedAt: new Date().toISOString() } : s)
+    );
+    toast.success("Schedule updated");
+  };
+
+  const handleDeleteClick = (scheduleId: string) => {
+    setScheduleToDelete(scheduleId);
     setDeleteDialogOpen(true);
   };
 
@@ -144,8 +176,12 @@ export default function HourlyData() {
     failed: executionHistory.filter((h) => h.status === "failed").length,
   };
 
-  // Analytics heatmap state
-  const [analyticsMetric, setAnalyticsMetric] = useState<MetricType>("roas");
+  const SCHEDULE_STATUS_STYLES: Record<string, string> = {
+    active: "bg-success/10 text-success border-success/30",
+    paused: "bg-warning/10 text-warning border-warning/30",
+    draft: "bg-primary/10 text-primary border-primary/30",
+    none: "bg-muted text-muted-foreground",
+  };
 
   return (
     <AppLayout>
@@ -153,7 +189,7 @@ export default function HourlyData() {
         <div className="flex-1 min-w-0 space-y-6 overflow-auto">
           <PageHeader
             title="Day Parting"
-            subtitle="Analyze hourly performance, manage schedules, and review execution history"
+            subtitle="Analyze hourly performance and manage campaign schedules"
             appLevelSelector={
               <AppLevelSelector>
                 <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
@@ -196,13 +232,12 @@ export default function HourlyData() {
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
-              <TabsTrigger value="campaigns">Campaigns & Schedules</TabsTrigger>
+              <TabsTrigger value="dayparting">Day Parting</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
-            {/* Tab 1: Campaigns & Schedules */}
-            <TabsContent value="campaigns" className="mt-4 space-y-6">
+            {/* Tab 1: Day Parting — Hero + Heatmap + Unified Table */}
+            <TabsContent value="dayparting" className="mt-4 space-y-6">
               {/* Hero Metrics */}
               <div className="space-y-3">
                 <h2 className="text-sm font-semibold text-foreground">Hourly Trends</h2>
@@ -234,19 +269,18 @@ export default function HourlyData() {
                 </div>
               </div>
 
-              {/* Campaigns Table */}
+              {/* Unified Campaigns & Schedules Table */}
               <div className="space-y-3">
-                <h2 className="text-sm font-semibold text-foreground">Campaigns</h2>
                 <DataTableToolbar
                   searchValue={searchQuery}
                   onSearchChange={setSearchQuery}
                   searchPlaceholder="Search campaigns..."
-                  onDownload={() => toast.success("Exporting campaigns...")}
+                  onDownload={() => toast.success("Exporting data...")}
                   showDeltas={showDeltas}
                   onShowDeltasChange={setShowDeltas}
                   leftContent={
                     <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createSchedule")}>
-                      <Plus className="h-3.5 w-3.5" />Create Rule
+                      <Plus className="h-3.5 w-3.5" />Create Schedule
                     </Button>
                   }
                 />
@@ -254,43 +288,72 @@ export default function HourlyData() {
                   <Table>
                     <TableHeader>
                       <tr className="bg-muted/30 hover:bg-muted/30">
-                        <SortableTableHead field="name" isFixed className="min-w-[300px]" {...sp}>Campaign</SortableTableHead>
+                        <SortableTableHead field="name" isFixed className="min-w-[260px]" {...sp}>Campaign</SortableTableHead>
                         <SortableTableHead field="status" align="center" {...sp}>Status</SortableTableHead>
                         <SortableTableHead field="budget" align="right" {...sp} style={ps("budget")} className={cn(pc("budget", true))}>Budget</SortableTableHead>
                         <SortableTableHead field="spend" align="right" {...sp} style={ps("spend")} className={cn(pc("spend", true))}>Spend</SortableTableHead>
                         <SortableTableHead field="revenue" align="right" {...sp} style={ps("revenue")} className={cn(pc("revenue", true))}>Revenue</SortableTableHead>
                         <SortableTableHead field="roas" align="right" {...sp} style={ps("roas")} className={cn(pc("roas", true))}>ROAS</SortableTableHead>
-                        <SortableTableHead field="scheduleCount" align="center" {...sp} style={ps("scheduleCount")} className={cn(pc("scheduleCount", true))}>Schedules</SortableTableHead>
+                        <SortableTableHead field="action" align="center" {...sp} style={ps("action")} className={cn(pc("action", true))}>Schedule Action</SortableTableHead>
+                        <SortableTableHead field="nextRun" align="center" {...sp} style={ps("nextRun")} className={cn(pc("nextRun", true))}>Next Run</SortableTableHead>
+                        <SortableTableHead field="actions" isFixed align="center" sortField={null} sortDirection="asc" onSort={undefined} pinnedColumns={pinnedColumns} onPinToggle={undefined}>Actions</SortableTableHead>
                       </tr>
                     </TableHeader>
                     <TableBody>
-                      {paginatedCampaigns.map((campaign) => (
+                      {paginatedRows.map((row) => (
                         <TableRow
-                          key={campaign.id}
+                          key={row.id}
                           className={cn(
                             "hover:bg-muted/50 cursor-pointer",
-                            selectedCampaigns.includes(campaign.id) && "bg-primary/5"
+                            selectedCampaigns.includes(row.id) && "bg-primary/5"
                           )}
-                          onClick={() => setSelectedCampaigns([campaign.id])}
+                          onClick={() => setSelectedCampaigns([row.id])}
                         >
-                          <TableCell className="font-medium">{campaign.name}</TableCell>
+                          <TableCell className="font-medium">{row.name}</TableCell>
                           <TableCell className="text-center">
-                            <Badge variant="outline" className={cn("capitalize", campaign.status === "enabled" ? "bg-success/10 text-success border-success/30" : "bg-muted text-muted-foreground")}>
-                              {campaign.status}
+                            <Badge variant="outline" className={cn("capitalize", row.status === "enabled" ? "bg-success/10 text-success border-success/30" : "bg-muted text-muted-foreground")}>
+                              {row.status}
                             </Badge>
                           </TableCell>
-                          <TableCell style={ps("budget")} className={cn("text-right", pc("budget"))}>{formatCurrency(campaign.budget)}</TableCell>
-                          <TableCell style={ps("spend")} className={cn("text-right", pc("spend"))}>{formatCurrency(campaign.spend)}</TableCell>
-                          <TableCell style={ps("revenue")} className={cn("text-right", pc("revenue"))}>{formatCurrency(campaign.revenue)}</TableCell>
+                          <TableCell style={ps("budget")} className={cn("text-right", pc("budget"))}>{formatCurrency(row.budget)}</TableCell>
+                          <TableCell style={ps("spend")} className={cn("text-right", pc("spend"))}>{formatCurrency(row.spend)}</TableCell>
+                          <TableCell style={ps("revenue")} className={cn("text-right", pc("revenue"))}>{formatCurrency(row.revenue)}</TableCell>
                           <TableCell style={ps("roas")} className={cn("text-right", pc("roas"))}>
-                            <span className={cn(campaign.roas >= 3 ? "text-success" : "text-foreground")}>{campaign.roas.toFixed(2)}x</span>
+                            <span className={cn(row.roas >= 3 ? "text-success" : "text-foreground")}>{row.roas.toFixed(2)}x</span>
                           </TableCell>
-                          <TableCell style={ps("scheduleCount")} className={cn("text-center", pc("scheduleCount"))}>
-                            {campaign.hasSchedule ? (
-                              <Badge variant="secondary" className="gap-1"><Calendar className="h-3 w-3" />{campaign.scheduleCount}</Badge>
+                          <TableCell style={ps("action")} className={cn("text-center", pc("action"))}>
+                            {row.scheduleId ? (
+                              <div className="flex flex-col items-center gap-0.5">
+                                <span className="text-sm">{row.action}</span>
+                                <Badge variant="outline" className={cn("capitalize text-[10px] px-1.5 py-0", SCHEDULE_STATUS_STYLES[row.scheduleStatus])}>
+                                  {row.scheduleStatus}
+                                </Badge>
+                              </div>
                             ) : (
-                              <span className="text-muted-foreground text-sm">None</span>
+                              <span className="text-muted-foreground text-sm">No schedule</span>
                             )}
+                          </TableCell>
+                          <TableCell style={ps("nextRun")} className={cn("text-center text-sm", pc("nextRun"))}>
+                            {row.nextRun ? format(new Date(row.nextRun), "MMM dd, HH:mm") : "—"}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex items-center justify-center gap-0.5" onClick={(e) => e.stopPropagation()}>
+                              {row.scheduleId && row.scheduleStatus !== "draft" && (
+                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handlePauseResume(row.scheduleId!)} title={row.scheduleStatus === "active" ? "Pause schedule" : "Resume schedule"}>
+                                  {row.scheduleStatus === "active" ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+                                </Button>
+                              )}
+                              {row.scheduleId && (
+                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive/80 hover:bg-destructive/10" onClick={() => handleDeleteClick(row.scheduleId!)} title="Delete schedule">
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              )}
+                              {!row.scheduleId && (
+                                <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={() => setDataPanel("createSchedule")}>
+                                  <Plus className="h-3 w-3" />Add
+                                </Button>
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -299,39 +362,11 @@ export default function HourlyData() {
                   <TablePagination
                     page={currentPage}
                     pageSize={pageSize}
-                    totalItems={filteredCampaigns.length}
+                    totalItems={filteredRows.length}
                     onPageChange={setCurrentPage}
                     onPageSizeChange={setPageSize}
                   />
                 </div>
-              </div>
-
-              {/* Schedules Table */}
-              <div className="space-y-3">
-                <h2 className="text-sm font-semibold text-foreground">Schedules</h2>
-                <DataTableToolbar
-                  searchValue={scheduleSearch}
-                  onSearchChange={setScheduleSearch}
-                  searchPlaceholder="Search schedules..."
-                  onDownload={() => toast.success("Exporting schedules...")}
-                  leftContent={
-                    <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createSchedule")}>
-                      <Plus className="h-3.5 w-3.5" />Create Schedule
-                    </Button>
-                  }
-                />
-                {filteredSchedules.length > 0 ? (
-                  <ScheduledJobsTable schedules={filteredSchedules} onPauseResume={handlePauseResume} onDelete={handleDeleteClick} />
-                ) : (
-                  <div className="text-center py-12 border border-border rounded-lg bg-card">
-                    <p className="text-muted-foreground">No scheduled jobs found</p>
-                    {scheduleSearch ? (
-                      <p className="text-sm mt-1 text-muted-foreground">Try adjusting your search query</p>
-                    ) : (
-                      <Button variant="link" onClick={() => setDataPanel("createSchedule")} className="mt-2">Create your first schedule</Button>
-                    )}
-                  </div>
-                )}
               </div>
             </TabsContent>
 
@@ -358,29 +393,6 @@ export default function HourlyData() {
                   {historySearch && <p className="text-sm mt-1">Try adjusting your search query</p>}
                 </div>
               )}
-            </TabsContent>
-
-            {/* Tab 3: Analytics */}
-            <TabsContent value="analytics" className="mt-4 space-y-4">
-              <div className="flex items-center gap-3">
-                <h2 className="text-sm font-semibold text-foreground">Hourly Performance Analysis</h2>
-                <Select value={analyticsMetric} onValueChange={(v) => setAnalyticsMetric(v as MetricType)}>
-                  <SelectTrigger className="h-8 w-[120px] text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="spend" className="text-xs">Spend</SelectItem>
-                    <SelectItem value="revenue" className="text-xs">Revenue</SelectItem>
-                    <SelectItem value="roas" className="text-xs">ROAS</SelectItem>
-                    <SelectItem value="acos" className="text-xs">ACOS</SelectItem>
-                    <SelectItem value="orders" className="text-xs">Orders</SelectItem>
-                    <SelectItem value="ctr" className="text-xs">CTR</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="overflow-auto">
-                <HourlyHeatmap data={hourlyData} metric={analyticsMetric} />
-              </div>
             </TabsContent>
           </Tabs>
 
