@@ -3,9 +3,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { AppLevelSelector } from "@/components/layout/AppLevelSelector";
-import { PeriodSummaryCard } from "@/components/profitability/PeriodSummaryCard";
 import { ProfitabilityHeroCard } from "@/components/profitability/ProfitabilityHeroCard";
-import { ProfitabilityTrendChart } from "@/components/profitability/ProfitabilityTrendChart";
 import { ProductsPnLTable } from "@/components/profitability/ProductsPnLTable";
 import { COGSEditModal } from "@/components/profitability/COGSEditModal";
 import { ProductDetailPanel } from "@/components/profitability/ProductDetailPanel";
@@ -19,10 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
-import { LayoutGrid, Layers } from "lucide-react";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
-const accentColors = ["hsl(var(--primary))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))"];
 
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },
@@ -68,7 +63,7 @@ export default function ProfitabilityDashboard() {
   const [products, setProducts] = useState(profitabilityProducts);
   const [showDeltas, setShowDeltas] = useState(false);
   const [catalogue, setCatalogue] = useState("all");
-  const [useNewDesign, setUseNewDesign] = useState(true);
+  
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -146,66 +141,13 @@ export default function ProfitabilityDashboard() {
           />
           <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} />
 
-          {/* Design toggle */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5">
-              <button
-                onClick={() => setUseNewDesign(true)}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all",
-                  useNewDesign ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Layers className="h-3.5 w-3.5" /> New Design
-              </button>
-              <button
-                onClick={() => setUseNewDesign(false)}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-all",
-                  !useNewDesign ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <LayoutGrid className="h-3.5 w-3.5" /> Classic
-              </button>
-            </div>
-          </div>
-
-          {useNewDesign ? (
-            <ProfitabilityHeroCard
-              summaries={profitabilitySummaries}
-              trendDataByPeriod={trendDataByPeriod}
-              selectedPeriod={selectedPeriod}
-              onPeriodChange={setSelectedPeriod}
-              onViewBreakdown={handleOpenBreakdown}
-            />
-          ) : (
-            <div className="grid gap-6 lg:grid-cols-3">
-              <div className="lg:col-span-2 space-y-3">
-                {profitabilitySummaries.map((summary, index) => (
-                  <div
-                    key={summary.period}
-                    onClick={() => setSelectedPeriod(summary.period)}
-                    className={cn(
-                      "cursor-pointer rounded-lg transition-all",
-                      selectedPeriod === summary.period && "ring-2 ring-primary/50"
-                    )}
-                  >
-                    <PeriodSummaryCard
-                      summary={summary}
-                      accentColor={accentColors[index % accentColors.length]}
-                      onViewMore={handleOpenBreakdown}
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="h-full">
-                <ProfitabilityTrendChart
-                  data={trendDataByPeriod[selectedPeriod] || trendDataByPeriod.this_month}
-                  periodLabel={profitabilitySummaries.find((s) => s.period === selectedPeriod)?.dateLabel || ""}
-                />
-              </div>
-            </div>
-          )}
+          <ProfitabilityHeroCard
+            summaries={profitabilitySummaries}
+            trendDataByPeriod={trendDataByPeriod}
+            selectedPeriod={selectedPeriod}
+            onPeriodChange={setSelectedPeriod}
+            onViewBreakdown={handleOpenBreakdown}
+          />
 
           <div className="space-y-3">
             <DataTableToolbar
