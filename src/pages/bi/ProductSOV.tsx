@@ -32,7 +32,8 @@ export default function ProductSOV() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Product Share of Voice"
+            breadcrumbItems={breadcrumbItems}
+            title="Product Share of Voice"
           subtitle="Track SOV performance by product"
           appLevelSelector={<AppLevelSelector />}
         />

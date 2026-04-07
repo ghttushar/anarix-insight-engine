@@ -96,7 +96,8 @@ export default function AppliedRules() {
           ]}
         />
         <PageHeader
-          title="Applied Rules"
+            breadcrumbItems={breadcrumbItems}
+            title="Applied Rules"
           subtitle="Manage and monitor all active automation rules"
         />
 

@@ -125,7 +125,8 @@ export default function RuleCreation() {
       <div className="space-y-6">
         <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
-          title={isEdit ? "Edit Rule" : "Create Rule"}
+            breadcrumbItems={breadcrumbItems}
+            title={isEdit ? "Edit Rule" : "Create Rule"}
           subtitle={template ? `Based on: ${template.name}` : "Define conditions, actions, and apply to campaigns"}
           actions={
             <Button variant="outline" size="sm" onClick={handleSaveDraft}>

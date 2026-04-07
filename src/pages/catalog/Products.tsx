@@ -56,7 +56,8 @@ export default function CatalogProducts() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Products Catalog"
+            breadcrumbItems={breadcrumbItems}
+            title="Products Catalog"
           subtitle="Manage your product catalog and inventory"
           appLevelSelector={<AppLevelSelector />}
         />

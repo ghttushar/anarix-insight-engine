@@ -29,7 +29,8 @@ export default function DesignSystem() {
   return (
     <AppLayout>
       <PageHeader
-        title="Design System"
+            breadcrumbItems={breadcrumbItems}
+            title="Design System"
         subtitle="Complete documentation of all design elements, components, and patterns used in Anarix"
       />
 
@@ -1149,7 +1150,8 @@ export default function MyPage() {
   return (
     <AppLayout>
       <PageHeader
-        title="Page Title"
+            breadcrumbItems={breadcrumbItems}
+            title="Page Title"
         subtitle="Page description"
       />
       

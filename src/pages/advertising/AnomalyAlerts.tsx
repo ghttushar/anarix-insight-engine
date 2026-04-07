@@ -50,7 +50,8 @@ export default function AnomalyAlerts() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Aan Anomaly Alerts"
+            breadcrumbItems={breadcrumbItems}
+            title="Aan Anomaly Alerts"
           subtitle="Proactive AI-powered alerts when metrics deviate significantly from expected patterns"
           actions={
             <div className="flex gap-2">

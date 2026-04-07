@@ -94,7 +94,8 @@ export default function ClientPortal() {
     <AppLayout>
       <div className="space-y-6 min-w-0">
         <PageHeader
-          title="Reports"
+            breadcrumbItems={breadcrumbItems}
+            title="Reports"
           subtitle="Generate, schedule, and share branded reports"
           actions={
             <Button size="sm" onClick={() => handleOpenCreate()}>

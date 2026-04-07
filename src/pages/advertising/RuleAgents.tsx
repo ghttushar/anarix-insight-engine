@@ -46,7 +46,8 @@ export default function RuleAgents() {
           ]}
         />
         <PageHeader
-          title="Rule Agents"
+            breadcrumbItems={breadcrumbItems}
+            title="Rule Agents"
           subtitle="Create automation rules from templates or with AI assistance"
           actions={
             draftCount > 0 ? (

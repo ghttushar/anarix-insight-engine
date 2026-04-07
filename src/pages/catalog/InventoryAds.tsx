@@ -40,7 +40,8 @@ export default function InventoryAds() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Inventory-Aware Ad Optimization"
+            breadcrumbItems={breadcrumbItems}
+            title="Inventory-Aware Ad Optimization"
           subtitle="Automatically adjust ad spend based on stock levels — reduce spend on stockouts, increase on overstock"
           actions={
             <div className="flex gap-2">
