@@ -169,7 +169,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
                 {cols.map((col) => {
                   const val = totals[col.id] || 0;
                   return (
-                    <TableCell key={col.id} className="text-right">
+                    <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
                       <TotalCell value={col.isUnit ? formatNumber(val) : formatCurrency(val)} metric={col.id} />
                     </TableCell>
                   );
