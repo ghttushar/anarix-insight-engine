@@ -121,130 +121,154 @@ export default function RuleCreation() {
     { label: isEdit ? "Edit Rule" : (template?.name || "Create Rule") },
   ];
 
+  const handleApplyRule = () => {
+    toast.success("Rule applied successfully");
+    navigate("/advertising/rules/applied");
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
         <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title={isEdit ? "Edit Rule" : "Create Rule"}
-          subtitle={template ? `Based on: ${template.name}` : "Define conditions, actions, and apply to campaigns"}
+          subtitle={
+            step === "campaigns"
+              ? "Select campaigns to apply this rule to"
+              : template
+              ? `Based on: ${template.name}`
+              : "Define conditions, actions, and apply to campaigns"
+          }
           actions={
-            <Button variant="outline" size="sm" onClick={handleSaveDraft}>
-              <Save className="mr-1.5 h-3.5 w-3.5" />
-              Save Draft
-            </Button>
+            step === "builder" ? (
+              <Button variant="outline" size="sm" onClick={handleSaveDraft}>
+                <Save className="mr-1.5 h-3.5 w-3.5" />
+                Save Draft
+              </Button>
+            ) : undefined
           }
         />
 
-        {/* Basic Information */}
-        <Card>
-          <CardContent className="pt-5 pb-4 px-5 space-y-4">
-            <h3 className="font-heading text-sm font-semibold text-foreground">Basic Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="space-y-1.5 lg:col-span-2">
-                <Label className="text-xs">Rule Name</Label>
-                <Input value={ruleName} onChange={(e) => setRuleName(e.target.value)} placeholder="Enter rule name" />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Status</Label>
-                <div className="flex items-center gap-2 h-10">
-                  <Switch checked={status} onCheckedChange={setStatus} />
-                  <span className="text-sm text-muted-foreground">{status ? "Active" : "Inactive"}</span>
+        {step === "builder" ? (
+          <>
+            {/* Basic Information */}
+            <Card>
+              <CardContent className="pt-5 pb-4 px-5 space-y-4">
+                <h3 className="font-heading text-sm font-semibold text-foreground">Basic Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="space-y-1.5 lg:col-span-2">
+                    <Label className="text-xs">Rule Name</Label>
+                    <Input value={ruleName} onChange={(e) => setRuleName(e.target.value)} placeholder="Enter rule name" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Status</Label>
+                    <div className="flex items-center gap-2 h-10">
+                      <Switch checked={status} onCheckedChange={setStatus} />
+                      <span className="text-sm text-muted-foreground">{status ? "Active" : "Inactive"}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Lookback Window</Label>
+                    <Select value={lookback} onValueChange={setLookback}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {lookbackOptions.map((o) => (
+                          <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Frequency</Label>
+                    <Select value={frequency} onValueChange={setFrequency}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {frequencyOptions.map((o) => (
+                          <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Lookback Window</Label>
-                <Select value={lookback} onValueChange={setLookback}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {lookbackOptions.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Frequency</Label>
-                <Select value={frequency} onValueChange={setFrequency}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {frequencyOptions.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              </CardContent>
+            </Card>
+
+            {/* Advanced Settings */}
+            <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+              <Card>
+                <CardContent className="py-3 px-5">
+                  <CollapsibleTrigger className="flex items-center gap-2 w-full">
+                    {advancedOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                    <span className="font-heading text-sm font-semibold text-foreground">Advanced Settings</span>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4">
+                    <p className="text-xs text-muted-foreground">Advanced configuration options will be available here.</p>
+                  </CollapsibleContent>
+                </CardContent>
+              </Card>
+            </Collapsible>
+
+            {/* Criteria Information */}
+            <Card>
+              <CardContent className="pt-5 pb-4 px-5 space-y-4">
+                <h3 className="font-heading text-sm font-semibold text-foreground">Criteria Information</h3>
+
+                {/* Info banner */}
+                <div className="flex items-start gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2.5">
+                  <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Define criteria with conditions and actions. Criteria are evaluated in priority order — the first matching criteria's action will be executed.
+                  </p>
+                </div>
+
+                {/* Criteria Blocks */}
+                <div className="space-y-4">
+                  {criteria.map((crit) => (
+                    <CriteriaBlock
+                      key={crit.id}
+                      criteria={crit}
+                      onUpdate={(updates) => updateCriteria(crit.id, updates)}
+                      onDuplicate={() => duplicateCriteria(crit.id)}
+                      onDelete={() => removeCriteria(crit.id)}
+                      onAddCondition={() => addCondition(crit.id)}
+                      onRemoveCondition={(condId) => removeCondition(crit.id, condId)}
+                      onUpdateCondition={(condId, updates) => updateCondition(crit.id, condId, updates)}
+                      canDelete={criteria.length > 1}
+                    />
+                  ))}
+                </div>
+
+                <Button variant="outline" size="sm" onClick={addCriteria}>
+                  <Plus className="mr-1.5 h-3.5 w-3.5" />
+                  Add Criteria
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Footer Actions */}
+            <div className="flex items-center justify-between rounded-lg border border-border bg-card px-5 py-3">
+              <Button variant="outline" size="sm" onClick={addCriteria}>
+                <Plus className="mr-1.5 h-3.5 w-3.5" />
+                Add Criteria
+              </Button>
+              <Button size="sm" onClick={() => setStep("campaigns")}>
+                Select Campaigns
+                <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Advanced Settings */}
-        <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
-          <Card>
-            <CardContent className="py-3 px-5">
-              <CollapsibleTrigger className="flex items-center gap-2 w-full">
-                {advancedOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
-                <span className="font-heading text-sm font-semibold text-foreground">Advanced Settings</span>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pt-4">
-                <p className="text-xs text-muted-foreground">Advanced configuration options will be available here.</p>
-              </CollapsibleContent>
-            </CardContent>
-          </Card>
-        </Collapsible>
-
-        {/* Criteria Information */}
-        <Card>
-          <CardContent className="pt-5 pb-4 px-5 space-y-4">
-            <h3 className="font-heading text-sm font-semibold text-foreground">Criteria Information</h3>
-
-            {/* Info banner */}
-            <div className="flex items-start gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2.5">
-              <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Define criteria with conditions and actions. Criteria are evaluated in priority order — the first matching criteria's action will be executed.
-              </p>
-            </div>
-
-            {/* Criteria Blocks */}
-            <div className="space-y-4">
-              {criteria.map((crit) => (
-                <CriteriaBlock
-                  key={crit.id}
-                  criteria={crit}
-                  onUpdate={(updates) => updateCriteria(crit.id, updates)}
-                  onDuplicate={() => duplicateCriteria(crit.id)}
-                  onDelete={() => removeCriteria(crit.id)}
-                  onAddCondition={() => addCondition(crit.id)}
-                  onRemoveCondition={(condId) => removeCondition(crit.id, condId)}
-                  onUpdateCondition={(condId, updates) => updateCondition(crit.id, condId, updates)}
-                  canDelete={criteria.length > 1}
-                />
-              ))}
-            </div>
-
-            <Button variant="outline" size="sm" onClick={addCriteria}>
-              <Plus className="mr-1.5 h-3.5 w-3.5" />
-              Add Criteria
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Footer Actions */}
-        <div className="flex items-center justify-between rounded-lg border border-border bg-card px-5 py-3">
-          <Button variant="outline" size="sm" onClick={addCriteria}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            Add Criteria
-          </Button>
-          <Button size="sm" onClick={() => toast.info("Select campaigns to apply this rule to")}>
-            Select Campaigns
-            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-          </Button>
-        </div>
+          </>
+        ) : (
+          <RuleCampaignSelector
+            onBack={() => setStep("builder")}
+            onSaveDraft={handleSaveDraft}
+            onApplyRule={handleApplyRule}
+            ruleName={ruleName}
+          />
+        )}
       </div>
     
       <PageFooterBar breadcrumbItems={breadcrumbItems} />
-</AppLayout>
+    </AppLayout>
   );
 }
 
