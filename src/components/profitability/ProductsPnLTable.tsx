@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Badge } from "@/components/ui/badge";
 import { TablePagination } from "@/components/tables/TablePagination";
+import { SortableTableHead, sortData, usePinning } from "@/components/tables/SortableTableHead";
 
 interface ProductsPnLTableProps {
   products: ProfitabilityProduct[];
