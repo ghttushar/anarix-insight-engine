@@ -58,15 +58,9 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
     const isNeutral = delta === 0;
     return (
       <div className="flex items-center justify-end gap-1.5">
-        <span className="text-muted-foreground">
-          <span className="text-[10px] uppercase tracking-wide opacity-60">Base: </span>
-          {fmtVal(baseline, format)}
-        </span>
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">vs</span>
-        <span className="font-medium text-foreground">
-          <span className="text-[10px] uppercase tracking-wide opacity-60">Impact: </span>
-          {fmtVal(impact, format)}
-        </span>
+        <span className="text-muted-foreground">{fmtVal(baseline, format)}</span>
+        <span className="text-[10px] text-muted-foreground/40">→</span>
+        <span className="font-medium text-foreground">{fmtVal(impact, format)}</span>
         <span className={cn(
           "inline-flex items-center gap-0.5 text-xs font-medium rounded-full px-1.5 py-0.5",
           isNeutral ? "text-muted-foreground bg-muted" : isPositive ? "text-success bg-success/10" : "text-destructive bg-destructive/10"
@@ -95,6 +89,17 @@ export function ImpactTable({ data, searchQuery = "", showType = true }: ImpactT
               <SortableTableHead field="adSales" {...sp} className={cn("min-w-[180px] text-right", pc("adSales", true))} style={ps("adSales")} align="right">Ad Sales</SortableTableHead>
               <SortableTableHead field="roas" {...sp} className={cn("min-w-[140px] text-right", pc("roas", true))} style={ps("roas")} align="right">ROAS</SortableTableHead>
               <SortableTableHead field="acos" {...sp} className={cn("min-w-[140px] text-right", pc("acos", true))} style={ps("acos")} align="right">ACOS</SortableTableHead>
+            </TableRow>
+            <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border">
+              <TableHead className="sticky left-0 z-10 bg-muted/50 h-6" />
+              <TableHead className="h-6" />
+              {["impressions", "clicks", "ctr", "adSpend", "adSales", "roas", "acos"].map((field) => (
+                <TableHead key={field} className={cn("h-6 text-center", pc(field, true))} style={ps(field)}>
+                  <span className="text-[10px] text-muted-foreground">base</span>
+                  <span className="text-[10px] text-muted-foreground/40 mx-1">→</span>
+                  <span className="text-[10px] text-foreground">impact</span>
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
