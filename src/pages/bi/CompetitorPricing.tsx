@@ -96,8 +96,7 @@ export default function CompetitorPricing() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-            breadcrumbItems={breadcrumbItems}
-            title="Competitor Price Tracking"
+          title="Competitor Price Tracking"
           subtitle="Track competitor pricing over time and correlate with your sales and conversion changes"
           appLevelSelector={<AppLevelSelector />}
           actions={

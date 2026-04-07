@@ -32,8 +32,7 @@ export default function AMCSchedules() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-            breadcrumbItems={breadcrumbItems}
-            title="AMC Schedules"
+          title="AMC Schedules"
           subtitle="Manage automated query execution schedules"
           actions={<Button><Plus className="h-4 w-4 mr-2" />New Schedule</Button>}
         />

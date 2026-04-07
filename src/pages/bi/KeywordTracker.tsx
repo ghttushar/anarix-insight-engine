@@ -45,8 +45,7 @@ export default function KeywordTracker() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-            breadcrumbItems={breadcrumbItems}
-            title="Keyword Tracker"
+          title="Keyword Tracker"
           subtitle="Manage keywords for share of voice tracking"
           appLevelSelector={<AppLevelSelector />}
         />

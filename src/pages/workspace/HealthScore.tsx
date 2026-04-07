@@ -42,8 +42,7 @@ export default function HealthScore() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-            breadcrumbItems={breadcrumbItems}
-            title="Marketplace Health Score"
+          title="Marketplace Health Score"
           subtitle="Composite account health metric weighing profitability, ad efficiency, inventory, keyword coverage, and buy box"
           actions={
             <Button variant="outline" size="sm" onClick={() => toast.info("Recalculating health score...")}><RefreshCw className="mr-2 h-4 w-4" />Recalculate</Button>

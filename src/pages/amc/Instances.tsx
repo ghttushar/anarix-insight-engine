@@ -30,7 +30,7 @@ export default function AMCInstances() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageHeader breadcrumbItems={breadcrumbItems} title="AMC Instances" subtitle="Manage your Amazon Marketing Cloud instances" />
+        <PageHeader title="AMC Instances" subtitle="Manage your Amazon Marketing Cloud instances" />
 
         <div className="rounded-lg border border-border bg-card">
           <div className="border-b border-border p-4">

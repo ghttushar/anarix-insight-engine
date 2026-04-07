@@ -41,8 +41,7 @@ export default function KeywordSOV() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-            breadcrumbItems={breadcrumbItems}
-            title="Keyword Share of Voice"
+          title="Keyword Share of Voice"
           subtitle="Track SOV performance by keyword"
           appLevelSelector={<AppLevelSelector />}
         />

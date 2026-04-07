@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { UnderlineTabs } from "@/components/advertising/UnderlineTabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,7 @@ type SortKey = "name" | "ruleType" | "entitiesCount" | "frequency" | "lastRun" |
 
 
 const breadcrumbItems = [
-  { label: "Advertising", href: "/advertising" },
-  { label: "Rules", href: "/advertising/rules/agents" },
+  { label: "Rules", href: "/advertising/rules/applied" },
   { label: "Applied Rules" },
 ];
 export default function AppliedRules() {
@@ -89,9 +88,15 @@ export default function AppliedRules() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb
+          items={[
+            { label: "Advertising", href: "/advertising" },
+            { label: "Rules", href: "/advertising/rules/agents" },
+            { label: "Applied Rules" },
+          ]}
+        />
         <PageHeader
-            breadcrumbItems={breadcrumbItems}
-            title="Applied Rules"
+          title="Applied Rules"
           subtitle="Manage and monitor all active automation rules"
         />
 

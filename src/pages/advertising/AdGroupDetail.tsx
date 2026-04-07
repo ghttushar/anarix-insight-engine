@@ -99,7 +99,7 @@ export default function AdGroupDetail() {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <PageHeader breadcrumbItems={breadcrumbItems} title="Advertising" />
+          <PageHeader title="Advertising" />
 
           <AppTaskbar showFrequency showDateRange>
             <Button size="sm" className="gap-1.5 ml-2">

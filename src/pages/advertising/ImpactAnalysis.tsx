@@ -85,8 +85,7 @@ export default function ImpactAnalysis() {
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
-            breadcrumbItems={breadcrumbItems}
-            title="Impact Analysis"
+          title="Impact Analysis"
           subtitle="Compare performance across time periods to measure campaign impact"
           appLevelSelector={
             <AppLevelSelector>
