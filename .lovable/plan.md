@@ -1,35 +1,46 @@
 
 
-## Remove Per-Cell Labels, Add Header-Level "Base → Impact" Indicator
+## Rename "Client Portal" → "Reports", Merge Views, Move Create to Right Panel, Enhance Page
 
-### Problem
-Every data cell repeats "Base:" and "Impact:" micro-labels, creating visual clutter. The user wants this context shown once in the table column headers instead, using an arrow pattern: `base → impact`.
+### 3 Changes
 
-### Changes
+---
 
-**File: `src/components/tables/ImpactTable.tsx`**
+### 1. Rename Page & Merge Agency/Brand Owner Views
 
-1. **Add a secondary header row** below the main `TableRow` — spanning all metric columns (Impressions through ACOS). Each metric column header gets a centered sub-label:
-   ```
-   base → impact
-   ```
-   Styled with `text-[10px] text-muted-foreground` for "base", a small `→` arrow in `text-muted-foreground/50`, and `text-[10px] text-foreground` for "impact" — matching the same color difference used in data cells.
+**Current:** Page titled "Client Portal" with a Tabs toggle between "Agency View" and "Brand Owner View" that conditionally shows different KPIs and template cards.
 
-2. **Simplify `DeltaCell`** — Remove the `Base:` and `Impact:` micro-labels and the `vs` separator. Show only:
-   ```
-   {baselineValue}  →  {impactValue}  [delta pill]
-   ```
-   - Baseline value in `text-muted-foreground`
-   - Arrow `→` in `text-muted-foreground/50`
-   - Impact value in `font-medium text-foreground`
-   - Delta pill unchanged (rounded-full with contextual bg)
+**Fix:**
+- Rename page title from "Client Portal" to "Reports"
+- Update breadcrumbs to just `["Reports"]`
+- Remove the Agency/Brand Owner toggle entirely
+- Show **all features from both views merged**: template quick-action cards always visible above the table, KPI row always shows Total Reports, Clients, Sent, Scheduled (no conditional switching)
+- The "Client Name" field in create form becomes optional — if filled, it's a client report; if empty, it's a personal/brand report
 
-### Result
-The column header row explains the pattern once ("base → impact"), and every data row follows it silently with just the two values + arrow + delta badge. Cleaner, less repetitive, immediately scannable.
+### 2. Move Create Report from Modal to Right-Side Panel
+
+**Current:** Create Report opens as a `Dialog` modal.
+
+**Fix:**
+- Add `"createReport"` to `DataPanelType` in `ActivePanelContext.tsx`
+- Create `src/components/panels/CreateReportPanel.tsx` following the same pattern as `CreateCampaignPanel` (320px wide, fixed right, ScrollArea, header with close button, footer with Cancel/Create)
+- Move all form fields (template selector, report name, client name, period, section checkboxes, schedule builder) into the panel
+- Remove the `Dialog` from `ClientPortal.tsx`
+- Wire the "Create Report" button and template quick-action cards to `setDataPanel("createReport")`
+- Render `<CreateReportPanel />` in `ClientPortal.tsx` as a sibling to the main content div
+
+### 3. Enhance the Page
+
+- Add report template quick-action cards always visible (not just in brand mode) — 4 cards in a row: Performance, P&L, Advertising, Custom
+- Each template card click opens the create panel pre-filled with that template
+- Table: keep existing sort/pin setup, no changes needed
+- Ensure the page follows all standard patterns (sticky taskbar, footer breadcrumb, DataTableToolbar)
 
 ### Files Summary
 
 | File | Change |
 |---|---|
-| `ImpactTable.tsx` | Add "base → impact" sub-label in column headers; remove per-cell "Base:"/"Impact:" labels; replace "vs" with "→" arrow |
+| `ActivePanelContext.tsx` | Add `"createReport"` to `DataPanelType` |
+| `CreateReportPanel.tsx` (new) | Right-side panel with all create report form fields + schedule builder |
+| `ClientPortal.tsx` | Rename title, remove view toggle, remove Dialog, show templates always, wire to panel |
 
