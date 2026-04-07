@@ -28,6 +28,7 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
@@ -261,6 +262,7 @@ export default function CampaignManager() {
     <AppLayout>
       <div className="flex flex-1 min-h-0 min-w-0">
         <div className="flex-1 min-w-0 space-y-6">
+          <PageBreadcrumb items={breadcrumbItems} />
           <PageHeader
             title="Campaign Manager"
             subtitle="Manage and optimize your advertising campaigns"

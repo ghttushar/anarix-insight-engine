@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 
 const breadcrumbItems = [
@@ -45,6 +46,7 @@ export default function ProfitabilityTrends() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Profitability Trends"
           subtitle="Analyze product performance quadrants"

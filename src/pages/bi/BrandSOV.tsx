@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { brands, sovTrendData, sovMetrics } from "@/data/mockBrandSOV";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 
 const breadcrumbItems = [
@@ -31,6 +32,7 @@ export default function BrandSOV() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Brand Share of Voice"
           subtitle="Track brand visibility across search results"

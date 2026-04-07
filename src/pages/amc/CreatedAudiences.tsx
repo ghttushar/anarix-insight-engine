@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { mockCreatedAudiences } from "@/data/mockAMC";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusColors: Record<string, string> = {
   active: "bg-success/10 text-success",
@@ -34,6 +35,7 @@ export default function AMCCreatedAudiences() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader title="Created Audiences" subtitle="Audiences created for activation in DSP campaigns" />
 
         <div className="rounded-lg border border-border bg-card">

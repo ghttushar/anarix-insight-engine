@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 type ActionTab = "keyword-action" | "history" | "archive";
 
@@ -80,6 +81,7 @@ export default function TargetingActions() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Targeting Actions"
           subtitle="Convert search terms into keyword targets across your campaigns"

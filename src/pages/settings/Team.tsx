@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { UserPlus, Send } from "lucide-react";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const mockUsers = [
   { id: "u1", name: "John Smith", email: "john@company.com", role: "Admin", status: "active", lastLogin: "2025-12-02 09:15" },
@@ -61,6 +62,7 @@ export default function Team() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-4xl space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader title="Team" subtitle="Manage members and invitations" />
 
         <Tabs defaultValue="members">

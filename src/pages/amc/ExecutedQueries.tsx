@@ -8,6 +8,7 @@ import { mockExecutedQueries } from "@/data/mockAMC";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusColors: Record<string, string> = {
   completed: "bg-success/10 text-success",
@@ -30,6 +31,7 @@ export default function AMCExecutedQueries() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader title="Executed Queries" subtitle="View query execution history and results" />
 
         <div className="rounded-lg border border-border bg-card">

@@ -11,7 +11,7 @@ import { AddProductAdsPanel } from "@/components/advertising/AddProductAdsPanel"
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { mockAdGroups } from "@/data/mockAdGroups";
 import { mockProductAds } from "@/data/mockProductAds";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/status/StatusBadge";
@@ -57,37 +57,13 @@ export default function ProductAdDetail() {
     <AppLayout>
       <div className="flex flex-1 min-h-0 min-w-0">
         <div className="flex-1 min-w-0 space-y-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate(`/advertising/campaigns/${campaignId}`)} className="text-primary hover:underline cursor-pointer">{campaignName}</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate(`/advertising/campaigns/${campaignId}/${adGroupId}`)} className="text-primary hover:underline cursor-pointer">{adGroupName}</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <span className="text-foreground font-medium">{productAdName}</span>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <PageBreadcrumb items={[
+            { label: "Advertising", href: "/advertising/campaigns" },
+            { label: adTypeLabel, href: "/advertising/campaigns" },
+            { label: campaignName, href: `/advertising/campaigns/${campaignId}` },
+            { label: adGroupName, href: `/advertising/campaigns/${campaignId}/${adGroupId}` },
+            { label: productAdName },
+          ]} />
 
           <PageHeader title="Advertising" />
 
@@ -141,11 +117,12 @@ export default function ProductAdDetail() {
           />
 
           <SearchTermsTable searchQuery={searchQuery} showDeltas={showDeltas} />
-          <PageFooterBar breadcrumbItems={breadcrumbItems} />
         </div>
 
         <AddProductAdsPanel />
       </div>
+
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
     </AppLayout>
   );
 }

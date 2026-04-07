@@ -15,7 +15,7 @@ import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
 import { mockAdGroups } from "@/data/mockAdGroups";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Play, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
@@ -73,31 +73,12 @@ export default function AdGroupDetail() {
     <AppLayout>
       <div className="flex flex-1 min-h-0 min-w-0">
         <div className="flex-1 min-w-0 space-y-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate(`/advertising/campaigns/${campaignId}`)} className="text-primary hover:underline cursor-pointer">{campaignName}</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <span className="text-foreground font-medium">{adGroupName}</span>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <PageBreadcrumb items={[
+            { label: "Advertising", href: "/advertising/campaigns" },
+            { label: adTypeLabel, href: "/advertising/campaigns" },
+            { label: campaignName, href: `/advertising/campaigns/${campaignId}` },
+            { label: adGroupName },
+          ]} />
 
           <PageHeader title="Advertising" />
 
@@ -134,12 +115,13 @@ export default function AdGroupDetail() {
           />
 
           {renderTable()}
-          <PageFooterBar breadcrumbItems={breadcrumbItems} />
         </div>
 
         {adGroup && <AdGroupSettingsPanel adGroup={adGroup} />}
         <AddProductAdsPanel />
       </div>
+
+      <PageFooterBar breadcrumbItems={breadcrumbItems} />
     </AppLayout>
   );
 }

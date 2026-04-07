@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { mockInstances } from "@/data/mockAMC";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusColors: Record<string, string> = {
   active: "bg-success/10 text-success",
@@ -30,6 +31,7 @@ export default function AMCInstances() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader title="AMC Instances" subtitle="Manage your Amazon Marketing Cloud instances" />
 
         <div className="rounded-lg border border-border bg-card">

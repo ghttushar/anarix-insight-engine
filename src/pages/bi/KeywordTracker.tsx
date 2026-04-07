@@ -12,6 +12,7 @@ import { trackedKeywords as initialKeywords } from "@/data/mockBrandSOV";
 import { TrackedKeyword } from "@/types/bi";
 import { toast } from "sonner";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 
 const breadcrumbItems = [
@@ -44,6 +45,7 @@ export default function KeywordTracker() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Keyword Tracker"
           subtitle="Manage keywords for share of voice tracking"

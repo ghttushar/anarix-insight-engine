@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const severityStyles: Record<string, string> = {
   critical: "border-l-destructive bg-destructive/5",
@@ -49,6 +50,7 @@ export default function AnomalyAlerts() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Aan Anomaly Alerts"
           subtitle="Proactive AI-powered alerts when metrics deviate significantly from expected patterns"

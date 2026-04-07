@@ -24,6 +24,7 @@ import {
   mockImpactSearchTerms,
 } from "@/data/mockImpactData";
 import { PageFooterBar } from "@/components/layout/PageFooterBar";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 type ImpactTab = "campaigns" | "ad-groups" | "products" | "keywords" | "search-terms";
 
@@ -84,6 +85,7 @@ export default function ImpactAnalysis() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <PageBreadcrumb items={breadcrumbItems} />
         <PageHeader
           title="Impact Analysis"
           subtitle="Compare performance across time periods to measure campaign impact"

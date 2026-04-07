@@ -14,7 +14,7 @@ import { ProductAdsTable } from "@/components/tables/ProductAdsTable";
 import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable";
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
 import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
@@ -31,7 +31,7 @@ const tabs = [
 ];
 
 
-const breadcrumbItems = [
+const staticBreadcrumbItems = [
   { label: "Advertising", href: "/advertising/campaigns" },
   { label: "Campaign Detail" },
 ];
@@ -70,25 +70,11 @@ export default function CampaignDetail() {
     <AppLayout>
       <div className="flex flex-1 min-h-0 min-w-0">
         <div className="flex-1 min-w-0 space-y-4">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">Advertising</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <button onClick={() => navigate("/advertising/campaigns")} className="text-primary hover:underline cursor-pointer">{adTypeLabel}</button>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <span className="text-foreground font-medium">{campaignName}</span>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <PageBreadcrumb items={[
+            { label: "Advertising", href: "/advertising/campaigns" },
+            { label: adTypeLabel, href: "/advertising/campaigns" },
+            { label: campaignName },
+          ]} />
 
           <PageHeader title="Advertising" />
 
@@ -118,12 +104,12 @@ export default function CampaignDetail() {
           />
 
           {renderTable()}
-
-          <PageFooterBar breadcrumbItems={breadcrumbItems} />
         </div>
 
         {campaign && <CampaignSettingsPanel campaign={campaign} />}
       </div>
+
+      <PageFooterBar breadcrumbItems={staticBreadcrumbItems} />
     </AppLayout>
   );
 }
