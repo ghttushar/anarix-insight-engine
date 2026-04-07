@@ -228,7 +228,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
       {/* Row 2: Filters/children left, island-off actions + bell right */}
       {hasRow2 && (
         <div className="flex items-center px-4 py-2 gap-3">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-3 flex-1 min-w-0 flex-wrap">
             {showAdType && (
               <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
                 <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
