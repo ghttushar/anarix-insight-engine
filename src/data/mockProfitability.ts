@@ -4,7 +4,7 @@ export const profitabilitySummaries: ProfitabilitySummary[] = [
   {
     period: "today",
     dateLabel: "Today",
-    dateRange: "Jan 30, 2026",
+    dateRange: "\n",
     gmv: 4521.97,
     authSales: 3842.50,
     orders: 28,
@@ -28,7 +28,7 @@ export const profitabilitySummaries: ProfitabilitySummary[] = [
   {
     period: "yesterday",
     dateLabel: "Yesterday",
-    dateRange: "Jan 29, 2026",
+    dateRange: "\n",
     gmv: 5234.87,
     authSales: 4567.23,
     orders: 34,
@@ -52,7 +52,7 @@ export const profitabilitySummaries: ProfitabilitySummary[] = [
   {
     period: "this_month",
     dateLabel: "This Month",
-    dateRange: "Jan 1 - Jan 30, 2026",
+    dateRange: "\n",
     gmv: 89234.56,
     authSales: 76543.21,
     orders: 567,
@@ -76,7 +76,7 @@ export const profitabilitySummaries: ProfitabilitySummary[] = [
   {
     period: "last_month",
     dateLabel: "Last Month",
-    dateRange: "Dec 1 - Dec 31, 2025",
+    dateRange: "\n",
     gmv: 102345.67,
     authSales: 89012.34,
     orders: 678,
