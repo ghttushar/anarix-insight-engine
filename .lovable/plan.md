@@ -1,42 +1,44 @@
 
 
-## Responsive Taskbar Actions + Profitability Hero Card Enhancement
+## Card Selection State, 6 Metrics Per Card, Taller Chart
 
 ### 3 Changes
 
 ---
 
-### 1. Taskbar: Shrink island-off actions to icon-only when panels are open
+### 1. Selectable cards — clicking a card highlights it and filters the chart
 
-**File: `src/components/layout/AppTaskbar.tsx`**
+**File: `ProfitabilityHeroCard.tsx`**
 
-- Import `useActivePanel` (already imported via `setDataPanel`) and read `hasAnyPanel`
-- When `hasAnyPanel` is true AND `islandOff` is true, render Ask Aan / Insights / Refresh as icon-only tooltip buttons (no text labels) — same as the bell icon pattern
-- When no panels are open, keep the current icon + label layout
-- This reduces the right-side width when space is constrained by open panels
+- Add `selectedCardIndex` state (default `0` — Today card selected)
+- Pass `isSelected` and `onSelect` props to each `SummaryCard` and `ForecastCard`
+- When selected: add `ring-2 ring-primary shadow-md` border styling to the card, remove the default `border-border` and replace with `border-primary`
+- When not selected: keep existing neutral border
+- On click anywhere on the card body, call `onSelect(index)`
+- The `ComparisonChart` below continues showing all 5 series (no filtering needed — the selection is purely visual to indicate which card is "active")
 
-### 2. Taskbar: Make filter row responsive with overflow handling
+### 2. Expand SummaryCard from 4 to 6 metrics
 
-**File: `src/components/layout/AppTaskbar.tsx`**
+**File: `ProfitabilityHeroCard.tsx` — `SummaryCard` component**
 
-- Add `flex-wrap` to Row 2's left-side filter container so selectors wrap instead of overflowing
-- Reduce selector label font sizes and padding slightly when space is tight
-- Add `overflow-hidden` on the outer container to prevent horizontal bleed
+Current 4 metrics: GMV, Orders, Auth Sales, Ad Cost
 
-### 3. Profitability Hero Card: Better metric visibility with proper boxes
+Add 2 more from available `ProfitabilitySummary` fields:
+- **Units** (`summary.units`, format: number)
+- **Est. Payout** (`summary.estPayout`, format: currency)
 
-**File: `src/components/profitability/ProfitabilityHeroCard.tsx`**
+Change grid from `grid-cols-2` (4 items) to `grid-cols-3` (6 items) so all 6 fit in 2 rows of 3.
 
-- **SummaryCard**: Replace the inline `grid grid-cols-2` metric layout (lines 176-184) with individually bordered metric boxes — each metric (GMV, Orders, Auth Sales, Ad Cost) gets its own `rounded-md border border-border/50 px-2.5 py-2` container with label on top and value below, making values more scannable
-- **Increase card height**: Remove the cramped `gap-y-1.5` spacing, use `gap-2` for the metric grid and increase vertical padding (`pb-3` instead of `pb-2`)
-- **Main profit display**: Add a subtle background box around the Net Profit + Margin section (`rounded-md bg-muted/30 px-3 py-2`)
-- **Responsive grid**: Change `grid-cols-5` to `grid-cols-5 xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2` so cards reflow on smaller viewports instead of getting crushed
-- **ForecastCard**: Match the same metric box pattern for consistency
+### 3. Increase ComparisonChart height
+
+**File: `ProfitabilityHeroCard.tsx` — `ComparisonChart` component**
+
+- Change inline render height from `160` → `220` (line 349)
+- This gives the chart more vertical breathing room
 
 ### Files Summary
 
 | File | Change |
 |---|---|
-| `AppTaskbar.tsx` | Icon-only actions when panels open; flex-wrap on filter row |
-| `ProfitabilityHeroCard.tsx` | Boxed metrics, increased height/spacing, responsive grid |
+| `ProfitabilityHeroCard.tsx` | Add selected card state + ring styling, expand metrics to 6 with 3-col grid, increase chart height to 220 |
 
