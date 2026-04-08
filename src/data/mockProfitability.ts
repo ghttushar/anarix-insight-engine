@@ -28,7 +28,7 @@ export const profitabilitySummaries: ProfitabilitySummary[] = [
   {
     period: "yesterday",
     dateLabel: "Yesterday",
-    dateRange: "Jan 29, 2026",
+    dateRange: "\n",
     gmv: 5234.87,
     authSales: 4567.23,
     orders: 34,
