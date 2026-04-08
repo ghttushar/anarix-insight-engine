@@ -52,7 +52,7 @@ export const profitabilitySummaries: ProfitabilitySummary[] = [
   {
     period: "this_month",
     dateLabel: "This Month",
-    dateRange: "Jan 1 - Jan 30, 2026",
+    dateRange: "\n",
     gmv: 89234.56,
     authSales: 76543.21,
     orders: 567,
