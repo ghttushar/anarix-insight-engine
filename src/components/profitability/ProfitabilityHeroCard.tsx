@@ -374,7 +374,7 @@ function ComparisonChart({
           <h4 className="text-xs font-semibold text-foreground">Trend Comparison</h4>
           {toolbar}
         </div>
-        {renderChart(160)}
+        {renderChart(220)}
       </div>
 
       <Dialog open={expanded} onOpenChange={setExpanded}>
