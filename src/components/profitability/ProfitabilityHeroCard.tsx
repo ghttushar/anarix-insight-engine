@@ -396,6 +396,7 @@ export function ProfitabilityHeroCard({
 }: ProfitabilityHeroCardProps) {
   const { formatCurrency } = useCurrency();
   const [activeView, setActiveView] = useState<"overview" | "breakdown" | "efficiency">("overview");
+  const [selectedCardIndex, setSelectedCardIndex] = useState(0);
 
   // Per-card dates
   const [todayDate, setTodayDate] = useState<Date>(new Date());
