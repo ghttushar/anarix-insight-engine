@@ -443,9 +443,9 @@ export function ProfitabilityHeroCard({
         </div>
         <button
           onClick={() => onViewBreakdown?.(primarySummary)}
-          className="flex items-center gap-0.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+          className="flex items-center justify-center h-6 w-6 rounded-full text-primary hover:bg-primary/10 transition-colors"
         >
-          Full Details <ChevronRight className="h-3 w-3" />
+          <ChevronRight className="h-4 w-4" />
         </button>
       </div>
 
