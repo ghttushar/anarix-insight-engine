@@ -125,6 +125,8 @@ function SummaryCard({
   date,
   onDateChange,
   onViewMore,
+  isSelected,
+  onSelect,
 }: {
   summary: ProfitabilitySummary;
   label: string;
@@ -135,6 +137,8 @@ function SummaryCard({
   date: Date;
   onDateChange: (d: Date) => void;
   onViewMore?: () => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }) {
   const profitMargin = summary.gmv > 0 ? (summary.netProfit / summary.gmv) * 100 : 0;
   const netDelta = getDelta(summary.netProfit, compareTo.netProfit);
@@ -144,10 +148,19 @@ function SummaryCard({
     { label: "Orders", value: summary.orders, fmt: "number" as const },
     { label: "Auth Sales", value: summary.authSales, fmt: "currency" as const },
     { label: "Ad Cost", value: summary.adCost, fmt: "currency" as const },
+    { label: "Units", value: summary.units, fmt: "number" as const },
+    { label: "Est. Payout", value: summary.estPayout, fmt: "currency" as const },
   ];
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden flex flex-col min-w-0" style={{ borderLeftWidth: 3, borderLeftColor: accentColor }}>
+    <div
+      onClick={onSelect}
+      className={cn(
+        "rounded-lg bg-card overflow-hidden flex flex-col min-w-0 cursor-pointer transition-all",
+        isSelected ? "ring-2 ring-primary border-primary shadow-md border" : "border border-border"
+      )}
+      style={{ borderLeftWidth: 3, borderLeftColor: accentColor }}
+    >
       <div className="px-3 pt-3 pb-2">
         <div className="flex items-center gap-1.5">
           <h4 className="text-xs font-semibold text-foreground truncate">{label}</h4>
@@ -175,7 +188,7 @@ function SummaryCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 px-3 pb-3 border-t border-border/50 pt-2">
+      <div className="grid grid-cols-3 gap-2 px-3 pb-3 border-t border-border/50 pt-2">
         {metrics.map((m) => (
           <div key={m.label} className="rounded-md border border-border/50 px-2.5 py-2">
             <p className="text-[10px] text-muted-foreground">{m.label}</p>
@@ -189,7 +202,7 @@ function SummaryCard({
       {onViewMore && (
         <div className="mt-auto border-t border-border/50 px-3 py-1.5">
           <button
-            onClick={onViewMore}
+            onClick={(e) => { e.stopPropagation(); onViewMore(); }}
             className="flex items-center gap-0.5 text-[10px] font-medium text-primary hover:text-primary/80 transition-colors"
           >
             View More <ChevronRight className="h-3 w-3" />
@@ -204,24 +217,39 @@ function SummaryCard({
 function ForecastCard({
   baseSummary,
   formatCurrency,
+  isSelected,
+  onSelect,
 }: {
   baseSummary: ProfitabilitySummary;
   formatCurrency: (v: number) => string;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }) {
   const projectionMultiplier = 1.67;
   const estProfit = baseSummary.netProfit * projectionMultiplier;
   const estGMV = baseSummary.gmv * projectionMultiplier;
   const estOrders = Math.round(baseSummary.orders * projectionMultiplier);
+  const estUnits = Math.round(baseSummary.units * projectionMultiplier);
+  const estPayout = baseSummary.estPayout * projectionMultiplier;
   const confidence = 78;
 
   const metrics = [
     { label: "Est. GMV", value: formatCurrency(estGMV) },
     { label: "Est. Orders", value: estOrders.toLocaleString() },
+    { label: "Est. Units", value: estUnits.toLocaleString() },
+    { label: "Est. Payout", value: formatCurrency(estPayout) },
     { label: "Confidence", value: `${confidence}%` },
+    { label: "Multiplier", value: `${projectionMultiplier}x` },
   ];
 
   return (
-    <div className="rounded-lg border border-dashed border-border bg-card/50 overflow-hidden flex flex-col min-w-0">
+    <div
+      onClick={onSelect}
+      className={cn(
+        "rounded-lg border-dashed bg-card/50 overflow-hidden flex flex-col min-w-0 cursor-pointer transition-all",
+        isSelected ? "ring-2 ring-primary border-primary shadow-md border" : "border border-border"
+      )}
+    >
       <div className="px-3 pt-3 pb-2">
         <div className="flex items-center gap-1.5">
           <Sparkles className="h-3 w-3 text-primary" />
@@ -239,7 +267,7 @@ function ForecastCard({
         <span className="text-[10px] text-muted-foreground">Est. Net Profit</span>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 px-3 pb-3 border-t border-border/50 pt-2">
+      <div className="grid grid-cols-3 gap-2 px-3 pb-3 border-t border-border/50 pt-2">
         {metrics.map((m) => (
           <div key={m.label} className="rounded-md border border-border/50 px-2.5 py-2">
             <p className="text-[10px] text-muted-foreground">{m.label}</p>
@@ -346,7 +374,7 @@ function ComparisonChart({
           <h4 className="text-xs font-semibold text-foreground">Trend Comparison</h4>
           {toolbar}
         </div>
-        {renderChart(160)}
+        {renderChart(220)}
       </div>
 
       <Dialog open={expanded} onOpenChange={setExpanded}>
@@ -368,6 +396,7 @@ export function ProfitabilityHeroCard({
 }: ProfitabilityHeroCardProps) {
   const { formatCurrency } = useCurrency();
   const [activeView, setActiveView] = useState<"overview" | "breakdown" | "efficiency">("overview");
+  const [selectedCardIndex, setSelectedCardIndex] = useState(0);
 
   // Per-card dates
   const [todayDate, setTodayDate] = useState<Date>(new Date());
@@ -467,9 +496,16 @@ export function ProfitabilityHeroCard({
                   date={cfg.date}
                   onDateChange={cfg.setDate}
                   onViewMore={() => onViewBreakdown?.(cfg.summary)}
+                  isSelected={selectedCardIndex === i}
+                  onSelect={() => setSelectedCardIndex(i)}
                 />
               ))}
-              <ForecastCard baseSummary={thisMonthSummary} formatCurrency={formatCurrency} />
+              <ForecastCard
+                baseSummary={thisMonthSummary}
+                formatCurrency={formatCurrency}
+                isSelected={selectedCardIndex === 4}
+                onSelect={() => setSelectedCardIndex(4)}
+              />
             </div>
 
             {/* Full-width chart */}
