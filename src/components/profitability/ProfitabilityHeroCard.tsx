@@ -217,24 +217,39 @@ function SummaryCard({
 function ForecastCard({
   baseSummary,
   formatCurrency,
+  isSelected,
+  onSelect,
 }: {
   baseSummary: ProfitabilitySummary;
   formatCurrency: (v: number) => string;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }) {
   const projectionMultiplier = 1.67;
   const estProfit = baseSummary.netProfit * projectionMultiplier;
   const estGMV = baseSummary.gmv * projectionMultiplier;
   const estOrders = Math.round(baseSummary.orders * projectionMultiplier);
+  const estUnits = Math.round(baseSummary.units * projectionMultiplier);
+  const estPayout = baseSummary.estPayout * projectionMultiplier;
   const confidence = 78;
 
   const metrics = [
     { label: "Est. GMV", value: formatCurrency(estGMV) },
     { label: "Est. Orders", value: estOrders.toLocaleString() },
+    { label: "Est. Units", value: estUnits.toLocaleString() },
+    { label: "Est. Payout", value: formatCurrency(estPayout) },
     { label: "Confidence", value: `${confidence}%` },
+    { label: "Multiplier", value: `${projectionMultiplier}x` },
   ];
 
   return (
-    <div className="rounded-lg border border-dashed border-border bg-card/50 overflow-hidden flex flex-col min-w-0">
+    <div
+      onClick={onSelect}
+      className={cn(
+        "rounded-lg border-dashed bg-card/50 overflow-hidden flex flex-col min-w-0 cursor-pointer transition-all",
+        isSelected ? "ring-2 ring-primary border-primary shadow-md border" : "border border-border"
+      )}
+    >
       <div className="px-3 pt-3 pb-2">
         <div className="flex items-center gap-1.5">
           <Sparkles className="h-3 w-3 text-primary" />
@@ -252,7 +267,7 @@ function ForecastCard({
         <span className="text-[10px] text-muted-foreground">Est. Net Profit</span>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 px-3 pb-3 border-t border-border/50 pt-2">
+      <div className="grid grid-cols-3 gap-2 px-3 pb-3 border-t border-border/50 pt-2">
         {metrics.map((m) => (
           <div key={m.label} className="rounded-md border border-border/50 px-2.5 py-2">
             <p className="text-[10px] text-muted-foreground">{m.label}</p>
