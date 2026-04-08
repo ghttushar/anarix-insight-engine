@@ -496,9 +496,16 @@ export function ProfitabilityHeroCard({
                   date={cfg.date}
                   onDateChange={cfg.setDate}
                   onViewMore={() => onViewBreakdown?.(cfg.summary)}
+                  isSelected={selectedCardIndex === i}
+                  onSelect={() => setSelectedCardIndex(i)}
                 />
               ))}
-              <ForecastCard baseSummary={thisMonthSummary} formatCurrency={formatCurrency} />
+              <ForecastCard
+                baseSummary={thisMonthSummary}
+                formatCurrency={formatCurrency}
+                isSelected={selectedCardIndex === 4}
+                onSelect={() => setSelectedCardIndex(4)}
+              />
             </div>
 
             {/* Full-width chart */}
