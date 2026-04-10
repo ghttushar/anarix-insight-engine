@@ -409,7 +409,7 @@ function ComponentsTab() {
             <Badge variant="destructive">Destructive</Badge><Badge variant="outline">Outline</Badge>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <StatusBadge status="live" /><StatusBadge status="paused" /><StatusBadge status="ended" /><StatusBadge status="draft" />
+            <StatusBadge status="live" /><StatusBadge status="paused" /><StatusBadge status="archived" /><StatusBadge status="scheduled" />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <DeltaBadge value={12.5} /><DeltaBadge value={-8.3} /><DeltaBadge value={0} />
@@ -476,7 +476,7 @@ function StatesTab() {
         <h2 className="text-lg font-semibold text-foreground">Status Badge States</h2>
         <Card className="p-4">
           <div className="flex items-center gap-3 flex-wrap">
-            <StatusBadge status="live" /><StatusBadge status="paused" /><StatusBadge status="ended" /><StatusBadge status="draft" /><StatusBadge status="archived" />
+            <StatusBadge status="live" /><StatusBadge status="paused" /><StatusBadge status="archived" /><StatusBadge status="scheduled" /><StatusBadge status="out_of_budget" />
           </div>
         </Card>
       </section>
