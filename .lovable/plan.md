@@ -1,44 +1,94 @@
 
 
-## Card Selection State, 6 Metrics Per Card, Taller Chart
+## Update Component Library and Design System Documentation
 
-### 3 Changes
+### Problem
+The Component Library and Design System pages are outdated. They don't reflect the recent 50+ changes including:
+- **AppTaskbar**: Now a 2-row layout (breadcrumb + account/sync on Row 1, filters + island-off actions on Row 2) with panel-aware icon-only collapse
+- **Profitability Hero Card**: Now a 5-card selectable grid with 6 metrics per card, bordered metric boxes, and 220px comparison chart
+- **Right-side panels**: CreateCampaignPanel, CreateReportPanel, CreateSchedulePanel, ProductDetailPanel, PeriodBreakdownPanel, CampaignSettingsPanel, AdGroupSettingsPanel -- none are in the Component Library
+- **Marketplace selector**: Sidebar-integrated with hover popup for account switching
+- **Floating Action Island**: Updated (removed Export/Screenshot, Alerts icon-only far right)
+- **Design System colors**: Muted data viz colors (success 142 55% 38%, destructive 0 65% 48%, warning 38 75% 45%) not reflected
+- **Icons section**: Missing newer icons used in the app (Bell, Play, Clock, Sparkles, Lightbulb, RefreshCw, etc.)
+- **Navigation**: MiniSidebar, SidebarHoverPopup patterns not documented
+
+### Plan
+
+This requires updates to **2 files** totaling ~4800 lines. Changes organized by file:
 
 ---
 
-### 1. Selectable cards — clicking a card highlights it and filters the chart
+### File 1: `src/pages/settings/ComponentLibrary.tsx`
 
-**File: `ProfitabilityHeroCard.tsx`**
+#### A. Update AppTaskbar section (replace "App Level Metric Selector")
+Replace the outdated "App Level Metric Selector" section (~lines 2341-2396) with a new "AppTaskbar (2-Row Layout)" section showing:
+- **Row 1 anatomy**: Breadcrumb (left) + Marketplace logo + status dot + account name + divider + clock icon + "Last synced" (right)
+- **Row 2 anatomy**: Filters/selectors (left: Ad Type, Catalogue, Date Range) + island-off actions (right: Ask Aan, Insights, Refresh + separated bell)
+- **Panel-collapsed variant**: Showing icon-only actions when `hasAnyPanel` is true
+- Static mockup with the `border-primary` top accent
 
-- Add `selectedCardIndex` state (default `0` — Today card selected)
-- Pass `isSelected` and `onSelect` props to each `SummaryCard` and `ForecastCard`
-- When selected: add `ring-2 ring-primary shadow-md` border styling to the card, remove the default `border-border` and replace with `border-primary`
-- When not selected: keep existing neutral border
-- On click anywhere on the card body, call `onSelect(index)`
-- The `ComparisonChart` below continues showing all 5 series (no filtering needed — the selection is purely visual to indicate which card is "active")
+#### B. Update Floating Action Island section
+- Remove Export and Screenshot buttons from both collapsed and expanded states (~lines 1155-1227)
+- Remove their labels from the expanded state array
+- Keep only: Ask Aan, Insights, Refresh
+- Update Alerts to icon-only (bell) positioned far right with a separator
 
-### 2. Expand SummaryCard from 4 to 6 metrics
+#### C. Update Profitability Hero Card section (~lines 2574-2627)
+Replace with a 5-card grid anatomy showing:
+- **Card grid**: 5 cards in a row (Today, Yesterday, This Month, Last Month, Forecast)
+- **Selected card state**: One card with `ring-2 ring-primary border-primary shadow-md`
+- **6 metrics per card**: GMV, Orders, Auth Sales, Ad Cost, Units, Est. Payout in `grid-cols-3` bordered boxes
+- **Net Profit hero section**: With `bg-muted/30` background box
+- **Comparison chart**: 220px height note
 
-**File: `ProfitabilityHeroCard.tsx` — `SummaryCard` component**
+#### D. Add Right-Side Panels section (NEW)
+Add static anatomy mockups for all right-side panels:
+1. **CreateCampaignPanel**: Form fields (name, type, bidding strategy, budget, dates)
+2. **CreateReportPanel**: Template selection, section checkboxes, schedule options
+3. **CreateSchedulePanel**: Campaign selector, action type, day/time selectors
+4. **ProductDetailPanel**: Product image/name, sparkline, expandable P&L sections
+5. **PeriodBreakdownPanel**: Summary period, sales/expenses/units breakdown rows
+6. **CampaignSettingsPanel**: Campaign metadata, budget/bid edits (reference to CampaignInfoCard)
+7. **AdGroupSettingsPanel**: Ad group metadata, bid/TRoAS edits
 
-Current 4 metrics: GMV, Orders, Auth Sales, Ad Cost
+Each shown as a ~380px-wide bordered container with header + content + footer anatomy.
 
-Add 2 more from available `ProfitabilitySummary` fields:
-- **Units** (`summary.units`, format: number)
-- **Est. Payout** (`summary.estPayout`, format: currency)
+#### E. Add Sidebar Navigation section (NEW)
+Static anatomy showing:
+- **Expanded sidebar**: Logo + toggle, "Ask Aan" pill, grouped nav items with active styling, footer (theme + avatar)
+- **Collapsed sidebar**: Icon-only with tooltip, SidebarHoverPopup mockup
+- **MarketplaceSelector**: Expanded and collapsed states with hover popup for account list
 
-Change grid from `grid-cols-2` (4 items) to `grid-cols-3` (6 items) so all 6 fit in 2 rows of 3.
+---
 
-### 3. Increase ComparisonChart height
+### File 2: `src/pages/settings/DesignSystem.tsx`
 
-**File: `ProfitabilityHeroCard.tsx` — `ComparisonChart` component**
+#### A. Update Color System section
+- Update muted-foreground light mode from `228 15% 46%` / `#646A86` to `228 18% 40%` / `#555D78`
+- Update data viz colors to muted variants:
+  - Success: `142 55% 38%` / `#1E9E4F` (was `142 71% 45%` / `#22C55E`)
+  - Destructive: `0 65% 48%` / `#C93535` (was `0 84% 60%` / `#EF4444`)
+  - Warning: `38 75% 45%` / `#C98A14` (was `38 92% 50%` / `#F59E0B`)
 
-- Change inline render height from `160` → `220` (line 349)
-- This gives the chart more vertical breathing room
+#### B. Update Icons section
+Add missing icons to the categories:
+- **Navigation**: Bell, Play, ChevronRight
+- **Actions**: RefreshCw (already there), Sparkles, Lightbulb, Camera → remove Camera
+- **Data**: Layers, Target, Percent, Package, ShoppingCart, DollarSign
+- **System**: Clock (already there), Store → remove Store if not imported
 
-### Files Summary
+#### C. Update Layout Components description
+Update the AppTaskbar description to reflect 2-row layout with breadcrumb + account info on Row 1 and filters + island-off actions on Row 2.
 
-| File | Change |
-|---|---|
-| `ProfitabilityHeroCard.tsx` | Add selected card state + ring styling, expand metrics to 6 with 3-col grid, increase chart height to 220 |
+#### D. Add new icons import
+Import any missing Lucide icons needed for the updated icon grid (Bell, Play, Sparkles, Lightbulb, Layers, Target, Percent, Package, ShoppingCart, DollarSign, Store).
+
+---
+
+### Implementation Complexity
+- ComponentLibrary.tsx: ~300 lines added/replaced
+- DesignSystem.tsx: ~80 lines modified
+- Both files are static mockups (no functional changes)
+- No new dependencies needed
 
