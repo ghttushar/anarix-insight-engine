@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -835,22 +835,28 @@ function PatternsSection() {
 
 export default function ComponentLibrary() {
   const { hash } = useLocation();
-  const [activeSection, setActiveSection] = useState("primitives");
+  const { section: paramSection } = useParams<{ section?: string }>();
+  const navigate = useNavigate();
+  const initialSection = (paramSection && SECTIONS.some((s) => s.id === paramSection)) ? paramSection : "primitives";
+  const [activeSection, setActiveSection] = useState(initialSection);
 
   useEffect(() => {
-    if (hash) {
+    if (paramSection && SECTIONS.some((s) => s.id === paramSection)) {
+      setActiveSection(paramSection);
+      setTimeout(() => { document.getElementById(paramSection)?.scrollIntoView({ behavior: "smooth" }); }, 100);
+    } else if (hash) {
       const id = hash.replace("#", "");
       if (SECTIONS.some((s) => s.id === id)) {
         setActiveSection(id);
         setTimeout(() => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); }, 100);
       }
     }
-  }, [hash]);
+  }, [paramSection, hash]);
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    window.history.replaceState(null, "", `#${id}`);
+    navigate(`/settings/component-library/${id}`, { replace: true });
   };
 
   return (

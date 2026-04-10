@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -596,22 +596,32 @@ function LayoutTab() {
 
 export default function DesignSystem() {
   const { hash } = useLocation();
-  const [activeTab, setActiveTab] = useState("colors");
+  const { tab } = useParams<{ tab?: string }>();
+  const navigate = useNavigate();
+  const validTabs = ["colors", "typography", "spacing", "icons", "components", "states", "layout"];
+  const initialTab = (tab && validTabs.includes(tab)) ? tab : "colors";
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   useEffect(() => {
-    if (hash) {
-      const tab = hash.replace("#", "");
-      const validTabs = ["colors", "typography", "spacing", "icons", "components", "states", "layout"];
-      if (validTabs.includes(tab)) setActiveTab(tab);
+    if (tab && validTabs.includes(tab)) {
+      setActiveTab(tab);
+    } else if (hash) {
+      const h = hash.replace("#", "");
+      if (validTabs.includes(h)) setActiveTab(h);
     }
-  }, [hash]);
+  }, [tab, hash]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    navigate(`/settings/design-system/${value}`, { replace: true });
+  };
 
   return (
     <AppLayout>
       <PageHeader title="Design System" subtitle="Periwinkle System 01 — Token-based design reference" />
       <AppTaskbar breadcrumbItems={breadcrumbItems} />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4">
         <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/50 p-1">
           <TabsTrigger value="colors" className="text-xs">Colors</TabsTrigger>
           <TabsTrigger value="typography" className="text-xs">Typography</TabsTrigger>
