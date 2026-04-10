@@ -164,7 +164,7 @@ export default function ProfitabilityDashboard() {
 
           <div className="space-y-3">
             <DataTableToolbar
-              leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />}
+              leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={handleTabChange} />}
               searchValue={searchValue}
               onSearchChange={setSearchValue}
               searchPlaceholder={tableTab === "products" ? "Search by Product Name / Item ID / SKU..." : "Search by Order ID / Country / Product..."}
