@@ -71,6 +71,9 @@ import WorkspaceDashboard from "./pages/workspace/Dashboard";
 import HealthScore from "./pages/workspace/HealthScore";
 import ClientPortal from "./pages/reports/ClientPortal";
 
+// Aan
+import AanWorkspacePage from "./pages/aan/Workspace";
+
 // Settings
 import Preferences from "./pages/settings/Preferences";
 import Accounts from "./pages/settings/Accounts";
@@ -184,6 +187,9 @@ function AppRoutes() {
       <Route path="/dayparting/history" element={<Navigate to="/dayparting" replace />} />
       <Route path="/dayparting/scheduled" element={<Navigate to="/dayparting" replace />} />
       <Route path="/dayparting/scheduled/*" element={<Navigate to="/dayparting" replace />} />
+
+      {/* Aan */}
+      <Route path="/aan" element={<AanWorkspacePage />} />
 
       {/* Reports */}
       <Route path="/reports/client-portal" element={<ClientPortal />} />
