@@ -649,7 +649,7 @@ function AanSection() {
       <Card className="p-4 space-y-3">
         <Label className="text-xs uppercase tracking-wider text-muted-foreground">ArtifactCard</Label>
         <div className="w-72">
-          <ArtifactCard artifact={{ id: "1", type: "audit", title: "Campaign Audit Report", description: "Full performance analysis of Q4 campaigns", changes: [], createdAt: "2 minutes ago" }} onView={() => toast.info("Opening artifact...")} />
+          <ArtifactCard artifact={{ id: "1", type: "audit", title: "Campaign Audit Report", description: "Full performance analysis of Q4 campaigns", changes: [], status: "pending" }} onView={() => toast.info("Opening artifact...")} />
         </div>
       </Card>
 
