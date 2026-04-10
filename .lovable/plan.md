@@ -1,191 +1,93 @@
+## Fix Component Library + Add Independent URLs for Figma Export
 
+### Problem
 
-## Delete and Recreate Component Library + Design System from Scratch + Remove Footer Breadcrumbs + Add Independent Routes
+1. Component Library panels section only shows text descriptions — no actual panel mockups rendered
+2. Day Parting tabs (`/dayparting/history`) redirect instead of being independent URLs
+3. Design System tabs need route-based URLs (not just hash) for HTML-to-Figma plugin compatibility
+4. Component Library sections need route-based URLs for HTML-to-Figma plugin compatibility
 
-### Scope: 3 Major Workstreams
-
----
-
-### Workstream 1: Remove PageFooterBar from ALL 43 pages
-
-Every page currently renders `<PageFooterBar breadcrumbItems={...} />`. Remove this line and the corresponding import from all 43 files:
-
-**Advertising (13):** CampaignManager, CampaignDetail, AdGroupDetail, ProductAdDetail, ImpactAnalysis, TargetingActions, BudgetPacing, SearchHarvesting, AnomalyAlerts, CreativeAnalyzer, RuleAgents, RuleCreation, AppliedRules
-
-**Profitability (5):** Dashboard, Trends, ProfitLoss, Geographical, UnifiedPnL
-
-**AMC (6):** Queries, ExecutedQueries, Schedules, Audiences, CreatedAudiences, Instances
-
-**BI (5):** BrandSOV, KeywordTracker, KeywordSOV, ProductSOV, CompetitorPricing
-
-**Catalog (2):** Products, InventoryAds
-
-**Workspace (2):** Dashboard, HealthScore
-
-**Day Parting (1):** HourlyData
-
-**Reports (1):** ClientPortal
-
-**Settings (7):** Preferences, Accounts, ConnectAmazon, ConnectWalmart, Team, System, ComponentLibrary, DesignSystem
-
-Also delete `src/components/layout/PageFooterBar.tsx` entirely.
+### Plan
 
 ---
 
-### Workstream 2: Delete and Recreate Design System (`src/pages/settings/DesignSystem.tsx`)
+### 1. Design System — Add route-based tab URLs
 
-Delete entire file (~1997 lines) and rewrite from scratch with these tabs:
+**File: `App.tsx**`
 
-**Tab 1 — Colors**
-- Periwinkle System 01 light + dark palettes with correct hex values
-- Muted data viz colors: Success `#1E9E4F`, Destructive `#C93535`, Warning `#C98A14`
-- Aan AI gradient spec
-- Reserved color rules
+- Add route: `/settings/design-system/:tab` pointing to same `DesignSystem` component
 
-**Tab 2 — Typography**
-- Satoshi Variable (headings), Noto Sans (body)
-- Type scale (H1 32px → Meta 12px)
-- Weight and usage rules
+**File: `DesignSystem.tsx**`
 
-**Tab 3 — Spacing**
-- 4px base unit scale
-- Component padding rules
-- Layout gap standards
-
-**Tab 4 — Icons**
-- Full Lucide icon grid organized by category: Navigation, Actions, Data, System, Status, Marketplace
-- All icons currently used in the app including: Bell, Play, Sparkles, Lightbulb, Layers, Target, Percent, Package, ShoppingCart, DollarSign, RefreshCw, Activity, Gauge, Wheat, FlaskConical, ShieldCheck, PackageCheck, PanelLeft, LayoutDashboard
-- Sizing rules (16/20/24px) and color inheritance
-
-**Tab 5 — Components**
-- Buttons (Primary, Secondary, Destructive, Ghost — all states)
-- Inputs (Text, Select, Checkbox, Switch, Radio — all states)
-- Badges (StatusBadge, DeltaBadge, Chip)
-- Cards (KPICard, standard Card)
-- Tables (header, rows, pagination)
-- Alerts and Toasts
-
-**Tab 6 — States**
-- Interactive state examples: Default, Hover, Active, Disabled, Loading, Error, Focus
-- Applied to buttons, inputs, selects, switches, table rows
-
-**Tab 7 — Layout**
-- AppTaskbar 2-row anatomy
-- Sidebar expanded/collapsed patterns
-- Right-side panel structure
-- Floating Action Island anatomy
-- Page structure hierarchy
+- Read `useParams().tab` to set active tab (e.g., `/settings/design-system/colors` → Colors tab)
+- Keep hash fallback for backward compat
+- Result: 7 independent URLs:
+  - `/settings/design-system/colors`
+  - `/settings/design-system/typography`
+  - `/settings/design-system/spacing`
+  - `/settings/design-system/icons`
+  - `/settings/design-system/components`
+  - `/settings/design-system/states`
+  - `/settings/design-system/layout`
 
 ---
 
-### Workstream 3: Delete and Recreate Component Library (`src/pages/settings/ComponentLibrary.tsx`)
+### 2. Component Library — Add route-based section URLs + flesh out panels
 
-Delete entire file (~3297 lines) and rewrite from scratch with systematic sections, each with an independent route anchor. Organized by application area:
+**File: `App.tsx**`
 
-**Section 1 — Foundation Primitives**
-- Typography specimens
-- Button matrix (all variants × all states)
-- Form controls (Input, Select, Textarea, Checkbox, Switch, Radio, Slider)
-- Badge/Chip/StatusBadge/DeltaBadge
-- Alert variants
-- Loading skeletons (Table, Card, Chart, Metric)
+- Add route: `/settings/component-library/:section` pointing to same `ComponentLibrary` component
 
-**Section 2 — Navigation**
-- AppSidebar (expanded state with all groups)
-- MiniSidebar (collapsed icon-only state)
-- SidebarHoverPopup anatomy
-- MarketplaceSelector (expanded + collapsed)
-- PageBreadcrumb
-- Floating Action Island (collapsed + expanded)
+**File: `ComponentLibrary.tsx**`
 
-**Section 3 — AppTaskbar**
-- Full 2-row layout anatomy
-- Row 1: Breadcrumb + Marketplace/Account info
-- Row 2: Filters + Island-off actions
-- Panel-collapsed variant (icon-only actions)
+- Read `useParams().section` to auto-scroll + highlight active section
+- Result: 10 independent URLs (e.g., `/settings/component-library/panels`)
 
-**Section 4 — Data Tables**
-- DataTableToolbar anatomy (search, columns, filters, sort, upload, download)
-- SortableTableHead with Pin states (hidden, hover, active, highlight)
-- TablePagination
-- UnderlineTabs
-- Sample table with all column types
+**Flesh out Panels section** — Replace text-only list with actual rendered mockups:
 
-**Section 5 — Cards & KPIs**
-- KPICard single
-- KPICardsRow (multi-card strip)
-- InlineKPIStrip
-- ProfitabilityHeroCard (5-card selectable grid, 6 metrics, 220px chart)
+- **CreateCampaignPanel**: Form with name, type, bidding strategy, budget, start/end date fields
+- **CreateReportPanel**: Template buttons, section checkboxes, schedule toggle
+- **CreateSchedulePanel**: Campaign selector, action type, day/time selectors
+- **ProductDetailPanel**: Product image/name, sparkline placeholder, expandable P&L rows
+- **PeriodBreakdownPanel**: Date header, sales/expenses/units breakdown rows
+- **CampaignSettingsPanel**: Name, status select, budget, bidding strategy radio, placement %
+- **AdGroupSettingsPanel**: Name, status, bid fields, target ROAS
 
-**Section 6 — Charts**
-- ChartContainer anatomy
-- PerformanceChart
-- MetricSelector
-
-**Section 7 — Right-Side Panels (ALL)**
-- CreateCampaignPanel anatomy
-- CreateReportPanel anatomy
-- CreateSchedulePanel anatomy
-- ProductDetailPanel anatomy
-- PeriodBreakdownPanel anatomy
-- CampaignSettingsPanel anatomy
-- AdGroupSettingsPanel anatomy
-
-**Section 8 — Aan AI Components**
-- AanLogo variants
-- ArtifactCard
-- AanInput
-- AanConversation anatomy
-- AanWorkspaceSidebar anatomy
-- AI gradient usage examples
-
-**Section 9 — Modals & Dialogs**
-- COGSEditModal anatomy
-- ProductTrendsModal anatomy
-- CreateCampaignModal anatomy
-- AddKeywordTargetModal anatomy
-- AddProductAdsModal anatomy
-
-**Section 10 — Page-Level Patterns**
-- Complete page anatomy (Header → Taskbar → Content → Table)
-- Tab group patterns (Campaign Manager tabs, Impact Analysis tabs, Day Parting tabs)
+Each panel rendered as a ~320px-wide bordered container with header + scrollable content + footer.
 
 ---
 
-### Workstream 4: Independent Routes
+### 3. Day Parting — Make tabs independent URLs
 
-Add routes in `App.tsx` for direct-linking to specific UI states:
+**File: `App.tsx**`
 
-| Route | Purpose |
-|---|---|
-| `/settings/design-system` | Already exists |
-| `/settings/component-library` | Already exists |
-| `/settings/component-library/navigation` | Section anchor |
-| `/settings/component-library/taskbar` | Section anchor |
-| `/settings/component-library/tables` | Section anchor |
-| `/settings/component-library/cards` | Section anchor |
-| `/settings/component-library/panels` | Section anchor |
-| `/settings/component-library/aan` | Section anchor |
-| `/settings/component-library/modals` | Section anchor |
-| `/settings/component-library/charts` | Section anchor |
+- Change `/dayparting/history` from `Navigate` redirect to rendering `HourlyData` with a prop/param
 
-Implementation: Use URL hash anchors (`#navigation`, `#taskbar`, etc.) with `useSearchParams` or `useLocation().hash` to auto-scroll to the correct section. This avoids creating 10+ separate route entries — a single route with hash navigation.
+**File: `HourlyData.tsx**`
+
+- Read route to determine initial tab: `/dayparting` → "dayparting" tab, `/dayparting/history` → "history" tab
+- Update `setActiveTab` to also update URL via `useNavigate`
+
+&nbsp;
+
+### 4. profitablity dashboard — products and orders tabs independent URLs
 
 ---
 
 ### Files Summary
 
-| Action | Files | Count |
-|---|---|---|
-| Delete | `PageFooterBar.tsx` | 1 |
-| Edit (remove footer) | All 43 page files | 43 |
-| Delete + Recreate | `DesignSystem.tsx` | 1 |
-| Delete + Recreate | `ComponentLibrary.tsx` | 1 |
-| **Total** | | **46 files** |
+
+| File                   | Change                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| `App.tsx`              | Add 3 parameterized routes                                                               |
+| `DesignSystem.tsx`     | Read `useParams().tab`, use for active tab                                               |
+| `ComponentLibrary.tsx` | Read `useParams().section`, replace panels text with rendered mockups (~200 lines added) |
+| `HourlyData.tsx`       | Read route for initial tab, sync tab changes to URL                                      |
+
 
 ### Implementation Order
-1. Remove PageFooterBar from all 43 pages + delete the component
-2. Recreate DesignSystem.tsx (~800 lines)
-3. Recreate ComponentLibrary.tsx (~2500 lines)
-4. Add hash-based section navigation to ComponentLibrary
 
+1. Add routes in `App.tsx`
+2. Update `DesignSystem.tsx` with param-based tabs
+3. Update `ComponentLibrary.tsx` with param-based sections + full panel mockups
+4. Update `HourlyData.tsx` with route-based tabs
