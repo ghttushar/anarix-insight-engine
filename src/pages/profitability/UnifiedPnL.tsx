@@ -11,8 +11,6 @@ import { cn } from "@/lib/utils";
 import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 const isMarginRow = (label: string) => label.toLowerCase().includes("margin");
 
 
@@ -94,8 +92,6 @@ export default function UnifiedPnL() {
           </Table>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

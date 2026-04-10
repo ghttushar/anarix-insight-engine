@@ -6,7 +6,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { mockInstances } from "@/data/mockAMC";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusColors: Record<string, string> = {
@@ -70,8 +69,6 @@ export default function AMCInstances() {
           </Table>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

@@ -20,8 +20,6 @@ import { Play, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 type TabValue = "product-ads" | "keywords" | "search-terms";
 
 const tabs = [
@@ -117,8 +115,6 @@ export default function AdGroupDetail() {
         {adGroup && <AdGroupSettingsPanel adGroup={adGroup} />}
         <AddProductAdsPanel />
       </div>
-
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
-    </AppLayout>
+</AppLayout>
   );
 }

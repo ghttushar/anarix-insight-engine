@@ -6,8 +6,6 @@ import { AddWidgetModal } from "@/components/workspace/AddWidgetModal";
 import { Button } from "@/components/ui/button";
 import { Plus, RotateCcw, Pencil, FilePlus } from "lucide-react";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 export type WidgetType = "metric" | "chart" | "table" | "annotation" | "task";
 
 export interface Widget {
@@ -180,8 +178,6 @@ export default function WorkspaceDashboard() {
         onClose={() => setShowAddModal(false)}
         onAdd={addWidget}
       />
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

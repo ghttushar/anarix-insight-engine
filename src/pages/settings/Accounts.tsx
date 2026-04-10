@@ -12,8 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 import { useAccounts, ConnectedAccount } from "@/contexts/AccountContext";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 // Walmart logo
 const WalmartLogo = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">
@@ -269,8 +267,6 @@ export default function Accounts() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

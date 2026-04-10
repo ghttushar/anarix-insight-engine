@@ -12,8 +12,6 @@ import { pnlData, profitabilityProducts } from "@/data/mockProfitability";
 import { ProfitabilityProduct } from "@/types/profitability";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },
   { id: "refundUnits", label: "Refund Units", visible: true },
@@ -156,8 +154,6 @@ export default function ProfitLoss() {
           <ProductDetailPanel product={detailProduct} isOpen={true} onClose={handleCloseDetail} />
         )}
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

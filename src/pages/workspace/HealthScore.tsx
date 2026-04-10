@@ -9,7 +9,6 @@ import { TrendingUp, TrendingDown, Minus, RefreshCw } from "lucide-react";
 import { mockHealthScore, type HealthDimension } from "@/data/mockHealthScore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusColors: Record<string, string> = {
@@ -107,8 +106,6 @@ export default function HealthScore() {
           </div>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

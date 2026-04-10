@@ -10,7 +10,6 @@ import { mockHarvestCandidates, type HarvestCandidate } from "@/data/mockSearchH
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const matchColors: Record<string, string> = {
@@ -135,8 +134,6 @@ export default function SearchHarvesting() {
           )}
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

@@ -1145,7 +1145,6 @@ import { Label } from "@/components/ui/label";
           <CodeBlock code={`// Typical page structure
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 export default function MyPage() {
@@ -1159,8 +1158,6 @@ export default function MyPage() {
       <div className="p-6 space-y-6">
         {/* Page content */}
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }`} />

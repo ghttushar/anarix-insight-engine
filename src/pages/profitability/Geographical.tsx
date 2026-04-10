@@ -11,8 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { geographicalData } from "@/data/mockProfitability";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 const regionLookup: Record<string, typeof geographicalData[0]> = {
   US: geographicalData[0],
   CA: geographicalData[0].children?.[0] || geographicalData[0],
@@ -135,8 +133,6 @@ export default function Geographical() {
           </div>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

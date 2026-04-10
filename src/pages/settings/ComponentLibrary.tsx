@@ -44,7 +44,6 @@ import { ArtifactCard } from "@/components/aan/ArtifactCard";
 import { SortableTableHead, usePinning } from "@/components/tables/SortableTableHead";
 import { TablePagination } from "@/components/tables/TablePagination";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { 
   AlertCircle, AlertTriangle, Info, CheckCircle, CheckCircle2, XCircle, Home, 
   Plus, Edit, Trash2, Download, Bold, Italic, Underline, Filter, Columns,
@@ -106,8 +105,6 @@ export default function ComponentLibrary() {
           <ComponentShowcase />
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }
@@ -2840,11 +2837,7 @@ function ComponentShowcase() {
         <div className="space-y-3">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Bottom Footer Bar</Label>
           <div className="p-4 rounded-lg border border-border bg-card">
-            <PageFooterBar breadcrumbItems={[
-              { label: "Advertising", href: "/advertising/campaigns" },
-              { label: "Campaign Manager" },
-            ]} />
-          </div>
+</div>
         </div>
       </section>
 

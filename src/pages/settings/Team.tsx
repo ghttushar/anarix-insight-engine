@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { UserPlus, Send } from "lucide-react";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const mockUsers = [
@@ -168,8 +167,6 @@ export default function Team() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

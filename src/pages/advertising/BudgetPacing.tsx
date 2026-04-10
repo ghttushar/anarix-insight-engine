@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusConfig: Record<string, { label: string; class: string }> = {
@@ -227,8 +226,6 @@ export default function BudgetPacing() {
           </Table>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

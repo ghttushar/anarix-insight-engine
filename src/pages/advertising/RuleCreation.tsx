@@ -15,7 +15,6 @@ import { Plus, Copy, Trash2, ChevronDown, ChevronRight, Info, Home, ArrowRight, 
 import { ruleTemplates, metricOptions, operatorOptions, actionOptions, lookbackOptions, frequencyOptions, type RuleCriteria, type RuleCondition } from "@/data/mockRules";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { RuleCampaignSelector } from "@/components/advertising/RuleCampaignSelector";
 
 function generateId() {
@@ -266,9 +265,7 @@ export default function RuleCreation() {
           />
         )}
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
-    </AppLayout>
+</AppLayout>
   );
 }
 

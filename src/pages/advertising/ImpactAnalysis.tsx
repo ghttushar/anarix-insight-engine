@@ -22,8 +22,6 @@ import {
   mockImpactKeywords,
   mockImpactSearchTerms,
 } from "@/data/mockImpactData";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 type ImpactTab = "campaigns" | "ad-groups" | "products" | "keywords" | "search-terms";
 
 const tabs = [
@@ -157,8 +155,6 @@ export default function ImpactAnalysis() {
 
         <ImpactTable data={data} searchQuery={searchQuery} showType={showType} />
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

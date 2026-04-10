@@ -13,7 +13,6 @@ import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import { cn } from "@/lib/utils";
 import { Pencil, RotateCcw, Globe, Palette } from "lucide-react";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const CUSTOM_SHORTCUTS_KEY = "anarix-custom-shortcuts";
@@ -442,8 +441,6 @@ export default function Preferences() {
           </div>
         </section>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

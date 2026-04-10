@@ -26,8 +26,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
 interface FilterRule {
@@ -325,8 +323,6 @@ export default function CampaignManager() {
         onClose={() => setCreateModalOpen(false)}
         onSubmit={handleCreateCampaign}
       />
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

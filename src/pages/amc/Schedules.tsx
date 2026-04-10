@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { mockSchedules } from "@/data/mockAMC";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusColors: Record<string, string> = {
@@ -75,8 +74,6 @@ export default function AMCSchedules() {
           </Table>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

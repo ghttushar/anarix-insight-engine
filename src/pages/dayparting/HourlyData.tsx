@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { HourlyHeatmap } from "@/components/dayparting/HourlyHeatmap";
 import { HistoryTable } from "@/components/dayparting/HistoryTable";
@@ -393,9 +392,7 @@ export default function HourlyData() {
               )}
             </TabsContent>
           </Tabs>
-
-          <PageFooterBar breadcrumbItems={breadcrumbItems} />
-        </div>
+</div>
         <CreateSchedulePanel />
       </div>
 

@@ -11,8 +11,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Edit, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { appliedRules, type AppliedRule } from "@/data/mockRules";
 import { cn } from "@/lib/utils";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 const statusStyles: Record<string, string> = {
   active: "bg-success/10 text-success border-success/20",
   paused: "bg-warning/10 text-warning border-warning/20",
@@ -193,8 +191,6 @@ export default function AppliedRules() {
           </div>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }
