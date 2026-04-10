@@ -1157,31 +1157,32 @@ function ComponentShowcase() {
       {/* ==================== FLOATING ACTION ISLAND ==================== */}
       <section className="space-y-4">
         <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Floating Action Island — Static Anatomy</h2>
+        <p className="text-xs text-muted-foreground">Persistent hub with border-primary/60 blue border. Contains Ask Aan, Insights, Refresh + separated bell icon. Export and Screenshot have been removed.</p>
 
         <div className="space-y-6">
           {/* Collapsed state */}
           <div className="space-y-2">
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">Collapsed (Compact)</Label>
-            <div className="inline-flex items-center gap-2 bg-card/95 border border-border rounded-full px-4 py-2 shadow-md">
+            <div className="inline-flex items-center gap-2 bg-card/95 border border-primary/60 rounded-full px-4 py-2 shadow-md">
               <button className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted">
                 <X className="h-4 w-4" />
               </button>
               <div className="h-6 w-px bg-border" />
               <div className="flex items-center gap-1">
-                <button className="h-8 px-2 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent">
+                <button className="h-8 px-2 rounded-full flex items-center gap-1.5 text-muted-foreground hover:text-foreground hover:bg-accent">
                   <Sparkles className="h-4 w-4" />
+                  <span className="text-xs">Ask Aan</span>
                 </button>
-                <button className="h-8 px-2 rounded-full flex items-center justify-center text-destructive hover:bg-accent">
+                <button className="h-8 px-2 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent">
                   <Lightbulb className="h-4 w-4" />
                 </button>
                 <button className="h-8 px-2 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent">
                   <RefreshCw className="h-4 w-4" />
                 </button>
-                <button className="h-8 px-2 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent">
-                  <Download className="h-4 w-4" />
-                </button>
-                <button className="h-8 px-2 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent">
-                  <Camera className="h-4 w-4" />
+              </div>
+              <div className="pl-2 border-l border-border">
+                <button className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent">
+                  <Bell className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -1190,7 +1191,7 @@ function ComponentShowcase() {
           {/* Expanded state */}
           <div className="space-y-2">
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">Expanded (Hover State)</Label>
-            <div className="inline-flex items-center gap-2 bg-card/95 border border-border rounded-full px-2 py-2 shadow-md">
+            <div className="inline-flex items-center gap-2 bg-card/95 border border-primary/60 rounded-full px-2 py-2 shadow-md">
               <button className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground">
                 <X className="h-4 w-4" />
               </button>
@@ -1200,8 +1201,6 @@ function ComponentShowcase() {
                   { icon: Sparkles, label: "Ask Aan", highlight: false },
                   { icon: Lightbulb, label: "Insights (2)", highlight: true },
                   { icon: RefreshCw, label: "Refresh", highlight: false },
-                  { icon: Download, label: "Export", highlight: false },
-                  { icon: Camera, label: "Screenshot", highlight: false },
                 ].map(({ icon: Icon, label, highlight }) => (
                   <button key={label} className={`h-8 px-3 rounded-full flex items-center gap-2 text-sm ${highlight ? "text-destructive" : "text-muted-foreground"} hover:bg-accent`}>
                     <Icon className="h-4 w-4 shrink-0" />
@@ -1210,9 +1209,9 @@ function ComponentShowcase() {
                 ))}
               </div>
               <div className="pl-2 border-l border-border">
-                <span className="text-xs text-muted-foreground">
-                  <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">⌘K</kbd>
-                </span>
+                <button className="h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent">
+                  <Bell className="h-4 w-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -2340,56 +2339,110 @@ function ComponentShowcase() {
 
       </section>
 
-      {/* ==================== APP LEVEL METRIC SELECTOR ==================== */}
+      {/* ==================== APP TASKBAR (2-ROW LAYOUT) ==================== */}
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">App Level Metric Selector</h2>
-        <p className="text-xs text-muted-foreground">Inline pill-style controls positioned top-right against the page title inside PageHeader. Contains marketplace, ad type, catalogue, and account selectors. No card wrapper — controls sit naturally in the flex row.</p>
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">AppTaskbar (2-Row Layout)</h2>
+        <p className="text-xs text-muted-foreground">Sticky two-row taskbar with border-primary accent. Row 1: breadcrumb + account/sync info. Row 2: page-specific filters + island-off fallback actions. Actions collapse to icon-only when side panels are open.</p>
         
+        {/* Default state */}
         <div className="space-y-3">
-          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Default State (Amazon + All Types)</Label>
-          <div className="p-4 rounded-lg border border-border bg-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">Campaign Manager</h3>
-                <p className="text-xs text-muted-foreground">Manage and optimize your campaigns</p>
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Default State — Full Actions</Label>
+          <div className="rounded-lg border border-primary bg-card overflow-hidden">
+            {/* Row 1 */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border/30">
+              <nav className="flex items-center gap-0.5 text-xs">
+                <span className="text-muted-foreground">Profitability</span>
+                <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
+                <span className="font-medium text-foreground">Dashboard</span>
+              </nav>
+              <div className="flex items-center gap-3">
+                <div className="h-4 w-6 rounded bg-[#FF9900]/20 flex items-center justify-center">
+                  <span className="text-[8px] font-bold text-[#FF9900]">a</span>
+                </div>
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span className="text-xs font-medium text-foreground">My Store</span>
+                <div className="h-3.5 w-px bg-border" />
+                <Clock className="h-3 w-3 text-muted-foreground" />
+                <span className="text-[11px] text-muted-foreground">Last synced: Apr 10, 2:30 PM</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2.5 rounded-md border border-border bg-muted/50 px-3 h-9 text-sm font-medium">
-                  <div className="h-5 w-5 rounded bg-orange-100 flex items-center justify-center">
-                    <Store className="h-3 w-3 text-orange-600" />
-                  </div>
-                  <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <span className="text-sm">My Store</span>
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+            </div>
+            {/* Row 2 */}
+            <div className="flex items-center px-4 py-2 gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0 flex-wrap">
+                <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+                  <span className="text-sm font-medium text-muted-foreground">Ad Type</span>
+                  <span className="text-sm">All Types</span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+                  <span className="text-sm font-medium text-muted-foreground">Date Range</span>
+                  <CalendarIcon className="h-3 w-3" />
+                  <span className="text-sm">Apr 01 – Apr 10, 2026</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-0.5 ml-auto shrink-0">
+                <button className="h-7 px-2 gap-1 inline-flex items-center rounded-md text-[11px] text-muted-foreground hover:bg-accent">
+                  <Sparkles className="h-3 w-3 text-primary" />
+                  <span>Ask Aan</span>
+                </button>
+                <button className="h-7 px-2 gap-1 inline-flex items-center rounded-md text-[11px] text-muted-foreground hover:bg-accent">
+                  <Lightbulb className="h-3 w-3" />
+                  <span>Insights</span>
+                </button>
+                <button className="h-7 px-2 gap-1 inline-flex items-center rounded-md text-[11px] text-muted-foreground hover:bg-accent">
+                  <RefreshCw className="h-3 w-3" />
+                  <span>Refresh</span>
+                </button>
+                <div className="pl-2 border-l border-border ml-1">
+                  <button className="h-7 w-7 p-0 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-accent">
+                    <Bell className="h-3.5 w-3.5" />
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Panel-collapsed variant */}
         <div className="space-y-3">
-          <Label className="text-xs uppercase tracking-wider text-muted-foreground">With Children (Ad Type + Catalogue selectors)</Label>
-          <div className="p-4 rounded-lg border border-border bg-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">Profitability Dashboard</h3>
-                <p className="text-xs text-muted-foreground">Track your profit and loss</p>
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Panel Open — Icon-Only Actions</Label>
+          <div className="rounded-lg border border-primary bg-card overflow-hidden">
+            {/* Row 1 */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border/30">
+              <nav className="flex items-center gap-0.5 text-xs">
+                <span className="text-muted-foreground">Advertising</span>
+                <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
+                <span className="font-medium text-foreground">Campaign Manager</span>
+              </nav>
+              <div className="flex items-center gap-3">
+                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span className="text-xs font-medium text-foreground">My Store</span>
+                <div className="h-3.5 w-px bg-border" />
+                <Clock className="h-3 w-3 text-muted-foreground" />
+                <span className="text-[11px] text-muted-foreground">Last synced: Apr 10, 2:30 PM</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Select defaultValue="all">
-                  <SelectTrigger className="h-9 w-[140px] text-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Catalogues</SelectItem>
-                    <SelectItem value="home">Home & Garden</SelectItem>
-                  </SelectContent>
-                </Select>
-                <div className="flex items-center gap-2.5 rounded-md border border-border bg-muted/50 px-3 h-9 text-sm font-medium">
-                  <div className="h-5 w-5 rounded bg-orange-100 flex items-center justify-center">
-                    <Store className="h-3 w-3 text-orange-600" />
-                  </div>
-                  <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <span className="text-sm">My Store</span>
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+            </div>
+            {/* Row 2 — icon-only actions */}
+            <div className="flex items-center px-4 py-2 gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0 flex-wrap">
+                <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
+                  <span className="text-sm font-medium text-muted-foreground">Ad Type</span>
+                  <span className="text-sm">SP</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-0.5 ml-auto shrink-0">
+                <button className="h-7 w-7 p-0 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-accent">
+                  <Sparkles className="h-3 w-3 text-primary" />
+                </button>
+                <button className="h-7 w-7 p-0 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-accent">
+                  <Lightbulb className="h-3 w-3" />
+                </button>
+                <button className="h-7 w-7 p-0 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-accent">
+                  <RefreshCw className="h-3 w-3" />
+                </button>
+                <div className="pl-2 border-l border-border ml-1">
+                  <button className="h-7 w-7 p-0 inline-flex items-center justify-center rounded-md text-muted-foreground hover:bg-accent">
+                    <Bell className="h-3.5 w-3.5" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -2575,54 +2628,62 @@ function ComponentShowcase() {
 
       {/* ==================== PROFITABILITY HERO CARD ==================== */}
       <section className="space-y-4">
-        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Profitability Hero Card</h2>
-        <p className="text-xs text-muted-foreground">Consolidated profitability card with frequency tabs (Today, Yesterday, This Month, Last Month) and three sub-views: Overview, Sales Mix, Efficiency. Replaces individual period cards.</p>
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Profitability Hero Card (5-Card Grid)</h2>
+        <p className="text-xs text-muted-foreground">Fixed 5-card grid: Today, Yesterday, This Month, Last Month, Forecast. Clicking selects a card (ring-2 ring-primary). Each card shows 6 metrics in bordered boxes + a highlighted Net Profit section. Comparison chart at 220px height below.</p>
 
         <div className="space-y-3">
-          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Overview Tab — Static Anatomy</Label>
-          <div className="rounded-xl border border-border bg-card overflow-hidden">
-            {/* Frequency tabs */}
-            <div className="flex items-center justify-between border-b border-border px-5 py-3">
-              <div className="flex items-center gap-1 rounded-lg bg-muted/50 p-0.5">
-                {["Today", "Yesterday", "This Month", "Last Month"].map((tab, i) => (
-                  <button key={tab} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${i === 0 ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}>{tab}</button>
-                ))}
-              </div>
-              <div className="flex items-center gap-1 rounded-lg bg-muted/50 p-0.5">
-                {["Overview", "Sales Mix", "Efficiency"].map((view, i) => (
-                  <button key={view} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${i === 0 ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}>{view}</button>
-                ))}
-              </div>
-            </div>
-            {/* Hero metric */}
-            <div className="px-5 py-4">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Net Profit</p>
-                  <div className="flex items-baseline gap-3 mt-1">
-                    <span className="text-3xl font-bold text-foreground">$12,450</span>
-                    <DeltaBadge value={14.2} />
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Card Grid — "Today" Selected</Label>
+          <div className="grid grid-cols-5 gap-3">
+            {[
+              { title: "Today", selected: true, profit: "$1,245", metrics: [
+                { label: "GMV", value: "$4,520" }, { label: "Orders", value: "89" }, { label: "Auth Sales", value: "$3,210" },
+                { label: "Ad Cost", value: "$680", }, { label: "Units", value: "124" }, { label: "Est. Payout", value: "$2,890" },
+              ]},
+              { title: "Yesterday", selected: false, profit: "$1,180", metrics: [
+                { label: "GMV", value: "$4,200" }, { label: "Orders", value: "82" }, { label: "Auth Sales", value: "$2,980" },
+                { label: "Ad Cost", value: "$620" }, { label: "Units", value: "115" }, { label: "Est. Payout", value: "$2,710" },
+              ]},
+              { title: "This Month", selected: false, profit: "$12,450", metrics: [
+                { label: "GMV", value: "$45,200" }, { label: "Orders", value: "890" }, { label: "Auth Sales", value: "$32,100" },
+                { label: "Ad Cost", value: "$6,800" }, { label: "Units", value: "1,240" }, { label: "Est. Payout", value: "$28,900" },
+              ]},
+              { title: "Last Month", selected: false, profit: "$10,800", metrics: [
+                { label: "GMV", value: "$42,100" }, { label: "Orders", value: "820" }, { label: "Auth Sales", value: "$29,800" },
+                { label: "Ad Cost", value: "$6,200" }, { label: "Units", value: "1,150" }, { label: "Est. Payout", value: "$27,100" },
+              ]},
+              { title: "Forecast", selected: false, profit: "$1,380", metrics: [
+                { label: "GMV", value: "$4,800" }, { label: "Est. Orders", value: "95" }, { label: "Est. Sales", value: "$3,400" },
+                { label: "Est. Ad Cost", value: "$700" }, { label: "Est. Units", value: "132" }, { label: "Est. Payout", value: "$3,060" },
+              ]},
+            ].map((card) => (
+              <div key={card.title} className={`rounded-lg border bg-card overflow-hidden ${card.selected ? "ring-2 ring-primary border-primary shadow-md" : "border-border"} ${card.title === "Forecast" ? "border-dashed" : ""}`}>
+                <div className="px-3 py-2 border-b border-border/50">
+                  <span className="text-xs font-medium text-muted-foreground">{card.title}</span>
+                </div>
+                <div className="px-3 py-2">
+                  <div className="rounded-md bg-muted/30 px-2.5 py-2 mb-2">
+                    <p className="text-[10px] text-muted-foreground">Net Profit</p>
+                    <p className="text-sm font-bold text-foreground">{card.profit}</p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {card.metrics.map((m) => (
+                      <div key={m.label} className="rounded-md border border-border/50 px-2 py-1.5">
+                        <p className="text-[9px] text-muted-foreground leading-tight">{m.label}</p>
+                        <p className="text-[10px] font-semibold text-foreground mt-0.5">{m.value}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="text-xs">Full Details</Button>
               </div>
-              {/* KPI tiles */}
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { label: "Revenue", value: "$45,200", delta: 8.5 },
-                  { label: "Ad Spend", value: "$12,800", delta: -3.2 },
-                  { label: "COGS", value: "$18,950", delta: 2.1 },
-                  { label: "Margin", value: "27.5%", delta: 4.8 },
-                  { label: "Orders", value: "1,234", delta: 12.3 },
-                  { label: "AOV", value: "$36.63", delta: -1.5 },
-                ].map(({ label, value, delta }) => (
-                  <div key={label} className="rounded-lg bg-muted/40 p-3">
-                    <p className="text-[11px] text-muted-foreground">{label}</p>
-                    <p className="text-base font-semibold text-foreground mt-0.5">{value}</p>
-                    <DeltaBadge value={delta} />
-                  </div>
-                ))}
-              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Comparison Chart Below Cards (220px height)</Label>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <div className="h-[220px] bg-muted/20 rounded-lg flex items-center justify-center border border-dashed border-border">
+              <span className="text-sm text-muted-foreground">5-Series Area Chart — 220px height — All periods overlaid</span>
             </div>
           </div>
         </div>
