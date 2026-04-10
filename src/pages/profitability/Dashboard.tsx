@@ -53,8 +53,23 @@ const breadcrumbItems = [
 ];
 export default function ProfitabilityDashboard() {
   const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
+  const { tab: routeTab } = useParams<{ tab?: string }>();
+  const profNav = useNavigate();
+  const validTabs = ["products", "orders"] as const;
+  const initialTab = (routeTab && validTabs.includes(routeTab as any)) ? routeTab as "products" | "orders" : "products";
   const [selectedPeriod, setSelectedPeriod] = useState<string>("today");
-  const [tableTab, setTableTab] = useState<"products" | "orders">("products");
+  const [tableTab, setTableTab] = useState<"products" | "orders">(initialTab);
+
+  useEffect(() => {
+    if (routeTab && validTabs.includes(routeTab as any)) {
+      setTableTab(routeTab as "products" | "orders");
+    }
+  }, [routeTab]);
+
+  const handleTabChange = (tab: "products" | "orders") => {
+    setTableTab(tab);
+    profNav(`/profitability/dashboard/${tab}`, { replace: true });
+  };
   const [searchValue, setSearchValue] = useState("");
   const [columns, setColumns] = useState(COLUMN_DEFS);
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
