@@ -1,94 +1,191 @@
 
 
-## Update Component Library and Design System Documentation
+## Delete and Recreate Component Library + Design System from Scratch + Remove Footer Breadcrumbs + Add Independent Routes
 
-### Problem
-The Component Library and Design System pages are outdated. They don't reflect the recent 50+ changes including:
-- **AppTaskbar**: Now a 2-row layout (breadcrumb + account/sync on Row 1, filters + island-off actions on Row 2) with panel-aware icon-only collapse
-- **Profitability Hero Card**: Now a 5-card selectable grid with 6 metrics per card, bordered metric boxes, and 220px comparison chart
-- **Right-side panels**: CreateCampaignPanel, CreateReportPanel, CreateSchedulePanel, ProductDetailPanel, PeriodBreakdownPanel, CampaignSettingsPanel, AdGroupSettingsPanel -- none are in the Component Library
-- **Marketplace selector**: Sidebar-integrated with hover popup for account switching
-- **Floating Action Island**: Updated (removed Export/Screenshot, Alerts icon-only far right)
-- **Design System colors**: Muted data viz colors (success 142 55% 38%, destructive 0 65% 48%, warning 38 75% 45%) not reflected
-- **Icons section**: Missing newer icons used in the app (Bell, Play, Clock, Sparkles, Lightbulb, RefreshCw, etc.)
-- **Navigation**: MiniSidebar, SidebarHoverPopup patterns not documented
-
-### Plan
-
-This requires updates to **2 files** totaling ~4800 lines. Changes organized by file:
+### Scope: 3 Major Workstreams
 
 ---
 
-### File 1: `src/pages/settings/ComponentLibrary.tsx`
+### Workstream 1: Remove PageFooterBar from ALL 43 pages
 
-#### A. Update AppTaskbar section (replace "App Level Metric Selector")
-Replace the outdated "App Level Metric Selector" section (~lines 2341-2396) with a new "AppTaskbar (2-Row Layout)" section showing:
-- **Row 1 anatomy**: Breadcrumb (left) + Marketplace logo + status dot + account name + divider + clock icon + "Last synced" (right)
-- **Row 2 anatomy**: Filters/selectors (left: Ad Type, Catalogue, Date Range) + island-off actions (right: Ask Aan, Insights, Refresh + separated bell)
-- **Panel-collapsed variant**: Showing icon-only actions when `hasAnyPanel` is true
-- Static mockup with the `border-primary` top accent
+Every page currently renders `<PageFooterBar breadcrumbItems={...} />`. Remove this line and the corresponding import from all 43 files:
 
-#### B. Update Floating Action Island section
-- Remove Export and Screenshot buttons from both collapsed and expanded states (~lines 1155-1227)
-- Remove their labels from the expanded state array
-- Keep only: Ask Aan, Insights, Refresh
-- Update Alerts to icon-only (bell) positioned far right with a separator
+**Advertising (13):** CampaignManager, CampaignDetail, AdGroupDetail, ProductAdDetail, ImpactAnalysis, TargetingActions, BudgetPacing, SearchHarvesting, AnomalyAlerts, CreativeAnalyzer, RuleAgents, RuleCreation, AppliedRules
 
-#### C. Update Profitability Hero Card section (~lines 2574-2627)
-Replace with a 5-card grid anatomy showing:
-- **Card grid**: 5 cards in a row (Today, Yesterday, This Month, Last Month, Forecast)
-- **Selected card state**: One card with `ring-2 ring-primary border-primary shadow-md`
-- **6 metrics per card**: GMV, Orders, Auth Sales, Ad Cost, Units, Est. Payout in `grid-cols-3` bordered boxes
-- **Net Profit hero section**: With `bg-muted/30` background box
-- **Comparison chart**: 220px height note
+**Profitability (5):** Dashboard, Trends, ProfitLoss, Geographical, UnifiedPnL
 
-#### D. Add Right-Side Panels section (NEW)
-Add static anatomy mockups for all right-side panels:
-1. **CreateCampaignPanel**: Form fields (name, type, bidding strategy, budget, dates)
-2. **CreateReportPanel**: Template selection, section checkboxes, schedule options
-3. **CreateSchedulePanel**: Campaign selector, action type, day/time selectors
-4. **ProductDetailPanel**: Product image/name, sparkline, expandable P&L sections
-5. **PeriodBreakdownPanel**: Summary period, sales/expenses/units breakdown rows
-6. **CampaignSettingsPanel**: Campaign metadata, budget/bid edits (reference to CampaignInfoCard)
-7. **AdGroupSettingsPanel**: Ad group metadata, bid/TRoAS edits
+**AMC (6):** Queries, ExecutedQueries, Schedules, Audiences, CreatedAudiences, Instances
 
-Each shown as a ~380px-wide bordered container with header + content + footer anatomy.
+**BI (5):** BrandSOV, KeywordTracker, KeywordSOV, ProductSOV, CompetitorPricing
 
-#### E. Add Sidebar Navigation section (NEW)
-Static anatomy showing:
-- **Expanded sidebar**: Logo + toggle, "Ask Aan" pill, grouped nav items with active styling, footer (theme + avatar)
-- **Collapsed sidebar**: Icon-only with tooltip, SidebarHoverPopup mockup
-- **MarketplaceSelector**: Expanded and collapsed states with hover popup for account list
+**Catalog (2):** Products, InventoryAds
+
+**Workspace (2):** Dashboard, HealthScore
+
+**Day Parting (1):** HourlyData
+
+**Reports (1):** ClientPortal
+
+**Settings (7):** Preferences, Accounts, ConnectAmazon, ConnectWalmart, Team, System, ComponentLibrary, DesignSystem
+
+Also delete `src/components/layout/PageFooterBar.tsx` entirely.
 
 ---
 
-### File 2: `src/pages/settings/DesignSystem.tsx`
+### Workstream 2: Delete and Recreate Design System (`src/pages/settings/DesignSystem.tsx`)
 
-#### A. Update Color System section
-- Update muted-foreground light mode from `228 15% 46%` / `#646A86` to `228 18% 40%` / `#555D78`
-- Update data viz colors to muted variants:
-  - Success: `142 55% 38%` / `#1E9E4F` (was `142 71% 45%` / `#22C55E`)
-  - Destructive: `0 65% 48%` / `#C93535` (was `0 84% 60%` / `#EF4444`)
-  - Warning: `38 75% 45%` / `#C98A14` (was `38 92% 50%` / `#F59E0B`)
+Delete entire file (~1997 lines) and rewrite from scratch with these tabs:
 
-#### B. Update Icons section
-Add missing icons to the categories:
-- **Navigation**: Bell, Play, ChevronRight
-- **Actions**: RefreshCw (already there), Sparkles, Lightbulb, Camera → remove Camera
-- **Data**: Layers, Target, Percent, Package, ShoppingCart, DollarSign
-- **System**: Clock (already there), Store → remove Store if not imported
+**Tab 1 — Colors**
+- Periwinkle System 01 light + dark palettes with correct hex values
+- Muted data viz colors: Success `#1E9E4F`, Destructive `#C93535`, Warning `#C98A14`
+- Aan AI gradient spec
+- Reserved color rules
 
-#### C. Update Layout Components description
-Update the AppTaskbar description to reflect 2-row layout with breadcrumb + account info on Row 1 and filters + island-off actions on Row 2.
+**Tab 2 — Typography**
+- Satoshi Variable (headings), Noto Sans (body)
+- Type scale (H1 32px → Meta 12px)
+- Weight and usage rules
 
-#### D. Add new icons import
-Import any missing Lucide icons needed for the updated icon grid (Bell, Play, Sparkles, Lightbulb, Layers, Target, Percent, Package, ShoppingCart, DollarSign, Store).
+**Tab 3 — Spacing**
+- 4px base unit scale
+- Component padding rules
+- Layout gap standards
+
+**Tab 4 — Icons**
+- Full Lucide icon grid organized by category: Navigation, Actions, Data, System, Status, Marketplace
+- All icons currently used in the app including: Bell, Play, Sparkles, Lightbulb, Layers, Target, Percent, Package, ShoppingCart, DollarSign, RefreshCw, Activity, Gauge, Wheat, FlaskConical, ShieldCheck, PackageCheck, PanelLeft, LayoutDashboard
+- Sizing rules (16/20/24px) and color inheritance
+
+**Tab 5 — Components**
+- Buttons (Primary, Secondary, Destructive, Ghost — all states)
+- Inputs (Text, Select, Checkbox, Switch, Radio — all states)
+- Badges (StatusBadge, DeltaBadge, Chip)
+- Cards (KPICard, standard Card)
+- Tables (header, rows, pagination)
+- Alerts and Toasts
+
+**Tab 6 — States**
+- Interactive state examples: Default, Hover, Active, Disabled, Loading, Error, Focus
+- Applied to buttons, inputs, selects, switches, table rows
+
+**Tab 7 — Layout**
+- AppTaskbar 2-row anatomy
+- Sidebar expanded/collapsed patterns
+- Right-side panel structure
+- Floating Action Island anatomy
+- Page structure hierarchy
 
 ---
 
-### Implementation Complexity
-- ComponentLibrary.tsx: ~300 lines added/replaced
-- DesignSystem.tsx: ~80 lines modified
-- Both files are static mockups (no functional changes)
-- No new dependencies needed
+### Workstream 3: Delete and Recreate Component Library (`src/pages/settings/ComponentLibrary.tsx`)
+
+Delete entire file (~3297 lines) and rewrite from scratch with systematic sections, each with an independent route anchor. Organized by application area:
+
+**Section 1 — Foundation Primitives**
+- Typography specimens
+- Button matrix (all variants × all states)
+- Form controls (Input, Select, Textarea, Checkbox, Switch, Radio, Slider)
+- Badge/Chip/StatusBadge/DeltaBadge
+- Alert variants
+- Loading skeletons (Table, Card, Chart, Metric)
+
+**Section 2 — Navigation**
+- AppSidebar (expanded state with all groups)
+- MiniSidebar (collapsed icon-only state)
+- SidebarHoverPopup anatomy
+- MarketplaceSelector (expanded + collapsed)
+- PageBreadcrumb
+- Floating Action Island (collapsed + expanded)
+
+**Section 3 — AppTaskbar**
+- Full 2-row layout anatomy
+- Row 1: Breadcrumb + Marketplace/Account info
+- Row 2: Filters + Island-off actions
+- Panel-collapsed variant (icon-only actions)
+
+**Section 4 — Data Tables**
+- DataTableToolbar anatomy (search, columns, filters, sort, upload, download)
+- SortableTableHead with Pin states (hidden, hover, active, highlight)
+- TablePagination
+- UnderlineTabs
+- Sample table with all column types
+
+**Section 5 — Cards & KPIs**
+- KPICard single
+- KPICardsRow (multi-card strip)
+- InlineKPIStrip
+- ProfitabilityHeroCard (5-card selectable grid, 6 metrics, 220px chart)
+
+**Section 6 — Charts**
+- ChartContainer anatomy
+- PerformanceChart
+- MetricSelector
+
+**Section 7 — Right-Side Panels (ALL)**
+- CreateCampaignPanel anatomy
+- CreateReportPanel anatomy
+- CreateSchedulePanel anatomy
+- ProductDetailPanel anatomy
+- PeriodBreakdownPanel anatomy
+- CampaignSettingsPanel anatomy
+- AdGroupSettingsPanel anatomy
+
+**Section 8 — Aan AI Components**
+- AanLogo variants
+- ArtifactCard
+- AanInput
+- AanConversation anatomy
+- AanWorkspaceSidebar anatomy
+- AI gradient usage examples
+
+**Section 9 — Modals & Dialogs**
+- COGSEditModal anatomy
+- ProductTrendsModal anatomy
+- CreateCampaignModal anatomy
+- AddKeywordTargetModal anatomy
+- AddProductAdsModal anatomy
+
+**Section 10 — Page-Level Patterns**
+- Complete page anatomy (Header → Taskbar → Content → Table)
+- Tab group patterns (Campaign Manager tabs, Impact Analysis tabs, Day Parting tabs)
+
+---
+
+### Workstream 4: Independent Routes
+
+Add routes in `App.tsx` for direct-linking to specific UI states:
+
+| Route | Purpose |
+|---|---|
+| `/settings/design-system` | Already exists |
+| `/settings/component-library` | Already exists |
+| `/settings/component-library/navigation` | Section anchor |
+| `/settings/component-library/taskbar` | Section anchor |
+| `/settings/component-library/tables` | Section anchor |
+| `/settings/component-library/cards` | Section anchor |
+| `/settings/component-library/panels` | Section anchor |
+| `/settings/component-library/aan` | Section anchor |
+| `/settings/component-library/modals` | Section anchor |
+| `/settings/component-library/charts` | Section anchor |
+
+Implementation: Use URL hash anchors (`#navigation`, `#taskbar`, etc.) with `useSearchParams` or `useLocation().hash` to auto-scroll to the correct section. This avoids creating 10+ separate route entries — a single route with hash navigation.
+
+---
+
+### Files Summary
+
+| Action | Files | Count |
+|---|---|---|
+| Delete | `PageFooterBar.tsx` | 1 |
+| Edit (remove footer) | All 43 page files | 43 |
+| Delete + Recreate | `DesignSystem.tsx` | 1 |
+| Delete + Recreate | `ComponentLibrary.tsx` | 1 |
+| **Total** | | **46 files** |
+
+### Implementation Order
+1. Remove PageFooterBar from all 43 pages + delete the component
+2. Recreate DesignSystem.tsx (~800 lines)
+3. Recreate ComponentLibrary.tsx (~2500 lines)
+4. Add hash-based section navigation to ComponentLibrary
 
