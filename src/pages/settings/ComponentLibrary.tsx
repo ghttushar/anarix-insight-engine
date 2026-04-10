@@ -49,9 +49,11 @@ import {
   AlertCircle, AlertTriangle, Info, CheckCircle, CheckCircle2, XCircle, Home, 
   Plus, Edit, Trash2, Download, Bold, Italic, Underline, Filter, Columns,
   Calendar as CalendarIcon, User, Mail, X, Settings, Search, Send, Loader2,
-  Sparkles, RefreshCw, Camera, Lightbulb, Maximize2, SlidersHorizontal,
-  ChevronDown, Eye, EyeOff, BarChart3, FileText, Zap, Store, ArrowRight,
-  Check, ArrowUpDown, ArrowUp, ArrowDown, Pin, Sun, Moon, Upload
+  Sparkles, RefreshCw, Lightbulb, SlidersHorizontal,
+  ChevronDown, ChevronRight, Eye, EyeOff, BarChart3, FileText, Zap, ArrowRight,
+  Check, ArrowUpDown, ArrowUp, ArrowDown, Pin, Sun, Moon, Upload, Bell, Clock,
+  Play, PanelLeft, LayoutDashboard, ShoppingCart, Target, Package, DollarSign,
+  TrendingUp, Megaphone, BarChart2, Layers, BookOpen, Wrench
 } from "lucide-react";
 
 
