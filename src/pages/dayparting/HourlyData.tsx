@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -56,7 +57,15 @@ const breadcrumbItems = [{ label: "Day Parting" }];
 export default function HourlyData() {
   const { adType, setAdType } = useFilter();
   const { setDataPanel } = useActivePanel();
-  const [activeTab, setActiveTab] = useState("dayparting");
+  const location = useLocation();
+  const nav = useNavigate();
+  const initialTab = location.pathname === "/dayparting/history" ? "history" : "dayparting";
+  const [activeTab, setActiveTab] = useState(initialTab);
+  
+  useEffect(() => {
+    const tab = location.pathname === "/dayparting/history" ? "history" : "dayparting";
+    setActiveTab(tab);
+  }, [location.pathname]);
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>(["camp-1"]);
   const [metric, setMetric] = useState<MetricType>("roas");
   const [searchQuery, setSearchQuery] = useState("");
@@ -227,7 +236,7 @@ export default function HourlyData() {
             </div>
           </AppTaskbar>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); nav(v === "history" ? "/dayparting/history" : "/dayparting", { replace: true }); }}>
             <TabsList>
               <TabsTrigger value="dayparting">Day Parting</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -582,51 +582,182 @@ function ChartsSection() {
   );
 }
 
-function PanelsSection() {
-  const panels = [
-    { name: "CreateCampaignPanel", desc: "Campaign creation: name, type, bidding strategy, budget, dates." },
-    { name: "CreateReportPanel", desc: "Report generation: template, date range, format options." },
-    { name: "CreateSchedulePanel", desc: "Automated schedule: frequency, query, notifications." },
-    { name: "ProductDetailPanel", desc: "Product viewer: image, metrics, ASIN/SKU, performance." },
-    { name: "PeriodBreakdownPanel", desc: "Daily/weekly P&L breakdown with sortable rows." },
-    { name: "CampaignSettingsPanel", desc: "Campaign edit: name, status, bidding, budget, targeting." },
-    { name: "AdGroupSettingsPanel", desc: "Ad group edit: name, bid, targeting, negative keywords." },
-  ];
+function PanelMockup({ title, children, footer }: { title: string; children: React.ReactNode; footer?: React.ReactNode }) {
+  return (
+    <div className="border border-border rounded-md overflow-hidden w-80 bg-card">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
+        <span className="text-sm font-semibold text-foreground">{title}</span>
+        <Button variant="ghost" size="icon" className="h-6 w-6"><X className="h-3.5 w-3.5" /></Button>
+      </div>
+      <div className="px-4 py-4 space-y-3 max-h-[320px] overflow-y-auto">{children}</div>
+      {footer && (
+        <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border bg-muted/30">{footer}</div>
+      )}
+    </div>
+  );
+}
 
+function PanelsSection() {
   return (
     <div className="space-y-6">
       <SectionHeader id="panels" title="7. Right-Side Panels" description="All configuration and viewing panels. Fixed viewport, independent scroll, auto-close on outside click." />
 
+      {/* CreateCampaignPanel */}
       <Card className="p-4 space-y-2">
-        <Label className="text-xs uppercase tracking-wider text-muted-foreground">Panel Structure</Label>
-        <div className="border border-border rounded-md overflow-hidden w-80">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
-            <span className="text-sm font-semibold text-foreground">Panel Title</span>
-            <Button variant="ghost" size="icon" className="h-6 w-6"><X className="h-3.5 w-3.5" /></Button>
+        <Label className="text-xs uppercase tracking-wider text-muted-foreground">CreateCampaignPanel</Label>
+        <PanelMockup title="Create Campaign" footer={<><Button variant="outline" size="sm" className="text-xs">Cancel</Button><Button size="sm" className="text-xs">Create Campaign</Button></>}>
+          <div className="space-y-1.5"><Label className="text-xs">Campaign Name</Label><Input placeholder="Enter campaign name..." className="h-8 text-xs" /></div>
+          <div className="space-y-1.5"><Label className="text-xs">Campaign Type</Label>
+            <Select><SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select type" /></SelectTrigger><SelectContent><SelectItem value="auto" className="text-xs">Auto</SelectItem><SelectItem value="manual" className="text-xs">Manual</SelectItem></SelectContent></Select>
           </div>
-          <div className="px-4 py-4 space-y-3 bg-card">
-            <div className="space-y-1.5"><Label className="text-xs">Field</Label><Input placeholder="Value..." className="h-8 text-xs" /></div>
-            <div className="space-y-1.5"><Label className="text-xs">Budget</Label>
-              <div className="flex items-center gap-2"><DollarSign className="h-3.5 w-3.5 text-muted-foreground" /><Input placeholder="0.00" className="h-8 text-xs" /></div>
-            </div>
+          <div className="space-y-1.5"><Label className="text-xs">Bidding Strategy</Label>
+            <Select><SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select strategy" /></SelectTrigger><SelectContent><SelectItem value="down" className="text-xs">Dynamic Down</SelectItem><SelectItem value="updown" className="text-xs">Dynamic Up/Down</SelectItem><SelectItem value="fixed" className="text-xs">Fixed</SelectItem></SelectContent></Select>
           </div>
-          <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border bg-muted/30">
-            <Button variant="outline" size="sm" className="text-xs">Cancel</Button>
-            <Button size="sm" className="text-xs">Create</Button>
+          <div className="space-y-1.5"><Label className="text-xs">Daily Budget</Label>
+            <div className="flex items-center gap-2"><DollarSign className="h-3.5 w-3.5 text-muted-foreground" /><Input placeholder="0.00" className="h-8 text-xs" /></div>
           </div>
-        </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5"><Label className="text-xs">Start Date</Label><Input type="date" className="h-8 text-xs" /></div>
+            <div className="space-y-1.5"><Label className="text-xs">End Date</Label><Input type="date" className="h-8 text-xs" /></div>
+          </div>
+        </PanelMockup>
       </Card>
 
-      <Card className="p-4 space-y-3">
-        <Label className="text-xs uppercase tracking-wider text-muted-foreground">All Right-Side Panels</Label>
-        <div className="space-y-2">
-          {panels.map((p) => (
-            <div key={p.name} className="flex items-start gap-3 py-2 border-b border-border last:border-0">
-              <code className="text-xs bg-muted px-1.5 py-0.5 rounded text-foreground shrink-0">{p.name}</code>
-              <span className="text-xs text-muted-foreground">{p.desc}</span>
+      {/* CreateReportPanel */}
+      <Card className="p-4 space-y-2">
+        <Label className="text-xs uppercase tracking-wider text-muted-foreground">CreateReportPanel</Label>
+        <PanelMockup title="Create Report" footer={<><Button variant="outline" size="sm" className="text-xs">Cancel</Button><Button size="sm" className="text-xs">Generate Report</Button></>}>
+          <div className="space-y-1.5"><Label className="text-xs">Report Name</Label><Input placeholder="Q4 Performance Report" className="h-8 text-xs" /></div>
+          <div className="space-y-1.5"><Label className="text-xs">Client Name</Label><Input placeholder="Acme Corp" className="h-8 text-xs" /></div>
+          <div className="space-y-1.5"><Label className="text-xs">Template</Label>
+            <div className="flex gap-1.5 flex-wrap">
+              {["Executive Summary", "Detailed Analysis", "Monthly Review"].map((t) => (
+                <Badge key={t} variant="outline" className="text-[10px] cursor-pointer hover:bg-primary/10">{t}</Badge>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-1.5"><Label className="text-xs">Sections</Label>
+            <div className="space-y-1">
+              {["Overview", "Campaign Performance", "Budget Analysis", "Recommendations"].map((s) => (
+                <div key={s} className="flex items-center gap-2"><Checkbox id={`s-${s}`} /><label htmlFor={`s-${s}`} className="text-xs text-foreground">{s}</label></div>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center justify-between"><Label className="text-xs">Schedule Recurring</Label><Switch /></div>
+        </PanelMockup>
+      </Card>
+
+      {/* CreateSchedulePanel */}
+      <Card className="p-4 space-y-2">
+        <Label className="text-xs uppercase tracking-wider text-muted-foreground">CreateSchedulePanel</Label>
+        <PanelMockup title="Create Schedule" footer={<><Button variant="outline" size="sm" className="text-xs">Cancel</Button><Button size="sm" className="text-xs">Apply Rule</Button></>}>
+          <div className="space-y-1.5"><Label className="text-xs">Selected Campaigns</Label>
+            <div className="flex gap-1 flex-wrap"><Badge className="text-[10px]">Campaign Alpha <X className="h-2.5 w-2.5 ml-1" /></Badge><Badge className="text-[10px]">Campaign Beta <X className="h-2.5 w-2.5 ml-1" /></Badge></div>
+          </div>
+          <div className="space-y-1.5"><Label className="text-xs">Rule Name</Label><Input placeholder="Peak hours bid increase" className="h-8 text-xs" /></div>
+          <div className="space-y-1.5"><Label className="text-xs">Action</Label>
+            <Select><SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select action" /></SelectTrigger><SelectContent><SelectItem value="pause" className="text-xs">Pause</SelectItem><SelectItem value="increase" className="text-xs">Increase Budget</SelectItem><SelectItem value="reduce" className="text-xs">Reduce Budget</SelectItem></SelectContent></Select>
+          </div>
+          <div className="space-y-1.5"><Label className="text-xs">Days</Label>
+            <div className="flex gap-1">{["M","T","W","T","F","S","S"].map((d,i) => (
+              <div key={i} className={`w-7 h-7 rounded-md flex items-center justify-center text-[10px] border border-border cursor-pointer ${i < 5 ? "bg-primary/10 text-primary" : "text-muted-foreground"}`}>{d}</div>
+            ))}</div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5"><Label className="text-xs">Start Time</Label><Input type="time" defaultValue="09:00" className="h-8 text-xs" /></div>
+            <div className="space-y-1.5"><Label className="text-xs">End Time</Label><Input type="time" defaultValue="17:00" className="h-8 text-xs" /></div>
+          </div>
+        </PanelMockup>
+      </Card>
+
+      {/* ProductDetailPanel */}
+      <Card className="p-4 space-y-2">
+        <Label className="text-xs uppercase tracking-wider text-muted-foreground">ProductDetailPanel</Label>
+        <PanelMockup title="Product Detail">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-md bg-muted flex items-center justify-center"><Package className="h-5 w-5 text-muted-foreground" /></div>
+            <div><div className="text-sm font-medium text-foreground">Wireless Bluetooth Speaker</div><div className="text-[10px] text-muted-foreground">Item ID: WM-12345 · SKU: BTS-001</div></div>
+          </div>
+          <div className="flex items-center justify-between py-2 border-y border-border">
+            <div><div className="text-[10px] text-muted-foreground">Net Profit</div><div className="text-lg font-semibold text-foreground">$1,245.80</div></div>
+            <Badge variant="secondary" className="text-[10px]">32.4% margin</Badge>
+          </div>
+          <div className="h-16 bg-muted/30 rounded-md flex items-center justify-center text-[10px] text-muted-foreground">Weekly trend sparkline</div>
+          {[
+            { label: "Revenue", items: [{ l: "Organic Sales", v: "$2,840" }, { l: "Ad Sales", v: "$1,020" }] },
+            { label: "Costs", items: [{ l: "COGS", v: "$1,200" }, { l: "Ad Spend", v: "$380" }, { l: "Fees", v: "$234" }] },
+          ].map((section) => (
+            <div key={section.label}>
+              <div className="flex items-center gap-1 text-xs font-medium text-foreground cursor-pointer"><ChevronDown className="h-3 w-3" />{section.label}</div>
+              <div className="ml-4 mt-1 space-y-1">{section.items.map((item) => (
+                <div key={item.l} className="flex justify-between text-xs"><span className="text-muted-foreground">{item.l}</span><span className="text-foreground">{item.v}</span></div>
+              ))}</div>
             </div>
           ))}
-        </div>
+        </PanelMockup>
+      </Card>
+
+      {/* PeriodBreakdownPanel */}
+      <Card className="p-4 space-y-2">
+        <Label className="text-xs uppercase tracking-wider text-muted-foreground">PeriodBreakdownPanel</Label>
+        <PanelMockup title="Today Breakdown">
+          <div className="text-xs text-muted-foreground mb-2">Apr 10, 2026</div>
+          {[
+            { title: "Sales Breakdown", rows: [{ l: "Organic", v: "$4,200" }, { l: "Sponsored Products", v: "$1,800" }, { l: "Sponsored Brands", v: "$620" }] },
+            { title: "Orders & Units", rows: [{ l: "Total Orders", v: "142" }, { l: "Total Units", v: "189" }, { l: "Returns", v: "7" }] },
+            { title: "Costs", rows: [{ l: "COGS", v: "$2,100" }, { l: "Ad Spend", v: "$890" }, { l: "Total Expenses", v: "$3,400" }] },
+            { title: "Metrics", rows: [{ l: "Net Profit", v: "$1,420" }, { l: "TACOS", v: "13.4%" }, { l: "ROAS", v: "3.2x" }] },
+          ].map((section) => (
+            <div key={section.title}>
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">{section.title}</div>
+              <div className="space-y-1">{section.rows.map((r) => (
+                <div key={r.l} className="flex justify-between rounded-md bg-muted/50 px-2 py-1.5 text-xs"><span className="text-muted-foreground">{r.l}</span><span className="font-medium text-foreground">{r.v}</span></div>
+              ))}</div>
+            </div>
+          ))}
+        </PanelMockup>
+      </Card>
+
+      {/* CampaignSettingsPanel */}
+      <Card className="p-4 space-y-2">
+        <Label className="text-xs uppercase tracking-wider text-muted-foreground">CampaignSettingsPanel</Label>
+        <PanelMockup title="Campaign Settings" footer={<><Button variant="outline" size="sm" className="text-xs">Cancel</Button><Button size="sm" className="text-xs">Save Changes</Button></>}>
+          <div className="space-y-1.5"><Label className="text-xs">Campaign Name</Label><Input defaultValue="Summer Sale SP" className="h-8 text-xs" /></div>
+          <div className="space-y-1.5"><Label className="text-xs">Campaign ID</Label><Input value="CAMP-2024-001" disabled className="h-8 text-xs bg-muted" /></div>
+          <div className="space-y-1.5"><Label className="text-xs">Status</Label>
+            <Select defaultValue="live"><SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="live" className="text-xs">Live</SelectItem><SelectItem value="paused" className="text-xs">Paused</SelectItem><SelectItem value="archived" className="text-xs">Archived</SelectItem></SelectContent></Select>
+          </div>
+          <div className="space-y-1.5"><Label className="text-xs">Daily Budget</Label>
+            <div className="flex items-center gap-2"><DollarSign className="h-3.5 w-3.5 text-muted-foreground" /><Input defaultValue="150.00" className="h-8 text-xs" /></div>
+          </div>
+          <div className="space-y-1.5"><Label className="text-xs">Bidding Strategy</Label>
+            <RadioGroup defaultValue="down" className="space-y-1">
+              <div className="flex items-center gap-2"><RadioGroupItem value="down" id="bs-d" /><label htmlFor="bs-d" className="text-xs">Dynamic Down</label></div>
+              <div className="flex items-center gap-2"><RadioGroupItem value="updown" id="bs-ud" /><label htmlFor="bs-ud" className="text-xs">Dynamic Up/Down</label></div>
+              <div className="flex items-center gap-2"><RadioGroupItem value="fixed" id="bs-f" /><label htmlFor="bs-f" className="text-xs">Fixed</label></div>
+            </RadioGroup>
+          </div>
+          <div className="space-y-1.5"><Label className="text-xs">Top of Search %</Label><Input defaultValue="25" className="h-8 text-xs" /></div>
+        </PanelMockup>
+      </Card>
+
+      {/* AdGroupSettingsPanel */}
+      <Card className="p-4 space-y-2">
+        <Label className="text-xs uppercase tracking-wider text-muted-foreground">AdGroupSettingsPanel</Label>
+        <PanelMockup title="Ad Group Settings" footer={<><Button variant="outline" size="sm" className="text-xs">Cancel</Button><Button size="sm" className="text-xs">Save Changes</Button></>}>
+          <div className="space-y-1.5"><Label className="text-xs">Ad Group Name</Label><Input defaultValue="High-Performance Keywords" className="h-8 text-xs" /></div>
+          <div className="space-y-1.5"><Label className="text-xs">Status</Label>
+            <Select defaultValue="live"><SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="live" className="text-xs">Live</SelectItem><SelectItem value="paused" className="text-xs">Paused</SelectItem></SelectContent></Select>
+          </div>
+          <div className="space-y-1.5"><Label className="text-xs">Default Bid</Label>
+            <div className="flex items-center gap-2"><DollarSign className="h-3.5 w-3.5 text-muted-foreground" /><Input defaultValue="1.25" className="h-8 text-xs" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5"><Label className="text-xs">Min Bid</Label><Input defaultValue="0.50" className="h-8 text-xs" /></div>
+            <div className="space-y-1.5"><Label className="text-xs">Max Bid</Label><Input defaultValue="3.00" className="h-8 text-xs" /></div>
+          </div>
+          <div className="space-y-1.5"><Label className="text-xs">Target ROAS</Label><Input defaultValue="4.5" className="h-8 text-xs" /></div>
+        </PanelMockup>
       </Card>
     </div>
   );
@@ -835,22 +966,28 @@ function PatternsSection() {
 
 export default function ComponentLibrary() {
   const { hash } = useLocation();
-  const [activeSection, setActiveSection] = useState("primitives");
+  const { section: paramSection } = useParams<{ section?: string }>();
+  const navigate = useNavigate();
+  const initialSection = (paramSection && SECTIONS.some((s) => s.id === paramSection)) ? paramSection : "primitives";
+  const [activeSection, setActiveSection] = useState(initialSection);
 
   useEffect(() => {
-    if (hash) {
+    if (paramSection && SECTIONS.some((s) => s.id === paramSection)) {
+      setActiveSection(paramSection);
+      setTimeout(() => { document.getElementById(paramSection)?.scrollIntoView({ behavior: "smooth" }); }, 100);
+    } else if (hash) {
       const id = hash.replace("#", "");
       if (SECTIONS.some((s) => s.id === id)) {
         setActiveSection(id);
         setTimeout(() => { document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }); }, 100);
       }
     }
-  }, [hash]);
+  }, [paramSection, hash]);
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    window.history.replaceState(null, "", `#${id}`);
+    navigate(`/settings/component-library/${id}`, { replace: true });
   };
 
   return (

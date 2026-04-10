@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -52,8 +53,23 @@ const breadcrumbItems = [
 ];
 export default function ProfitabilityDashboard() {
   const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
+  const { tab: routeTab } = useParams<{ tab?: string }>();
+  const profNav = useNavigate();
+  const validTabs = ["products", "orders"] as const;
+  const initialTab = (routeTab && validTabs.includes(routeTab as any)) ? routeTab as "products" | "orders" : "products";
   const [selectedPeriod, setSelectedPeriod] = useState<string>("today");
-  const [tableTab, setTableTab] = useState<"products" | "orders">("products");
+  const [tableTab, setTableTab] = useState<"products" | "orders">(initialTab);
+
+  useEffect(() => {
+    if (routeTab && validTabs.includes(routeTab as any)) {
+      setTableTab(routeTab as "products" | "orders");
+    }
+  }, [routeTab]);
+
+  const handleTabChange = (tab: "products" | "orders") => {
+    setTableTab(tab);
+    profNav(`/profitability/dashboard/${tab}`, { replace: true });
+  };
   const [searchValue, setSearchValue] = useState("");
   const [columns, setColumns] = useState(COLUMN_DEFS);
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
@@ -148,7 +164,7 @@ export default function ProfitabilityDashboard() {
 
           <div className="space-y-3">
             <DataTableToolbar
-              leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={setTableTab} />}
+              leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={handleTabChange} />}
               searchValue={searchValue}
               onSearchChange={setSearchValue}
               searchPlaceholder={tableTab === "products" ? "Search by Product Name / Item ID / SKU..." : "Search by Order ID / Country / Product..."}

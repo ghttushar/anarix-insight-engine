@@ -138,6 +138,7 @@ function AppRoutes() {
 
       {/* Profitability */}
       <Route path="/profitability/dashboard" element={<ProfitabilityDashboard />} />
+      <Route path="/profitability/dashboard/:tab" element={<ProfitabilityDashboard />} />
       <Route path="/profitability/trends" element={<ProfitabilityTrends />} />
       <Route path="/profitability/pnl" element={<ProfitLoss />} />
       <Route path="/profitability/geo" element={<Geographical />} />
@@ -184,7 +185,7 @@ function AppRoutes() {
       <Route path="/dayparting/hourly" element={<Navigate to="/dayparting" replace />} />
       <Route path="/dayparting/campaigns" element={<Navigate to="/dayparting" replace />} />
       <Route path="/dayparting/campaigns/:campaignId" element={<Navigate to="/dayparting" replace />} />
-      <Route path="/dayparting/history" element={<Navigate to="/dayparting" replace />} />
+      <Route path="/dayparting/history" element={<HourlyData />} />
       <Route path="/dayparting/scheduled" element={<Navigate to="/dayparting" replace />} />
       <Route path="/dayparting/scheduled/*" element={<Navigate to="/dayparting" replace />} />
 
@@ -202,7 +203,9 @@ function AppRoutes() {
       <Route path="/settings/team" element={<SettingsTeam />} />
       <Route path="/settings/system" element={<SettingsSystem />} />
       <Route path="/settings/design-system" element={<DesignSystem />} />
+      <Route path="/settings/design-system/:tab" element={<DesignSystem />} />
       <Route path="/settings/component-library" element={<ComponentLibrary />} />
+      <Route path="/settings/component-library/:section" element={<ComponentLibrary />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
