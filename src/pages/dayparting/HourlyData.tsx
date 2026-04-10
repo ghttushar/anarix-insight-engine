@@ -236,7 +236,7 @@ export default function HourlyData() {
             </div>
           </AppTaskbar>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); nav(v === "history" ? "/dayparting/history" : "/dayparting", { replace: true }); }}>
             <TabsList>
               <TabsTrigger value="dayparting">Day Parting</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
