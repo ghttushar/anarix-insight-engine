@@ -9,7 +9,6 @@ import { mockCreativeAssets, mockCreativeInsights } from "@/data/mockCreativeAna
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const impactColors: Record<string, string> = { high: "bg-destructive/10 text-destructive border-destructive/20", medium: "bg-warning/10 text-warning border-warning/20", low: "bg-primary/10 text-primary border-primary/20" };
@@ -121,8 +120,6 @@ export default function CreativeAnalyzer() {
           </Table>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

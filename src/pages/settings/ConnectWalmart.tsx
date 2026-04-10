@@ -11,8 +11,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import logoFull from "@/assets/logo-light-full.svg";
 import logoWhite from "@/assets/logo-dark-full.svg";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 // Walmart logo
 const WalmartLogo = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="currentColor">

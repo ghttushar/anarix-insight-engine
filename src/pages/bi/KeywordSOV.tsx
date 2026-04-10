@@ -9,7 +9,6 @@ import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { TablePagination } from "@/components/tables/TablePagination";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 
@@ -96,8 +95,6 @@ export default function KeywordSOV() {
           <TablePagination page={page} pageSize={pageSize} totalItems={filteredKeywords.length} onPageChange={setPage} onPageSizeChange={setPageSize} />
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

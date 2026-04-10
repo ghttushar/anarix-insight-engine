@@ -16,8 +16,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },
   { id: "refundUnits", label: "Refund Units", visible: true },
@@ -210,8 +208,6 @@ export default function ProfitabilityDashboard() {
         isOpen={!!trendsProduct}
         onClose={() => setTrendsProduct(null)}
       />
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

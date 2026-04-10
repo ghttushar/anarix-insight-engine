@@ -13,9 +13,6 @@ import { Download, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
-
 const breadcrumbItems = [
   { label: "Profitability", href: "/profitability/trends" },
   { label: "Trends" },
@@ -157,8 +154,6 @@ export default function ProfitabilityTrends() {
       </div>
 
       <ProductTrendsModal product={trendsProduct} isOpen={!!trendsProduct} onClose={() => setTrendsProduct(null)} />
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

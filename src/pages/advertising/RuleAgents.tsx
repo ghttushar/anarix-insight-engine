@@ -10,8 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, ChevronLeft, ChevronRight, ArrowRight, FileText } from "lucide-react";
 import { ruleTemplates, suggestionChips, appliedRules, type RuleTemplate } from "@/data/mockRules";
 import { cn } from "@/lib/utils";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 const draftCount = appliedRules.filter((r) => r.status === "draft").length;
 
 
@@ -125,8 +123,6 @@ export default function RuleAgents() {
           </div>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

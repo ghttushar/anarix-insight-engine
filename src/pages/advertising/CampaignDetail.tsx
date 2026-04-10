@@ -18,8 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 type TabValue = "ad-groups" | "product-ads" | "keywords" | "search-terms";
 
 const tabs = [
@@ -105,8 +103,6 @@ export default function CampaignDetail() {
 
         {campaign && <CampaignSettingsPanel campaign={campaign} />}
       </div>
-
-      <PageFooterBar breadcrumbItems={staticBreadcrumbItems} />
-    </AppLayout>
+</AppLayout>
   );
 }

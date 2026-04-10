@@ -9,7 +9,6 @@ import { mockInventoryProducts } from "@/data/mockInventoryAds";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const stockColors: Record<string, string> = {
@@ -132,8 +131,6 @@ export default function InventoryAds() {
           </Table>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

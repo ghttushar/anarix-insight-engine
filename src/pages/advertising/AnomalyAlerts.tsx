@@ -10,7 +10,6 @@ import { mockAnomalyAlerts, type AnomalyAlert } from "@/data/mockAnomalyAlerts";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const severityStyles: Record<string, string> = {
@@ -103,8 +102,6 @@ export default function AnomalyAlerts() {
           )}
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

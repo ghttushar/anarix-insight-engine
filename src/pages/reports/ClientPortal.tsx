@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -223,9 +222,7 @@ export default function ClientPortal() {
             onPageSizeChange={setPageSize}
           />
         </div>
-
-        <PageFooterBar breadcrumbItems={breadcrumbItems} />
-      </div>
+</div>
 
       <CreateReportPanel initialTemplate={selectedTemplate} onSubmit={handleReportSubmit} />
     </AppLayout>

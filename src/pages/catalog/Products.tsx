@@ -6,8 +6,6 @@ import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { CatalogProductsTable } from "@/components/catalog/CatalogProductsTable";
 import { catalogProducts } from "@/data/mockCatalog";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 const COLUMN_DEFS = [
   { id: "status", label: "Status", visible: true },
   { id: "reviews", label: "Reviews", visible: true },
@@ -91,8 +89,6 @@ export default function CatalogProducts() {
           sortDirection={sortDirection}
         />
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

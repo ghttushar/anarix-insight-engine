@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { mockExecutedQueries } from "@/data/mockAMC";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
 
 const statusColors: Record<string, string> = {
@@ -75,8 +74,6 @@ export default function AMCExecutedQueries() {
           </Table>
         </div>
       </div>
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }

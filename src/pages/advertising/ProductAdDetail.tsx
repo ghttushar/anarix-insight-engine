@@ -19,9 +19,6 @@ import { useFilter } from "@/contexts/FilterContext";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { toast } from "sonner";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
-
 const breadcrumbItems = [
   { label: "Advertising", href: "/advertising/campaigns" },
   { label: "Product Ad Detail" },
@@ -118,8 +115,6 @@ export default function ProductAdDetail() {
 
         <AddProductAdsPanel />
       </div>
-
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
-    </AppLayout>
+</AppLayout>
   );
 }

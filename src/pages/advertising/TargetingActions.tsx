@@ -16,8 +16,6 @@ import { mockTargetingActions, mockTargetCampaigns, mockTargetAdGroups } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { PageFooterBar } from "@/components/layout/PageFooterBar";
-
 type ActionTab = "keyword-action" | "history" | "archive";
 
 const tabs = [
@@ -263,8 +261,6 @@ export default function TargetingActions() {
       </div>
 
       <AddKeywordTargetModal isOpen={addKeywordsOpen} onClose={() => setAddKeywordsOpen(false)} onAdd={handleAddKeywords} />
-    
-      <PageFooterBar breadcrumbItems={breadcrumbItems} />
 </AppLayout>
   );
 }
