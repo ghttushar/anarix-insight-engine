@@ -163,7 +163,7 @@ function PrimitivesSection() {
             <Badge variant="destructive">Destructive</Badge><Badge variant="outline">Outline</Badge>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <StatusBadge status="live" /><StatusBadge status="paused" /><StatusBadge status="ended" /><StatusBadge status="draft" /><StatusBadge status="archived" />
+            <StatusBadge status="live" /><StatusBadge status="paused" /><StatusBadge status="archived" /><StatusBadge status="scheduled" /><StatusBadge status="out_of_budget" />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <DeltaBadge value={12.5} /><DeltaBadge value={-8.3} /><DeltaBadge value={0} />
@@ -482,10 +482,10 @@ function TablesSection() {
 
 function CardsSection() {
   const kpiData = [
-    { label: "Ad Spend", value: 45230, previousValue: 42100, format: "currency" as const },
-    { label: "Ad Sales", value: 156780, previousValue: 148900, format: "currency" as const },
-    { label: "ROAS", value: 3.47, previousValue: 3.54, format: "decimal" as const },
-    { label: "Impressions", value: 2340000, previousValue: 2100000, format: "number" as const },
+    { label: "Ad Spend", value: 45230, previousValue: 42100, format: "currency" as const, trend: "up" as const },
+    { label: "Ad Sales", value: 156780, previousValue: 148900, format: "currency" as const, trend: "up" as const },
+    { label: "ROAS", value: 3.47, previousValue: 3.54, format: "decimal" as const, trend: "down" as const },
+    { label: "Impressions", value: 2340000, previousValue: 2100000, format: "number" as const, trend: "up" as const },
   ];
 
   const stripItems = [
@@ -649,7 +649,7 @@ function AanSection() {
       <Card className="p-4 space-y-3">
         <Label className="text-xs uppercase tracking-wider text-muted-foreground">ArtifactCard</Label>
         <div className="w-72">
-          <ArtifactCard artifact={{ id: "1", type: "audit", title: "Campaign Audit Report", summary: "Full performance analysis of Q4 campaigns", createdAt: "2 minutes ago" }} onView={() => toast.info("Opening artifact...")} />
+          <ArtifactCard artifact={{ id: "1", type: "audit", title: "Campaign Audit Report", description: "Full performance analysis of Q4 campaigns", changes: [], status: "pending" }} onClick={() => toast.info("Opening artifact...")} />
         </div>
       </Card>
 
