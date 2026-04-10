@@ -2896,6 +2896,402 @@ function ComponentShowcase() {
         </div>
       </section>
 
+      {/* ==================== RIGHT-SIDE PANELS ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Right-Side Panels — Anatomy</h2>
+        <p className="text-xs text-muted-foreground">All right-side panels use fixed viewport positioning, independent scroll containers (ScrollArea), and automatically close on outside click. Panels replace modal dialogs to maintain analytical context.</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* CreateCampaignPanel */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Create Campaign Panel</Label>
+            <div className="w-[380px] rounded-lg border border-border bg-card overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <h4 className="text-sm font-semibold text-foreground">Create Campaign</h4>
+                <button className="text-muted-foreground"><X className="h-4 w-4" /></button>
+              </div>
+              <div className="px-5 py-4 space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Campaign Name</Label>
+                  <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center text-sm text-muted-foreground">SP | Bamboo | Q4</div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Campaign Type</Label>
+                  <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Sponsored Products</span><ChevronDown className="h-3.5 w-3.5" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Bidding Strategy</Label>
+                  <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Dynamic Bids - Down Only</span><ChevronDown className="h-3.5 w-3.5" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Daily Budget</Label>
+                  <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center text-sm text-muted-foreground">$50.00</div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Start Date</Label>
+                    <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center text-sm text-muted-foreground">2026-04-10</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">End Date</Label>
+                    <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center text-sm text-muted-foreground">Optional</div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-muted/30">
+                <Button variant="outline" size="sm">Cancel</Button>
+                <Button size="sm">Create Campaign</Button>
+              </div>
+            </div>
+          </div>
+
+          {/* CreateReportPanel */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Create Report Panel</Label>
+            <div className="w-[380px] rounded-lg border border-border bg-card overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <h4 className="text-sm font-semibold text-foreground">Create Report</h4>
+                <button className="text-muted-foreground"><X className="h-4 w-4" /></button>
+              </div>
+              <div className="px-5 py-4 space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Template</Label>
+                  <div className="flex gap-2">
+                    <button className="px-3 py-1.5 rounded-md text-xs bg-primary text-primary-foreground">Performance</button>
+                    <button className="px-3 py-1.5 rounded-md text-xs border border-border text-muted-foreground">Custom</button>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Report Name</Label>
+                  <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center text-sm text-muted-foreground">Weekly Performance Report</div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Sections</Label>
+                  <div className="space-y-1.5">
+                    {["Executive Summary", "Campaign Performance", "Keyword Analysis", "Budget Allocation"].map((s, i) => (
+                      <div key={s} className="flex items-center gap-2">
+                        <div className={`h-4 w-4 rounded border ${i < 3 ? "bg-primary border-primary" : "border-border"} flex items-center justify-center`}>
+                          {i < 3 && <Check className="h-3 w-3 text-primary-foreground" />}
+                        </div>
+                        <span className="text-xs text-foreground">{s}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-muted/30">
+                <Button variant="outline" size="sm">Cancel</Button>
+                <Button size="sm">Create Report</Button>
+              </div>
+            </div>
+          </div>
+
+          {/* CreateSchedulePanel */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Create Schedule Panel</Label>
+            <div className="w-[380px] rounded-lg border border-border bg-card overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <h4 className="text-sm font-semibold text-foreground">Create Schedule</h4>
+                <button className="text-muted-foreground"><X className="h-4 w-4" /></button>
+              </div>
+              <div className="px-5 py-4 space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Campaigns</Label>
+                  <div className="flex flex-wrap gap-1">
+                    <Badge variant="secondary" className="text-[10px]">SP | Bamboo <X className="h-2.5 w-2.5 ml-1" /></Badge>
+                    <Badge variant="secondary" className="text-[10px]">SB | Mattress <X className="h-2.5 w-2.5 ml-1" /></Badge>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Action</Label>
+                  <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Increase Bids</span><ChevronDown className="h-3.5 w-3.5" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Days</Label>
+                  <div className="flex gap-1.5">
+                    {["M", "T", "W", "T", "F", "S", "S"].map((day, i) => (
+                      <button key={i} className={`h-8 w-8 rounded-md text-xs font-medium ${i < 5 ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}>{day}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Start Time</Label>
+                    <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center text-sm text-muted-foreground">09:00 AM</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">End Time</Label>
+                    <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center text-sm text-muted-foreground">05:00 PM</div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-muted/30">
+                <Button variant="outline" size="sm">Cancel</Button>
+                <Button size="sm">Apply</Button>
+              </div>
+            </div>
+          </div>
+
+          {/* ProductDetailPanel */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Product Detail Panel</Label>
+            <div className="w-[380px] rounded-lg border border-border bg-card overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <h4 className="text-sm font-semibold text-foreground">Product Details</h4>
+                <button className="text-muted-foreground"><X className="h-4 w-4" /></button>
+              </div>
+              <div className="px-5 py-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <Package className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Bamboo Pillow — Queen Size</p>
+                    <p className="text-[10px] text-muted-foreground">SKU: BPQ-2024 • ASIN: B09XYZ1234</p>
+                  </div>
+                </div>
+                <div className="rounded-md bg-muted/30 px-3 py-2">
+                  <p className="text-[10px] text-muted-foreground">Net Profit</p>
+                  <p className="text-lg font-bold text-success">$4,520</p>
+                </div>
+                <div className="h-16 bg-muted/20 rounded-lg border border-dashed border-border flex items-center justify-center">
+                  <span className="text-[10px] text-muted-foreground">Sparkline Chart</span>
+                </div>
+                <div className="space-y-1">
+                  <button className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-muted text-xs">
+                    <span className="font-medium">Revenue</span>
+                    <span className="text-muted-foreground">$12,400</span>
+                  </button>
+                  <button className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-muted text-xs">
+                    <span className="font-medium">COGS</span>
+                    <span className="text-muted-foreground">$5,200</span>
+                  </button>
+                  <button className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-muted text-xs">
+                    <span className="font-medium">Expenses</span>
+                    <span className="text-muted-foreground">$2,680</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* PeriodBreakdownPanel */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Period Breakdown Panel</Label>
+            <div className="w-[380px] rounded-lg border border-border bg-card overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <h4 className="text-sm font-semibold text-foreground">Period Breakdown</h4>
+                <button className="text-muted-foreground"><X className="h-4 w-4" /></button>
+              </div>
+              <div className="px-5 py-4 space-y-3">
+                <p className="text-xs text-muted-foreground">Apr 1 – Apr 10, 2026</p>
+                {[
+                  { section: "Sales", items: [{ label: "Authorized Sales", value: "$32,100" }, { label: "Ad Sales", value: "$8,400" }] },
+                  { section: "Costs", items: [{ label: "COGS", value: "$14,200" }, { label: "Ad Spend", value: "$6,800" }, { label: "FBA Fees", value: "$4,100" }] },
+                  { section: "Units", items: [{ label: "Ordered Units", value: "890" }, { label: "Shipped Units", value: "872" }] },
+                ].map((group) => (
+                  <div key={group.section}>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">{group.section}</p>
+                    <div className="space-y-1">
+                      {group.items.map((item) => (
+                        <div key={item.label} className="flex items-center justify-between text-xs px-2 py-1 rounded hover:bg-muted/50">
+                          <span className="text-muted-foreground">{item.label}</span>
+                          <span className="font-medium text-foreground">{item.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                <div className="rounded-md bg-muted/30 px-3 py-2 flex items-center justify-between">
+                  <span className="text-xs font-medium text-foreground">Net Profit</span>
+                  <span className="text-sm font-bold text-success">$12,450</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CampaignSettingsPanel */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Campaign Settings Panel</Label>
+            <div className="w-[380px] rounded-lg border border-border bg-card overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <h4 className="text-sm font-semibold text-foreground">Campaign Settings</h4>
+                <button className="text-muted-foreground"><X className="h-4 w-4" /></button>
+              </div>
+              <div className="px-5 py-4 space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Campaign</span>
+                  <span className="font-medium text-foreground">SP | Bamboo | Queen</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Type</span>
+                  <span className="text-foreground">Sponsored Products</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Status</span>
+                  <Badge variant="outline" className="text-[10px]">Live</Badge>
+                </div>
+                <Separator />
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Daily Budget</Label>
+                  <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center text-sm">$50.00</div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Bidding Strategy</Label>
+                  <div className="h-9 rounded-md border border-border bg-background px-3 flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Dynamic Bids - Down Only</span><ChevronDown className="h-3.5 w-3.5" />
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-muted/30">
+                <Button variant="outline" size="sm">Cancel</Button>
+                <Button size="sm">Save Changes</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== SIDEBAR NAVIGATION ==================== */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold border-b pb-2 text-foreground">Sidebar Navigation — Anatomy</h2>
+        <p className="text-xs text-muted-foreground">Collapsible left sidebar (w-56). Auto-collapses when right panels open. Features grouped nav items, "Ask Aan" pill, marketplace selector, and footer with theme toggle + avatar.</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Expanded sidebar */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Expanded (w-56)</Label>
+            <div className="w-56 rounded-lg border border-border bg-card overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 rounded bg-primary/20 flex items-center justify-center">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <span className="text-sm font-heading font-semibold">Anarix</span>
+                </div>
+                <button className="text-muted-foreground"><PanelLeft className="h-4 w-4" /></button>
+              </div>
+              {/* Ask Aan pill */}
+              <div className="px-3 py-2">
+                <button className="w-full h-9 rounded-lg border border-primary/30 bg-primary/5 flex items-center justify-center gap-2 text-sm text-primary">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span className="font-medium">Ask Aan</span>
+                </button>
+              </div>
+              {/* Nav groups */}
+              <div className="px-2 py-1 space-y-0.5">
+                {[
+                  { icon: LayoutDashboard, label: "Workspace", active: false },
+                  { icon: DollarSign, label: "Profitability", active: true },
+                  { icon: Megaphone, label: "Advertising", active: false },
+                  { icon: BarChart2, label: "Business Intel", active: false },
+                  { icon: Layers, label: "AMC", active: false },
+                ].map((item) => (
+                  <div key={item.label} className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm ${item.active ? "bg-primary/10 text-primary font-medium border-l-2 border-primary" : "text-muted-foreground hover:bg-muted"}`}>
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+              {/* Footer */}
+              <div className="mt-auto px-3 py-3 border-t border-border flex items-center justify-between">
+                <button className="h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:bg-muted">
+                  <Sun className="h-4 w-4" />
+                </button>
+                <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium text-primary">JD</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Collapsed sidebar */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Collapsed (Icon-Only)</Label>
+            <div className="w-14 rounded-lg border border-border bg-card overflow-hidden">
+              <div className="flex flex-col items-center py-3 gap-1">
+                <div className="h-8 w-8 rounded bg-primary/20 flex items-center justify-center mb-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                </div>
+                {[LayoutDashboard, DollarSign, Megaphone, BarChart2, Layers].map((Icon, i) => (
+                  <button key={i} className={`h-9 w-9 rounded-md flex items-center justify-center ${i === 1 ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}>
+                    <Icon className="h-4 w-4" />
+                  </button>
+                ))}
+              </div>
+              <div className="border-t border-border py-2 flex flex-col items-center gap-1">
+                <button className="h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground"><Sun className="h-4 w-4" /></button>
+                <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium text-primary">JD</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Hover popup */}
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Hover Popup (Submenu)</Label>
+            <div className="w-[200px] rounded-lg border border-border bg-card shadow-lg overflow-hidden">
+              <div className="px-3 py-2 border-b border-border">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Profitability</span>
+              </div>
+              <div className="p-1.5 space-y-0.5">
+                {["Dashboard", "Profit & Loss", "Trends", "Geographical", "Unified P&L"].map((item, i) => (
+                  <button key={item} className={`w-full text-left px-3 py-1.5 rounded-md text-xs ${i === 0 ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{item}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Marketplace Selector */}
+        <div className="space-y-3">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Marketplace Selector (Sidebar-Integrated)</Label>
+          <div className="p-4 rounded-lg border border-border bg-card">
+            <div className="flex items-center gap-6">
+              {/* Expanded */}
+              <div className="space-y-1">
+                <span className="text-[10px] text-muted-foreground">Expanded</span>
+                <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
+                  <div className="h-5 w-5 rounded bg-[#FF9900]/20 flex items-center justify-center">
+                    <span className="text-[8px] font-bold text-[#FF9900]">a</span>
+                  </div>
+                  <span className="text-sm font-medium">Amazon</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
+              </div>
+              {/* Collapsed */}
+              <div className="space-y-1">
+                <span className="text-[10px] text-muted-foreground">Collapsed</span>
+                <div className="h-9 w-9 rounded-md border border-border flex items-center justify-center">
+                  <div className="h-5 w-5 rounded bg-[#FF9900]/20 flex items-center justify-center">
+                    <span className="text-[8px] font-bold text-[#FF9900]">a</span>
+                  </div>
+                </div>
+              </div>
+              {/* Account popup */}
+              <div className="space-y-1">
+                <span className="text-[10px] text-muted-foreground">Account Popup</span>
+                <div className="w-[200px] rounded-lg border border-border bg-card shadow-lg p-2 space-y-1">
+                  <button className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md bg-primary/10 text-xs">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="font-medium text-foreground">My Store</span>
+                    <Check className="h-3 w-3 ml-auto text-primary" />
+                  </button>
+                  <button className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted text-xs">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="text-foreground">Second Store</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
