@@ -126,8 +126,8 @@ function ColorSystemSection() {
           <ColorSwatch
             name="Muted Foreground"
             token="--muted-foreground"
-            hsl="228 15% 46%"
-            hex="#646A86"
+            hsl="228 18% 40%"
+            hex="#555D78"
             usage="Secondary text, labels, hints"
           />
           <ColorSwatch
@@ -156,24 +156,24 @@ function ColorSystemSection() {
           <ColorSwatch
             name="Success (Green)"
             token="--success"
-            hsl="142 71% 45%"
-            hex="#22C55E"
+            hsl="142 55% 38%"
+            hex="#1E9E4F"
             usage="Positive metrics, profit, success states"
             reserved
           />
           <ColorSwatch
             name="Destructive (Red)"
             token="--destructive"
-            hsl="0 84% 60%"
-            hex="#EF4444"
+            hsl="0 65% 48%"
+            hex="#C93535"
             usage="Negative metrics, loss, errors, delete actions"
             reserved
           />
           <ColorSwatch
             name="Warning (Amber)"
             token="--warning"
-            hsl="38 92% 50%"
-            hex="#F59E0B"
+            hsl="38 75% 45%"
+            hex="#C98A14"
             usage="Warning states, out-of-budget indicators"
             reserved
           />
@@ -1134,8 +1134,10 @@ import { Label } from "@/components/ui/label";
             <div className="p-4 border rounded-lg">
               <div className="font-medium mb-1">AppTaskbar</div>
               <p className="text-muted-foreground">
-                Universal controls (Ad Type, Frequency, Date Range, Marketplace) below page heading.
-                Consistent positioning across all data pages.
+                Two-row sticky taskbar with <code className="text-xs bg-muted px-1 py-0.5 rounded">border-primary</code> accent.
+                Row 1: breadcrumb (left) + marketplace logo, status dot, account name, last synced (right).
+                Row 2: page-specific filters (left) + island-off actions (Ask Aan, Insights, Refresh, Bell) (right).
+                Actions collapse to icon-only when side panels are open.
               </p>
             </div>
           </div>
@@ -1534,6 +1536,8 @@ function IconsSection() {
         { name: "ChevronDown", component: ChevronDown },
         { name: "Menu", component: Menu },
         { name: "X", component: X },
+        { name: "Bell", component: Bell },
+        { name: "Play", component: Play },
       ]
     },
     {
@@ -1550,7 +1554,9 @@ function IconsSection() {
         { name: "Copy", component: Copy },
         { name: "Search", component: Search },
         { name: "Filter", component: Filter },
-        { name: "RotateCw", component: RotateCw },
+        { name: "RefreshCw", component: RefreshCw },
+        { name: "Sparkles", component: Sparkles },
+        { name: "Lightbulb", component: Lightbulb },
       ]
     },
     {
@@ -1577,6 +1583,12 @@ function IconsSection() {
         { name: "EyeOff", component: EyeOff },
         { name: "ZoomIn", component: ZoomIn },
         { name: "ZoomOut", component: ZoomOut },
+        { name: "Layers", component: Layers },
+        { name: "Target", component: Target },
+        { name: "Percent", component: Percent },
+        { name: "Package", component: Package },
+        { name: "ShoppingCart", component: ShoppingCart },
+        { name: "DollarSign", component: DollarSign },
       ]
     },
     {
