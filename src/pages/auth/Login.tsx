@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAccounts } from "@/contexts/AccountContext";
-import { useTheme } from "@/contexts/ThemeContext";
+
 import { AnarixLogo } from "@/components/branding/AnarixLogo";
 import { useBranding } from "@/contexts/BrandingContext";
 import legacyLogoWhite from "@/assets/logo-dark-full.svg";
@@ -14,7 +14,6 @@ import newLogoFullDark from "@/assets/branding/anarix-full-dark.svg";
 export default function Login() {
   const navigate = useNavigate();
   const { clearAccounts } = useAccounts();
-  useTheme();
   const { newBranding } = useBranding();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
