@@ -8,15 +8,13 @@ import { useAccounts } from "@/contexts/AccountContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { AnarixLogo } from "@/components/branding/AnarixLogo";
 import { useBranding } from "@/contexts/BrandingContext";
-import legacyLogoFull from "@/assets/logo-light-full.svg";
 import legacyLogoWhite from "@/assets/logo-dark-full.svg";
-import newLogoFullLight from "@/assets/branding/anarix-full-light.svg";
 import newLogoFullDark from "@/assets/branding/anarix-full-dark.svg";
 
 export default function Login() {
   const navigate = useNavigate();
   const { clearAccounts } = useAccounts();
-  const { resolvedTheme } = useTheme();
+  useTheme();
   const { newBranding } = useBranding();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
