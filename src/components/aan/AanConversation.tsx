@@ -3,12 +3,15 @@ import { useAan } from "./AanContext";
 import { cn } from "@/lib/utils";
 import { User } from "lucide-react";
 import { AanGlyph } from "./AanGlyph";
+import { AanMascot } from "./AanMascot";
+import { useBranding } from "@/contexts/BrandingContext";
 import { format } from "date-fns";
 import { ArtifactCard } from "./ArtifactCard";
 import { CircularProgress } from "@/components/ui/circular-progress";
 
 export function AanConversation() {
   const { messages, openSplit, isGenerating, generationType, generationProgress } = useAan();
+  const { newBranding } = useBranding();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
