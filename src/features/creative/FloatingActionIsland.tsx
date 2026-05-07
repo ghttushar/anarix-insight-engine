@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { Sparkles, RefreshCw, Download, Camera, Lightbulb, GripVertical, Bell } from "lucide-react";
+import { RefreshCw, Download, Camera, Lightbulb, GripVertical, Bell } from "lucide-react";
+import { AanGlyph } from "@/components/aan/AanGlyph";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAan } from "@/components/aan";
@@ -71,7 +72,7 @@ export function FloatingActionIsland() {
   const { setDataPanel } = useActivePanel();
 
   const actions: ActionItem[] = [
-    { icon: Sparkles, label: "Ask Aan", onClick: () => openPanel(), alwaysShowLabel: true },
+    { icon: AanGlyph, label: "Ask Aan", onClick: () => openPanel(), alwaysShowLabel: true },
     { icon: Bell, label: criticalCount > 0 ? `Alerts (${criticalCount})` : "Alerts", onClick: () => setDataPanel("notifications"), highlight: criticalCount > 0, badge: criticalCount > 0 ? criticalCount : undefined },
     { icon: Lightbulb, label: "Insights", onClick: openInsights },
     { icon: RefreshCw, label: "Refresh", onClick: () => toast.info("Refreshing data...") },

@@ -4,7 +4,7 @@ import {
   LayoutGrid, TrendingUp, FileText, MapPin, Megaphone, Target,
   MousePointerClick, Package, Database, Search, BarChart3, Clock,
   CalendarClock, History, ListTodo, Settings, Users, ChevronDown,
-  ChevronRight, Sparkles, Layers, Image, FlaskConical, PackageCheck,
+  ChevronRight, Layers, Image, FlaskConical, PackageCheck,
   Send, Sun, Moon, User, LogOut, PanelLeft,
   Gauge, Wheat, Bell, Activity, Link, Wrench, LayoutDashboard, Palette, ShieldCheck
 } from "lucide-react";
@@ -19,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { SidebarHoverPopup } from "./SidebarHoverPopup";
 import { MarketplaceSelector } from "./MarketplaceSelector";
 import { useAan } from "@/components/aan";
+import { AanGlyph } from "@/components/aan/AanGlyph";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -231,7 +232,7 @@ export function AppSidebar() {
               className="group relative w-full flex items-center gap-2 h-9 rounded-full border border-border/60 bg-background px-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
             >
               <div className="absolute inset-0 rounded-full aan-gradient opacity-0 group-hover:opacity-[0.06] transition-opacity" />
-              <Sparkles className="h-4 w-4 shrink-0 aan-gradient-text" />
+              <AanGlyph className="h-4 w-4 shrink-0 aan-gradient-text" />
               <span>Ask Aan</span>
             </button>
           ) : (
@@ -241,7 +242,7 @@ export function AppSidebar() {
                   onClick={e => { e.stopPropagation(); e.preventDefault(); openWorkspace(); }}
                   className="group relative flex w-full items-center justify-center rounded-md h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors"
                 >
-                  <Sparkles className="h-4 w-4 aan-gradient-text" />
+                  <AanGlyph className="h-4 w-4 aan-gradient-text" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right">Ask Aan</TooltipContent>
