@@ -9,6 +9,7 @@ import { useDensity } from "@/contexts/DensityContext";
 import { useCurrency, CURRENCIES } from "@/contexts/CurrencyContext";
 import { useVisualEffects } from "@/contexts/VisualEffectsContext";
 import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
+import { useBranding } from "@/contexts/BrandingContext";
 import { useColorScheme } from "@/contexts/ColorSchemeContext";
 import { cn } from "@/lib/utils";
 import { Pencil, RotateCcw, Globe, Palette } from "lucide-react";
@@ -153,6 +154,7 @@ export default function Preferences() {
   const { displayCurrency, setDisplayCurrency, exchangeRate, lastUpdated } = useCurrency();
   const { effects, toggle } = useVisualEffects();
   const { newFeaturesVisible, toggleNewFeatures } = useFeatureToggle();
+  const { newBranding, toggleNewBranding } = useBranding();
   const { schemeId, setSchemeId, schemes, currentScheme } = useColorScheme();
   const currencyList = Object.values(CURRENCIES);
   const [customShortcuts, setCustomShortcuts] = useState<Record<string, string[]>>(loadCustomShortcuts);
