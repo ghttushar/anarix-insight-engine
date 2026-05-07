@@ -5,21 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAccounts } from "@/contexts/AccountContext";
-import { useTheme } from "@/contexts/ThemeContext";
-import logoFull from "@/assets/logo-light-full.svg";
-import logoWhite from "@/assets/logo-dark-full.svg";
+
+import { AnarixLogo } from "@/components/branding/AnarixLogo";
+import { useBranding } from "@/contexts/BrandingContext";
+import legacyLogoWhite from "@/assets/logo-dark-full.svg";
+import newLogoFullDark from "@/assets/branding/anarix-full-dark.svg";
 
 export default function Login() {
   const navigate = useNavigate();
   const { clearAccounts } = useAccounts();
-  const { resolvedTheme } = useTheme();
+  const { newBranding } = useBranding();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Theme-aware logo for mobile
-  const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
+  // Brand panel always uses the dark/white-on-color logo
+  const brandPanelLogo = newBranding ? newLogoFullDark : legacyLogoWhite;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +51,7 @@ export default function Login() {
         <div className="relative z-10 flex flex-col justify-center px-16 text-white">
           {/* White logo for brand panel */}
           <img
-            src={logoWhite}
+            src={brandPanelLogo}
             alt="Anarix"
             className="h-12 w-auto mb-12 object-contain" />
           
@@ -88,7 +90,7 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Mobile logo - theme-aware */}
           <div className="lg:hidden mb-8">
-            <img src={logoSrc} alt="Anarix" className="h-10 w-auto" />
+            <AnarixLogo variant="full" className="h-10 w-auto" />
           </div>
 
           <div className="mb-8">
