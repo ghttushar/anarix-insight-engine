@@ -103,6 +103,7 @@ function formatFileSize(bytes: number): string {
 export function AanInput() {
   const { addMessage, setGenerationState, messages, selectedModel, setSelectedModel, pendingPrompt, setPendingPrompt, isGenerating, generationType } = useAan();
   const { newBranding } = useBranding();
+  const { registerAnchor } = useAanPresence();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -111,26 +112,18 @@ export function AanInput() {
   const [suggestionIndex, setSuggestionIndex] = useState(0);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [modelOpen, setModelOpen] = useState(false);
+  const [inputAnchorEl, setInputAnchorEl] = useState<HTMLDivElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const suggestionTimerRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Aan presence state for the mascot above the input
-  const presenceState: AanMascotState = isGenerating || isLoading
-    ? "thinking"
-    : (input.trim().length > 0 || isFocused)
-      ? "listening"
-      : "idle";
-  const presenceLabel = isGenerating && generationType === "report"
-    ? "Working on your report\u2026"
-    : isGenerating && generationType === "audit"
-      ? "Running the audit\u2026"
-      : isLoading
-        ? "Thinking\u2026"
-        : input.trim().length > 0
-          ? "Your prompt is ready."
-          : "Ready when you are.";
+  // Register the top-left input slot as the resting anchor for the travelling Aan presence
+  useEffect(() => {
+    if (!newBranding) return;
+    registerAnchor("input", inputAnchorEl, 24);
+    return () => registerAnchor("input", null);
+  }, [newBranding, inputAnchorEl, registerAnchor]);
 
   useEffect(() => {
     return () => {
