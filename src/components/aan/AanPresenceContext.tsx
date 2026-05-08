@@ -17,7 +17,14 @@ interface AanPresenceContextType {
   getAnchorSize: (anchor: AanAnchor) => number;
 }
 
-const Ctx = createContext<AanPresenceContextType | null>(null);
+const NOOP_CTX: AanPresenceContextType = {
+  activeAnchor: null,
+  registerAnchor: () => {},
+  getAnchorEl: () => null,
+  getAnchorSize: () => 28,
+};
+
+const Ctx = createContext<AanPresenceContextType>(NOOP_CTX);
 
 const PRIORITY: AanAnchor[] = ["generation", "pending", "lastMessage", "input"];
 
