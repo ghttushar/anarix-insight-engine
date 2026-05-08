@@ -7,6 +7,8 @@ import { AanDraftPreview } from "./AanDraftPreview";
 import { AanInput } from "./AanInput";
 import { AanLogo } from "./AanLogo";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { AanPresenceProvider } from "./AanPresenceContext";
+import { AanPresencePortal } from "./AanPresencePortal";
 
 export function AanCopilotPanel() {
   const { mode, closeAan, openWorkspace, context } = useAan();
