@@ -20,7 +20,6 @@ export function AanWorkspace() {
   const showArtifactPanel = !!viewingArtifact;
 
   return (
-    <div className="fixed inset-0 z-[60] flex bg-background">
     <AanPresenceProvider>
       <div className="fixed inset-0 z-[60] flex bg-background">
         {/* Mini app sidebar for navigation */}
