@@ -102,9 +102,6 @@ export default function Integrations() {
           )}
         </section>
 
-        <section className="pt-2">
-          <WhatsAppPurposeInfo />
-        </section>
       </div>
 
       <IntegrationWhatsAppFlow
