@@ -308,6 +308,15 @@ export function AanInput() {
 
           {/* Input container */}
           <div className="relative flex items-end gap-0 rounded-lg border border-border bg-card focus-within:border-primary/40 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+            {/* Aan presence anchor — top-left of input box (new branding only) */}
+            {newBranding && (
+              <div
+                ref={setInputAnchorEl}
+                aria-hidden
+                data-aan-anchor="input"
+                className="absolute top-1.5 left-2 w-6 h-6 pointer-events-none z-10"
+              />
+            )}
             {/* Attachment button */}
             <button
               onClick={() => fileInputRef.current?.click()}
