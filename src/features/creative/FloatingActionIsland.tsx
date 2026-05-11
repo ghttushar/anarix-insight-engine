@@ -31,7 +31,7 @@ export function FloatingActionIsland() {
   const dragRef = useRef<{ startX: number; startY: number; startPosX: number; startPosY: number } | null>(null);
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const location = useLocation();
-  const { openPanel, openCopilot, setPendingPrompt } = useAan();
+  const { openPanel } = useAan();
   const { openPanel: openInsights, criticalCount } = useInsights();
   const { newBranding } = useBranding();
 
