@@ -180,13 +180,15 @@ export function AanMascot({
   const floatDur = state === "listening" ? 3.2 : state === "thinking" || state === "working" ? 2.6 : 4.4;
   const floatRange = tier === "full" && shape !== "bar" ? (state === "thinking" ? 3 : 2.5) : 0;
   const auraScale =
-    state === "thinking" || state === "working"
-      ? [1, 1.06, 1]
-      : state === "listening"
-        ? [1, 1.04, 1]
-        : [1, 1.02, 1];
+    shape === "bar"
+      ? [1, 1.02, 1]
+      : state === "thinking" || state === "working"
+        ? [1, 1.06, 1]
+        : state === "listening"
+          ? [1, 1.04, 1]
+          : [1, 1.02, 1];
   const auraOpacity =
-    state === "thinking" || state === "working" ? 1.05 : state === "listening" ? 1.0 : 0.85;
+    shape === "bar" ? 0.55 : state === "thinking" || state === "working" ? 1.05 : state === "listening" ? 1.0 : 0.85;
   const internalSpin = state === "thinking" && !isStatic && tier === "full";
 
   // Container must accommodate the widest body shape (bar) to avoid clipping
