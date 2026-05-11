@@ -428,7 +428,22 @@ export function AanMascot({
                 {[-1, 1].map((dir) => {
                   const gx = Math.max(-eyeTravel, Math.min(eyeTravel, eyeGaze.x));
                   const gy = Math.max(-eyeTravel, Math.min(eyeTravel, eyeGaze.y));
-                  return (
+                  return staticEyes ? (
+                    <div
+                      key={`eye-${dir}`}
+                      style={{
+                        position: "absolute",
+                        left: `calc(50% + ${dir * eyeOffsetX}px)`,
+                        top: `calc(50% + ${eyeY}px)`,
+                        width: eyeSize,
+                        height: eyeSize,
+                        marginLeft: -eyeSize / 2,
+                        marginTop: -eyeSize / 2,
+                        borderRadius: "50%",
+                        background: "#1a0608",
+                      }}
+                    />
+                  ) : (
                     <motion.div
                       key={`eye-${dir}`}
                       animate={{ x: gx, y: gy }}
