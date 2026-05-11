@@ -129,7 +129,9 @@ export function FloatingActionIsland() {
             </button>
             <div className="h-5 w-px bg-border" />
             <div className="flex items-center gap-0.5">
-              {actions.map((action, index) => (
+              {actions.map((action, index) => {
+                const isAskAan = index === 0 && newBranding;
+                return (
                 <Button
                   key={index}
                   variant="ghost"
@@ -141,7 +143,11 @@ export function FloatingActionIsland() {
                     action.highlight && "text-destructive"
                   )}
                 >
-                  <action.icon className="h-3.5 w-3.5 shrink-0" />
+                  {isAskAan ? (
+                    <AanMascot size={18} state="idle" interactive={false} />
+                  ) : (
+                    <action.icon className="h-3.5 w-3.5 shrink-0" />
+                  )}
                   {(isExpanded || action.alwaysShowLabel) && (
                     <span className="text-xs whitespace-nowrap animate-in fade-in duration-200">{action.label}</span>
                   )}
@@ -151,7 +157,8 @@ export function FloatingActionIsland() {
                     </span>
                   )}
                 </Button>
-              ))}
+                );
+              })}
               <Button
                 variant="ghost"
                 size="sm"
@@ -164,27 +171,6 @@ export function FloatingActionIsland() {
               </Button>
             </div>
 
-            {/* Aan quick-action chips — brand manual: "highest-readiness surface for fast explain, compare, and generate" */}
-            {newBranding && isExpanded && (
-              <div className="flex items-center gap-0.5 pl-1.5 border-l border-border animate-in fade-in slide-in-from-left-1 duration-200">
-                {[
-                  { label: "Summarize", prompt: "Summarize the current view in 3 bullet points." },
-                  { label: "Build report", prompt: "Generate a report for my last 7 days campaign performance." },
-                  { label: "Explain drop", prompt: "Explain the most recent drop in the highlighted metric." },
-                ].map((chip) => (
-                  <Button
-                    key={chip.label}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => { setPendingPrompt(chip.prompt); openCopilot(); }}
-                    className="rounded-full h-8 px-2.5 gap-1.5 text-primary hover:bg-primary/10"
-                  >
-                    <AanGlyph className="h-3 w-3" />
-                    <span className="text-xs whitespace-nowrap">{chip.label}</span>
-                  </Button>
-                ))}
-              </div>
-            )}
             {isExpanded && (
               <div className="pl-1.5 border-l border-border">
                 <span className="text-xs text-muted-foreground"><kbd className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">⌘K</kbd></span>
