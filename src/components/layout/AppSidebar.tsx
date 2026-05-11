@@ -18,7 +18,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { SidebarHoverPopup } from "./SidebarHoverPopup";
 import { MarketplaceSelector } from "./MarketplaceSelector";
-import { useAan } from "@/components/aan";
+
 import { AanGlyph } from "@/components/aan/AanGlyph";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
@@ -128,7 +128,7 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
-  const { openWorkspace } = useAan();
+  // (Ask Aan navigates to /aan via react-router)
   const { resolvedTheme, setTheme } = useTheme();
   const { newFeaturesVisible } = useFeatureToggle();
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
