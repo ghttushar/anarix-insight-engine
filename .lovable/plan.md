@@ -1,124 +1,82 @@
-## Aan v2 — A Living Diamond
+## Aan Idle Pass — Aria-style behavior, Anarix shape
 
-Keep Aan's shape exactly as defined: the coral diamond/cube echoing the Anarix logo symbol. Take from Aria only the **behavior** — a single, fluid, mature presence that travels through the chat surface, morphs subtly between states, and never appears twice at once. No sparkle dot. Fix the small-size diamond. Move to top-left of the input. One Aan, always at the point of action.
-
----
-
-### 1. Mascot stays a diamond — refined, not replaced
-
-`AanMascot.tsx` keeps its identity. We refine it, we don't redesign it.
-
-**Visual changes**
-- **Remove the white sparkle dot** entirely (`shapeStyles[*].sparkLeft/sparkTop` + the `<motion.span>` sparkle block).
-- **Remove the eyes.** Aria has no face; Aan shouldn't either at this scale. Personality moves into shape morph + motion.
-- Keep the coral gradient + soft aura + ground shadow.
-- Add a faint inner highlight (top-left, white at 8% opacity) so the diamond reads dimensional without a sparkle.
-- Add a very subtle rim-light using `brand.accent` (#A7AEF2) at 15% — ties Aan to the periwinkle palette without breaking the coral.
-
-**State system (Aria-inspired morphing — diamond is always the base)**
-| State | Behavior |
-|---|---|
-| `idle` | Diamond, slow breathe (scale 1 → 1.015, 4s), drift ±1px |
-| `listening` | Diamond softens corners (radius 16% → 28%), gentle horizontal stretch (1.04 / 0.97), aura brightens — like Aria opening up |
-| `thinking` | Corners tighten back, internal slow rotation (one full turn over 5s, linear), eyes-area replaced by a subtle liquid-swirl SVG path that morphs between 3 keyframes (Aria's "processing" feel) |
-| `working` | Same as thinking + a thin progress arc traces around the rim (stroke-dasharray driven by `generationProgress`) |
-| `speaking` | Single soft outward ring ripple every ~2s |
-| `anchor` | Static diamond, no motion — used as inline avatar in past assistant messages |
-
-All transitions: Framer Motion spring (stiffness 180, damping 22), ≤240ms per project motion spec. No bounce, no elastic.
-
-**Small-size fix (nav, FAB, suggestion chip, breadcrumb)**
-The diamond looks ugly when it's tiny because the rotation + aura + ground shadow are all visible at 16px. Fix:
-- **Below 24px**: render a flat filled "soft-diamond" — the same coral gradient but with rounded corners (radius 30%), no aura, no ground shadow, no internal motion, no rotation. Reads as a confident brand mark, not a wobbly toy.
-- **24–40px**: diamond with breathe only, no swirl, no rotation.
-- **40px+**: full state behavior.
-
-A single `size` prop on `AanMascot` decides which tier renders — consumers don't change.
+Scope: idle state only. Other states (`thinking`, `working`, `speaking`, etc.) untouched.
 
 ---
 
-### 2. One travelling Aan in the chat (`AanPresence` controller)
+### 1. `AanMascot.tsx` — bring eyes back + Aria reactions
 
-Only **one** animated diamond exists in the conversation surface at a time. It physically moves between anchor points using Framer Motion `layoutId="aan-presence"` so the same DOM element animates between locations.
+**Eyes (full tier only, ≥40px, idle/listening/anchor):**
+- Two small dots, coral-deep on a faint cream highlight, sized `size * 0.07`, positioned symmetric on a horizontal axis at ~52% Y.
+- Eyes track cursor: per-eye pupil offset within a ±`size*0.025` box, eased with `useSpring` (stiffness 120, damping 18). Same `mousemove` handler already wired — drives both body lean and eye gaze.
+- Hidden in `thinking` / `working` (concentration) and at compact tier (≤40px) — eyes at small sizes look like specks.
 
-**Anchor points (priority order)**
-1. **Input top-left** — resting position. Replaces today's centered mascot above the input.
-2. **Pending-reply slot** — placeholder row inserted on send, where the next assistant message will land.
-3. **Generation card slot** — inside the "Generating Report / Running Audit" card, replacing the current `CircularProgress` puck.
-4. **Latest assistant message avatar** — once a response finishes, the diamond settles there as the row avatar.
+**Blink (idle only):**
+- Random interval 4–8 s. Eye height scales from 1 → 0.05 → 1 over 140 ms (Framer keyframes, not opacity).
+- Resets on cursor movement (Aan re-locks gaze before next blink).
 
-**Choreography on Send**
-1. User hits Send → input clears.
-2. Diamond at input-top-left morphs to `thinking`.
-3. It animates (layoutId) down into the new pending-assistant row in ~220ms.
-4. While the assistant is "typing": diamond stays in pending row in `thinking` state.
-5. If response is a **report/audit**: diamond animates into the Generation Card slot, morphs to `working`, the rim arc tracks `generationProgress`.
-6. When generation completes: diamond animates back up to the input anchor and returns to `idle`. The completed message shows a static `anchor`-state mini-diamond as its row avatar.
-7. **Never two animated diamonds.** Past assistant messages get the small static variant only.
+**Hover "petting" — Aria's vertical→horizontal morph, but as a diamond:**
+- On `mouseenter` over the mascot bounding box: diamond softens corners (`borderRadius` 18% → 30%) and tilts on the tilt axis: `rotateZ` shifts to follow cursor X velocity (clamped ±10°), with horizontal stretch `scaleX` 1.0 → 1.08, `scaleY` 1.0 → 0.94.
+- On `mouseleave`: spring back to base over 220 ms.
+- Drag-direction sensing: on `mousemove` while hovering, lerp tilt toward cursor X position relative to center. Feels like the cursor is brushing across.
+- All transitions: spring stiffness 180 / damping 22 (matches existing motion budget).
 
-**Implementation**
-- New `AanPresenceContext` exposes `currentAnchor: 'input' | 'pending' | 'generation' | 'lastMessage'` and `setAnchor()`.
-- A single `<AanMascot layoutId="aan-presence" />` is portalled (`createPortal`) into whichever anchor slot is registered as active.
-- Each anchor slot renders an empty `data-aan-anchor` div sized to reserve space; the portal injects the live diamond there. Layout stays stable as Aan moves.
+**Idle micro-life (kept, refined):**
+- Existing breathe + float kept.
+- Add a very slow horizontal drift of ±1.5 px every 6 s so Aan doesn't feel frozen between blinks.
 
----
-
-### 3. Specific placement changes
-
-**`AanInput.tsx`**
-- Remove the centered presence block above the textarea (lines 268–276), including the `presenceLabel` micro-copy ("Ready when you are.", etc.) — it's noise; the diamond communicates state.
-- Add a `data-aan-anchor="input"` slot at the **top-left** corner of the input container. Diamond size: 24px.
-- Paperclip moves down to bottom-left, beside the model selector.
-
-**`AanConversation.tsx`**
-- Per-message assistant avatars: switch from animated `AanMascot` to the small static variant (`size={20}`, `state="anchor"`, `interactive={false}`) — the "soft-diamond" tier.
-- The `isGenerating` block: replace the avatar + `CircularProgress` puck with a single `data-aan-anchor="generation"` slot. The `AanPresence` controller drops the live diamond here, and the rim arc reflects `generationProgress`. Keep the "Generating Report / 18s remaining" copy beside it.
-- Insert a `data-aan-anchor="pending"` row after the user's message while `isLoading` is true (before the assistant reply lands).
-
-**Other small-size surfaces (sparkle/diamond fix)**
-- `AanWorkspaceSidebar`, `AanTrigger`, `MiniSidebar`, `FloatingActionIsland`, prompt suggestion chip, breadcrumb — all keep `<AanMascot />` but at sizes 16–20px, which now auto-render the flat soft-diamond variant. No diamond rotation/aura at these sizes.
+**Cleanup inside `AanMascot.tsx`:**
+- The `bodyLean` cursor-tracking block stays. Add a sibling `eyeGaze` state and a `hovered` boolean.
+- No new dependencies. Pure CSS/Framer.
 
 ---
 
-### 4. Cleanup
+### 2. `AanInput.tsx` — give Aan its own slot above the textarea
 
-- **Keep** `AanMascot.tsx` (it remains the diamond identity); refactor internals.
-- **Remove**: sparkle motion span; eyes block; `shape: circle | bar | cube` API (only `diamond` remains, with size-tier-driven rendering).
-- **Remove** the `AanGlyph` fallback in `AanConversation` for the new-branding path — single source of truth is `AanMascot`.
-- Update `AanMascotShowcase` page to demo the refined diamond + the travelling presence.
+Today Aan is anchored top-left *inside* the input border (24 px). That doesn't match Aria's placement (centered, sitting *above* the input, slightly to the left of the text label).
 
----
+**Changes:**
+- **Remove** the in-input `data-aan-anchor="input"` overlay div (lines 312–319).
+- **Add** a new horizontal slot directly above the input container, inside the existing `relative` wrapper:
+  - Height: 48 px reserved (so layout doesn't shift when prompt-suggestion notch appears).
+  - Aan sits left-aligned with `pl-3` (aligned to the textarea's text start, not the input border).
+  - Aan size at this anchor: **40 px** (was 24 px). Compact tier — breathes, no eyes. We bump to **44 px** to cross into full tier so eyes + cursor tracking are active.
+  - `data-aan-anchor="input"` moves onto this new slot. `registerAnchor("input", el, 44)`.
+- **Prompt-suggestion notch** (lines 264–291): currently sits `bottom-full` of the input. Move it to render *beside* Aan (right of the mascot, same row), or stack it directly under Aan above the input. Proposing **same row** (Aan on left, suggestion chip flowing right) — matches Aria's "Your prompt is ready." pattern in the screenshots.
+  - When no suggestion is active, Aan sits alone in the slot.
+  - When suggestion appears, it fades in to Aan's right with the existing 300 ms transition; Aan stays put.
+- The Anchor portal already renders the live mascot into whichever `data-aan-anchor` is registered, so no presence-portal changes are needed.
 
-### 5. What stays the same
-
-- Aan's role, copy, gating, the `newBranding` toggle.
-- Coral diamond identity (matches Anarix logo).
-- Periwinkle palette, motion budget (≤240ms), no decorative loops outside Aan.
-- All chat logic in `AanInput.handleSend` (report/audit detection, mock responses, generation timers).
-
----
-
-### Files to touch
-
-**Create**
-- `src/components/aan/AanPresenceContext.tsx` — anchor state
-- `src/components/aan/AanPresencePortal.tsx` — single travelling diamond, portalled to active anchor
-
-**Edit**
-- `src/components/aan/AanMascot.tsx` — remove sparkle + eyes, add size tiers, refine states
-- `src/components/aan/AanInput.tsx` — orb at top-left input slot, remove centered block + label
-- `src/components/aan/AanConversation.tsx` — pending anchor, generation anchor, static row avatars
-- `src/pages/aan/Workspace.tsx` — wrap with `AanPresenceProvider`, mount `AanPresencePortal`
-- Small-size consumers (sidebar/trigger/island/suggestion/breadcrumb) — no API change, sizes already correct
-- `src/pages/brand/AanMascotShowcase.tsx` — refresh demos
-
-**Delete**
-- None (we're refining, not replacing)
+**Spacing impact:**
+- Input container moves down by 48 px. The bottom-aligned model selector + disclaimer row is unaffected.
 
 ---
 
-### Open questions before I build
+### 3. Files touched
 
-1. **Past assistant message avatars** — keep a small static diamond on every past row, or remove avatars entirely once "the" presence has moved on (more Aria-like minimalism)? Proposing: keep small static diamonds — provides scan-ability without competing with the live presence.
-2. **Travel motion** — straight line via `layoutId` spring (snappy, ~220ms), or a slight arc? Proposing: straight + spring; arcs feel decorative and break the 240ms budget.
-3. **Color** — keep the current coral, or shift slightly toward the Anarix logo's exact coral hex if it differs? If you have the logo's exact hex, drop it and I'll match.
+**Edit only:**
+- `src/components/aan/AanMascot.tsx` — eyes, blink, hover-petting, gaze tracking
+- `src/components/aan/AanInput.tsx` — new above-input Aan slot, suggestion notch repositioned, anchor size 44
+
+**No** changes to `AanPresenceContext`, `AanPresencePortal`, `AanConversation`, or any other consumer. Other states untouched.
+
+---
+
+### 4. About the Wix Harmony reference
+
+Direct link sharing won't work because Wix gates it behind login, and I can't bypass auth or create an account. Options that do work:
+
+1. **Paste the rendered HTML/CSS** of the page into a `.txt` upload (View Source → copy → paste).
+2. **Save the page as MHTML or single-file HTML** from your browser (Chrome: ⋮ → Save as → "Webpage, single file") and upload it. I can read the saved file.
+3. **Screen recording** of specific interactions (you already shared one — that's the most useful for motion).
+4. **Paste specific JS/CSS snippets** for any animation you want me to mirror.
+
+For this idle pass I have enough from the screenshots + your description (eye tracking, hover-petting morph, blink). If you want me to mirror any other Aria reaction later, the saved-HTML route is the cleanest.
+
+---
+
+### Open questions
+
+1. **Eye style** — match the original Aan eyes (two small dark dots) or Aria's flatter "..." style? Proposing original Aan dark dots for personality continuity.
+2. **Suggestion chip placement** — same row as Aan (Aria-style), or keep it stacked above as today? Proposing same row.
+3. **Hover-petting trigger area** — just the mascot itself, or the whole 48 px slot row? Proposing mascot only, so brushing across the input doesn't constantly trigger it.
