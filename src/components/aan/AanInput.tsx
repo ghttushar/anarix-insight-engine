@@ -121,7 +121,7 @@ export function AanInput() {
   // Register the top-left input slot as the resting anchor for the travelling Aan presence
   useEffect(() => {
     if (!newBranding) return;
-    registerAnchor("input", inputAnchorEl, 24);
+    registerAnchor("input", inputAnchorEl, 44);
     return () => registerAnchor("input", null);
   }, [newBranding, inputAnchorEl, registerAnchor]);
 
@@ -260,8 +260,46 @@ export function AanInput() {
     <div className="shrink-0 bg-background">
       <div className="px-4 pb-4 pt-3">
         <div className="relative">
-          {/* Prompt suggestion notch */}
-          {showSuggestion && (
+          {/* Aan presence slot — sits above the input, left-aligned. Reserves height even when no suggestion is active. */}
+          {newBranding && (
+            <div className="flex items-center gap-3 pl-3 mb-2 h-[52px]">
+              <div
+                ref={setInputAnchorEl}
+                data-aan-anchor="input"
+                className="w-[52px] h-[52px] flex items-center justify-center shrink-0"
+              />
+              {showSuggestion && (
+                <div
+                  className={cn(
+                    "flex-1 min-w-0 transition-all duration-300 ease-out",
+                    suggestionVisible
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 -translate-x-1"
+                  )}
+                >
+                  <button
+                    onClick={handleSuggestionClick}
+                    className="group inline-flex max-w-full items-center gap-2 text-left"
+                  >
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 shrink-0">Suggested</span>
+                    <span className="text-xs font-medium text-primary group-hover:underline truncate">
+                      {PROMPT_SUGGESTIONS[suggestionIndex]}
+                    </span>
+                  </button>
+                  <button
+                    onClick={handleDismissSuggestion}
+                    className="ml-2 p-0.5 rounded hover:bg-muted text-muted-foreground transition-colors"
+                    aria-label="Dismiss suggestion"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Legacy suggestion notch (old branding only) */}
+          {!newBranding && showSuggestion && (
             <div
               className={cn(
                 "absolute bottom-full left-0 right-0 origin-bottom transition-all duration-300 ease-out",
@@ -270,7 +308,7 @@ export function AanInput() {
                   : "opacity-0 translate-y-1 scale-[0.98]"
               )}
             >
-              <div className="mx-0 flex overflow-hidden rounded-t-lg border border-b-0 border-border bg-card/90 backdrop-blur-sm shadow-sm">
+              <div className="mx-0 flex overflow-hidden rounded-t-lg border border-b-0 border-border bg-card/90 shadow-sm">
                 <div className="w-[3px] shrink-0 bg-gradient-to-b from-primary to-accent" />
                 <div className="flex items-center gap-2.5 px-3 py-2.5 flex-1 min-w-0">
                   <div className="flex items-center justify-center h-6 w-6 rounded-md bg-primary/10 shrink-0">
@@ -308,15 +346,6 @@ export function AanInput() {
 
           {/* Input container */}
           <div className="relative flex items-end gap-0 rounded-lg border border-border bg-card focus-within:border-primary/40 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
-            {/* Aan presence anchor — top-left of input box (new branding only) */}
-            {newBranding && (
-              <div
-                ref={setInputAnchorEl}
-                aria-hidden
-                data-aan-anchor="input"
-                className="absolute top-1.5 left-2 w-6 h-6 pointer-events-none z-10"
-              />
-            )}
             {/* Attachment button */}
             <button
               onClick={() => fileInputRef.current?.click()}

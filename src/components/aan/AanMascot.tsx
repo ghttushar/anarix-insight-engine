@@ -3,20 +3,15 @@ import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export type AanMascotState = "idle" | "listening" | "thinking" | "working" | "speaking" | "anchor";
-// Legacy shape prop kept for backwards compatibility; ignored. Diamond is the only shape.
 export type AanMascotShape = "diamond" | "circle" | "bar" | "cube";
 
 interface AanMascotProps {
   state?: AanMascotState;
-  /** Legacy / ignored. Aan is always a diamond. */
   shape?: AanMascotShape;
   size?: number;
   interactive?: boolean;
-  /** Soft ground shadow ellipse beneath. Only honored at large sizes. */
   floating?: boolean;
-  /** 0–100, used by `working` state to draw a rim arc. */
   progress?: number;
-  /** When true, this instance participates in the travelling-presence layout animation. */
   layoutId?: string;
   className?: string;
 }
@@ -27,12 +22,6 @@ const CORAL = {
   deep: "#f05e6a",
 };
 
-/**
- * Aan — the coral diamond. One shape, three rendering tiers based on size:
- *   • <24px  → flat soft-diamond (rounded square), no motion, no aura. Confident brand mark.
- *   • 24–40px → diamond with subtle breathe only.
- *   • >40px  → full state behavior: morph, swirl, rim arc, ground shadow.
- */
 export function AanMascot({
   state = "idle",
   size = 64,
@@ -45,14 +34,22 @@ export function AanMascot({
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const [bodyLean, setBodyLean] = useState({ x: 0, y: 0, tilt: 0 });
+  const [eyeGaze, setEyeGaze] = useState({ x: 0, y: 0 });
+  const [hovered, setHovered] = useState(false);
+  const [petTilt, setPetTilt] = useState(0);
+  const [blinkKey, setBlinkKey] = useState(0);
 
   const tier: "micro" | "compact" | "full" = size < 24 ? "micro" : size <= 40 ? "compact" : "full";
   const isStatic = state === "anchor" || reduceMotion;
   const trackCursor = interactive && !isStatic && tier === "full";
+  const showEyes =
+    tier === "full" && !reduceMotion && (state === "idle" || state === "listening" || state === "speaking");
 
+  // Cursor tracking — body lean + eye gaze
   useEffect(() => {
     if (!trackCursor) {
       setBodyLean({ x: 0, y: 0, tilt: 0 });
+      setEyeGaze({ x: 0, y: 0 });
       return;
     }
     const handler = (event: MouseEvent) => {
@@ -71,12 +68,57 @@ export function AanMascot({
         y: Math.sin(angle) * distance * bodyTravel,
         tilt: Math.cos(angle) * distance * 4,
       });
+      // Eye gaze — clamped to a small box
+      const eyeRange = size * 0.06;
+      const eyeDist = Math.min(1, Math.hypot(dx, dy) / 260);
+      setEyeGaze({
+        x: Math.cos(angle) * eyeDist * eyeRange,
+        y: Math.sin(angle) * eyeDist * eyeRange,
+      });
     };
     window.addEventListener("mousemove", handler);
     return () => window.removeEventListener("mousemove", handler);
   }, [size, trackCursor]);
 
-  // ---------- MICRO TIER (<24px): flat soft-diamond mark ----------
+  // Hover-petting tilt — follows cursor X across the mascot
+  useEffect(() => {
+    if (!hovered || !trackCursor) {
+      setPetTilt(0);
+      return;
+    }
+    const handler = (event: MouseEvent) => {
+      const node = ref.current;
+      if (!node) return;
+      const bounds = node.getBoundingClientRect();
+      const cx = bounds.left + bounds.width / 2;
+      const rel = (event.clientX - cx) / (bounds.width / 2); // -1..1
+      setPetTilt(Math.max(-1, Math.min(1, rel)) * 10);
+    };
+    window.addEventListener("mousemove", handler);
+    return () => window.removeEventListener("mousemove", handler);
+  }, [hovered, trackCursor]);
+
+  // Blink — random interval 4–8s, idle/listening only
+  useEffect(() => {
+    if (!showEyes || state !== "idle") return;
+    let cancelled = false;
+    const schedule = () => {
+      const delay = 4000 + Math.random() * 4000;
+      const t = setTimeout(() => {
+        if (cancelled) return;
+        setBlinkKey((k) => k + 1);
+        schedule();
+      }, delay);
+      return t;
+    };
+    const t = schedule();
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [showEyes, state]);
+
+  // ---------- MICRO TIER (<24px) ----------
   if (tier === "micro") {
     return (
       <motion.span
@@ -93,13 +135,19 @@ export function AanMascot({
     );
   }
 
-  // ---------- COMPACT & FULL TIERS ----------
-  const baseRotate = 45; // diamond
-  // listening: corners soften and stretch slightly; thinking/working: tighten back; idle: standard.
+  const baseRotate = 45;
+  // Hover-petting softens corners further
+  const hoverBoost = hovered && tier === "full" ? 1 : 0;
   const radius =
-    state === "listening" ? "26%" : state === "thinking" || state === "working" ? "14%" : "18%";
-  const stretchX = state === "listening" ? 1.04 : 1;
-  const stretchY = state === "listening" ? 0.97 : 1;
+    state === "listening"
+      ? "26%"
+      : state === "thinking" || state === "working"
+        ? "14%"
+        : hoverBoost
+          ? "30%"
+          : "18%";
+  const stretchX = state === "listening" ? 1.04 : hoverBoost ? 1.08 : 1;
+  const stretchY = state === "listening" ? 0.97 : hoverBoost ? 0.94 : 1;
 
   const floatDur = state === "listening" ? 3.2 : state === "thinking" || state === "working" ? 2.6 : 4.4;
   const floatRange = tier === "full" ? (state === "thinking" || state === "working" ? 3 : 2.5) : 0;
@@ -116,11 +164,16 @@ export function AanMascot({
   const containerW = size + (floating && tier === "full" ? 8 : 0);
   const containerH = size + (floating && tier === "full" ? 14 : 0);
 
-  // Rim arc geometry (working state)
   const arcSize = size * 1.18;
   const arcR = arcSize / 2 - 2;
   const arcCircum = 2 * Math.PI * arcR;
   const arcOffset = arcCircum * (1 - Math.min(100, Math.max(0, progress)) / 100);
+
+  // Eye geometry — counter-rotated against the diamond's 45° rotation so eyes stay upright
+  const eyeSize = Math.max(2.5, size * 0.075);
+  const eyeOffsetX = size * 0.16;
+  const eyeY = size * 0.04; // slightly above center for "looking forward" feel
+  const pupilSize = eyeSize * 0.55;
 
   return (
     <motion.span
@@ -130,7 +183,6 @@ export function AanMascot({
       style={{ width: containerW, height: containerH }}
       transition={{ type: "spring", stiffness: 180, damping: 22 }}
     >
-      {/* Ground shadow ellipse (full tier + floating only) */}
       {floating && tier === "full" && (
         <motion.span
           aria-hidden
@@ -158,6 +210,8 @@ export function AanMascot({
       <motion.div
         ref={ref}
         className="relative inline-flex items-center justify-center"
+        onMouseEnter={() => trackCursor && setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         animate={
           isStatic || tier === "compact"
             ? { y: 0 }
@@ -166,7 +220,6 @@ export function AanMascot({
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
         style={{ width: size, height: size }}
       >
-        {/* Rim progress arc (working state, full tier) */}
         {state === "working" && tier === "full" && (
           <svg
             aria-hidden
@@ -204,13 +257,11 @@ export function AanMascot({
           </svg>
         )}
 
-        {/* Body lean (cursor reactive) */}
         <motion.div
-          animate={{ x: bodyLean.x, y: bodyLean.y, rotate: bodyLean.tilt }}
+          animate={{ x: bodyLean.x, y: bodyLean.y, rotate: bodyLean.tilt + petTilt }}
           transition={{ type: "spring", stiffness: 110, damping: 16 }}
           style={{ position: "relative", width: size, height: size }}
         >
-          {/* Aura */}
           {tier === "full" && (
             <motion.div
               aria-hidden
@@ -236,7 +287,7 @@ export function AanMascot({
             />
           )}
 
-          {/* Body */}
+          {/* Body — diamond rotated 45deg */}
           <motion.div
             animate={{
               width: size,
@@ -252,7 +303,7 @@ export function AanMascot({
                     rotate: { duration: 5, repeat: Infinity, ease: "linear" },
                     default: { type: "spring", stiffness: 140, damping: 18 },
                   }
-                : { type: "spring", stiffness: 140, damping: 18 }
+                : { type: "spring", stiffness: 180, damping: 22 }
             }
             style={{
               background: `radial-gradient(circle at 50% 38%, ${CORAL.light} 0%, #f57780 42%, ${CORAL.base} 78%, ${CORAL.deep} 100%)`,
@@ -264,7 +315,6 @@ export function AanMascot({
               overflow: "hidden",
             }}
           >
-            {/* Inner highlight (top-left soft white) */}
             <span
               aria-hidden
               style={{
@@ -275,8 +325,6 @@ export function AanMascot({
                 pointerEvents: "none",
               }}
             />
-
-            {/* Periwinkle rim-light (subtle palette tie-in) */}
             <span
               aria-hidden
               style={{
@@ -288,7 +336,6 @@ export function AanMascot({
               }}
             />
 
-            {/* Liquid swirl for thinking/working (full tier only) */}
             {(state === "thinking" || state === "working") && tier === "full" && !isStatic && (
               <motion.div
                 aria-hidden
@@ -314,7 +361,66 @@ export function AanMascot({
             )}
           </motion.div>
 
-          {/* Speaking ripple */}
+          {/* Eyes — overlay, counter-rotated so they stay upright on top of the diamond */}
+          {showEyes && (
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                pointerEvents: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div
+                style={{
+                  position: "relative",
+                  width: size,
+                  height: size,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {[-1, 1].map((dir) => (
+                  <motion.div
+                    key={`eye-${dir}-${blinkKey}`}
+                    animate={{ scaleY: [1, 0.05, 1] }}
+                    transition={{ duration: 0.16, times: [0, 0.5, 1], ease: "easeOut" }}
+                    style={{
+                      position: "absolute",
+                      left: `calc(50% + ${dir * eyeOffsetX}px)`,
+                      top: `calc(50% + ${eyeY}px)`,
+                      transform: "translate(-50%, -50%)",
+                      width: eyeSize,
+                      height: eyeSize,
+                      borderRadius: "50%",
+                      background: "rgba(255, 240, 235, 0.85)",
+                      boxShadow: "inset 0 0 0 0.5px rgba(176,40,50,0.25)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <motion.div
+                      animate={{ x: eyeGaze.x, y: eyeGaze.y }}
+                      transition={{ type: "spring", stiffness: 120, damping: 18 }}
+                      style={{
+                        width: pupilSize,
+                        height: pupilSize,
+                        borderRadius: "50%",
+                        background: "#3a0d10",
+                      }}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {state === "speaking" && tier === "full" && !isStatic && (
             <motion.span
               aria-hidden
