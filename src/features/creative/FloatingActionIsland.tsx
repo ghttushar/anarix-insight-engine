@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { RefreshCw, Download, Camera, Lightbulb, GripVertical, Bell } from "lucide-react";
 import { AanGlyph } from "@/components/aan/AanGlyph";
+import { AanMascot } from "@/components/aan/AanMascot";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAan } from "@/components/aan";
