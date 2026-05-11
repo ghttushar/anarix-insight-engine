@@ -169,9 +169,9 @@ export function AanMascot({
 
   // Body dimensions per shape
   const bodyW =
-    shape === "bar" ? size * 1.6 : shape === "cube" ? size * 0.92 : size;
+    shape === "bar" ? size * 1.8 : shape === "cube" ? size * 0.92 : size;
   const bodyH =
-    shape === "bar" ? size * 0.5 : shape === "cube" ? size * 0.92 : size;
+    shape === "bar" ? size * 0.34 : shape === "cube" ? size * 0.92 : size;
 
   // Stretch on hover (diamond only)
   const stretchX = hoverBoost ? 1.06 : 1;
