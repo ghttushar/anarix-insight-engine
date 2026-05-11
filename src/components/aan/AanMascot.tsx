@@ -15,6 +15,8 @@ interface AanMascotProps {
   progress?: number;
   layoutId?: string;
   className?: string;
+  /** Render eyes as static dots with no motion. Forces tier ≥ compact eye visibility and disables all animation. */
+  staticEyes?: boolean;
 }
 
 const CORAL = {
@@ -42,6 +44,7 @@ export function AanMascot({
   progress = 0,
   layoutId,
   className,
+  staticEyes = false,
 }: AanMascotProps) {
   const reduceMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
@@ -53,13 +56,14 @@ export function AanMascot({
 
   const shape = deriveShape(state, shapeOverride);
   const tier: "micro" | "compact" | "full" = size < 24 ? "micro" : size <= 40 ? "compact" : "full";
-  const isStatic = state === "anchor" || reduceMotion;
+  const isStatic = staticEyes || state === "anchor" || reduceMotion;
   const trackCursor = interactive && !isStatic && tier === "full" && shape !== "bar";
-  const showEyes =
-    tier === "full" &&
-    !reduceMotion &&
-    shape !== "bar" &&
-    (state === "idle" || state === "listening" || state === "speaking");
+  const showEyes = staticEyes
+    ? size >= 16 && shape !== "bar"
+    : tier === "full" &&
+      !reduceMotion &&
+      shape !== "bar" &&
+      (state === "idle" || state === "listening" || state === "speaking");
 
   // Cursor tracking — body lean + eye gaze
   useEffect(() => {
