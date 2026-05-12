@@ -29,7 +29,7 @@ export function AanConversation() {
   useEffect(() => {
     if (!newBranding) return;
     if (isGenerating) {
-      registerAnchor("generation", generationAnchorEl, 56);
+      registerAnchor("generation", generationAnchorEl, 40);
     } else {
       registerAnchor("generation", null);
     }
@@ -124,7 +124,7 @@ export function AanConversation() {
                   ref={setGenerationAnchorEl}
                   aria-hidden
                   data-aan-anchor="generation"
-                  className="w-12 h-12 shrink-0 flex items-center justify-center"
+                  className="w-10 h-10 shrink-0 flex items-center justify-center"
                 />
               ) : (
                 <CircularProgress progress={generationProgress} size={48} />
