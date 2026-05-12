@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, ArrowRight, Heart, Zap, Users, Globe, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/website/components/PageLayout";
 
 const positions = [
   { title: "Senior ML Engineer", dept: "Engineering", location: "Remote", type: "Full-time", desc: "Build and deploy ML models that optimize ad spend for 500+ brands. Work with large-scale data pipelines and real-time bidding systems." },
@@ -129,7 +129,7 @@ const Careers = () => {
 
         <div className="text-center">
           <p className="text-muted-foreground mb-4">Don't see your role? We're always looking for great people.</p>
-          <Link to="/contact"><Button className="rounded-pill bg-primary text-primary-foreground btn-shine">Send Open Application</Button></Link>
+          <Link to="/website/company/contact"><Button className="rounded-pill bg-primary text-primary-foreground btn-shine">Send Open Application</Button></Link>
         </div>
       </div>
     </PageLayout>

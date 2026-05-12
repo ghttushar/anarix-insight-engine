@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { CheckCircle, Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/website/components/PageLayout";
 import { useState } from "react";
 
 const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM"];

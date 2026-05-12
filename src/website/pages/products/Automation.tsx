@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Zap, Settings, ShieldCheck, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/website/components/PageLayout";
 
 const features = [
   { icon: Zap, title: "Smart Bid Management", desc: "AI-optimized bids that adapt in real-time to market conditions and competition." },
@@ -26,7 +26,7 @@ const ProductAutomation = () => (
           </motion.div>
         ))}
       </div>
-      <div className="text-center"><Link to="/demo"><Button size="lg" className="rounded-pill px-8 h-12 bg-primary text-primary-foreground btn-shine">Schedule a Demo</Button></Link></div>
+      <div className="text-center"><Link to="/website/demo"><Button size="lg" className="rounded-pill px-8 h-12 bg-primary text-primary-foreground btn-shine">Schedule a Demo</Button></Link></div>
     </div>
   </PageLayout>
 );

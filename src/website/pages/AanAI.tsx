@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { Bot, FileText, Shield, Zap, Palette, Users, Sparkles, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
-import CycloneScrollSection from "@/components/CycloneScrollSection";
+import PageLayout from "@/website/components/PageLayout";
+import CycloneScrollSection from "@/website/components/CycloneScrollSection";
 
 const capabilities = [
   { icon: FileText, title: "Reports", desc: "Auto-generated weekly and monthly insights with channel and SKU-level detail." },
@@ -159,7 +159,7 @@ const AanAI = () => {
       </div>
       <CycloneScrollSection />
       <div className="max-w-6xl mx-auto px-6 text-center pb-8">
-        <Link to="/demo">
+        <Link to="/website/demo">
           <Button size="lg" className="rounded-pill px-8 h-12 bg-primary text-primary-foreground btn-shine">Try Aan Live</Button>
         </Link>
       </div>

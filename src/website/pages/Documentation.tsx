@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { BookOpen, Rocket, Plug, Code2, GitBranch } from "lucide-react";
 import { Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/website/components/PageLayout";
 
 const sections = [
   {

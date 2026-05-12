@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Target, Heart, Eye, Rocket, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/website/components/PageLayout";
 
 const values = [
   { icon: Target, title: "Outcome Obsessed", desc: "We measure success by your revenue, not our features." },
@@ -99,7 +99,7 @@ const About = () => (
         <p className="text-muted-foreground max-w-lg mx-auto mb-6">
           Engineers, strategists, designers, and account managers — united by a mission to make e-commerce advertising work.
         </p>
-        <Link to="/careers">
+        <Link to="/website/company/career">
           <Button className="rounded-pill px-6 bg-primary text-primary-foreground btn-shine">
             Join Our Team <ArrowRight className="w-4 h-4 ml-1" />
           </Button>

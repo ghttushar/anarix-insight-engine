@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Megaphone, Target, Sparkles, Clock, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/website/components/PageLayout";
 
 const features = [
   { icon: Sparkles, title: "AI + Rule-Based Bidder", desc: "A bidder that thinks. Combines machine learning with rules you trust to keep CPC efficient and ROAS climbing." },
@@ -45,7 +45,7 @@ const ProductAdvertising = () => (
         </div>
 
         <div className="text-center pb-8">
-          <Link to="/demo">
+          <Link to="/website/demo">
             <Button size="lg" className="rounded-pill px-8 h-12 bg-primary text-primary-foreground btn-shine">
               See Advertising in Action
             </Button>

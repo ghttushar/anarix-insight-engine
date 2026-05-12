@@ -1,6 +1,6 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import ScrollToTop from "@/components/ScrollToTop";
+import Navbar from "@/website/components/Navbar";
+import Footer from "@/website/components/Footer";
+import ScrollToTop from "@/website/components/ScrollToTop";
 
 const PageLayout = ({ children }: { children: React.ReactNode }) => (
   <div className="min-h-screen bg-background">

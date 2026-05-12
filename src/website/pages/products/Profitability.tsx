@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { BarChart3, PieChart, TrendingUp, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
-import TacosSection from "@/components/TacosSection";
+import PageLayout from "@/website/components/PageLayout";
+import TacosSection from "@/website/components/TacosSection";
 
 const features = [
   { icon: PieChart, title: "SKU-Level P&L", desc: "Contribution margin per SKU, fees broken out, and the cost lines hiding inside marketplace settlements." },
@@ -48,7 +48,7 @@ const ProductProfitability = () => (
     </div>
     <TacosSection />
     <div className="max-w-6xl mx-auto px-6 text-center pb-8">
-      <Link to="/demo"><Button size="lg" className="rounded-pill px-8 h-12 bg-primary text-primary-foreground btn-shine">See It in Action</Button></Link>
+      <Link to="/website/demo"><Button size="lg" className="rounded-pill px-8 h-12 bg-primary text-primary-foreground btn-shine">See It in Action</Button></Link>
     </div>
   </PageLayout>
 );

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Users, Handshake, Eye, LineChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/website/components/PageLayout";
 
 const features = [
   { icon: Users, title: "Dedicated Team", desc: "Experienced account managers and strategists assigned to your brand. Not a call center." },
@@ -26,7 +26,7 @@ const ProductManagedServices = () => (
           </motion.div>
         ))}
       </div>
-      <div className="text-center"><Link to="/demo"><Button size="lg" className="rounded-pill px-8 h-12 bg-primary text-primary-foreground btn-shine">Talk to Our Team</Button></Link></div>
+      <div className="text-center"><Link to="/website/demo"><Button size="lg" className="rounded-pill px-8 h-12 bg-primary text-primary-foreground btn-shine">Talk to Our Team</Button></Link></div>
     </div>
   </PageLayout>
 );

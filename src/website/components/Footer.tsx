@@ -36,7 +36,7 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto bg-card rounded-3xl border border-border shadow-soft p-10 sm:p-14">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
           <div className="col-span-2 md:col-span-1">
-            <Link to="/" className="text-2xl font-display font-semibold text-foreground tracking-tight">
+            <Link to="/website" className="text-2xl font-display font-semibold text-foreground tracking-tight">
               Anarix<span className="text-coral">.</span>ai
             </Link>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed">

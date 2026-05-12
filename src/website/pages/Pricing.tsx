@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Check, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/website/components/PageLayout";
 
 const plans = [
   {
@@ -135,7 +135,7 @@ const Pricing = () => {
                   <span className={`text-2xl font-bold ${plan.dark ? "text-background" : "text-foreground"}`}>Custom</span>
                 )}
               </div>
-              <Link to="/demo">
+              <Link to="/website/demo">
                 <Button
                   className={`w-full rounded-pill mb-6 ${
                     plan.popular ? "bg-primary text-primary-foreground btn-shine" :

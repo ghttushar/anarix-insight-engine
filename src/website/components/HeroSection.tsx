@@ -160,7 +160,7 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.65, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Link to="/demo">
+          <Link to="/website/demo">
             <Button
               size="lg"
               className="rounded-pill px-8 h-12 text-base bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-strong active:translate-y-0 active:scale-[0.97] will-change-transform btn-shine"
@@ -168,7 +168,7 @@ const HeroSection = () => {
               Schedule a Demo
             </Button>
           </Link>
-          <Link to="/products/profitability">
+          <Link to="/website/products/profitability">
             <Button
               size="lg"
               variant="outline"

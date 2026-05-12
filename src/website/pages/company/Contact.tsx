@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Mail, MapPin, Phone, Send, MessageSquare, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/website/components/PageLayout";
 
 const Contact = () => (
   <PageLayout>
