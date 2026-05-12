@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, Sparkles } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { AanMascot } from "@/components/aan/AanMascot";
 import { cn } from "@/lib/utils";
 
