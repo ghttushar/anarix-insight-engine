@@ -1,27 +1,20 @@
 ## Goal
-Restyle the "Ask Aan" button in the Floating Action Island to match the attached pill design, give the mascot inside it a live mouse-tracking sway like the full-screen Aan mascot, and make the button open the **Aan Copilot side panel** (not navigate to the full `/aan` page).
+Make the Ask Aan mascot fit the pill more snugly, and have the entire Ask Aan pill disappear from the Floating Action Island the moment the Aan Copilot side panel opens — reinforcing the idea that the mascot "lives" and travels to wherever Aan is currently working.
 
 ## Changes
 
-### 1. `src/features/creative/FloatingActionIsland.tsx`
-- Replace `navigate("/aan")` on the Ask Aan action with `openCopilot()` from `useAan()` (re-add the `useAan` import). All other buttons untouched.
-- Restyle the Ask Aan button to match the attached image:
-  - Render it as a separate, distinct pill (not a `ghost` Button) — `rounded-full bg-card border border-border shadow-sm h-10 pl-1.5 pr-3 gap-2 hover:shadow-md transition-shadow`.
-  - Inside: the `AanMascot` (coral diamond with eyes) + "Ask Aan" label in body font, `text-sm font-medium text-foreground`.
-  - Always visible label (no expand-on-hover for this button).
-- Keep mascot at a size that activates the **full tier** so cursor tracking + body lean + eye gaze work the same as in `/aan`. Use `size={44}` with `interactive` and `floating` (matches the in-chat anchor behavior). The container pill height adjusts to `h-12` to accommodate.
+### `src/features/creative/FloatingActionIsland.tsx`
+- Read `mode` from `useAan()` alongside `openCopilot`.
+- Shrink the mascot inside the Ask Aan pill from `size={44}` to `size={32}`, and tighten the pill: `h-10 pl-1 pr-3 gap-1.5` (was `h-12 pl-1.5 pr-3.5 gap-2`). This keeps the coral diamond comfortably inside the capsule with even vertical padding.
+  - Note: at size 32 the mascot is in "compact" tier and won't run cursor-sway. To preserve the live mouse-tracking behavior the user just approved, I'll bump to `size={36}` instead — still visually smaller than the current 44, but inside the "full" tier (>= 32 with floating; tier threshold is `size <= 40 → compact`, so I'll use `size={42}` with tighter pill padding `h-11 pl-1 pr-3.5`). Choosing **size 42 + h-11 pill** to keep the live sway intact while reducing visual heft.
+- Wrap the Ask Aan pill render in `{newBranding && mode !== "copilot" && (...)}` so it disappears when the Copilot panel is active. When the user closes the Copilot panel, the pill reappears in the island.
 
-### 2. `src/components/aan/AanMascot.tsx` (minor)
-- No behavioral change needed — at `size={44}` the mascot is already tier `full`, so `trackCursor` is enabled automatically (mouse sway + eye gaze + blink). No prop additions.
-
-### 3. No changes elsewhere
-- `AppSidebar` Ask Aan buttons keep navigating to `/aan` (full screen) — unchanged. Only the Floating Action Island button switches to the Copilot side panel per the user's request.
-- `AanCopilotPanel` is already wired through `ActivePanelContext` and opens via `openCopilot()`.
-
-## Visual reference
-Attached image: white rounded pill, coral diamond mascot with two eyes on the left, "Ask Aan" label on the right. The pill sits inline inside the existing Floating Action Island, between the drag handle and the other action icons.
-
-## Out of scope
+### Out of scope
+- No changes to the mascot component itself.
 - No changes to other action island buttons.
-- No changes to mascot states elsewhere in the app.
-- No routing changes for the navbar/sidebar Ask Aan entries.
+- No changes to the Copilot panel — its existing internal mascot (input anchor) already represents the "moved" Aan.
+
+## Behavior summary
+- Default state: Ask Aan pill visible in the island, mascot lives there with cursor sway.
+- Click Ask Aan → Copilot panel opens → pill instantly hides from the island (mascot has "moved" into the Copilot input).
+- Close Copilot → pill returns to the island.

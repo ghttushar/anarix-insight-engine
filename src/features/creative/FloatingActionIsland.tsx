@@ -33,7 +33,7 @@ export function FloatingActionIsland() {
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { openCopilot } = useAan();
+  const { openCopilot, mode } = useAan();
   const { openPanel: openInsights, criticalCount } = useInsights();
   const { newBranding } = useBranding();
 
@@ -129,14 +129,14 @@ export function FloatingActionIsland() {
               <GripVertical className="h-3.5 w-3.5" />
             </button>
             <div className="h-5 w-px bg-border" />
-            {newBranding && (
+            {newBranding && mode !== "copilot" && (
               <button
                 type="button"
                 onClick={openCopilot}
-                className="group flex items-center gap-2 h-12 pl-1.5 pr-3.5 rounded-full bg-card border border-border shadow-sm hover:shadow-md hover:border-primary/40 transition-all"
+                className="group flex items-center gap-1.5 h-11 pl-1 pr-3.5 rounded-full bg-card border border-border shadow-sm hover:shadow-md hover:border-primary/40 transition-all"
                 title="Ask Aan"
               >
-                <AanMascot size={44} state="idle" interactive floating />
+                <AanMascot size={42} state="idle" interactive floating />
                 <span className="text-sm font-medium text-foreground whitespace-nowrap">Ask Aan</span>
               </button>
             )}
