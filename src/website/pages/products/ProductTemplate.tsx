@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { SectionLabel } from "../components/SectionLabel";
+import { SectionLabel } from "../../components/SectionLabel";
 
 interface Props {
   eyebrow: string;
