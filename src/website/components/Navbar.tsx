@@ -19,8 +19,8 @@ const navItems: Array<{
       { label: "Managed Services", href: "/website/products/managed-services" },
     ],
   },
-  { label: "Aan AI", href: "/website/aan" },
-  { label: "Documentation", href: "/website/docs" },
+  { label: "Aan AI", href: "/website/aan-ai" },
+  { label: "Documentation", href: "/website/documentation" },
   {
     label: "Company",
     dropdown: [
