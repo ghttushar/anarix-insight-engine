@@ -137,13 +137,13 @@ export default function WebsiteAanChat({
           >
             <div
               className={cn(
-                "max-w-[85%] px-3.5 py-2 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed",
+                "max-w-[85%] px-3.5 py-2 rounded-2xl text-sm leading-relaxed",
                 m.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-sm"
-                  : "bg-accent text-foreground rounded-bl-sm"
+                  ? "bg-primary text-primary-foreground rounded-br-sm whitespace-pre-wrap"
+                  : "bg-accent text-foreground rounded-bl-sm prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:my-1 prose-strong:text-foreground"
               )}
             >
-              {m.content}
+              {m.role === "assistant" ? <ReactMarkdown>{m.content}</ReactMarkdown> : m.content}
             </div>
           </motion.div>
         ))}
