@@ -228,6 +228,19 @@ function AppRoutes() {
 
       <Route path="/brand/aan" element={<AanMascotShowcase />} />
 
+      {/* Marketing website */}
+      <Route path="/website" element={<WebsiteLayout />}>
+        <Route index element={<WebsiteHome />} />
+        <Route path="product" element={<WebsiteProduct />} />
+        <Route path="aan" element={<WebsiteAan />} />
+        <Route path="pricing" element={<WebsitePricing />} />
+        <Route path="customers" element={<WebsiteCustomers />} />
+        <Route path="about" element={<WebsiteAbout />} />
+        <Route path="contact" element={<WebsiteContact />} />
+        <Route path="docs" element={<WebsiteDocsHome />} />
+        <Route path="docs/:slug" element={<WebsiteDocPage />} />
+      </Route>
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
