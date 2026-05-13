@@ -144,13 +144,13 @@ const HeroSection = () => {
 
         {/* Sub-headline */}
         <motion.p
-          className="max-w-2xl mx-auto text-lg sm:text-xl text-muted-foreground mb-10 leading-relaxed"
+          className="max-w-2xl mx-auto text-lg text-muted-foreground mb-10 leading-relaxed sm:text-lg"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          Anarix is the AI operating layer between your ads, your catalog, and
-          your unified P&amp;L - across Amazon, Walmart, Shopify, and TikTok.
+          The Complete Growth Platform for your E-commerce Business.<br />
+          Unify ads, analytics, automation, and creative in one place. Replace fragmented tools with a single solution to scale traffic and profit on Amazon, Walmart, Social, and D2C.
         </motion.p>
 
         {/* CTAs */}
