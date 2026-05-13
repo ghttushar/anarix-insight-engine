@@ -1,4 +1,3 @@
-import { Shield, Lock, BadgeCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const footerLinks: Record<string, { label: string; href: string }[]> = {
