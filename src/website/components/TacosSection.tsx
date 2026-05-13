@@ -2,103 +2,199 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
-const AnimatedTaco = ({ progress }: { progress: number }) => {
-  const radius = 52;
-  const circumference = 2 * Math.PI * radius;
-  const arcReduction = circumference * (progress * 0.3);
-  const dashArray = circumference - arcReduction;
-  const sliceAngle = progress * 108; // 30% of 360
+/**
+ * Editorial side-profile taco. A smooth bite is removed from the upper-right
+ * (~30% of silhouette area) via an animated SVG mask. Mature linework, muted
+ * palette, single composed object.
+ */
+const BittenTaco = ({ progress }: { progress: number }) => {
+  // Bite ellipse grows from 0 -> full radius
+  const biteRx = 78 * progress;
+  const biteRy = 70 * progress;
+  // Crumbs fall after bite forms
+  const crumbT = Math.max(0, (progress - 0.55) / 0.45);
 
   return (
-    <div className="relative w-64 h-64 sm:w-80 sm:h-80 mx-auto">
-      {/* Circular progress arc */}
-      <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 120 120">
-        {/* Background circle */}
-        <circle cx="60" cy="60" r={radius} fill="none" stroke="hsl(var(--border))" strokeWidth="3" />
-        {/* Animated arc */}
-        <circle
-          cx="60" cy="60" r={radius}
-          fill="none"
-          stroke="hsl(var(--primary))"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-          strokeDasharray={`${dashArray} ${circumference}`}
-          style={{ transition: "stroke-dasharray 0.05s linear" }}
-        />
-      </svg>
-
-      {/* Percentage label */}
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 text-sm font-bold text-primary tabular-nums">
-        {Math.round(progress * 30)}%
-      </div>
-
-      {/* SVG Taco illustration with pie-slice mask */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 120 120">
+    <div className="relative w-full max-w-md mx-auto aspect-[360/260]">
+      <svg
+        viewBox="0 0 360 260"
+        className="absolute inset-0 w-full h-full"
+        role="img"
+        aria-label="Taco with a 30% bite removed"
+      >
         <defs>
-          {/* Mask that removes a pie slice */}
-          <mask id="taco-mask">
-            <rect width="120" height="120" fill="white" />
-            {/* Pie slice removal from center */}
-            <path
-              d={`M60,60 L60,${60 - radius} A${radius},${radius} 0 0,1 ${
-                60 + radius * Math.sin((sliceAngle * Math.PI) / 180)
-              },${60 - radius * Math.cos((sliceAngle * Math.PI) / 180)} Z`}
+          {/* Bite mask: white reveals, black hides */}
+          <mask id="taco-bite-mask">
+            <rect width="360" height="260" fill="white" />
+            <ellipse
+              cx="262"
+              cy="78"
+              rx={biteRx}
+              ry={biteRy}
               fill="black"
+              transform="rotate(-18 262 78)"
             />
           </mask>
+
+          {/* Soft ground shadow */}
+          <radialGradient id="taco-shadow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="hsl(var(--foreground))" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="hsl(var(--foreground))" stopOpacity="0" />
+          </radialGradient>
+
+          {/* Filling depth gradients */}
+          <linearGradient id="shell-grad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="hsl(36 48% 70%)" />
+            <stop offset="100%" stopColor="hsl(34 44% 55%)" />
+          </linearGradient>
+          <linearGradient id="lettuce-grad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="hsl(140 26% 52%)" />
+            <stop offset="100%" stopColor="hsl(142 24% 42%)" />
+          </linearGradient>
         </defs>
 
-        <g mask="url(#taco-mask)">
-          {/* Taco shell - outer */}
+        {/* Ground shadow */}
+        <ellipse cx="180" cy="222" rx="130" ry="9" fill="url(#taco-shadow)" />
+
+        <g mask="url(#taco-bite-mask)">
+          {/* Back shell (slightly darker, peeks above filling) */}
           <path
-            d="M30,72 Q60,28 90,72"
+            d="M52 198 Q 180 14 308 198 Z"
+            fill="hsl(34 40% 50%)"
+          />
+
+          {/* Filling group — sits inside the shell */}
+          <g>
+            {/* Sour cream / cream backdrop */}
+            <path
+              d="M70 192 Q 180 70 290 192 Z"
+              fill="hsl(40 30% 92%)"
+            />
+
+            {/* Lettuce ribbon */}
+            <path
+              d="M72 188
+                 Q 95 150 118 174
+                 Q 138 142 162 168
+                 Q 186 138 210 168
+                 Q 234 144 258 174
+                 Q 280 150 290 188 Z"
+              fill="url(#lettuce-grad)"
+            />
+
+            {/* Cheese strands */}
+            <g stroke="hsl(40 65% 62%)" strokeWidth="2.5" strokeLinecap="round" opacity="0.85">
+              <line x1="92" y1="178" x2="86" y2="200" />
+              <line x1="118" y1="172" x2="116" y2="202" />
+              <line x1="148" y1="170" x2="150" y2="202" />
+              <line x1="180" y1="166" x2="180" y2="204" />
+              <line x1="212" y1="170" x2="214" y2="202" />
+              <line x1="244" y1="172" x2="246" y2="202" />
+              <line x1="272" y1="178" x2="276" y2="200" />
+            </g>
+
+            {/* Tomato dice — small, restrained */}
+            <g fill="hsl(8 52% 52%)">
+              <rect x="108" y="172" width="9" height="9" rx="1.5" transform="rotate(8 112 176)" />
+              <rect x="156" y="166" width="9" height="9" rx="1.5" transform="rotate(-6 160 170)" />
+              <rect x="200" y="170" width="9" height="9" rx="1.5" transform="rotate(12 204 174)" />
+              <rect x="240" y="174" width="9" height="9" rx="1.5" transform="rotate(-10 244 178)" />
+            </g>
+          </g>
+
+          {/* Front shell (foreground curve, defines silhouette) */}
+          <path
+            d="M52 198
+               Q 180 14 308 198
+               L 296 200
+               Q 180 36 64 200 Z"
+            fill="url(#shell-grad)"
+          />
+
+          {/* Subtle shell texture lines */}
+          <g stroke="hsl(34 38% 42%)" strokeWidth="1.2" fill="none" opacity="0.45" strokeLinecap="round">
+            <path d="M70 188 Q 180 36 290 188" />
+            <path d="M82 178 Q 180 56 278 178" />
+          </g>
+
+          {/* Ink outline for definition */}
+          <path
+            d="M52 198 Q 180 14 308 198"
             fill="none"
-            stroke="hsl(42 70% 55%)"
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
-          {/* Shell fill */}
-          <path
-            d="M32,72 Q60,30 88,72 Z"
-            fill="hsl(42 65% 75%)"
-            opacity="0.5"
-          />
-          {/* Inner shell texture line */}
-          <path
-            d="M36,68 Q60,36 84,68"
-            fill="none"
-            stroke="hsl(42 60% 60%)"
-            strokeWidth="1.5"
-            opacity="0.6"
-          />
-          {/* Lettuce */}
-          <path
-            d="M34,68 Q42,54 48,62 Q54,50 60,60 Q66,48 72,58 Q78,46 86,68"
-            fill="hsl(120 40% 55%)"
-            opacity="0.8"
-          />
-          {/* Tomato bits */}
-          <circle cx="48" cy="62" r="3.5" fill="hsl(0 65% 55%)" opacity="0.8" />
-          <circle cx="65" cy="58" r="3" fill="hsl(0 65% 55%)" opacity="0.7" />
-          <circle cx="56" cy="56" r="2.5" fill="hsl(0 60% 60%)" opacity="0.6" />
-          {/* Cheese */}
-          <path
-            d="M40,70 L38,78 M50,66 L48,76 M62,64 L60,76 M72,66 L72,78 M80,70 L82,78"
-            stroke="hsl(45 80% 60%)"
+            stroke="hsl(var(--foreground))"
             strokeWidth="2"
+            strokeOpacity="0.75"
             strokeLinecap="round"
-            opacity="0.7"
           />
-          {/* Base line */}
           <path
-            d="M28,73 Q60,73 92,73"
+            d="M52 198 L 308 198"
             fill="none"
-            stroke="hsl(42 70% 50%)"
-            strokeWidth="2.5"
+            stroke="hsl(var(--foreground))"
+            strokeWidth="2"
+            strokeOpacity="0.55"
             strokeLinecap="round"
           />
         </g>
+
+        {/* Bite-edge highlight: thin arc traces the bite where it meets the taco */}
+        {progress > 0.05 && (
+          <ellipse
+            cx="262"
+            cy="78"
+            rx={biteRx}
+            ry={biteRy}
+            transform="rotate(-18 262 78)"
+            fill="none"
+            stroke="hsl(var(--foreground))"
+            strokeOpacity="0.18"
+            strokeWidth="1.25"
+            strokeDasharray="2 4"
+          />
+        )}
+
+        {/* Crumbs — three falling specks from the bite area */}
+        <g fill="hsl(34 44% 55%)">
+          {[
+            { x: 248, y: 110, dy: 26, delay: 0 },
+            { x: 268, y: 122, dy: 38, delay: 0.15 },
+            { x: 232, y: 132, dy: 44, delay: 0.3 },
+          ].map((c, i) => {
+            const t = Math.max(0, Math.min(1, crumbT - c.delay));
+            const ease = 1 - Math.pow(1 - t, 2);
+            return (
+              <circle
+                key={i}
+                cx={c.x}
+                cy={c.y + c.dy * ease}
+                r={2.2}
+                opacity={t > 0 ? 1 - t : 0}
+              />
+            );
+          })}
+        </g>
       </svg>
+
+      {/* 30% badge — appears near the bite once bite is mostly formed */}
+      <div
+        className="absolute"
+        style={{
+          top: "14%",
+          right: "8%",
+          opacity: Math.max(0, (progress - 0.35) / 0.65),
+          transform: `translateY(${(1 - Math.min(1, progress)) * 8}px)`,
+          transition: "none",
+        }}
+      >
+        <div className="flex items-baseline gap-1">
+          <span className="text-4xl sm:text-5xl font-bold text-foreground tabular-nums leading-none">
+            {Math.round(progress * 30)}
+          </span>
+          <span className="text-xl sm:text-2xl font-semibold text-muted-foreground leading-none">%</span>
+        </div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mt-1">
+          bite taken
+        </div>
+      </div>
     </div>
   );
 };
@@ -112,64 +208,61 @@ const TacosSection = () => {
     if (!isVisible || hasAnimated.current) return;
     hasAnimated.current = true;
 
-    const duration = 2000;
+    const duration = 1400;
     const start = performance.now();
+    // cubic-bezier(0.2, 0, 0, 1) approximation via easeOutQuart for value
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 4);
+
     const animate = (now: number) => {
       const elapsed = now - start;
       const t = Math.min(elapsed / duration, 1);
-      setProgress(t);
+      setProgress(easeOut(t));
       if (t < 1) requestAnimationFrame(animate);
     };
     requestAnimationFrame(animate);
   }, [isVisible]);
 
   return (
-    <section ref={ref} className="py-24 bg-background">
-      <div className="max-w-4xl mx-auto px-6 text-center">
+    <section ref={ref} className="py-24 sm:py-32 bg-background">
+      <div className="max-w-3xl mx-auto px-6 text-center">
         <motion.p
-          className="text-muted-foreground text-sm uppercase tracking-widest mb-8"
+          className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-10"
           initial={{ opacity: 0 }}
           animate={isVisible ? { opacity: 1 } : {}}
           transition={{ duration: 0.6 }}
         >
-          Our Take on TACoS
+          TACoS · Total Advertising Cost of Sales
         </motion.p>
-
-        <motion.h2
-          className="text-3xl sm:text-5xl font-bold text-foreground mb-12"
-          initial={{ opacity: 0, y: 16 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        >
-          One for you. One for us.
-        </motion.h2>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-          transition={{ delay: 0.3, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <AnimatedTaco progress={progress} />
-        </motion.div>
-
-        <motion.p
-          className="text-xl sm:text-2xl font-semibold text-foreground mt-8"
           initial={{ opacity: 0, y: 12 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.5, duration: 0.6 }}
+          transition={{ delay: 0.15, duration: 0.7, ease: [0.2, 0, 0, 1] }}
         >
-          But we'll reduce yours by{" "}
-          <span className="text-gradient-primary">{Math.round(progress * 30)}%</span>.
-        </motion.p>
+          <BittenTaco progress={progress} />
+        </motion.div>
+
+        <motion.h2
+          className="text-3xl sm:text-5xl font-bold text-foreground mt-12 leading-[1.1]"
+          initial={{ opacity: 0, y: 12 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.5, duration: 0.6, ease: [0.2, 0, 0, 1] }}
+        >
+          We take a{" "}
+          <span className="text-gradient-primary tabular-nums">
+            {Math.round(progress * 30)}%
+          </span>{" "}
+          bite out of yours.
+        </motion.h2>
 
         <motion.p
-          className="text-muted-foreground mt-4 max-w-md mx-auto"
+          className="text-base sm:text-lg text-muted-foreground mt-5 max-w-xl mx-auto leading-relaxed"
           initial={{ opacity: 0 }}
           animate={isVisible ? { opacity: 1 } : {}}
           transition={{ delay: 0.7, duration: 0.6 }}
         >
-          TACoS (Total Advertising Cost of Sales) is the metric that matters.
-          We obsess over it so you don't have to.
+          One bite for us. The rest stays on your plate. TACoS is the only ad-spend
+          ratio your CFO actually cares about — and we're built to shrink it.
         </motion.p>
       </div>
     </section>
