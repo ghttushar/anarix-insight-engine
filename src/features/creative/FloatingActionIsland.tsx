@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { RefreshCw, Download, Camera, Lightbulb, GripVertical, Bell, CalendarPlus, ArrowUp } from "lucide-react";
+import { RefreshCw, Download, Camera, Lightbulb, GripVertical, Bell, CalendarPlus, ArrowUp, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 import { AanGlyph } from "@/components/aan/AanGlyph";
 import { AanMascot } from "@/components/aan/AanMascot";
@@ -37,6 +38,8 @@ export function FloatingActionIsland() {
   const { openCopilot, mode } = useAan();
   const { openPanel: openInsights, criticalCount } = useInsights();
   const { newBranding } = useBranding();
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   
   const isWebsite = location.pathname.startsWith("/website");
   const [scrolled, setScrolled] = useState(false);
@@ -87,15 +90,23 @@ export function FloatingActionIsland() {
 
   const { setDataPanel } = useActivePanel();
 
+  const themeAction: ActionItem = {
+    icon: isDark ? Sun : Moon,
+    label: isDark ? "Light mode" : "Dark mode",
+    onClick: () => setTheme(isDark ? "light" : "dark"),
+  };
+
   const appActions: ActionItem[] = [
     { icon: Bell, label: criticalCount > 0 ? `Alerts (${criticalCount})` : "Alerts", onClick: () => setDataPanel("notifications"), highlight: criticalCount > 0, badge: criticalCount > 0 ? criticalCount : undefined },
     { icon: Lightbulb, label: "Insights", onClick: openInsights },
     { icon: RefreshCw, label: "Refresh", onClick: () => toast.info("Refreshing data...") },
     { icon: Download, label: "Export", onClick: () => toast.success("Export started") },
+    themeAction,
   ];
 
   const websiteActions: ActionItem[] = [
     { icon: CalendarPlus, label: "Book a demo", onClick: () => navigate("/website/demo") },
+    themeAction,
     ...(scrolled ? [{ icon: ArrowUp, label: "Top", onClick: () => window.scrollTo({ top: 0, behavior: "smooth" }) }] : []),
   ];
 
