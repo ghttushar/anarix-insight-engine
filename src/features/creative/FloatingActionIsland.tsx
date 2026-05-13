@@ -37,7 +37,7 @@ export function FloatingActionIsland() {
   const { openCopilot, mode } = useAan();
   const { openPanel: openInsights, criticalCount } = useInsights();
   const { newBranding } = useBranding();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const isWebsite = location.pathname.startsWith("/website");
   const [scrolled, setScrolled] = useState(false);
 
@@ -97,7 +97,7 @@ export function FloatingActionIsland() {
   const websiteActions: ActionItem[] = [
     { icon: CalendarPlus, label: "Book a demo", onClick: () => navigate("/website/demo") },
     { icon: BookOpen, label: "Docs", onClick: () => navigate("/website/documentation") },
-    { icon: theme === "dark" ? Sun : Moon, label: theme === "dark" ? "Light" : "Dark", onClick: () => setTheme(theme === "dark" ? "light" : "dark") },
+    { icon: resolvedTheme === "dark" ? Sun : Moon, label: resolvedTheme === "dark" ? "Light" : "Dark", onClick: () => setTheme(resolvedTheme === "dark" ? "light" : "dark") },
     ...(scrolled ? [{ icon: ArrowUp, label: "Top", onClick: () => window.scrollTo({ top: 0, behavior: "smooth" }) }] : []),
   ];
 
