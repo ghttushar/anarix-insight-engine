@@ -79,7 +79,7 @@ const AanAI = () => {
       {/* Capabilities */}
       <section className="py-24 px-6 bg-muted/20">
         <div className="max-w-6xl mx-auto">
-          <SectionHeader eyebrow="What Aan does" title="Five jobs. Done with receipts." lead="Aan isn't a chatbot bolted onto a dashboard. It's a working layer of intelligence with explicit responsibilities." align="center" className="mb-14" />
+          <SectionHeader eyebrow="What else do you need?" title="Okayyy… here are the other boring things Aan also does." lead="Aan isn't a chatbot bolted onto a dashboard. It's a working layer of intelligence with explicit responsibilities." align="center" className="mb-14" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {capabilities.map((cap, i) => (
               <motion.div
