@@ -1,14 +1,12 @@
 import Navbar from "@/website/components/Navbar";
 import HeroSection from "@/website/components/HeroSection";
-import SocialProofSection from "@/website/components/SocialProofSection";
-import StatBand from "@/website/components/home/StatBand";
+import ImpactSection from "@/website/components/ImpactSection";
+import TestimonialsSection from "@/website/components/TestimonialsSection";
 import ProblemSection from "@/website/components/home/ProblemSection";
 import SolutionsSection from "@/website/components/SolutionsSection";
 import ProductPreviewBand from "@/website/components/home/ProductPreviewBand";
 import WorkflowSection from "@/website/components/home/WorkflowSection";
-import ImpactSection from "@/website/components/ImpactSection";
-import TestimonialsSection from "@/website/components/TestimonialsSection";
-import IntegrationOrbit from "@/website/components/IntegrationOrbit";
+import CycloneScrollSection from "@/website/components/CycloneScrollSection";
 import AuditCTASection from "@/website/components/AuditCTASection";
 import Footer from "@/website/components/Footer";
 import ScrollToTop from "@/website/components/ScrollToTop";
@@ -18,15 +16,13 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
-      <SocialProofSection />
-      <StatBand />
+      <ImpactSection />
+      <TestimonialsSection />
       <ProblemSection />
       <SolutionsSection />
       <ProductPreviewBand />
       <WorkflowSection />
-      <ImpactSection />
-      <TestimonialsSection />
-      <IntegrationOrbit />
+      <CycloneScrollSection />
       <AuditCTASection />
       <Footer />
       <ScrollToTop />
