@@ -3,8 +3,6 @@ import { Bot, FileText, Shield, Zap, Palette, Users, Eye, History, Lock } from "
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import PageLayout from "@/website/components/PageLayout";
-import CycloneScrollSection from "@/website/components/CycloneScrollSection";
-import WebsiteAanChat from "@/website/components/WebsiteAanChat";
 import { AanMascot } from "@/components/aan/AanMascot";
 import SectionHeader from "@/website/components/marketing/SectionHeader";
 import WorkflowDiagram from "@/website/components/marketing/WorkflowDiagram";
@@ -34,13 +32,6 @@ const safetyPillars = [
   { icon: Lock, title: "Full audit log", desc: "Who approved what, when, and why. Exportable for compliance and client reporting." },
 ];
 
-const promptChips = [
-  "Why did ROAS drop on Sponsored Brands last week?",
-  "Find search terms wasting more than $50 with zero orders.",
-  "Draft a dayparting rule for our hero ASIN.",
-  "Summarise this month's profitability for the leadership review.",
-];
-
 const AanAI = () => {
   return (
     <PageLayout>
@@ -66,6 +57,9 @@ const AanAI = () => {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Your second analyst. Aan reads your data, diagnoses issues, drafts rules, and explains every decision — so you can move fast without flying blind.
             </p>
+            <p className="font-aan text-2xl sm:text-3xl text-primary/80 mt-5 italic">
+              Because our AI glows.
+            </p>
             <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
               {["Reads 47 data sources", "Drafts in <8s", "100% auditable"].map((c) => (
                 <span key={c} className="text-xs px-3 py-1.5 rounded-pill bg-card border border-border text-muted-foreground">{c}</span>
@@ -78,7 +72,7 @@ const AanAI = () => {
       {/* Capabilities */}
       <section className="py-24 px-6 bg-muted/20">
         <div className="max-w-6xl mx-auto">
-          <SectionHeader eyebrow="What Aan does" title="Five jobs. Done with receipts." lead="Aan isn't a chatbot bolted onto a dashboard. It's a working layer of intelligence with explicit responsibilities." align="center" className="mb-14" />
+          <SectionHeader eyebrow="What else do you need?" title="Okayyy… here are the other boring things Aan also does." lead="Aan isn't a chatbot bolted onto a dashboard. It's a working layer of intelligence with explicit responsibilities." align="center" className="mb-14" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {capabilities.map((cap, i) => (
               <motion.div
@@ -132,22 +126,6 @@ const AanAI = () => {
         </div>
       </section>
 
-      {/* Live chat */}
-      <section className="py-24 px-6">
-        <div className="max-w-3xl mx-auto">
-          <SectionHeader eyebrow="Try it now" title="Ask Aan anything." lead="Live chat powered by the same model that runs inside Anarix. Ask about products, integrations, methodology, or how Aan would handle a specific scenario." align="center" className="mb-8" />
-          <div className="flex flex-wrap gap-2 justify-center mb-5">
-            {promptChips.map((p) => (
-              <span key={p} className="text-xs px-3 py-1.5 rounded-pill bg-card border border-border text-muted-foreground">{p}</span>
-            ))}
-          </div>
-          <WebsiteAanChat
-            height="h-[560px]"
-            initialMessage="Hey, I'm Aan. Ask me anything about Anarix — products, methodology, integrations, or how I'd handle a specific scenario in your account."
-          />
-        </div>
-      </section>
-
       {/* Safety */}
       <section className="py-24 px-6 bg-muted/20">
         <div className="max-w-6xl mx-auto">
@@ -173,7 +151,11 @@ const AanAI = () => {
         </div>
       </section>
 
-      <CycloneScrollSection />
+      <div className="max-w-3xl mx-auto px-6 text-center pt-16 pb-4">
+        <p className="text-sm text-muted-foreground">
+          Want to try Aan now? Tap <span className="text-primary font-semibold">Ask Aan</span> in the floating action island — bottom-right of your screen.
+        </p>
+      </div>
 
       <div className="max-w-6xl mx-auto px-6 text-center pb-16">
         <Link to="/website/demo">

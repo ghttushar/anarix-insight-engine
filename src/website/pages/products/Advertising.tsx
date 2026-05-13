@@ -10,6 +10,7 @@ import AppEmbedFrame from "@/website/components/marketing/AppEmbedFrame";
 import EmbedCampaignTable from "@/website/components/embeds/EmbedCampaignTable";
 import EmbedDayparting from "@/website/components/embeds/EmbedDayparting";
 import AdHeroAnimation from "@/website/components/products/heroes/AdHeroAnimation";
+import BigNumberStrip from "@/website/components/products/BigNumberStrip";
 
 const features = [
   { icon: Sparkles, title: "AI + Rule-Based Bidder", desc: "A bidder that thinks. Combines machine learning with rules you trust to keep CPC efficient and ROAS climbing — without surrendering control." },
@@ -49,9 +50,17 @@ const ProductAdvertising = () => (
           </p>
         </motion.div>
 
-        <div className="mb-24">
+        <div className="mb-16">
           <AdHeroAnimation />
         </div>
+
+        <BigNumberStrip
+          items={[
+            { value: "4.2x", label: "Median ROAS", caption: "Across 100+ managed accounts." },
+            { value: "−38%", label: "Wasted spend", caption: "Cut in the first 30 days." },
+            { value: "<8s", label: "Time to draft a rule", caption: "Aan reads, diagnoses, drafts." },
+          ]}
+        />
 
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-24">
           <SectionHeader eyebrow="The problem" title="Most ad tools optimise for the wrong thing." lead="Bid platforms chase impressions. Agencies chase ACoS. Aan chases contribution margin — the only number your CFO actually cares about." />
