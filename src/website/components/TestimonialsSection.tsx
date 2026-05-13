@@ -112,13 +112,6 @@ export default function TestimonialsSection() {
             <p className="font-display text-2xl sm:text-[28px] text-foreground leading-[1.35] tracking-tight mb-8">
               "{TESTIMONIALS[0].quote}"
             </p>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {TESTIMONIALS[0].chips.map((c) => (
-                <span key={c} className="px-2.5 py-1 rounded-pill bg-primary/8 border border-primary/20 text-[11px] font-semibold text-primary tracking-tight">
-                  {c}
-                </span>
-              ))}
-            </div>
             <div className="flex items-center gap-3 border-t border-border pt-5">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-periwinkle flex items-center justify-center text-primary-foreground font-bold">
                 {TESTIMONIALS[0].author[0]}
@@ -132,35 +125,78 @@ export default function TestimonialsSection() {
             </div>
           </article>
 
-          {/* Quote 2 - dark accent card */}
+          {/* Video testimonial card - top right */}
           <article
-            className={`lg:col-span-5 relative p-8 rounded-3xl border border-border shadow-soft overflow-hidden transition-all duration-500 ${
+            className={`lg:col-span-5 relative rounded-3xl border border-border shadow-medium overflow-hidden transition-all duration-500 flex flex-col ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
             }`}
             style={{
               transitionDelay: isVisible ? "140ms" : "0ms",
-              background: "linear-gradient(140deg, hsl(var(--card)), hsl(var(--accent) / 0.8))",
+              background: "linear-gradient(140deg, hsl(var(--foreground)) 0%, hsl(var(--periwinkle-dark, var(--primary))) 100%)",
             }}
           >
-            <Quote className="w-10 h-10 text-primary/40 mb-4" strokeWidth={1.5} />
-            <p className="text-foreground text-base sm:text-[17px] leading-relaxed mb-6">
-              "{TESTIMONIALS[1].quote}"
-            </p>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {TESTIMONIALS[1].chips.map((c) => (
-                <span key={c} className="px-2.5 py-1 rounded-pill bg-background/60 border border-border text-[11px] font-semibold text-foreground/80 tracking-tight">
-                  {c}
-                </span>
-              ))}
+            <div className="relative aspect-video bg-foreground/20">
+              <video
+                ref={videoRef}
+                src={VIDEO_TESTIMONIAL.src}
+                poster={VIDEO_TESTIMONIAL.poster}
+                controls={playing}
+                className="absolute inset-0 w-full h-full object-cover"
+                preload="metadata"
+              />
+              {!playing && (
+                <button
+                  onClick={play}
+                  className="absolute inset-0 flex items-center justify-center bg-foreground/30 hover:bg-foreground/20 transition-colors group"
+                  aria-label="Play testimonial"
+                >
+                  <span className="relative w-20 h-20 rounded-full bg-background/95 flex items-center justify-center shadow-strong group-hover:scale-105 transition-transform">
+                    <span
+                      className="absolute inset-0 rounded-full opacity-60 blur-md"
+                      style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--periwinkle)))" }}
+                    />
+                    <Play className="relative w-8 h-8 text-primary translate-x-0.5" fill="currentColor" />
+                  </span>
+                </button>
+              )}
+              <div className="absolute top-4 left-4 px-2.5 py-1 rounded-pill bg-background/85 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground">
+                Customer Story · 02:14
+              </div>
             </div>
-            <div className="flex items-center gap-3 border-t border-border pt-5">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-periwinkle to-primary flex items-center justify-center text-primary-foreground font-bold">
-                {TESTIMONIALS[1].author[0]}
+            <div className="p-6 flex items-center gap-3 text-background">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-periwinkle to-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+                {VIDEO_TESTIMONIAL.author[0]}
               </div>
               <div>
-                <div className="text-sm font-semibold text-foreground">{TESTIMONIALS[1].author}</div>
+                <div className="text-sm font-semibold">{VIDEO_TESTIMONIAL.author}</div>
+                <div className="text-xs opacity-70">{VIDEO_TESTIMONIAL.role}</div>
+              </div>
+            </div>
+          </article>
+
+          {/* Bottom full-width text-only quote */}
+          <article
+            className={`lg:col-span-12 relative p-10 sm:p-14 rounded-3xl bg-card border border-border shadow-soft overflow-hidden transition-all duration-500 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            }`}
+            style={{ transitionDelay: isVisible ? "220ms" : "0ms" }}
+          >
+            <div
+              className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full opacity-20 pointer-events-none"
+              style={{ background: "radial-gradient(circle, hsl(var(--periwinkle) / 0.4), transparent 70%)" }}
+            />
+            <Quote className="w-10 h-10 text-primary/30 mb-5" strokeWidth={1.5} />
+            <p className="font-display text-xl sm:text-2xl text-foreground leading-[1.45] tracking-tight mb-8 max-w-4xl">
+              "{BOTTOM_TESTIMONIAL.quote}"
+            </p>
+            <div className="flex items-center gap-3 border-t border-border pt-5">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-periwinkle to-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+                {BOTTOM_TESTIMONIAL.author[0]}
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-foreground">{BOTTOM_TESTIMONIAL.author}</div>
                 <div className="text-xs text-muted-foreground">
-                  {TESTIMONIALS[1].role} · {TESTIMONIALS[1].company}
+                  {BOTTOM_TESTIMONIAL.role} · {BOTTOM_TESTIMONIAL.company}
                 </div>
               </div>
             </div>
