@@ -8,6 +8,7 @@ import StatBlock from "@/website/components/marketing/StatBlock";
 import SplitFeature from "@/website/components/marketing/SplitFeature";
 import EmbedInsightCard from "@/website/components/embeds/EmbedInsightCard";
 import MSHeroAnimation from "@/website/components/products/heroes/MSHeroAnimation";
+import BigNumberStrip from "@/website/components/products/BigNumberStrip";
 
 const features = [
   { icon: Users, title: "Dedicated Team", desc: "Senior account managers and strategists assigned to your brand. Not a call centre, not a junior shuffle. The same humans week after week." },

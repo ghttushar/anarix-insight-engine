@@ -10,6 +10,7 @@ import AppEmbedFrame from "@/website/components/marketing/AppEmbedFrame";
 import EmbedRuleCard from "@/website/components/embeds/EmbedRuleCard";
 import WorkflowDiagram from "@/website/components/marketing/WorkflowDiagram";
 import AutomationHeroAnimation from "@/website/components/products/heroes/AutomationHeroAnimation";
+import BigNumberStrip from "@/website/components/products/BigNumberStrip";
 
 const features = [
   { icon: Zap, title: "Smart Bid Management", desc: "AI-optimised bids that adapt to market conditions, competition, and inventory state — not yesterday's spreadsheet." },

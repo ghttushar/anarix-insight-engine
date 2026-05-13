@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import PageLayout from "@/website/components/PageLayout";
 import TacosSection from "@/website/components/TacosSection";
+import BigNumberStrip from "@/website/components/products/BigNumberStrip";
 import SectionHeader from "@/website/components/marketing/SectionHeader";
 import StatBlock from "@/website/components/marketing/StatBlock";
 import SplitFeature from "@/website/components/marketing/SplitFeature";
