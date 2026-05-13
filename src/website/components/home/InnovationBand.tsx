@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Bot, Command, Clock, LayoutDashboard, Lightbulb, Maximize2 } from "lucide-react";
+import { Bot, Command, Clock, LayoutDashboard, Lightbulb } from "lucide-react";
 
 const features = [
   {
