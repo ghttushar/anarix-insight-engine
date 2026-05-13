@@ -10,6 +10,7 @@ import AppEmbedFrame from "@/website/components/marketing/AppEmbedFrame";
 import EmbedCampaignTable from "@/website/components/embeds/EmbedCampaignTable";
 import EmbedDayparting from "@/website/components/embeds/EmbedDayparting";
 import AdHeroAnimation from "@/website/components/products/heroes/AdHeroAnimation";
+import BigNumberStrip from "@/website/components/products/BigNumberStrip";
 
 const features = [
   { icon: Sparkles, title: "AI + Rule-Based Bidder", desc: "A bidder that thinks. Combines machine learning with rules you trust to keep CPC efficient and ROAS climbing — without surrendering control." },
