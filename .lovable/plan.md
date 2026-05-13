@@ -71,7 +71,7 @@ Other 4 items left as-is (already accurate).
 
 `src/website/pages/products/ManagedServices.tsx`: replace "Senior strategists. Junior egos." with:
 
-> **Senior strategists. Zero ego.**
+> **Senior strategists. Zero mess.**
 
 (or "Senior strategists. Quietly relentless." - will use "Zero ego" as primary; one-line, same rhythm, non-offensive.)
 
