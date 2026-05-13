@@ -115,8 +115,8 @@ const surfaces = [
   {
     title: "Aan Copilot",
     sub: "The right-side workspace",
-    body: "Open it on any page. Aan keeps the context, drafts the action, and shows its work. Every output gets a preview before it touches your account.",
-    use: "When ROAS dips and you need a diagnosis in under a minute.",
+    body: "\n",
+    use: "\n",
     Mock: CopilotMock,
   },
   {
@@ -177,10 +177,12 @@ export default function AanSurfacesSection() {
               <div className="h-44 mb-4">
                 <s.Mock />
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-3">{s.body}</p>
-              <div className="text-xs italic text-foreground/80 border-l-2 border-primary/40 pl-3">
-                Use it: {s.use}
-              </div>
+              {s.body !== "\n" && <p className="text-sm text-muted-foreground leading-relaxed mb-3">{s.body}</p>}
+              {s.use !== "\n" && (
+                <div className="text-xs italic text-foreground/80 border-l-2 border-primary/40 pl-3">
+                  Use it: {s.use}
+                </div>
+              )}
             </motion.article>
           ))}
         </div>
