@@ -127,6 +127,9 @@ const AanAI = () => {
         </div>
       </section>
 
+      {/* Aan surfaces */}
+      <AanSurfacesSection />
+
       {/* Safety */}
       <section className="py-24 px-6 bg-muted/20">
         <div className="max-w-6xl mx-auto">
