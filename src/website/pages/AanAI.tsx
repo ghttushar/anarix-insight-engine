@@ -9,6 +9,7 @@ import WorkflowDiagram from "@/website/components/marketing/WorkflowDiagram";
 import SplitFeature from "@/website/components/marketing/SplitFeature";
 import EmbedInsightCard from "@/website/components/embeds/EmbedInsightCard";
 import EmbedRuleCard from "@/website/components/embeds/EmbedRuleCard";
+import AanSurfacesSection from "@/website/components/aan/AanSurfacesSection";
 
 const capabilities = [
   { icon: FileText, title: "Reports", desc: "Auto-generated weekly and monthly reviews. Channel, SKU, campaign, and search-term breakdowns - written in plain English with sources cited." },
