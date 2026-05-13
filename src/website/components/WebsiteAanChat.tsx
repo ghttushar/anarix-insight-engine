@@ -124,7 +124,7 @@ export default function WebsiteAanChat({
             {loading ? "Thinking…" : "Online"}
           </div>
         </div>
-        <Sparkles className="w-4 h-4 text-primary" />
+        <Sparkles className="w-4 h-4 text-primary text-[#f26e76]" />
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -174,7 +174,7 @@ export default function WebsiteAanChat({
             <button
               key={q}
               onClick={() => send(q)}
-              className="text-[11px] px-2.5 py-1 rounded-pill bg-accent text-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+              className="text-[11px] px-2.5 py-1 rounded-pill bg-accent text-foreground hover:bg-primary/10 hover:text-primary text-[#f26e76] transition-colors"
             >
               {q}
             </button>
