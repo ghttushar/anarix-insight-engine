@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import TacoIllustration from "./products/TacoIllustration";
 
-const _UnusedBittenTaco = ({ progress }: { progress: number }) => {
   const biteRx = 96 * progress;
   const biteRy = 86 * progress;
   const crumbT = Math.max(0, (progress - 0.55) / 0.45);
