@@ -9,23 +9,20 @@ const TESTIMONIALS = [
     author: "Firat Ozkan",
     role: "Co-Founder, CMO & CSO",
     company: "Mount-It!",
-    chips: ["+62% New-to-Brand", "3.4x ROAS", "Walmart"],
-  },
-  {
-    quote:
-      "Since partnering with Anarix, I have seen tremendous improvements in our business. The dedication of their team to ensuring our success is unmatched as we have seen strong sales growth and dramatically improved spend efficiencies.",
-    author: "James Ellington",
-    role: "Sr. Director of Sales, Retail Division",
-    company: "Drive Medical",
-    chips: ["+38% Sales", "-22% TACoS", "Amazon"],
   },
 ];
+
+const BOTTOM_TESTIMONIAL = {
+  quote:
+    "Since partnering with Anarix, I have seen tremendous improvements in our business. The dedication of their team to ensuring our success is unmatched as we have seen strong sales growth and dramatically improved spend efficiencies.",
+  author: "James Ellington",
+  role: "Sr. Director of Sales, Retail Division",
+  company: "Drive Medical",
+};
 
 const VIDEO_TESTIMONIAL = {
   src: "/testimonials/video.mp4",
   poster: "/testimonials/poster.jpg",
-  quote:
-    "Since partnering with Anarix, we have seen tremendous improvements - strong sales growth and dramatically improved spend efficiencies.",
   author: "James Ellington",
   role: "Sr. Director of Sales, Drive Medical",
 };
