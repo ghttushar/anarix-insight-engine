@@ -129,7 +129,6 @@ const Navbar = () => {
 
         {/* Right side */}
         <div className="hidden lg:flex items-center gap-2 justify-end">
-          <WebsiteThemeToggle />
           <Link
             to="/login"
             className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 group px-2"
