@@ -24,7 +24,7 @@ const milestones = [
 const About = () => (
   <PageLayout>
     <div className="max-w-6xl mx-auto px-6">
-      {/* Hero — large typography */}
+      {/* Hero - large typography */}
       <motion.div
         className="mb-24"
         initial={{ opacity: 0, y: 20 }}
@@ -42,7 +42,7 @@ const About = () => (
         </p>
       </motion.div>
 
-      {/* Values — large typography blocks */}
+      {/* Values - large typography blocks */}
       <div className="grid md:grid-cols-2 gap-12 mb-24">
         {values.map((v, i) => (
           <motion.div
@@ -59,7 +59,7 @@ const About = () => (
         ))}
       </div>
 
-      {/* Timeline — horizontal scroll */}
+      {/* Timeline - horizontal scroll */}
       <motion.div
         className="mb-24"
         initial={{ opacity: 0 }}
@@ -98,7 +98,7 @@ const About = () => (
       >
         <h2 className="text-2xl font-bold text-foreground mb-6">Powered by 40+ experts across 8 countries</h2>
         <p className="text-muted-foreground max-w-lg mx-auto mb-6">
-          Engineers, strategists, designers, and account managers — united by a mission to make e-commerce advertising work.
+          Engineers, strategists, designers, and account managers - united by a mission to make e-commerce advertising work.
         </p>
         <Link to="/website/company/career">
           <Button className="rounded-pill px-6 bg-primary text-primary-foreground btn-shine">
@@ -108,7 +108,7 @@ const About = () => (
       </motion.div>
     </div>
 
-    {/* Teams — full-width section */}
+    {/* Teams - full-width section */}
     <TeamsSection />
   </PageLayout>
 );

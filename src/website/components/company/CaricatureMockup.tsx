@@ -16,7 +16,7 @@ const DEPT_TINTS: Record<string, { bg: string; skin: string; hair: string; accen
 };
 
 /**
- * Placeholder caricature — stylized head silhouette, deterministic per name
+ * Placeholder caricature - stylized head silhouette, deterministic per name
  * via a tiny hash so each member looks slightly different. Swap the SVG with
  * real artwork later by replacing this component only.
  */

@@ -7,7 +7,7 @@ type Dept = { name: string; tagline: string; members: Member[] };
 const DEPARTMENTS: Dept[] = [
   {
     name: "Leadership",
-    tagline: "Sets the bar — and clears it.",
+    tagline: "Sets the bar - and clears it.",
     members: [{ name: "Sunil", role: "CEO" }],
   },
   {
@@ -33,7 +33,7 @@ const DEPARTMENTS: Dept[] = [
   },
   {
     name: "Tech",
-    tagline: "Engineers the platform you don't think about — because it just works.",
+    tagline: "Engineers the platform you don't think about - because it just works.",
     members: [
       { name: "Aman", role: "Engineering" },
       { name: "Rajveer", role: "Engineering" },
@@ -85,7 +85,7 @@ export default function TeamsSection() {
             One team. Six departments. <span className="text-gradient-primary">Zero silos.</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            Operators, engineers, designers, and analysts — distributed across continents but
+            Operators, engineers, designers, and analysts - distributed across continents but
             answering the same question every morning: what does our customer need today?
           </p>
         </div>
