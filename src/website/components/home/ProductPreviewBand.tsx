@@ -107,14 +107,12 @@ const ProductPreviewBand = () => (
                   <div className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
                     {t.label}
                   </div>
-                  <div className="mt-1 flex items-baseline gap-0.5 text-foreground font-semibold tabular-nums text-base sm:text-lg">
-                    {t.prefix}
-                    <MorphingNumber
-                      value={t.value}
-                      decimals={t.decimals}
-                      duration={900}
-                    />
-                    {t.suffix}
+                  <div className="mt-1 text-foreground font-semibold tabular-nums text-base sm:text-lg">
+                    <span className="inline-flex items-baseline">
+                      {t.prefix}
+                      <MorphingNumber value={t.value} decimals={t.decimals} duration={900} />
+                      {t.suffix}
+                    </span>
                   </div>
                 </div>
               ))}
