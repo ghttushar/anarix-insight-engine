@@ -366,7 +366,7 @@ const TacosSection = () => {
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, ease: [0.2, 0, 0, 1] }}
           >
-            <BittenTaco progress={progress} />
+            <TacoIllustration progress={progress} />
           </motion.div>
 
           {/* Editorial poster — right 40% */}
