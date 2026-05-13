@@ -22,6 +22,7 @@ const Index = () => {
       <ProblemSection />
       <SolutionsSection />
       <ProductPreviewBand />
+      <InnovationBand />
       <WorkflowSection />
       <CycloneScrollSection />
       <AuditCTASection />
