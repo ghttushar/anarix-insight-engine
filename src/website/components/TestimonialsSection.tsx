@@ -201,58 +201,6 @@ export default function TestimonialsSection() {
               </div>
             </div>
           </article>
-
-          {/* Video testimonial - full width, dark */}
-          <article
-            className={`lg:col-span-12 rounded-3xl border border-border shadow-medium overflow-hidden transition-all duration-500 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-            }`}
-            style={{
-              transitionDelay: isVisible ? "220ms" : "0ms",
-              background: "linear-gradient(120deg, hsl(var(--foreground)) 0%, hsl(var(--periwinkle-dark, var(--primary))) 100%)",
-            }}
-          >
-            <div className="grid md:grid-cols-2">
-              <div className="relative aspect-video md:aspect-auto md:min-h-[320px] bg-foreground/20">
-                <video
-                  ref={videoRef}
-                  src={VIDEO_TESTIMONIAL.src}
-                  poster={VIDEO_TESTIMONIAL.poster}
-                  controls={playing}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  preload="metadata"
-                />
-                {!playing && (
-                  <button
-                    onClick={play}
-                    className="absolute inset-0 flex items-center justify-center bg-foreground/30 hover:bg-foreground/20 transition-colors group"
-                    aria-label="Play testimonial"
-                  >
-                    <span className="relative w-20 h-20 rounded-full bg-background/95 flex items-center justify-center shadow-strong group-hover:scale-105 transition-transform">
-                      <span
-                        className="absolute inset-0 rounded-full opacity-60 blur-md"
-                        style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(var(--periwinkle)))" }}
-                      />
-                      <Play className="relative w-8 h-8 text-primary translate-x-0.5" fill="currentColor" />
-                    </span>
-                  </button>
-                )}
-                <div className="absolute top-4 left-4 px-2.5 py-1 rounded-pill bg-background/85 backdrop-blur-sm text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground">
-                  Customer Story · 02:14
-                </div>
-              </div>
-              <div className="p-10 flex flex-col justify-center text-background">
-                <Quote className="w-10 h-10 mb-5 opacity-60" strokeWidth={1.5} />
-                <p className="font-display text-xl sm:text-2xl leading-snug tracking-tight mb-8">
-                  "{VIDEO_TESTIMONIAL.quote}"
-                </p>
-                <div className="border-t border-background/20 pt-5">
-                  <div className="text-sm font-semibold">{VIDEO_TESTIMONIAL.author}</div>
-                  <div className="text-xs opacity-70">{VIDEO_TESTIMONIAL.role}</div>
-                </div>
-              </div>
-            </div>
-          </article>
         </div>
       </div>
     </section>
