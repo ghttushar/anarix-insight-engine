@@ -3,8 +3,6 @@ import { Bot, FileText, Shield, Zap, Palette, Users, Eye, History, Lock } from "
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import PageLayout from "@/website/components/PageLayout";
-import CycloneScrollSection from "@/website/components/CycloneScrollSection";
-import WebsiteAanChat from "@/website/components/WebsiteAanChat";
 import { AanMascot } from "@/components/aan/AanMascot";
 import SectionHeader from "@/website/components/marketing/SectionHeader";
 import WorkflowDiagram from "@/website/components/marketing/WorkflowDiagram";
