@@ -17,6 +17,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
+import { DataSyncingState } from "@/components/billing/DataSyncingState";
+import { TrialBanner } from "@/components/billing/TrialBanner";
+import { useTrial } from "@/contexts/TrialContext";
+import { useBillingFlow } from "@/contexts/BillingFlowContext";
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },
   { id: "refundUnits", label: "Refund Units", visible: true },
@@ -53,6 +57,9 @@ const breadcrumbItems = [
 ];
 export default function ProfitabilityDashboard() {
   const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
+  const { trial } = useTrial();
+  const { billingFlowEnabled } = useBillingFlow();
+  const isSyncing = billingFlowEnabled && trial === "syncing";
   const { tab: routeTab } = useParams<{ tab?: string }>();
   const profNav = useNavigate();
   const validTabs = ["products", "orders"] as const;
@@ -154,55 +161,63 @@ export default function ProfitabilityDashboard() {
             </div>
           </AppTaskbar>
 
-          <ProfitabilityHeroCard
-            summaries={profitabilitySummaries}
-            trendDataByPeriod={trendDataByPeriod}
-            selectedPeriod={selectedPeriod}
-            onPeriodChange={setSelectedPeriod}
-            onViewBreakdown={handleOpenBreakdown}
-          />
+          <TrialBanner />
 
-          <div className="space-y-3">
-            <DataTableToolbar
-              leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={handleTabChange} />}
-              searchValue={searchValue}
-              onSearchChange={setSearchValue}
-              searchPlaceholder={tableTab === "products" ? "Search by Product Name / Item ID / SKU..." : "Search by Order ID / Country / Product..."}
-              columns={columns}
-              onColumnToggle={handleColumnToggle}
-              onSelectAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: true })))}
-              onClearAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: false })))}
-              activeFilters={activeFilters}
-              onFiltersChange={setActiveFilters}
-              filterFields={FILTER_FIELDS}
-              showDeltas={showDeltas}
-              onShowDeltasChange={setShowDeltas}
-              showUpload
-              onUpload={(files) => {
-                toast.info(`Analyzing ${files[0]?.name}...`);
-                setTimeout(() => toast.success("COGS uploaded successfully. Table refreshed."), 1500);
-              }}
-              uploadTitle="Upload COGS"
-              uploadAccept=".csv,.xlsx,.xls"
-              onDownload={handleDownload}
-              sortableFields={SORTABLE_FIELDS}
-              sortField={sortField}
-              sortDirection={sortDirection}
-              onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
-            />
-            <div className="rounded-lg border border-border bg-card">
-              <ProductsPnLTable
-                products={filteredProducts}
-                orders={filteredOrders}
-                mode={tableTab}
-                visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
-                showDeltas={showDeltas}
-                onCogsClick={(product) => setCogsProduct(product)}
-                onTrendsClick={(product) => setTrendsProduct(product)}
-                onMoreClick={handleOpenDetail}
+          {isSyncing ? (
+            <DataSyncingState />
+          ) : (
+            <>
+              <ProfitabilityHeroCard
+                summaries={profitabilitySummaries}
+                trendDataByPeriod={trendDataByPeriod}
+                selectedPeriod={selectedPeriod}
+                onPeriodChange={setSelectedPeriod}
+                onViewBreakdown={handleOpenBreakdown}
               />
-            </div>
-          </div>
+
+              <div className="space-y-3">
+                <DataTableToolbar
+                  leftContent={<ProductsOrdersToggle activeTab={tableTab} onTabChange={handleTabChange} />}
+                  searchValue={searchValue}
+                  onSearchChange={setSearchValue}
+                  searchPlaceholder={tableTab === "products" ? "Search by Product Name / Item ID / SKU..." : "Search by Order ID / Country / Product..."}
+                  columns={columns}
+                  onColumnToggle={handleColumnToggle}
+                  onSelectAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: true })))}
+                  onClearAllColumns={() => setColumns((prev) => prev.map((c) => ({ ...c, visible: false })))}
+                  activeFilters={activeFilters}
+                  onFiltersChange={setActiveFilters}
+                  filterFields={FILTER_FIELDS}
+                  showDeltas={showDeltas}
+                  onShowDeltasChange={setShowDeltas}
+                  showUpload
+                  onUpload={(files) => {
+                    toast.info(`Analyzing ${files[0]?.name}...`);
+                    setTimeout(() => toast.success("COGS uploaded successfully. Table refreshed."), 1500);
+                  }}
+                  uploadTitle="Upload COGS"
+                  uploadAccept=".csv,.xlsx,.xls"
+                  onDownload={handleDownload}
+                  sortableFields={SORTABLE_FIELDS}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
+                />
+                <div className="rounded-lg border border-border bg-card">
+                  <ProductsPnLTable
+                    products={filteredProducts}
+                    orders={filteredOrders}
+                    mode={tableTab}
+                    visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}
+                    showDeltas={showDeltas}
+                    onCogsClick={(product) => setCogsProduct(product)}
+                    onTrendsClick={(product) => setTrendsProduct(product)}
+                    onMoreClick={handleOpenDetail}
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {showProductDetail && (
