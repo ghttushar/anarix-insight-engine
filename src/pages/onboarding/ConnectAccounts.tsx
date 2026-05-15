@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FullPageLoader } from "@/components/ui/loader";
 import { useAccounts } from "@/contexts/AccountContext";
+import { useTrial } from "@/contexts/TrialContext";
+import { useBillingFlow } from "@/contexts/BillingFlowContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import logoFull from "@/assets/logo-light-full.svg";
 import logoWhite from "@/assets/logo-dark-full.svg";
@@ -20,6 +22,8 @@ const WalmartLogo = ({ className }: { className?: string }) => (
 export default function ConnectAccounts() {
   const navigate = useNavigate();
   const { accounts, addAccount, completeOnboarding, hasAccounts } = useAccounts();
+  const { startSync } = useTrial();
+  const { billingFlowEnabled } = useBillingFlow();
   const { resolvedTheme } = useTheme();
   const [showMarketplaceModal, setShowMarketplaceModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +47,7 @@ export default function ConnectAccounts() {
     await new Promise((resolve) => setTimeout(resolve, 1500));
     
     completeOnboarding();
+    if (billingFlowEnabled) startSync();
     navigate("/profitability/dashboard");
   };
 
@@ -68,6 +73,7 @@ export default function ConnectAccounts() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     
     completeOnboarding();
+    if (billingFlowEnabled) startSync();
     navigate("/profitability/dashboard");
   };
 
