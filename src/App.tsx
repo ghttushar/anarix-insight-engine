@@ -77,6 +77,7 @@ import ClientPortal from "./pages/reports/ClientPortal";
 
 // Aan
 import AanWorkspacePage from "./pages/aan/Workspace";
+import TrialStateRoute from "./pages/_dev/TrialStateRoute";
 
 // Settings
 import Preferences from "./pages/settings/Preferences";
