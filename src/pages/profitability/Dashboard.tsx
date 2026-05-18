@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { DataSyncingState } from "@/components/billing/DataSyncingState";
 import { TrialExpiredState } from "@/components/billing/TrialExpiredState";
-import { TrialBanner } from "@/components/billing/TrialBanner";
+
 import { useTrial } from "@/contexts/TrialContext";
 import { useBillingFlow } from "@/contexts/BillingFlowContext";
 const COLUMN_DEFS = [
