@@ -5,6 +5,10 @@ import { InsightsPanel } from "@/components/insights/InsightsPanel";
 import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useDensity } from "@/contexts/DensityContext";
+import { useTrial } from "@/contexts/TrialContext";
+import { useBillingFlow } from "@/contexts/BillingFlowContext";
+import { DataSyncingState } from "@/components/billing/DataSyncingState";
+import { TrialExpiredState } from "@/components/billing/TrialExpiredState";
 import { cn } from "@/lib/utils";
 
 const AanCopilotPanel = lazy(() => import("@/components/aan/AanCopilotPanel").then(m => ({ default: m.AanCopilotPanel })));
