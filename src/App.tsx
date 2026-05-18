@@ -77,6 +77,7 @@ import ClientPortal from "./pages/reports/ClientPortal";
 
 // Aan
 import AanWorkspacePage from "./pages/aan/Workspace";
+import TrialStateRoute from "./pages/_dev/TrialStateRoute";
 
 // Settings
 import Preferences from "./pages/settings/Preferences";
@@ -158,6 +159,9 @@ function AppRoutes() {
       {/* Auth & Onboarding */}
       <Route path="/login" element={<Login />} />
       <Route path="/onboarding/connect" element={<ConnectAccounts />} />
+
+      {/* Hidden dev utility: force a trial state then redirect to dashboard */}
+      <Route path="/_state/:state" element={<TrialStateRoute />} />
 
       {/* Sandbox */}
       <Route path="/workspace" element={<WorkspaceDashboard />} />

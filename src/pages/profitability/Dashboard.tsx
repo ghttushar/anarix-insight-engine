@@ -18,7 +18,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { DataSyncingState } from "@/components/billing/DataSyncingState";
-import { TrialBanner } from "@/components/billing/TrialBanner";
+import { TrialExpiredState } from "@/components/billing/TrialExpiredState";
+
 import { useTrial } from "@/contexts/TrialContext";
 import { useBillingFlow } from "@/contexts/BillingFlowContext";
 const COLUMN_DEFS = [
@@ -60,6 +61,7 @@ export default function ProfitabilityDashboard() {
   const { trial } = useTrial();
   const { billingFlowEnabled } = useBillingFlow();
   const isSyncing = billingFlowEnabled && trial === "syncing";
+  const isExpired = billingFlowEnabled && trial === "expired";
   const { tab: routeTab } = useParams<{ tab?: string }>();
   const profNav = useNavigate();
   const validTabs = ["products", "orders"] as const;
@@ -161,10 +163,10 @@ export default function ProfitabilityDashboard() {
             </div>
           </AppTaskbar>
 
-          <TrialBanner />
-
           {isSyncing ? (
             <DataSyncingState />
+          ) : isExpired ? (
+            <TrialExpiredState />
           ) : (
             <>
               <ProfitabilityHeroCard
