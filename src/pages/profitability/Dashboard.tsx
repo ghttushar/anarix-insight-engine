@@ -17,11 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
-import { DataSyncingState } from "@/components/billing/DataSyncingState";
-import { TrialExpiredState } from "@/components/billing/TrialExpiredState";
 
-import { useTrial } from "@/contexts/TrialContext";
-import { useBillingFlow } from "@/contexts/BillingFlowContext";
+
 const COLUMN_DEFS = [
   { id: "units", label: "Units", visible: true },
   { id: "refundUnits", label: "Refund Units", visible: true },
