@@ -65,7 +65,13 @@ function LayoutInner({ children }: { children: ReactNode }) {
           )}
           onClick={handleMainClick}
         >
-          {children}
+          {showSyncOverlay ? (
+            <DataSyncingState />
+          ) : showExpiredOverlay ? (
+            <TrialExpiredState />
+          ) : (
+            children
+          )}
         </main>
         {showInsights && <InsightsPanel />}
         {showNotifications && <NotificationsPanel />}
