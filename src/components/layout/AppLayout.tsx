@@ -5,6 +5,10 @@ import { InsightsPanel } from "@/components/insights/InsightsPanel";
 import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useDensity } from "@/contexts/DensityContext";
+import { useTrial } from "@/contexts/TrialContext";
+import { useBillingFlow } from "@/contexts/BillingFlowContext";
+import { DataSyncingState } from "@/components/billing/DataSyncingState";
+import { TrialExpiredState } from "@/components/billing/TrialExpiredState";
 import { cn } from "@/lib/utils";
 
 const AanCopilotPanel = lazy(() => import("@/components/aan/AanCopilotPanel").then(m => ({ default: m.AanCopilotPanel })));
@@ -14,6 +18,10 @@ function LayoutInner({ children }: { children: ReactNode }) {
   const { dataPanel, aiPanel, hasAnyPanel, closeDataPanel } = useActivePanel();
   const { open, setOpen } = useSidebar();
   const { density } = useDensity();
+  const { trial } = useTrial();
+  const { billingFlowEnabled } = useBillingFlow();
+  const showSyncOverlay = billingFlowEnabled && trial === "syncing";
+  const showExpiredOverlay = billingFlowEnabled && trial === "expired";
 
   const autoCollapsedRef = useRef(false);
   const prevHasPanelRef = useRef(hasAnyPanel);
@@ -57,7 +65,13 @@ function LayoutInner({ children }: { children: ReactNode }) {
           )}
           onClick={handleMainClick}
         >
-          {children}
+          {showSyncOverlay ? (
+            <DataSyncingState />
+          ) : showExpiredOverlay ? (
+            <TrialExpiredState />
+          ) : (
+            children
+          )}
         </main>
         {showInsights && <InsightsPanel />}
         {showNotifications && <NotificationsPanel />}

@@ -160,8 +160,8 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/onboarding/connect" element={<ConnectAccounts />} />
 
-      {/* Hidden dev utility: force a trial state then redirect to dashboard */}
-      <Route path="/_state/:state" element={<TrialStateRoute />} />
+      {/* Hidden dev utility: pin a trial state and render any nav-bar page underneath */}
+      <Route path="/_state/:state/*" element={<TrialStateRoute />} />
 
       {/* Sandbox */}
       <Route path="/workspace" element={<WorkspaceDashboard />} />

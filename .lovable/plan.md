@@ -1,84 +1,79 @@
 ## Goal
 
-Make the **trial-expired** state prominent (no underlying data visible) with a warm, human message — and give every trial state its own URL so each can be opened directly for Figma capture.
+1. Make the **syncing** and **expired** trial states appear on every page reachable from the left sidebar (Workspace, Profitability, Advertising, Rules, Catalog, AMC, Business Intelligence, Day Parting, Reports), not just the Profitability Dashboard.
+2. Give each (state × page) combination its own stable URL that stays in the browser address bar, so Figma's "Link to design" plugin can target each one individually.
+3. Exclude profile-area pages: `/settings/*`, `/login`, `/onboarding/*`, `/aan`, `/website/*`, `/brand/*`.
 
----
+## Why current setup fails the URL requirement
 
-## 1. New component: `TrialExpiredState.tsx`
+- `/_state/:state` pins the trial state but only ever renders `ProfitabilityDashboard`. Every other page (Campaign Manager, Trends, etc.) has no dedicated URL for syncing/expired.
+- There is no mechanism that keeps the URL stable while showing the syncing/expired overlay on, say, `/advertising/campaigns`.
 
-Full-card replacement (mirrors `DataSyncingState` structure, same min-height, same shimmer position) so the dashboard reads as a deliberate "paused" state, not a paywall.
+## Approach
 
-**Visual**
+### 1. Centralize the overlay in `AppLayout`
 
-- Same outer card: `rounded-lg border border-border bg-card p-12 min-h-[420px]`
-- Reuses the taco illustration (continuity with sync state) — slight tilt, soft drop-shadow
-- Headline (Satoshi 24px/600): *"Your taco's gone cold."*
-- Sub (Noto 14px, muted, max-w-md): *"Your free trial wrapped up — your data is safe, just paused. Warm it back up whenever you're ready."*
-- Two buttons centered, 12px gap:
-  - Primary: **Reheat my plan** → `/website/pricing`
-  - Secondary (ghost): **Talk to us first** → `/website/contact`
-- Tiny meta line below buttons: *"Nothing's been deleted. Pick up exactly where you left off."*
-- Top shimmer bar **removed** (sync uses motion to signal "working"; expired is intentionally still)
-- Soft gradient halo behind the illustration using `brand.accent` at low opacity — calm, not loud
+Add a `<TrialStateGate>` inside `src/components/layout/AppLayout.tsx` that wraps `{children}`. It reads `useTrial()` and `useBillingFlow()`. When `billingFlowEnabled && trial === "syncing"` it renders `<DataSyncingState />` in place of children. When `trial === "expired"` it renders `<TrialExpiredState />`. Otherwise it renders `{children}` untouched.
 
-**Behavior**
+Since every nav-bar page already wraps its content in `<AppLayout>`, this single change makes both states appear on every page automatically. No per-page edits.
 
-- Renders inside Dashboard *instead of* `<TrialBanner /> + hero + table` block when `trial === "expired"` and billing flow is on
-- Banner is no longer needed for the expired case (the whole screen becomes the message) — `TrialBanner` stays only as the lighter in-flow nudge for future states if needed; for now we'll remove its `expired` branch since the full-screen state replaces it
+Exclusion is automatic: `/settings/*`, `/aan`, `/website/*`, `/login`, `/onboarding/*`, and `/brand/*` either do not use `AppLayout` or are excluded by the existing `billingFlowEnabled` flag scope. (Verify by reading the excluded pages; the Aan workspace and website have their own layouts.)
 
-**Tone check (per §10.5)**: sanctioned quirky copy is allowed because this is part of the marketing/trial onboarding moment, same exception that covers the sync state.
+### 2. Per-page stable URLs via a wildcard state route
 
----
+Replace the current `/_state/:state` route with `/_state/:state/*`. The new `TrialStateRoute`:
 
-## 2. Dashboard wiring (`src/pages/profitability/Dashboard.tsx`)
+- Pins `trial` to `:state` on every render (defeating the auto-progress timer in `TrialContext`, same trick as today).
+- Renders a nested `<Routes>` block that mirrors the real app routes but **without changing the URL**. The inner Routes match against the wildcard portion (e.g. `advertising/campaigns`) and render the same page component the real route would.
 
-Replace the current `isSyncing ? <DataSyncingState/> : (...)` ternary with a single switch on `trial`:
+Result: URLs like
+- `/_state/syncing/profitability/dashboard`
+- `/_state/expired/advertising/campaigns`
+- `/_state/syncing/bi/keyword-tracker`
+- `/_state/expired/reports/client-portal`
 
-```text
-syncing  → <DataSyncingState />
-expired  → <TrialExpiredState />
-default  → existing hero + toolbar + table
-```
+…all stay in the address bar, render the correct page inside `AppLayout`, and `AppLayout`'s `TrialStateGate` shows the syncing or expired overlay on top.
 
-`TrialBanner` is removed from this page (the full-screen expired state replaces it). No other dashboard logic changes.
+### 3. Keep the existing short routes working
 
----
+Continue to support `/_state/:state` (no page) → redirect to `/_state/:state/profitability/dashboard` so existing Figma links keep working.
 
-## 3. Dedicated URLs for every trial state (for Figma capture)
+### 4. Build URL list
 
-Add a tiny dev-only route that forces a given trial state, so each screen is reachable by URL without waiting on timers.
+Generate a small helper in `src/pages/_dev/trialStatePages.ts` listing every nav-bar page (read from `navigationGroups` in `AppSidebar.tsx`) so the dev route can also expose a printable index (optional, for convenience). Not required for the URLs to work — they work purely via the wildcard.
 
-**Route:** `/_state/:state` → sets `trial` via `useTrial().setTrial(state)` on mount, then redirects to `/profitability/dashboard`.
+## Files
 
-Resulting copy-paste URLs:
-
-| State | URL |
-|---|---|
-| Fresh / no trial | `/_state/none` |
-| Syncing overlay | `/_state/syncing` |
-| Active trial | `/_state/active` |
-| **Expired (new)** | `/_state/expired` |
-| Paid | `/_state/paid` |
-
-Gated behind `billingFlowEnabled` — if the toggle is off, the route just bounces to the dashboard untouched. Also excluded from sidebar/nav so it stays a hidden utility URL.
-
----
-
-## 4. Files
+**Edit**
+- `src/components/layout/AppLayout.tsx` — add `TrialStateGate` wrapping `{children}` inside `<main>`. Imports: `useTrial`, `useBillingFlow`, `DataSyncingState`, `TrialExpiredState`.
+- `src/pages/_dev/TrialStateRoute.tsx` — switch to wildcard rendering; nested `<Routes>` mirroring every left-nav route (Workspace, Profitability, Advertising incl. Rules, Catalog, AMC, BI, Day Parting, Reports). Pin trial state on every render.
+- `src/App.tsx` — change `/_state/:state` route to `/_state/:state/*`. Add a redirect from `/_state/:state` (exact) → `/_state/:state/profitability/dashboard`.
+- `src/pages/profitability/Dashboard.tsx` — remove the now-redundant inline `isSyncing ? <DataSyncingState /> : isExpired ? <TrialExpiredState /> : (...)` branch since `AppLayout` handles it globally. Keep `TrialBanner` for the `active` (non-expired trial) state if it lives there today.
 
 **Create**
-- `src/components/billing/TrialExpiredState.tsx`
-- `src/pages/_dev/TrialStateRoute.tsx` (the `/_state/:state` setter)
+- (optional) `src/pages/_dev/trialStatePages.ts` — array of `{ label, path }` for every left-nav page, derived from `navigationGroups`.
 
-**Modify**
-- `src/pages/profitability/Dashboard.tsx` — switch render based on `trial`
-- `src/App.tsx` — register `/_state/:state` route
+## Technical notes
 
-**Untouched**
-- `TrialContext.tsx`, `BillingFlowContext.tsx`, `DataSyncingState.tsx`, `TrialBanner.tsx` (kept for other surfaces), pricing/billing pages
+- `TrialStateGate` must render the overlay inside the same `<main>` container so the sidebar stays visible — this matches existing behavior on the Dashboard.
+- The overlay components (`DataSyncingState`, `TrialExpiredState`) currently return `null` unless `billingFlowEnabled && trial === <their state>`. Keep that guard; the gate just decides whether to pass `children` or the overlay.
+- The wildcard `/_state/:state/*` route renders `<AppLayout>` once via each nested page component (every page already wraps itself in `AppLayout`), so no double layout.
+- React Router v6 nested `<Routes>` under a `*` parent works as long as paths inside are relative (no leading `/`).
 
----
+## URL examples after the change
 
-## Open question
+| Page | Syncing | Expired |
+|---|---|---|
+| Profitability Dashboard | `/_state/syncing/profitability/dashboard` | `/_state/expired/profitability/dashboard` |
+| Campaign Manager | `/_state/syncing/advertising/campaigns` | `/_state/expired/advertising/campaigns` |
+| Keyword Tracker | `/_state/syncing/bi/keyword-tracker` | `/_state/expired/bi/keyword-tracker` |
+| Automated Reports | `/_state/syncing/reports/client-portal` | `/_state/expired/reports/client-portal` |
+| Health Score | `/_state/syncing/workspace/health-score` | `/_state/expired/workspace/health-score` |
+| Day Parting | `/_state/syncing/dayparting` | `/_state/expired/dayparting` |
 
-The auto-progress in `TrialContext` flips `active → expired` after 20s. Want me to keep that for the demo, or pause it so you can dwell on the expired screen in Figma without it bouncing? (URL route still forces state either way.)
+All 9 left-nav groups × 2 states covered.
+
+## Out of scope
+
+- Settings pages (Preferences, Accounts, Integrations, Team, System, Design System, Component Library, Billing) — explicitly excluded per request.
+- Aan workspace, marketing website, login, onboarding, brand showcase — not in the left nav.
