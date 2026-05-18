@@ -163,10 +163,10 @@ export default function ProfitabilityDashboard() {
             </div>
           </AppTaskbar>
 
-          <TrialBanner />
-
           {isSyncing ? (
             <DataSyncingState />
+          ) : isExpired ? (
+            <TrialExpiredState />
           ) : (
             <>
               <ProfitabilityHeroCard
