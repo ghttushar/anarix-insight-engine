@@ -160,6 +160,9 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/onboarding/connect" element={<ConnectAccounts />} />
 
+      {/* Hidden dev utility: force a trial state then redirect to dashboard */}
+      <Route path="/_state/:state" element={<TrialStateRoute />} />
+
       {/* Sandbox */}
       <Route path="/workspace" element={<WorkspaceDashboard />} />
       <Route path="/workspace/:dashboardId" element={<WorkspaceDashboard />} />
