@@ -18,6 +18,10 @@ function LayoutInner({ children }: { children: ReactNode }) {
   const { dataPanel, aiPanel, hasAnyPanel, closeDataPanel } = useActivePanel();
   const { open, setOpen } = useSidebar();
   const { density } = useDensity();
+  const { trial } = useTrial();
+  const { billingFlowEnabled } = useBillingFlow();
+  const showSyncOverlay = billingFlowEnabled && trial === "syncing";
+  const showExpiredOverlay = billingFlowEnabled && trial === "expired";
 
   const autoCollapsedRef = useRef(false);
   const prevHasPanelRef = useRef(hasAnyPanel);
