@@ -13,14 +13,14 @@ const VALID: TrialState[] = ["none", "syncing", "active", "expired", "paid"];
 export default function TrialStateRoute() {
   const { state } = useParams<{ state: string }>();
   const { setTrial } = useTrial();
-  const { billingFlowEnabled, setBillingFlowEnabled } = useBillingFlow();
+  const { billingFlowEnabled, setBillingFlow } = useBillingFlow();
 
   const target = (VALID.includes(state as TrialState) ? state : "none") as TrialState;
 
   useEffect(() => {
-    if (!billingFlowEnabled) setBillingFlowEnabled(true);
+    if (!billingFlowEnabled) setBillingFlow(true);
     setTrial(target);
-  }, [target, billingFlowEnabled, setBillingFlowEnabled, setTrial]);
+  }, [target, billingFlowEnabled, setBillingFlow, setTrial]);
 
   return <Navigate to="/profitability/dashboard" replace />;
 }
