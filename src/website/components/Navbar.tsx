@@ -20,6 +20,7 @@ const navItems: Array<{
     ],
   },
   { label: "Aan AI", href: "/website/aan-ai" },
+  { label: "Pricing", href: "/website/pricing" },
   { label: "Documentation", href: "/website/documentation" },
   {
     label: "Company",
