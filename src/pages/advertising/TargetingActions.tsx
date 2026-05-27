@@ -221,8 +221,11 @@ export default function TargetingActions() {
                           <SelectContent>{mockTargetAdGroups.map((ag) => (<SelectItem key={ag.id} value={ag.id}>{ag.name}</SelectItem>))}</SelectContent>
                         </Select>
                       </TableCell>
-                      <TableCell className="px-2">
-                        <MatchTypePicker value={action.matchTypes as any} />
+                      <TableCell className="px-2 align-top py-2">
+                        <MatchTypePicker
+                          value={matchTypeState[action.id]}
+                          onChange={(next) => setMatchTypeState((s) => ({ ...s, [action.id]: next }))}
+                        />
                       </TableCell>
                       <TableCell className="text-center">
                         <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Archive className="h-3.5 w-3.5 text-muted-foreground" /></Button>
