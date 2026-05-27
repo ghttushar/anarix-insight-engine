@@ -84,9 +84,10 @@ const ColorSchemeContext = createContext<ColorSchemeContextType | undefined>(und
 export function ColorSchemeProvider({ children }: { children: React.ReactNode }) {
   const [schemeId, setSchemeIdState] = useState<string>(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("anarix-color-scheme") || "periwinkle-classic";
+      const stored = localStorage.getItem("anarix-color-scheme");
+      if (stored && schemes.some((s) => s.id === stored)) return stored;
     }
-    return "periwinkle-classic";
+    return DEFAULT_SCHEME_ID;
   });
 
   const currentScheme = schemes.find((s) => s.id === schemeId) || schemes[0];
