@@ -18,6 +18,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CampaignTagBar } from "@/components/advertising/CampaignTagBar";
 import { format, parse } from "date-fns";
 
 interface CampaignTableProps {
@@ -30,6 +32,9 @@ interface CampaignTableProps {
   onRowClick?: (id: string) => void;
   hiddenColumns?: Set<string>;
   showDeltas?: boolean;
+  /** Edit-mode selection. */
+  selectedIds?: Set<string>;
+  onSelectionChange?: (ids: Set<string>) => void;
 }
 
 type SortField = keyof Campaign | null;
@@ -102,6 +107,8 @@ export function CampaignTable({
   onRowClick,
   hiddenColumns,
   showDeltas = false,
+  selectedIds,
+  onSelectionChange,
 }: CampaignTableProps) {
   const { formatCurrency } = useCurrency();
   const show = (col: string) => !hiddenColumns?.has(col);
