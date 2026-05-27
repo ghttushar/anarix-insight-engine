@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -13,12 +14,14 @@ import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
 interface ImpactTableProps {
   data: ImpactComparison[];
   searchQuery?: string;
+  selectedIds?: Set<string>;
+  onSelectionChange?: (ids: Set<string>) => void;
 }
 
 const PINNABLE = ["impactPercentage", "impressions", "clicks", "ctr", "adSpend", "adSales", "roas", "acos"];
 const FIXED_OFFSET = 250;
 
-export function ImpactTable({ data, searchQuery = "" }: ImpactTableProps) {
+export function ImpactTable({ data, searchQuery = "", selectedIds, onSelectionChange }: ImpactTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [sortField, setSortField] = useState<string | null>(null);
