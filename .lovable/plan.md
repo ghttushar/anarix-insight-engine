@@ -1,30 +1,26 @@
-## Simplify Match Type selection in Targeting Actions
+## Wire up Campaign Tagging entry points
 
-Replace the current 3-column grid (Broad / Exact / Phrase), where every row shows 3 large bordered cards with a checkbox + bid input (whether used or not), with a single compact "Match Types" column.
+The tagging primitives exist (`TagsContext`, `TagPopover`, `CampaignTagBar`, `CampaignBulkActionsBar`, `mockTags`) but are not mounted — `CampaignTagBar` is imported into `CampaignTable.tsx` and never rendered, and `CampaignManager.tsx` never wraps with `TagsProvider` or renders the bulk bar. This plan finishes the wiring per the two uploaded flows (individual + bulk).
 
-### New cell design
+### 1. `src/pages/advertising/CampaignManager.tsx`
+- Import `TagsProvider` and `CampaignBulkActionsBar`.
+- Add `selectedIds` state: `useState<Set<string>>(new Set())`.
+- Wrap the page return body in `<TagsProvider>`.
+- Pass `selectedIds` + `onSelectionChange={setSelectedIds}` into `<CampaignTable>` (existing props already supported).
+- Render `<CampaignBulkActionsBar selectedIds={selectedIds} onClear={() => setSelectedIds(new Set())} />` directly above `{renderTable()}` — visible only when `viewMode === "edit"` AND `selectedIds.size > 0` AND `activeTab === "campaigns"` (component already handles internal visibility but gate by tab here).
 
-- One column header: **Match Types** (min-width ~220px, replaces the 3 × 100px columns).
-- Inside each row cell: a horizontal row of 3 small pill toggles — `BROAD`, `EXACT`, `PHRASE`.
-  - Unselected pill: outlined, muted text, 10px uppercase tracking-wide. Click toggles on.
-  - Selected pill: filled `bg-primary/10` + `border-primary/40` + `text-primary`.
-- Bid inputs only appear for selected pills, rendered inline immediately to the right of each selected pill as a compact `h-6 w-14` numeric input prefixed by the currency symbol (muted).
-- When nothing is selected: show a muted hint "Select match type" so the row reads cleanly.
+### 2. `src/components/tables/CampaignTable.tsx`
+In the Campaign Name cell (lines ~225–229), under the existing name/Input render a `<CampaignTagBar campaignId={campaign.id} isEdit={isEdit} />` so:
+- **View mode** → renders read-only tag chips beneath the name (individual-level visibility from the flow).
+- **Edit mode** → renders chips + "+ Tag" trigger opening `TagPopover` (individual-level tagging entry point from the flow).
 
-Result: unused match types collapse to a single small pill instead of a full card with an unused bid field — far less visual noise, and the "active vs inactive" state is immediately scannable.
+Wrap the name + tag bar in a `<div className="space-y-1">` so layout stays clean.
 
-### Files
-
-- `src/pages/advertising/TargetingActions.tsx`
-  - Remove the 3 `<TableHead>` cells for Broad/Exact/Phrase; add 1 `<TableHead className="min-w-[240px]">Match Types</TableHead>`.
-  - Replace the per-row `.map(["broad","exact","phrase"])` block (lines ~222–233) with a single `<TableCell>` containing the new pill+bid component.
-- New component: `src/components/advertising/MatchTypePicker.tsx`
-  - Props: `value: { broad, exact, phrase: { selected, bid } }`, `onChange`.
-  - Renders 3 pills; when `selected`, renders inline bid input next to it. Uses currency symbol from `useCurrency`.
-  - No new state shape on backend — uses existing `action.matchTypes` structure from `mockTargetingActions`.
+### 3. Entry-point summary (after wiring)
+- **Individual tagging**: every campaign row shows existing tags as chips; in Edit mode, click "+ Tag" under the name to add/create/remove via `TagPopover`.
+- **Bulk tagging**: in Edit mode, select multiple rows via the row checkboxes → floating `CampaignBulkActionsBar` appears above the table with a "Tag" action that opens `TagPopover` and applies/removes tags to all selected campaigns at once.
 
 ### Out of scope
-
-- No changes to other columns, toolbar, or data model.
-- "Add Keyword Target" modal already uses its own multi-match UI; not touched here.
-- No bulk edit behavior changes.
+- No changes to `TagsContext`, `TagPopover`, `CampaignTagBar`, `CampaignBulkActionsBar`, or `mockTags` — they already implement the logic from the PDFs.
+- No tagging on Ad Groups / Keywords / etc. — only Campaigns level for now, matching the existing component scope.
+- No persistence beyond the in-memory `TagsContext` (matches current mock data approach).
