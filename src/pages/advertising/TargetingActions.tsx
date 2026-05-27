@@ -174,7 +174,7 @@ export default function TargetingActions() {
                   <TableHead className="min-w-[130px]">Source AdGroup</TableHead>
                   <TableHead className="min-w-[150px]">Target Campaign</TableHead>
                   <TableHead className="min-w-[150px]">Target Ad Group</TableHead>
-                  <TableHead className="min-w-[260px]">Match Types</TableHead>
+                  <TableHead className="min-w-[200px]">Match Types</TableHead>
                   <TableHead className="w-14 text-center">Archive</TableHead>
                   <TableHead className="text-right">Impressions</TableHead>
                   <TableHead className="text-right">Clicks</TableHead>
