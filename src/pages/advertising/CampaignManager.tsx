@@ -324,6 +324,16 @@ function CampaignManagerInner() {
             }
           />
 
+          {viewMode === "edit" && activeTab === "campaigns" && (
+            <CampaignBulkActionsBar
+              selectedIds={Array.from(selectedIds)}
+              totalCount={campaigns.length}
+              onClearSelection={() => setSelectedIds(new Set())}
+              onCancel={() => { discardDrafts(); setSelectedIds(new Set()); setViewMode("view"); }}
+              onSave={() => { commitDrafts(); setSelectedIds(new Set()); toast.success("Changes saved"); }}
+            />
+          )}
+
           {renderTable()}
         </div>
 
