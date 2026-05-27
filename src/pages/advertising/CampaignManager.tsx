@@ -26,6 +26,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
+import { TagsProvider, useTags } from "@/contexts/TagsContext";
+import { CampaignBulkActionsBar } from "@/components/advertising/CampaignBulkActionsBar";
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
 interface FilterRule {
@@ -164,6 +166,14 @@ const breadcrumbItems = [
   { label: "Campaign Manager" },
 ];
 export default function CampaignManager() {
+  return (
+    <TagsProvider>
+      <CampaignManagerInner />
+    </TagsProvider>
+  );
+}
+
+function CampaignManagerInner() {
   const navigate = useNavigate();
   const { isWalmart } = useMarketplace();
   const { adType, setAdType } = useFilter();
@@ -182,6 +192,8 @@ export default function CampaignManager() {
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const { commitDrafts, discardDrafts } = useTags();
 
   const kpiItems = mockKPIData
     .filter((kpi) => selectedKPIs.includes(kpi.label))
@@ -242,7 +254,7 @@ export default function CampaignManager() {
 
   const renderTable = () => {
     switch (activeTab) {
-      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} onRowClick={(id) => navigate(`/advertising/campaigns/${id}`)} hiddenColumns={hiddenColumns} showDeltas={showDeltas} />;
+      case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} onRowClick={(id) => navigate(`/advertising/campaigns/${id}`)} hiddenColumns={hiddenColumns} showDeltas={showDeltas} selectedIds={selectedIds} onSelectionChange={setSelectedIds} />;
       case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       case "product-ads": return <ProductAdsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
       case "keywords": return <KeywordTargetingTable searchQuery={searchQuery} showDeltas={showDeltas} />;
@@ -311,6 +323,16 @@ export default function CampaignManager() {
               </Button>
             }
           />
+
+          {viewMode === "edit" && activeTab === "campaigns" && (
+            <CampaignBulkActionsBar
+              selectedIds={Array.from(selectedIds)}
+              totalCount={campaigns.length}
+              onClearSelection={() => setSelectedIds(new Set())}
+              onCancel={() => { discardDrafts(); setSelectedIds(new Set()); setViewMode("view"); }}
+              onSave={() => { commitDrafts(); setSelectedIds(new Set()); toast.success("Changes saved"); }}
+            />
+          )}
 
           {renderTable()}
         </div>
