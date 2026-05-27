@@ -51,6 +51,9 @@ export default function TargetingActions() {
   const [showDeltas, setShowDeltas] = useState(false);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [matchTypeState, setMatchTypeState] = useState<Record<string, any>>(() =>
+    Object.fromEntries(mockTargetingActions.map((a) => [a.id, a.matchTypes]))
+  );
 
   const filteredActions = mockTargetingActions.filter((action) => {
     const matchesSearch =
@@ -171,7 +174,7 @@ export default function TargetingActions() {
                   <TableHead className="min-w-[130px]">Source AdGroup</TableHead>
                   <TableHead className="min-w-[150px]">Target Campaign</TableHead>
                   <TableHead className="min-w-[150px]">Target Ad Group</TableHead>
-                  <TableHead className="min-w-[260px]">Match Types</TableHead>
+                  <TableHead className="min-w-[200px]">Match Types</TableHead>
                   <TableHead className="w-14 text-center">Archive</TableHead>
                   <TableHead className="text-right">Impressions</TableHead>
                   <TableHead className="text-right">Clicks</TableHead>
@@ -218,8 +221,11 @@ export default function TargetingActions() {
                           <SelectContent>{mockTargetAdGroups.map((ag) => (<SelectItem key={ag.id} value={ag.id}>{ag.name}</SelectItem>))}</SelectContent>
                         </Select>
                       </TableCell>
-                      <TableCell className="px-2">
-                        <MatchTypePicker value={action.matchTypes as any} />
+                      <TableCell className="px-2 align-top py-2">
+                        <MatchTypePicker
+                          value={matchTypeState[action.id]}
+                          onChange={(next) => setMatchTypeState((s) => ({ ...s, [action.id]: next }))}
+                        />
                       </TableCell>
                       <TableCell className="text-center">
                         <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Archive className="h-3.5 w-3.5 text-muted-foreground" /></Button>
