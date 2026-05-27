@@ -51,6 +51,9 @@ export default function TargetingActions() {
   const [showDeltas, setShowDeltas] = useState(false);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [matchTypeState, setMatchTypeState] = useState<Record<string, any>>(() =>
+    Object.fromEntries(mockTargetingActions.map((a) => [a.id, a.matchTypes]))
+  );
 
   const filteredActions = mockTargetingActions.filter((action) => {
     const matchesSearch =
