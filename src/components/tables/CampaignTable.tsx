@@ -149,10 +149,22 @@ export function CampaignTable({
         <Table>
           <TableHeader>
               <TableRow className="bg-muted">
+              {isEdit && onSelectionChange && (
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={paginatedCampaigns.length > 0 && paginatedCampaigns.every((c) => selectedIds?.has(c.id))}
+                    onCheckedChange={(checked) => {
+                      const next = new Set(selectedIds);
+                      paginatedCampaigns.forEach((c) => checked ? next.add(c.id) : next.delete(c.id));
+                      onSelectionChange(next);
+                    }}
+                  />
+                </TableHead>
+              )}
               {isEdit && show("active") && <TableHead className="w-16">Active</TableHead>}
               {show("status") && <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>}
               {show("type") && <TableHead className="w-24">Type</TableHead>}
-              {show("name") && <TableHead className={cn("min-w-[200px] sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")}>
+              {show("name") && <TableHead className={cn("min-w-[220px] sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")}>
                 Campaign Name
               </TableHead>}
               {show("startDate") && <TableHead>Start Date</TableHead>}
@@ -180,6 +192,18 @@ export function CampaignTable({
                     )}
                     onClick={() => onRowClick?.(campaign.id)}
                   >
+                    {isEdit && onSelectionChange && (
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selectedIds?.has(campaign.id) || false}
+                          onCheckedChange={(checked) => {
+                            const next = new Set(selectedIds);
+                            if (checked) next.add(campaign.id); else next.delete(campaign.id);
+                            onSelectionChange(next);
+                          }}
+                        />
+                      </TableCell>
+                    )}
                     {isEdit && show("active") && (
                       <TableCell onClick={(e) => e.stopPropagation()}>
                         <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
