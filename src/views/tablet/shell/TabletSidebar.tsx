@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { LongPressTooltip } from "../primitives/LongPressTooltip";
 
 const ITEMS = [
-  { to: "/tablet/profitability", label: "Profitability", icon: LayoutDashboard },
+  { to: "/tablet/profitability/dashboard", base: "/tablet/profitability", label: "Profitability", icon: LayoutDashboard },
   { to: "/tablet/advertising/campaigns", base: "/tablet/advertising", label: "Advertising", icon: Megaphone },
   { to: "/tablet/bi", label: "Business Intel", icon: TrendingUp },
   { to: "/tablet/catalog", label: "Catalog", icon: Package },
@@ -38,6 +38,14 @@ const ADVERTISING_SUB = [
   { to: "/tablet/advertising/rules/applied", label: "Applied Rules" },
 ];
 
+const PROFITABILITY_SUB = [
+  { to: "/tablet/profitability/dashboard", label: "Dashboard" },
+  { to: "/tablet/profitability/trends", label: "Trends" },
+  { to: "/tablet/profitability/pnl", label: "Profit & Loss" },
+  { to: "/tablet/profitability/geo", label: "Geographical" },
+  { to: "/tablet/profitability/unified-pnl", label: "Unified P&L" },
+];
+
 function usePortrait() {
   const [portrait, setPortrait] = useState(
     typeof window !== "undefined" ? window.matchMedia("(orientation: portrait)").matches : false,
@@ -56,6 +64,7 @@ export function TabletSidebar() {
   const rail = portrait;
   const { pathname } = useLocation();
   const advertisingActive = pathname.startsWith("/tablet/advertising");
+  const profitabilityActive = pathname.startsWith("/tablet/profitability");
 
   return (
     <aside
@@ -90,6 +99,24 @@ export function TabletSidebar() {
               {!rail && label === "Advertising" && advertisingActive && (
                 <div className="ml-7 my-1 space-y-0.5 border-l border-border pl-2">
                   {ADVERTISING_SUB.map((sub) => (
+                    <NavLink
+                      key={sub.to}
+                      to={sub.to}
+                      className={({ isActive: a }) =>
+                        cn(
+                          "block min-h-10 px-2 py-1 rounded text-xs",
+                          a ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground",
+                        )
+                      }
+                    >
+                      {sub.label}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+              {!rail && label === "Profitability" && profitabilityActive && (
+                <div className="ml-7 my-1 space-y-0.5 border-l border-border pl-2">
+                  {PROFITABILITY_SUB.map((sub) => (
                     <NavLink
                       key={sub.to}
                       to={sub.to}

@@ -6,6 +6,7 @@ import { TabletFloatingIsland } from "./TabletFloatingIsland";
 import { TabletAanController } from "../aan/TabletAanController";
 import TablePreview from "../_preview/TablePreview";
 import { TabletAdvertisingRoutes } from "../advertising/AdvertisingRoutes";
+import { TabletProfitabilityRoutes } from "../profitability/ProfitabilityRoutes";
 
 interface TabletAppShellProps {
   children?: ReactNode;
@@ -44,6 +45,7 @@ export function TabletAppShell({ children }: TabletAppShellProps) {
           {children ?? (
             <Routes>
               <Route path="advertising/*" element={<TabletAdvertisingRoutes />} />
+              <Route path="profitability/*" element={<TabletProfitabilityRoutes />} />
               <Route path="_preview/tables" element={<TablePreview />} />
               <Route path="*" element={<EmptyState />} />
             </Routes>
