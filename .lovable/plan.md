@@ -1,117 +1,75 @@
-## Goal
+# Phase 2 — Shared Tablet Shell & Touch Primitives
 
-Introduce three distinct viewport variants of the app — **Desktop** (current build, untouched), **Tablet** (touch-optimized, no feature/layout changes), and **Mobile** (scaffold only, empty for now). User picks the variant explicitly from Preferences; choice persists and forces routing into that view's URL prefix. Each variant lives in its own folder for clean Figma-frame mapping.
+Goal: stand up the tablet variant's visual shell (sidebar, taskbar, right-side panel chrome, Aan presence) and the shared touch primitives every later phase will consume. No module screens yet — those start Phase 3+.
 
-## Locked decisions (from Q&A)
+Same routes, same data, same containers from `src/app/*`. Only the shell and interaction primitives fork under `src/views/tablet/`.
 
-- **Folder structure:** sibling `src/views/desktop`, `src/views/tablet`, `src/views/mobile`.
-- **Routing:** path-prefix per view — every existing route mirrored under `/desktop/*`, `/tablet/*`, `/mobile/*`. Root `/` redirects to the user's saved choice (default desktop).
-- **Switching:** Hard override from Preferences. No auto device detection. Persisted per user. Small badge in the taskbar shows active view.
-- **Touch targets:** min 44×44, primary actions 48×48.
-- **Hover removal:** all hover-only affordances become persistent (icons always visible, no hover-reveal).
-- **Tooltips:** long-press 500ms; native `title` retained for stylus.
-- **Gestures:** swipe-left on table rows = row actions; swipe-right from left edge of right-side panels = close.
-- **Aan on tablet:** tap-driven core + stylus hover allowed (pointerType=pen) + persistent bottom-right Aan FAB replaces pointer-follow.
-- **Keyboard:** use `h-dvh` and `visualViewport` API. Keyboard overlays; input scrolls into view; layout doesn't shrink.
-- **Orientation:** single responsive tablet layout. Sidebar = icon rail in portrait, expanded in landscape.
+## Scope (in)
 
-## Architecture
+### 1. Touch primitives (`src/views/tablet/primitives/`)
+- `TouchTarget.tsx` — wrapper enforcing min 44×44 (48×48 for `primary`), used by tablet buttons/icon buttons.
+- `LongPressTooltip.tsx` — 500ms long-press → tooltip; also forwards `title` for stylus; cancels on move/scroll.
+- `SwipeableRow.tsx` — swipe-left reveals row actions (snap-open/snap-closed thresholds, rubber-band).
+- `SwipeToCloseEdge.tsx` — swipe-right from left edge of right-side panels = close.
+- `useVisualViewportInset.ts` — hook returning keyboard inset via `visualViewport` API; powers input-into-view scrolling.
+- `useStylusHover.ts` — detects `pointerType === 'pen'` to selectively allow hover affordances.
 
-```text
-src/
-  app/              ← shared business logic (contexts, hooks, data, types) — single source of truth
-  views/
-    desktop/        ← current shell + screens (moved/re-exported from existing src/)
-      AppLayout.tsx
-      pages/...
-    tablet/         ← new touch-first shell + screens
-      AppLayout.tsx
-      shell/ (Sidebar, Taskbar, FloatingAanFab, PanelHost)
-      pages/...
-      primitives/ (TouchButton, LongPressTooltip, SwipeRow, KeyboardSafeArea)
-    mobile/         ← stub only; placeholder route
-  contexts/
-    ViewportContext.tsx   ← exposes 'desktop' | 'tablet' | 'mobile', persisted
-  App.tsx           ← top-level router with /desktop, /tablet, /mobile prefixes + root redirect
+### 2. Tablet shell (`src/views/tablet/shell/`)
+- `TabletAppShell.tsx` — root layout, uses `h-dvh`, applies `data-view="tablet"`, mounts sidebar + taskbar + outlet + floating elements. Locks layout so on-screen keyboard overlays (no shrink).
+- `TabletSidebar.tsx` — icon-rail in portrait, expanded in landscape; orientation detected via `matchMedia('(orientation: portrait)')`. All items are persistent (no hover-reveal); active state always visible; labels via `LongPressTooltip` in rail mode.
+- `TabletTaskbar.tsx` — taller (56px) for touch; `ViewBadge` present; breadcrumbs collapse to a tap-to-expand chip in portrait.
+- `TabletRightPanel.tsx` — fixed right-edge panel chrome wired to `SwipeToCloseEdge`; close button is 48×48; respects keyboard inset; independent scroll container (`flex-1 min-h-0`) per project rules.
+- `TabletFloatingIsland.tsx` — port of the floating action island sized for touch (no hover-only affordances).
+
+### 3. Aan presence on tablet (`src/views/tablet/aan/`)
+- `TabletAanController.tsx` — combines the three behaviors approved:
+  - Tap-driven mascot: reacts on tap of its anchors and during generation; idle = ambient breathing only (no pointer-follow).
+  - Stylus hover allowed: when `pointerType === 'pen'`, hover-react is enabled.
+  - `FloatingAanFab.tsx` anchored bottom-right (48×48, safe-area aware) opens the Aan panel.
+- Reuses existing Aan panel container from `src/app` (no duplication of chat/insights logic).
+
+### 4. Wiring
+- `src/views/tablet/TabletPlaceholder.tsx` is replaced by a real `TabletAppShell` that renders an empty content area with a "Phase 3 will mount module screens here" notice. Routes under `/tablet/*` go through the shell.
+- `ViewportContext` already toggles `data-view`; shell reads it to short-circuit any desktop-only globals (e.g., pointer-follow mascot on the desktop shell stays disabled when `data-view="tablet"`).
+
+## Scope (out)
+- Any module screens (Advertising, Profitability, Reports, BI, Catalog, AMC, Settings) — those are Phase 4–7.
+- Tables/filters/date picker tablet ports — Phase 3.
+- Mobile shell — later.
+- Any change to desktop behavior, data, business logic, or feature set.
+
+## Technical notes
+- Layout uses `h-dvh` + `overflow-hidden` on the shell root so the on-screen keyboard overlays rather than shrinks the app; focused inputs call `scrollIntoView({ block: 'center' })` on `visualViewport` resize.
+- Orientation handled by a single responsive shell via CSS + `matchMedia`; no duplicate portrait/landscape files.
+- All primitives are tablet-only — no impact on desktop bundle for `/desktop/*` routes.
+- New files only; no edits to existing desktop components or `src/app/*` containers.
+- No new dependencies.
+
+## Files to create
+```
+src/views/tablet/primitives/TouchTarget.tsx
+src/views/tablet/primitives/LongPressTooltip.tsx
+src/views/tablet/primitives/SwipeableRow.tsx
+src/views/tablet/primitives/SwipeToCloseEdge.tsx
+src/views/tablet/primitives/useVisualViewportInset.ts
+src/views/tablet/primitives/useStylusHover.ts
+src/views/tablet/shell/TabletAppShell.tsx
+src/views/tablet/shell/TabletSidebar.tsx
+src/views/tablet/shell/TabletTaskbar.tsx
+src/views/tablet/shell/TabletRightPanel.tsx
+src/views/tablet/shell/TabletFloatingIsland.tsx
+src/views/tablet/aan/TabletAanController.tsx
+src/views/tablet/aan/FloatingAanFab.tsx
 ```
 
-Existing `src/pages/*` and `src/components/*` stay in place for Phase 1; the desktop view re-exports them. Tablet screens import the same containers/hooks from `src/app` / existing data layer — only the **presentational shell and primitives** fork.
+## Files to edit
+- `src/App.tsx` — mount `TabletAppShell` for `/tablet/*` (replace placeholder).
+- `src/views/tablet/TabletPlaceholder.tsx` — becomes the shell's empty-state content (or deleted if no longer needed).
 
-## Routing model
+## Verification
+- Switch to Tab in Preferences → `/tablet` renders the new shell with sidebar (rail in portrait, expanded in landscape), taller taskbar, ViewBadge, FloatingAanFab bottom-right.
+- Resize between portrait and landscape — sidebar swaps without layout jump.
+- Focus an input and trigger on-screen keyboard (DevTools device emulation) — layout does not shrink; input scrolls into view.
+- Desktop view (`/desktop/*` and existing routes) unchanged.
 
-- `/` → redirects to `/<savedView>` (default `/desktop`).
-- `/desktop/*` → mounts current router tree (unchanged behavior).
-- `/tablet/*` → mounts tablet router tree, same route paths under it.
-- `/mobile/*` → renders an "Mobile view coming soon" placeholder.
-- A tiny `<ViewBadge>` in the AppTaskbar shows the active view and links to Preferences.
-- Switching view in Preferences: rewrites the current URL prefix in place (preserves the remainder of the path + query + state).
-
-## Tablet-specific interaction rules
-
-| Concern | Desktop today | Tablet rule |
-|---|---|---|
-| Tap target min | ~32–36px | 44×44, primary 48×48 |
-| Hover reveals | Row actions, pin/sort icons, edit pencils | Always visible |
-| Tooltips | Radix hover | `LongPressTooltip` (500ms) + native `title` for stylus |
-| Right-side panels | Click outside / X | Same + swipe-right from left edge |
-| Table row actions | Hover row → buttons appear | Swipe-left → action drawer |
-| Aan mascot | Follows cursor, reacts to hover | No follow; tap-driven; stylus hover via pointerType=pen; persistent bottom-right Aan FAB |
-| Dropdowns / menus | Open on click, dense items | Same logic, items padded to 44px, scrollable |
-| Date range picker | Hover preview | Tap to select, explicit Apply/Cancel (already present) |
-| Keyboard | n/a | `h-dvh` shell; `visualViewport` listener auto-scrolls focused input above keyboard; layout fixed |
-| Orientation | n/a | Portrait: sidebar rail (56px); landscape: expanded sidebar |
-
-No features added, no features removed, no information architecture changes — only the input layer changes.
-
-## Phases
-
-**Phase 1 — Scaffold**
-- Create `src/views/{desktop,tablet,mobile}` + `src/contexts/ViewportContext.tsx`.
-- Move/re-export current shell under `views/desktop` (zero behavior change).
-- Add `/desktop`, `/tablet`, `/mobile` prefix routing in `App.tsx` + root redirect.
-- Add three view buttons (Desktop / Tab / Mobile) in **Preferences**; persist choice; clicking rewrites prefix.
-- Add `ViewBadge` in `AppTaskbar`.
-- Mobile shows a placeholder.
-
-**Phase 2 — Tablet shell + Aan**
-- Build `views/tablet/AppLayout.tsx`, tablet `AppSidebar` (rail + expanded modes by orientation), tablet `AppTaskbar`, panel host.
-- Build touch primitives: `TouchButton` (44/48), `LongPressTooltip`, `SwipeRow`, `SwipePanel`, `KeyboardSafeArea`.
-- Add tablet `FloatingAanFab` (bottom-right), wire it to existing `AanContext`.
-- Disable hover-only states inside tablet shell via a `data-view="tablet"` attribute on `<html>` + Tailwind variant override.
-- Implement `visualViewport` listener for keyboard.
-
-**Phase 3 — Tables, filters, date picker, dropdowns**
-- Tablet-tuned wrappers around shared table components: persistent row actions, swipe-left drawer, 44px row min-tap on action cells (keeps dense numeric rows visually unchanged), padded menu items, larger hit areas on pin/sort icons.
-- Tablet date range picker layout (same logic).
-- Filter builder with touch-padded chips/inputs.
-
-**Phase 4 — Advertising module screens** (Campaign Manager, Campaign / Ad Group / Product detail, Impact Analysis + drill-downs, Targeting Actions, Rule Creation, Anomaly Alerts, Budget Pacing, Search Harvesting, Creative Analyzer, Applied Rules, Rule Agents).
-
-**Phase 5 — Profitability module** (Dashboard, Trends, P&L, Geographical, Unified P&L, Period/Product detail panels).
-
-**Phase 6 — Reports + Aan workspace** (Reports list, Client Portal, full-screen `/aan` workspace, Aan copilot panel, AskAan tooltip → long-press text-selection on tablet).
-
-**Phase 7 — BI / Catalog / AMC / Settings** (Brand SOV, Keyword/Product SOV, Keyword Tracker, Competitor Pricing, Day Parting heatmap with finger-friendly cells, Catalog Products + Inventory Ads, AMC Instances/Queries/Audiences/Schedules, Settings pages).
-
-**Phase 8 — Orientation, keyboard, gesture polish**
-- Portrait vs landscape sidebar rail/expanded.
-- Keyboard overlay verified across all input-heavy screens (Rule Creation, Filter Builder, Aan input, Auth).
-- Gesture conflicts audited (horizontal table scroll vs swipe-row).
-- Stylus pointerType=pen hover states enabled where it adds clarity.
-
-**Phase 9 — QA pass**
-- Walk every tablet route in both orientations on a real tablet viewport (1024×768 and 1366×1024).
-- Verify no hover-only affordance anywhere.
-- Verify Aan FAB opens panel and mascot behavior is tap/stylus only.
-- Verify view-switcher round-trip preserves filters/date range.
-- Verify keyboard never hides focused input.
-
-## Out of scope (this project)
-
-- Mobile screens (folder exists, route exists, content is a placeholder).
-- Any feature, layout, hierarchy, or data change for desktop or tablet.
-- Auto device detection.
-
-## Deliverable for next message
-
-If approved, I'll execute **Phase 1 only** (scaffold + Preferences switcher + routing + ViewBadge + Mobile placeholder). Phases 2+ proceed one at a time on your approval after each.
+Awaiting approval to execute Phase 2.
