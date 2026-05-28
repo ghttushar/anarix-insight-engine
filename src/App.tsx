@@ -22,7 +22,7 @@ import { AanProvider } from "@/components/aan";
 import { InsightsProvider } from "@/components/insights";
 import { CreativeFeatures } from "@/features/creative";
 import { ViewportProvider } from "@/contexts/ViewportContext";
-import TabletPlaceholder from "@/views/tablet/TabletPlaceholder";
+import { TabletAppShell } from "@/views/tablet/shell/TabletAppShell";
 import MobilePlaceholder from "@/views/mobile/MobilePlaceholder";
 import { toast } from "sonner";
 import NotFound from "./pages/NotFound";
@@ -168,8 +168,8 @@ function AppRoutes() {
       {/* Viewport variants — Phase 1 scaffold. Tablet/Mobile screens land in later phases. */}
       <Route path="/desktop" element={<Navigate to="/profitability/dashboard" replace />} />
       <Route path="/desktop/*" element={<Navigate to="/profitability/dashboard" replace />} />
-      <Route path="/tablet" element={<TabletPlaceholder />} />
-      <Route path="/tablet/*" element={<TabletPlaceholder />} />
+      <Route path="/tablet" element={<TabletAppShell />} />
+      <Route path="/tablet/*" element={<TabletAppShell />} />
       <Route path="/mobile" element={<MobilePlaceholder />} />
       <Route path="/mobile/*" element={<MobilePlaceholder />} />
 
