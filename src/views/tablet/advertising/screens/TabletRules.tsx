@@ -47,8 +47,9 @@ export function TabletAppliedRules() {
         {r.status}
       </span>
     )},
-    { id: "scope", header: "Scope", cell: (r) => r.scope },
-    { id: "triggered", header: "Triggered", align: "right", sortable: true, cell: (r) => r.timesTriggered },
+    { id: "type", header: "Type", cell: (r) => r.ruleType },
+    { id: "scope", header: "Scope", cell: (r) => `${r.entitiesCount} ${r.entityLabel}` },
+    { id: "freq", header: "Frequency", cell: (r) => r.frequency },
     { id: "last", header: "Last Run", cell: (r) => r.lastRun },
     {
       id: "actions", header: "Actions",
