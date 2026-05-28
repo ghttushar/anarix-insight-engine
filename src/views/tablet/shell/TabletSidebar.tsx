@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { LongPressTooltip } from "../primitives/LongPressTooltip";
 
 const ITEMS = [
-  { to: "/tablet/profitability", label: "Profitability", icon: LayoutDashboard },
+  { to: "/tablet/profitability/dashboard", base: "/tablet/profitability", label: "Profitability", icon: LayoutDashboard },
   { to: "/tablet/advertising/campaigns", base: "/tablet/advertising", label: "Advertising", icon: Megaphone },
   { to: "/tablet/bi", label: "Business Intel", icon: TrendingUp },
   { to: "/tablet/catalog", label: "Catalog", icon: Package },
@@ -36,6 +36,14 @@ const ADVERTISING_SUB = [
   { to: "/tablet/advertising/creative-analyzer", label: "Creative" },
   { to: "/tablet/advertising/rules/agents", label: "Rule Agents" },
   { to: "/tablet/advertising/rules/applied", label: "Applied Rules" },
+];
+
+const PROFITABILITY_SUB = [
+  { to: "/tablet/profitability/dashboard", label: "Dashboard" },
+  { to: "/tablet/profitability/trends", label: "Trends" },
+  { to: "/tablet/profitability/pnl", label: "Profit & Loss" },
+  { to: "/tablet/profitability/geo", label: "Geographical" },
+  { to: "/tablet/profitability/unified-pnl", label: "Unified P&L" },
 ];
 
 function usePortrait() {
