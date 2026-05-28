@@ -64,6 +64,7 @@ export function TabletSidebar() {
   const rail = portrait;
   const { pathname } = useLocation();
   const advertisingActive = pathname.startsWith("/tablet/advertising");
+  const profitabilityActive = pathname.startsWith("/tablet/profitability");
 
   return (
     <aside
@@ -98,6 +99,24 @@ export function TabletSidebar() {
               {!rail && label === "Advertising" && advertisingActive && (
                 <div className="ml-7 my-1 space-y-0.5 border-l border-border pl-2">
                   {ADVERTISING_SUB.map((sub) => (
+                    <NavLink
+                      key={sub.to}
+                      to={sub.to}
+                      className={({ isActive: a }) =>
+                        cn(
+                          "block min-h-10 px-2 py-1 rounded text-xs",
+                          a ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground",
+                        )
+                      }
+                    >
+                      {sub.label}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+              {!rail && label === "Profitability" && profitabilityActive && (
+                <div className="ml-7 my-1 space-y-0.5 border-l border-border pl-2">
+                  {PROFITABILITY_SUB.map((sub) => (
                     <NavLink
                       key={sub.to}
                       to={sub.to}
