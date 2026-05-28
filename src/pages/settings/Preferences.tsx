@@ -197,6 +197,57 @@ export default function Preferences() {
 
         <Separator />
 
+        {/* App View */}
+        <section className="space-y-4">
+          <div>
+            <h2 className="font-heading text-lg font-medium text-foreground">App View</h2>
+            <p className="text-sm text-muted-foreground">
+              Choose how Anarix renders. Desktop is the current build. Tablet is touch-optimized
+              (same features and layout, redesigned for finger and stylus input). Mobile is reserved.
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {([
+              { id: "desktop" as AppView, icon: Monitor, label: "Desktop", note: "Current build", enabled: true },
+              { id: "tablet" as AppView, icon: Tablet, label: "Tab", note: "Touch-optimized", enabled: true },
+              { id: "mobile" as AppView, icon: Smartphone, label: "Mobile", note: "Coming later", enabled: true },
+            ]).map(({ id, icon: Icon, label, note }) => {
+              const active = view === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => handleViewChange(id)}
+                  className={cn(
+                    "flex flex-col items-start gap-2 rounded-lg border p-4 text-left transition-colors",
+                    active
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-card hover:bg-muted/40"
+                  )}
+                >
+                  <div className="flex items-center gap-2 w-full">
+                    <Icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground")} />
+                    <span className={cn("text-sm font-medium", active ? "text-primary" : "text-foreground")}>{label}</span>
+                    {active && (
+                      <span className="ml-auto text-[10px] font-medium uppercase tracking-wider text-primary">Active</span>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground">{note}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Your choice persists across sessions. Tablet and Mobile each have a dedicated route
+            prefix (<code className="px-1 py-0.5 rounded bg-muted">/tablet</code>,{" "}
+            <code className="px-1 py-0.5 rounded bg-muted">/mobile</code>) so Figma links resolve to
+            the correct variant.
+          </p>
+        </section>
+
+        <Separator />
+
+
         {/* Theme */}
         <section className="space-y-4">
           <div>
