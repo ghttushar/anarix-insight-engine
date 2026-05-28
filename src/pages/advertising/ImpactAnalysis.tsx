@@ -154,6 +154,7 @@ export default function ImpactAnalysis() {
           searchQuery={searchQuery}
           selectedIds={selectedIds}
           onSelectionChange={setSelection}
+          onRowClick={activeTab === "campaigns" ? (id) => navigate(`/advertising/impact/campaigns/${id}`) : undefined}
         />
       </div>
     </AppLayout>
