@@ -125,7 +125,7 @@ export function TabletReports() {
       </div>
 
       <TabletKpiBand
-        items={[
+        chips={[
           { label: "Total", value: String(reports.length) },
           { label: "Clients", value: String(uniqueClients) },
           { label: "Sent", value: String(sentCount) },
