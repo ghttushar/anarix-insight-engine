@@ -354,3 +354,74 @@ table th,
 table td {
   vertical-align: middle;
 }
+
+/* =========================================================================
+   TABLET VIEW DELTAS — applied only when ViewportContext sets
+   data-view="tablet" on <html>. These rules MUST NOT change visual layout;
+   they only enlarge tap targets, kill the 300ms tap delay, and surface
+   hover-only affordances for finger and stylus input.
+   ========================================================================= */
+
+/* 1. Remove 300ms tap delay and disable double-tap zoom on interactive
+      elements. Safe globally for tablet — desktop is unaffected. */
+html[data-view="tablet"] button,
+html[data-view="tablet"] a,
+html[data-view="tablet"] [role="button"],
+html[data-view="tablet"] [role="menuitem"],
+html[data-view="tablet"] [role="option"],
+html[data-view="tablet"] [role="tab"],
+html[data-view="tablet"] input,
+html[data-view="tablet"] select,
+html[data-view="tablet"] textarea,
+html[data-view="tablet"] label {
+  touch-action: manipulation;
+}
+
+/* 2. Enforce WCAG 44x44 minimum on icon-only / small buttons without
+      changing visible padding for desktop. We expand the touch hit-box
+      while leaving the visual box untouched via min-height/min-width. */
+html[data-view="tablet"] button[class*="h-7"],
+html[data-view="tablet"] button[class*="h-8"],
+html[data-view="tablet"] button[class*="h-9"],
+html[data-view="tablet"] a[class*="h-7"],
+html[data-view="tablet"] a[class*="h-8"],
+html[data-view="tablet"] a[class*="h-9"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* 3. Keyboard overlay safety: convert h-screen to h-dvh so the on-screen
+      keyboard overlays the layout rather than resizing it. */
+html[data-view="tablet"] .h-screen {
+  height: 100dvh;
+}
+html[data-view="tablet"] .min-h-screen {
+  min-height: 100dvh;
+}
+
+/* 4. Table row affordances cannot rely on hover. Make row-action icons,
+      pin/sort handles, and hover-only chips faintly visible at rest and
+      fully visible on active/touch. */
+html[data-view="tablet"] tr [class*="opacity-0"],
+html[data-view="tablet"] tr [class*="group-hover:opacity"] {
+  opacity: 0.6 !important;
+}
+html[data-view="tablet"] tr:active [class*="opacity-0"],
+html[data-view="tablet"] tr:focus-within [class*="opacity-0"] {
+  opacity: 1 !important;
+}
+
+/* 5. Disable Aan mascot pointer-tracking transforms on tablet — pointer
+      events from finger/stylus should not drive idle animation. */
+html[data-view="tablet"] [data-aan-mascot] {
+  pointer-events: none;
+}
+
+/* 6. Ensure scroll containers behave well with momentum/finger scroll. */
+html[data-view="tablet"] [class*="overflow-auto"],
+html[data-view="tablet"] [class*="overflow-y-auto"],
+html[data-view="tablet"] [class*="overflow-x-auto"] {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
