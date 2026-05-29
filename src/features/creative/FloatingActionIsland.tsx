@@ -27,7 +27,8 @@ interface ActionItem {
 const hiddenRoutes = ["/login", "/onboarding", "/settings"];
 
 export function FloatingActionIsland() {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const isTabletView = typeof document !== "undefined" && document.documentElement.getAttribute("data-view") === "tablet";
+  const [isExpanded, setIsExpanded] = useState(isTabletView);
   const [isCapturing, setIsCapturing] = useState(false);
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -51,24 +52,26 @@ export function FloatingActionIsland() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isWebsite]);
 
-  const handleDragStart = useCallback((e: React.MouseEvent) => {
+  const handleDragStart = useCallback((e: React.PointerEvent | React.MouseEvent) => {
     e.preventDefault();
     const rect = (e.currentTarget.closest("[data-island]") as HTMLElement)?.getBoundingClientRect();
     if (!rect) return;
+    const startClientX = "clientX" in e ? e.clientX : 0;
+    const startClientY = "clientY" in e ? e.clientY : 0;
     setIsDragging(true);
-    dragRef.current = { startX: e.clientX, startY: e.clientY, startPosX: rect.left + rect.width / 2, startPosY: rect.top };
-    const handleMove = (ev: MouseEvent) => {
+    dragRef.current = { startX: startClientX, startY: startClientY, startPosX: rect.left + rect.width / 2, startPosY: rect.top };
+    const handleMove = (ev: PointerEvent) => {
       if (!dragRef.current) return;
       setPosition({ x: dragRef.current.startPosX + (ev.clientX - dragRef.current.startX), y: dragRef.current.startPosY + (ev.clientY - dragRef.current.startY) });
     };
     const handleUp = () => {
       setIsDragging(false);
       dragRef.current = null;
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mouseup", handleUp);
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
     };
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("mouseup", handleUp);
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
   }, []);
 
   const shouldHide = hiddenRoutes.some((route) => location.pathname.startsWith(route));
