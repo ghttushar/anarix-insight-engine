@@ -156,7 +156,7 @@ export function FloatingActionIsland() {
         >
           <div className="flex items-center gap-1.5">
             <button
-              onMouseDown={handleDragStart}
+              onPointerDown={handleDragStart}
               className="h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-grab active:cursor-grabbing shrink-0"
               title="Drag to reposition"
             >
