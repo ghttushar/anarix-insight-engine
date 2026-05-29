@@ -78,6 +78,7 @@ export function FloatingActionIsland() {
   if (shouldHide) return null;
 
   const handleMouseEnter = () => {
+    if (isTabletView) return; // tablet stays expanded; no hover semantics
     if (collapseTimer.current) {
       clearTimeout(collapseTimer.current);
       collapseTimer.current = null;
@@ -86,6 +87,7 @@ export function FloatingActionIsland() {
   };
 
   const handleMouseLeave = () => {
+    if (isTabletView) return;
     collapseTimer.current = setTimeout(() => {
       setIsExpanded(false);
     }, 300);
