@@ -58,6 +58,7 @@ export function MarketplaceHoverPopup({
   return createPortal(
     <div
       ref={popupRef}
+      data-mp-popup
       className={cn(
         "fixed z-[9999]",
         "min-w-[220px] rounded-lg border border-border bg-popover shadow-xl",
