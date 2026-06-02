@@ -403,6 +403,8 @@ export function ProfitabilityHeroCard({
   const { formatCurrency } = useCurrency();
   const [activeView, setActiveView] = useState<"overview" | "breakdown" | "efficiency">("overview");
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
+  const [chartMetrics, setChartMetrics] = useState<MetricKey[]>(["gmv", "netProfit", "adCost", "orders"]);
+  const [chartFrequency, setChartFrequency] = useState<Frequency>("daily");
 
   // Per-card dates
   const [todayDate, setTodayDate] = useState<Date>(new Date());
