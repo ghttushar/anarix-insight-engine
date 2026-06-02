@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LineChart, Line, BarChart, Bar, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -8,12 +9,17 @@ import { METRIC_CONFIGS, MAX_VISIBLE_METRICS, DEFAULT_SELECTED_METRICS } from "@
 import { ChartContainer, ChartType, ChartMetric } from "./ChartContainer";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { mockCampaigns } from "@/data/mockCampaigns";
+import { ExternalLink } from "lucide-react";
 
 interface PerformanceChartProps {
   data: ChartDataPoint[];
   title?: string;
   showImpact?: boolean;
   onShowImpactChange?: (value: boolean) => void;
+  selectedMetrics?: MetricKey[];
+  onSelectedMetricsChange?: (next: MetricKey[]) => void;
 }
 
 const IMPACT_MULTIPLIERS: Record<string, number> = {
