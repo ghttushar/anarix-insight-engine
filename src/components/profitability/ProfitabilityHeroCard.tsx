@@ -21,6 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { MetricFrequencyChart, MetricKey, Frequency } from "./MetricFrequencyChart";
 
 interface ProfitabilityHeroCardProps {
   summaries: ProfitabilitySummary[];
