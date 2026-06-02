@@ -190,7 +190,7 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
         <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
-          <Tooltip {...tooltipConfig} />
+          {tooltipNode}
           <Legend />
           {selectedConfigs.map((config) => (
             <Bar key={config.key} dataKey={config.key} name={config.key} fill={config.color} radius={[3, 3, 0, 0]} />
@@ -205,7 +205,7 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
           <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
           {hasLeftAxis && <YAxis yAxisId="left" orientation="left" tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />}
           {hasRightAxis && <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} className="text-muted-foreground" />}
-          <Tooltip {...tooltipConfig} />
+          {tooltipNode}
           <Legend />
           {selectedConfigs.map((config) => (
             <Area key={config.key} type="monotone" dataKey={config.key} name={config.key} stroke={config.color} fill={config.color} fillOpacity={0.15} yAxisId={config.yAxisId || "left"} strokeWidth={2} />
@@ -220,7 +220,7 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
           <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
           {hasLeftAxis && <YAxis yAxisId="left" orientation="left" tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />}
           {hasRightAxis && <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} className="text-muted-foreground" />}
-          <Tooltip {...tooltipConfig} />
+          {tooltipNode}
           <Legend />
           {selectedConfigs.map((config) => (
             <Line key={config.key} type="monotone" dataKey={config.key} name={config.key} stroke={config.color} yAxisId={config.yAxisId || "left"} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
