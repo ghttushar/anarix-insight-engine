@@ -9,7 +9,7 @@ import { TrendingUp, TrendingDown, Minus, RefreshCw } from "lucide-react";
 import { mockHealthScore, type HealthDimension } from "@/data/mockHealthScore";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 
 const statusColors: Record<string, string> = {
   good: "text-success",
@@ -41,7 +41,7 @@ export default function HealthScore() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
         <PageHeader
           title="Marketplace Health Score"
           subtitle="Composite account health metric weighing profitability, ad efficiency, inventory, keyword coverage, and buy box"

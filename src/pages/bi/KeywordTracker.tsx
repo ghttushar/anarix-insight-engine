@@ -10,7 +10,7 @@ import { Plus } from "lucide-react";
 import { trackedKeywords as initialKeywords } from "@/data/mockBrandSOV";
 import { TrackedKeyword } from "@/types/bi";
 import { toast } from "sonner";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 
 
 const breadcrumbItems = [
@@ -43,7 +43,7 @@ export default function KeywordTracker() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
         <PageHeader
           title="Keyword Tracker"
           subtitle="Manage keywords for share of voice tracking"

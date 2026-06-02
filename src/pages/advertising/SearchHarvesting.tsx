@@ -10,7 +10,7 @@ import { mockHarvestCandidates, type HarvestCandidate } from "@/data/mockSearchH
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 
 const matchColors: Record<string, string> = {
   exact: "bg-primary/10 text-primary border-primary/20",
@@ -46,7 +46,7 @@ export default function SearchHarvesting() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
         <PageHeader
           title="Search Term Harvesting"
           subtitle="High-performing search terms surfaced for keyword targeting with Aan AI recommendations"

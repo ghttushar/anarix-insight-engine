@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { productSOVData, sovTrendData } from "@/data/mockBrandSOV";
 import { toast } from "sonner";
 import { TablePagination } from "@/components/tables/TablePagination";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 
 
 const breadcrumbItems = [
@@ -30,7 +30,7 @@ export default function ProductSOV() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
         <PageHeader
           title="Product Share of Voice"
           subtitle="Track SOV performance by product"
