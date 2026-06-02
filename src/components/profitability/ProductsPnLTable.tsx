@@ -90,10 +90,49 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
     </div>
   );
 
-  // Products mode
+  // Parent/Child expand state for category rows
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const toggleCategory = (key: string) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  // Derive a category key + ASIN from the first 3 words of the product name
+  const getCategoryKey = (p: ProfitabilityProduct) =>
+    p.name.split(" ").slice(0, 3).join(" ");
+
+  // Products mode — grouped parent/child
   if (mode === "products") {
     const sortedProducts = sortData(products, sortField, sortDirection);
-    const paginatedProducts = sortedProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+    // Group by category
+    const grouped = new Map<string, ProfitabilityProduct[]>();
+    sortedProducts.forEach((p) => {
+      const k = getCategoryKey(p);
+      const arr = grouped.get(k) ?? [];
+      arr.push(p);
+      grouped.set(k, arr);
+    });
+
+    // Build a stable list of categories for pagination at the category level
+    const categories = Array.from(grouped.entries()).map(([key, items]) => {
+      // Aggregate metrics across children for the parent row
+      const agg = items.reduce((acc, p) => {
+        ALL_COLUMNS.forEach((col) => {
+          (acc as any)[col.id] = ((acc as any)[col.id] || 0) + ((p as any)[col.id] || 0);
+        });
+        return acc;
+      }, {} as Record<string, number>);
+      // Parent ASIN: prefix from first child's itemId
+      const parentAsin = items[0]?.itemId?.replace(/-\d+$/, "") ?? key;
+      return { key, parentAsin, items, agg, image: items[0]?.image };
+    });
+
+    const paginatedCategories = categories.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
     const totals = products.reduce((acc, p) => {
       ALL_COLUMNS.forEach((col) => {
@@ -109,7 +148,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
           <Table>
             <TableHeader>
               <TableRow className="bg-muted hover:bg-muted">
-                <SortableTableHead field="name" {...sp} isFixed className="sticky left-0 z-20 bg-muted min-w-[280px] border-r border-border">Product Details</SortableTableHead>
+                <SortableTableHead field="name" {...sp} isFixed className="sticky left-0 z-20 bg-muted min-w-[280px] border-r border-border">Product / Category</SortableTableHead>
                 {cols.map((col) => (
                   <SortableTableHead key={col.id} field={col.id} {...sp} className={cn("text-right", pc(col.id, true))} style={ps(col.id)} align="right">{col.label}</SortableTableHead>
                 ))}
@@ -117,55 +156,115 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedProducts.map((product) => (
-                <TableRow key={product.id} className="hover:bg-muted/30 group">
-                  <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors border-r border-border/20">
-                    <div className="flex items-center gap-3">
-                      <img src={product.image} alt={product.name} className="h-9 w-9 rounded-md border border-border object-cover flex-shrink-0" />
-                      <div className="flex flex-col min-w-0">
-                        <span className="font-medium text-foreground text-sm line-clamp-1">{product.name}</span>
-                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                          <span>{product.itemId}</span>
-                          <span>·</span>
-                          <span>{product.sku}</span>
-                          <span>·</span>
-                          <span>{formatCurrency(product.price)}</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          {onCogsClick && (
-                            <button onClick={() => onCogsClick(product)} className="text-[11px] text-primary hover:underline flex items-center gap-0.5 cursor-pointer">
-                              <ExternalLink className="h-2.5 w-2.5" />COGS
-                            </button>
+              {paginatedCategories.map((cat) => {
+                const isExpanded = expandedCategories.has(cat.key);
+                const childCount = cat.items.length;
+                return (
+                  <>
+                    {/* Parent / category row */}
+                    <TableRow
+                      key={`cat-${cat.key}`}
+                      className="hover:bg-muted/40 group cursor-pointer"
+                      onClick={(e) => {
+                        const isTablet = typeof document !== "undefined" && document.documentElement.getAttribute("data-view") === "tablet";
+                        if (isTablet && !(e.target as HTMLElement).closest("[data-cat-toggle]")) return;
+                        toggleCategory(cat.key);
+                      }}
+                    >
+                      <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors border-r border-border/20">
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            data-cat-toggle
+                            onClick={(e) => { e.stopPropagation(); toggleCategory(cat.key); }}
+                            className="flex items-center justify-center h-8 w-8 rounded border border-border bg-muted flex-shrink-0 hover:bg-muted/70"
+                            aria-label={isExpanded ? "Collapse category" : "Expand category"}
+                          >
+                            {isExpanded ? <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />}
+                          </button>
+                          {cat.image && (
+                            <img src={cat.image} alt={cat.key} className="h-9 w-9 rounded-md border border-border object-cover flex-shrink-0" />
                           )}
-                          {onTrendsClick && (
-                            <button onClick={() => onTrendsClick(product)} className="text-[11px] text-primary hover:underline flex items-center gap-0.5 cursor-pointer">
-                              <TrendingUp className="h-2.5 w-2.5" />Trends
-                            </button>
-                          )}
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-medium text-foreground text-sm line-clamp-1">{cat.key}</span>
+                            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                              <span className="font-medium">{cat.parentAsin}</span>
+                              <span>·</span>
+                              <span>{childCount} {childCount === 1 ? "product" : "products"}</span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  {cols.map((col) => (
-                    <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
-                      <div className="flex flex-col items-end">
-                        <span className="text-foreground text-sm">{col.getValue(product)}</span>
-                        {showDeltas && <DeltaBadge value={getDelta(product.id, col.id)} />}
-                      </div>
-                    </TableCell>
-                  ))}
-                  <TableCell className="text-center">
-                    {onMoreClick ? (
-                      <button onClick={() => onMoreClick(product)} className="text-xs text-primary hover:underline cursor-pointer">More</button>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
+                      </TableCell>
+                      {cols.map((col) => {
+                        const val = (cat.agg as any)[col.id] || 0;
+                        return (
+                          <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
+                            <span className="text-foreground text-sm font-medium">
+                              {col.isUnit ? formatNumber(val) : formatCurrency(val)}
+                            </span>
+                          </TableCell>
+                        );
+                      })}
+                      <TableCell className="text-center">
+                        <span className="text-[10px] text-muted-foreground">{isExpanded ? "Open" : "Tap to expand"}</span>
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Child rows */}
+                    {isExpanded && cat.items.map((product) => (
+                      <TableRow key={product.id} className="bg-muted/20 hover:bg-muted/40 group">
+                        <TableCell className="sticky left-0 z-10 bg-muted/20 group-hover:bg-muted/40 transition-colors border-r border-border/20 pl-14">
+                          <div className="flex items-center gap-3">
+                            <img src={product.image} alt={product.name} className="h-7 w-7 rounded border border-border object-cover flex-shrink-0" />
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-xs font-medium text-foreground line-clamp-1">{product.name}</span>
+                              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                                <span>ASIN: {product.itemId}</span>
+                                <span>·</span>
+                                <span>SKU: {product.sku}</span>
+                                <span>·</span>
+                                <span>Price: {formatCurrency(product.price)}</span>
+                                <span>·</span>
+                                <span>COG: {formatCurrency(product.cogs)}</span>
+                              </div>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                {onCogsClick && (
+                                  <button onClick={(e) => { e.stopPropagation(); onCogsClick(product); }} className="text-[11px] text-primary hover:underline flex items-center gap-0.5 cursor-pointer">
+                                    <ExternalLink className="h-2.5 w-2.5" />Edit COGS
+                                  </button>
+                                )}
+                                {onTrendsClick && (
+                                  <button onClick={(e) => { e.stopPropagation(); onTrendsClick(product); }} className="text-[11px] text-primary hover:underline flex items-center gap-0.5 cursor-pointer">
+                                    <TrendingUp className="h-2.5 w-2.5" />Trends
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        {cols.map((col) => (
+                          <TableCell key={col.id} className={cn("text-right", pc(col.id))} style={ps(col.id)}>
+                            <div className="flex flex-col items-end">
+                              <span className="text-foreground text-sm">{col.getValue(product)}</span>
+                              {showDeltas && <DeltaBadge value={getDelta(product.id, col.id)} />}
+                            </div>
+                          </TableCell>
+                        ))}
+                        <TableCell className="text-center">
+                          {onMoreClick ? (
+                            <button onClick={(e) => { e.stopPropagation(); onMoreClick(product); }} className="text-xs text-primary hover:underline cursor-pointer">More</button>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </>
+                );
+              })}
 
               <TableRow className="bg-muted font-medium hover:bg-muted">
-                <TableCell className="sticky left-0 z-10 bg-muted border-r border-border/20 font-semibold">Total ({products.length} products)</TableCell>
+                <TableCell className="sticky left-0 z-10 bg-muted border-r border-border/20 font-semibold">Total ({products.length} products · {categories.length} categories)</TableCell>
                 {cols.map((col) => {
                   const val = totals[col.id] || 0;
                   return (
@@ -182,7 +281,7 @@ export function ProductsPnLTable({ products, orders = [], mode = "products", vis
         <TablePagination
           page={currentPage}
           pageSize={pageSize}
-          totalItems={products.length}
+          totalItems={categories.length}
           onPageChange={setCurrentPage}
           onPageSizeChange={setPageSize}
         />
