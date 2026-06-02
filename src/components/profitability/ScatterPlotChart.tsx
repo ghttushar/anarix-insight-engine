@@ -16,6 +16,8 @@ import { toast } from "sonner";
 
 interface ScatterPlotChartProps {
   data: ScatterDataPoint[];
+  selectedIds?: string[];
+  onPointToggle?: (id: string) => void;
 }
 
 type ChartView = "scatter" | "bar" | "line";
@@ -61,10 +63,11 @@ const viewIcons: Record<ChartView, React.ComponentType<{ className?: string }>> 
   line: Activity,
 };
 
-export function ScatterPlotChart({ data }: ScatterPlotChartProps) {
+export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPlotChartProps) {
   const [expanded, setExpanded] = useState(false);
   const [chartView, setChartView] = useState<ChartView>("scatter");
   const [zoomLevel, setZoomLevel] = useState(1);
+  const hasSelection = (selectedIds?.length ?? 0) > 0;
 
   const maxSales = Math.max(...data.map((d) => d.totalSales)) * 1.1;
   const maxMargin = Math.max(...data.map((d) => d.profitMargin)) * 1.1;
@@ -104,9 +107,29 @@ export function ScatterPlotChart({ data }: ScatterPlotChartProps) {
         <YAxis type="number" dataKey="totalSales" name="Total Sales" domain={[0, zoomedMaxSales]} tick={{ fontSize: 12 }} className="text-muted-foreground" tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} label={{ value: "Total Sales ($)", angle: -90, position: "insideLeft" }} />
         <ZAxis range={[80, 200]} />
         <Tooltip content={<CustomTooltip />} />
-        {Object.keys(quadrantColors).map((quadrant) => (
-          <Scatter key={quadrant} name={quadrantLabels[quadrant as keyof typeof quadrantLabels].title} data={data.filter((d) => d.quadrant === quadrant)} fill={quadrantColors[quadrant as keyof typeof quadrantColors]} />
-        ))}
+        {Object.keys(quadrantColors).map((quadrant) => {
+          const quadrantData = data.filter((d) => d.quadrant === quadrant);
+          return (
+            <Scatter
+              key={quadrant}
+              name={quadrantLabels[quadrant as keyof typeof quadrantLabels].title}
+              data={quadrantData}
+              fill={quadrantColors[quadrant as keyof typeof quadrantColors]}
+              fillOpacity={hasSelection ? 0.25 : 1}
+              onClick={(p: any) => onPointToggle?.(p?.id)}
+              style={{ cursor: onPointToggle ? "pointer" : "default" }}
+            />
+          );
+        })}
+        {hasSelection && (
+          <Scatter
+            name="Selected"
+            data={data.filter((d) => selectedIds!.includes(d.id))}
+            fill="hsl(var(--primary))"
+            onClick={(p: any) => onPointToggle?.(p?.id)}
+            style={{ cursor: onPointToggle ? "pointer" : "default" }}
+          />
+        )}
       </ScatterChart>
     </ResponsiveContainer>
   );
