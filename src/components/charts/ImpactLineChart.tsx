@@ -119,6 +119,9 @@ export function ImpactLineChart({ items, previous, impact, metrics }: Props) {
     );
   }
 
+  const hasLeft = metrics.some((m) => !isRatio(m));
+  const hasRight = metrics.some((m) => isRatio(m));
+
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart data={data} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
@@ -129,9 +132,11 @@ export function ImpactLineChart({ items, previous, impact, metrics }: Props) {
           interval="preserveStartEnd"
           minTickGap={20}
         />
-        <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+        {hasLeft && <YAxis yAxisId="left" orientation="left" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)} />}
+        {hasRight && <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `${v}${metrics.some((m) => m === "ctr" || m === "acos") ? "%" : ""}`} />}
         {impactStartLabel && impactEndLabel && (
           <ReferenceArea
+            yAxisId={hasLeft ? "left" : "right"}
             x1={impactStartLabel}
             x2={impactEndLabel}
             fill="hsl(var(--primary))"
@@ -143,9 +148,11 @@ export function ImpactLineChart({ items, previous, impact, metrics }: Props) {
         {metrics.map((m) => {
           const opt = optionFor(m);
           const color = opt?.color || "hsl(var(--primary))";
+          const yAxisId = isRatio(m) ? "right" : "left";
           return [
             <Line
               key={`${m}-prev`}
+              yAxisId={yAxisId}
               type="monotone"
               dataKey={`${m}_previous`}
               name={`${opt?.label} (Previous)`}
@@ -159,6 +166,7 @@ export function ImpactLineChart({ items, previous, impact, metrics }: Props) {
             />,
             <Line
               key={`${m}-imp`}
+              yAxisId={yAxisId}
               type="monotone"
               dataKey={`${m}_impact`}
               name={`${opt?.label} (Impact)`}
