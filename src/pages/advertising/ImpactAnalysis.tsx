@@ -39,6 +39,8 @@ const SORTABLE_FIELDS = [
   { id: "roas", label: "ROAS" },
 ];
 
+const FILTER_FIELDS = ["Name", "Impact %", "Impressions", "Clicks", "CTR", "Ad Spend", "Ad Sales", "ROAS", "ACOS"];
+
 const breadcrumbItems = [
   { label: "Advertising", href: "/advertising/impact" },
   { label: "Impact Analysis" },
@@ -62,13 +64,7 @@ export default function ImpactAnalysis() {
   const [{ previous, impact }, setRanges] = useState(defaultRanges());
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [selectionByTab, setSelectionByTab] = useState<Record<ImpactTab, Set<string>>>({
-    "campaigns": new Set(),
-    "ad-groups": new Set(),
-    "products": new Set(),
-    "keywords": new Set(),
-    "search-terms": new Set(),
-  });
+  const [activeFilters, setActiveFilters] = useState<{ id: string; field: string; operator: string; value: string }[]>([]);
 
   const data = useMemo(() => {
     switch (activeTab) {
@@ -81,18 +77,11 @@ export default function ImpactAnalysis() {
     }
   }, [activeTab]);
 
-  const selectedIds = selectionByTab[activeTab];
-  const selectedItems = useMemo(
-    () => (selectedIds.size > 0 ? data.filter((d) => selectedIds.has(d.id)) : data),
-    [data, selectedIds],
-  );
+  const selectedItems = data;
 
   const handleDownload = () => {
     toast.success("Exporting impact data as CSV...");
   };
-
-  const setSelection = (next: Set<string>) =>
-    setSelectionByTab((prev) => ({ ...prev, [activeTab]: next }));
 
   return (
     <AppLayout>
@@ -119,9 +108,7 @@ export default function ImpactAnalysis() {
             <div>
               <h3 className="font-heading text-sm font-medium text-foreground">Performance Comparison</h3>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                {selectedIds.size > 0
-                  ? `Showing ${selectedIds.size} selected item${selectedIds.size === 1 ? "" : "s"}`
-                  : `Showing all ${data.length} items — select rows below to filter`}
+                Showing all {data.length} items
               </p>
             </div>
             <div className="flex items-center gap-1">
@@ -144,6 +131,9 @@ export default function ImpactAnalysis() {
           onSearchChange={setSearchQuery}
           searchPlaceholder={`Search ${activeTab.replace("-", " ")}...`}
           onDownload={handleDownload}
+          activeFilters={activeFilters}
+          onFiltersChange={setActiveFilters}
+          filterFields={FILTER_FIELDS}
           sortableFields={SORTABLE_FIELDS}
           sortField={sortField}
           sortDirection={sortDirection}
@@ -153,8 +143,7 @@ export default function ImpactAnalysis() {
         <ImpactTable
           data={data}
           searchQuery={searchQuery}
-          selectedIds={selectedIds}
-          onSelectionChange={setSelection}
+          hideSelection
           onRowClick={activeTab === "campaigns" ? (id) => navigate(`/advertising/impact/campaigns/${id}`) : undefined}
         />
       </div>

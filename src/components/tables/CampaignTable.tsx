@@ -10,7 +10,7 @@ import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { cn } from "@/lib/utils";
-import { ArrowUpDown, ArrowUp, ArrowDown, CalendarIcon } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, CalendarIcon, AlertCircle } from "lucide-react";
 import { CampaignTablePagination } from "./CampaignTablePagination";
 import { CampaignTableTotalRow } from "./CampaignTableTotalRow";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -213,7 +213,21 @@ export function CampaignTable({
                       <div className="space-y-1 min-w-[200px]">
                         {isEdit ? (
                           <Input defaultValue={campaign.name} className="h-8 text-sm" onBlur={(e) => onCampaignUpdate?.(campaign.id, { name: e.target.value })} onClick={(e) => e.stopPropagation()} />
-                        ) : <span className="text-primary hover:underline cursor-pointer">{campaign.name}</span>}
+                        ) : (
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-primary hover:underline cursor-pointer">{campaign.name}</span>
+                            {(campaign.acos > 30 || campaign.status === "out_of_budget") && (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); }}
+                                title="Open campaign insights"
+                                className="inline-flex items-center justify-center h-5 w-5 rounded-full text-warning hover:bg-warning/10 cursor-pointer"
+                              >
+                                <AlertCircle className="h-3.5 w-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        )}
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className={cn(
                             "rounded-full px-2 py-0.5 text-[10px] font-medium border whitespace-nowrap",

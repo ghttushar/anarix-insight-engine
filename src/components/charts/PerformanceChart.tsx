@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   LineChart, Line, BarChart, Bar, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -8,12 +9,17 @@ import { METRIC_CONFIGS, MAX_VISIBLE_METRICS, DEFAULT_SELECTED_METRICS } from "@
 import { ChartContainer, ChartType, ChartMetric } from "./ChartContainer";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { mockCampaigns } from "@/data/mockCampaigns";
+import { ExternalLink } from "lucide-react";
 
 interface PerformanceChartProps {
   data: ChartDataPoint[];
   title?: string;
   showImpact?: boolean;
   onShowImpactChange?: (value: boolean) => void;
+  selectedMetrics?: MetricKey[];
+  onSelectedMetricsChange?: (next: MetricKey[]) => void;
 }
 
 const IMPACT_MULTIPLIERS: Record<string, number> = {
@@ -43,8 +49,14 @@ function formatTooltipValue(value: number, format: string): string {
   }
 }
 
-export function PerformanceChart({ data, title = "Performance Overview", showImpact = false, onShowImpactChange }: PerformanceChartProps) {
-  const [selectedMetrics, setSelectedMetrics] = useState<MetricKey[]>(DEFAULT_SELECTED_METRICS);
+export function PerformanceChart({ data, title = "Performance Overview", showImpact = false, onShowImpactChange, selectedMetrics: selectedMetricsProp, onSelectedMetricsChange }: PerformanceChartProps) {
+  const navigate = useNavigate();
+  const [internalSelected, setInternalSelected] = useState<MetricKey[]>(DEFAULT_SELECTED_METRICS);
+  const selectedMetrics = selectedMetricsProp ?? internalSelected;
+  const setSelectedMetrics = (next: MetricKey[]) => {
+    if (onSelectedMetricsChange) onSelectedMetricsChange(next);
+    else setInternalSelected(next);
+  };
   const [chartType, setChartType] = useState<ChartType>("line");
 
   const chartData = showImpact
@@ -61,12 +73,14 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
     : data;
 
   const handleMetricToggle = (metricKey: string) => {
-    setSelectedMetrics((prev) => {
-      const key = metricKey as MetricKey;
-      if (prev.includes(key)) return prev.filter((m) => m !== key);
-      if (prev.length >= MAX_VISIBLE_METRICS) return [...prev.slice(1), key];
-      return [...prev, key];
-    });
+    const key = metricKey as MetricKey;
+    if (selectedMetrics.includes(key)) {
+      setSelectedMetrics(selectedMetrics.filter((m) => m !== key));
+    } else if (selectedMetrics.length >= MAX_VISIBLE_METRICS) {
+      setSelectedMetrics([...selectedMetrics.slice(1), key]);
+    } else {
+      setSelectedMetrics([...selectedMetrics, key]);
+    }
   };
 
   const metrics: ChartMetric[] = METRIC_CONFIGS.map((m) => ({
@@ -80,6 +94,67 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
   const hasLeftAxis = selectedConfigs.some((m) => m.yAxisId === "left");
   const hasRightAxis = selectedConfigs.some((m) => m.yAxisId === "right");
 
+  // Build top-3 / bottom-2 contributors for the Show Impact tooltip
+  const contributors = (() => {
+    const sorted = [...mockCampaigns].sort((a, b) => b.spend - a.spend);
+    const top3 = sorted.slice(0, 3);
+    const bottom2 = sorted.slice(-2).reverse();
+    return { top3, bottom2 };
+  })();
+
+  const ImpactTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="rounded-md border border-border bg-popover px-3 py-2 text-xs shadow-md min-w-[260px]">
+        <div className="flex items-center justify-between gap-3 pb-1.5 border-b border-border">
+          <span className="font-medium text-foreground">{label}</span>
+          <span className="text-primary font-medium">Show Impact</span>
+        </div>
+        <div className="space-y-1 pt-1.5">
+          {payload.map((p: any) => {
+            const config = METRIC_CONFIGS.find((m) => m.key === p.name || m.key === p.dataKey?.replace?.("_impact", ""));
+            return (
+              <div key={p.dataKey} className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: p.color }} />
+                  {config?.label || p.name}
+                </span>
+                <span className="font-mono text-foreground">{formatTooltipValue(p.value, config?.format || "number")}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="pt-2 mt-2 border-t border-border space-y-1.5">
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Top 3 campaigns</p>
+            {contributors.top3.map((c) => (
+              <div key={c.id} className="flex items-center justify-between gap-2">
+                <span className="truncate text-foreground max-w-[170px]">{c.name}</span>
+                <span className="font-mono text-success">${c.spend.toFixed(0)}</span>
+              </div>
+            ))}
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Bottom 2 campaigns</p>
+            {contributors.bottom2.map((c) => (
+              <div key={c.id} className="flex items-center justify-between gap-2">
+                <span className="truncate text-foreground max-w-[170px]">{c.name}</span>
+                <span className="font-mono text-muted-foreground">${c.spend.toFixed(0)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); navigate(`/advertising/impact?date=${encodeURIComponent(label)}`); }}
+          className="mt-2 w-full inline-flex items-center justify-center gap-1.5 rounded-md border border-primary/30 bg-primary/5 px-2 py-1 text-[11px] font-medium text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+        >
+          <ExternalLink className="h-3 w-3" /> View in Table
+        </button>
+      </div>
+    );
+  };
+
   const tooltipConfig = {
     contentStyle: {
       backgroundColor: "hsl(var(--card))",
@@ -92,6 +167,8 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
       return [formatTooltipValue(value, config?.format || "number"), config?.label || name];
     },
   };
+
+  const tooltipNode = showImpact ? <Tooltip content={<ImpactTooltip />} /> : <Tooltip {...tooltipConfig} />;
 
   const impactControl = onShowImpactChange ? (
     <div className="flex items-center gap-2">
@@ -113,7 +190,7 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
         <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
-          <Tooltip {...tooltipConfig} />
+          {tooltipNode}
           <Legend />
           {selectedConfigs.map((config) => (
             <Bar key={config.key} dataKey={config.key} name={config.key} fill={config.color} radius={[3, 3, 0, 0]} />
@@ -128,7 +205,7 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
           <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
           {hasLeftAxis && <YAxis yAxisId="left" orientation="left" tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />}
           {hasRightAxis && <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} className="text-muted-foreground" />}
-          <Tooltip {...tooltipConfig} />
+          {tooltipNode}
           <Legend />
           {selectedConfigs.map((config) => (
             <Area key={config.key} type="monotone" dataKey={config.key} name={config.key} stroke={config.color} fill={config.color} fillOpacity={0.15} yAxisId={config.yAxisId || "left"} strokeWidth={2} />
@@ -143,7 +220,7 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
           <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
           {hasLeftAxis && <YAxis yAxisId="left" orientation="left" tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} className="text-muted-foreground" />}
           {hasRightAxis && <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} className="text-muted-foreground" />}
-          <Tooltip {...tooltipConfig} />
+          {tooltipNode}
           <Legend />
           {selectedConfigs.map((config) => (
             <Line key={config.key} type="monotone" dataKey={config.key} name={config.key} stroke={config.color} yAxisId={config.yAxisId || "left"} strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
