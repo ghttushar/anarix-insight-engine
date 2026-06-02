@@ -36,13 +36,8 @@ export default function RuleAgents() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb
-          items={[
-            { label: "Advertising", href: "/advertising" },
-            { label: "Rules", href: "/advertising/rules/agents" },
-            { label: "Agents" },
-          ]}
-        />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
+
         <PageHeader
           title="Rule Agents"
           subtitle="Create automation rules from templates or with AI assistance"
