@@ -176,7 +176,7 @@ export default function Accounts() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
 
         {/* Header */}
         <div>
