@@ -39,6 +39,8 @@ const SORTABLE_FIELDS = [
   { id: "roas", label: "ROAS" },
 ];
 
+const FILTER_FIELDS = ["Name", "Impact %", "Impressions", "Clicks", "CTR", "Ad Spend", "Ad Sales", "ROAS", "ACOS"];
+
 const breadcrumbItems = [
   { label: "Advertising", href: "/advertising/impact" },
   { label: "Impact Analysis" },
