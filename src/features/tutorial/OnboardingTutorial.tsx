@@ -99,7 +99,7 @@ export function OnboardingTutorial() {
   const { active, state, next, prev, skip, complete } = useTutorial();
   const navigate = useNavigate();
   const { setDataPanel, closeDataPanel } = useActivePanel();
-  const { openCopilot, closeCopilot } = useAan();
+  const { openCopilot, closePanel } = useAan();
 
   const step = tutorialSteps[state.currentStep];
   const isLast = state.currentStep === tutorialSteps.length - 1;
@@ -116,9 +116,9 @@ export function OnboardingTutorial() {
     else if (step.panel === "aan") openCopilot();
     return () => {
       if (step.panel === "insights" || step.panel === "notifications") closeDataPanel();
-      if (step.panel === "aan") closeCopilot();
+      if (step.panel === "aan") closePanel();
     };
-  }, [active, step, navigate, setDataPanel, closeDataPanel, openCopilot, closeCopilot]);
+  }, [active, step, navigate, setDataPanel, closeDataPanel, openCopilot, closePanel]);
 
   // Lock background scroll while active.
   useEffect(() => {

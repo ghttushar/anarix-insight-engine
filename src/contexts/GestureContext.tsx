@@ -138,7 +138,7 @@ export function useGestures() {
 export function GestureProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { setDataPanel, closeDataPanel, dataPanel } = useActivePanel();
-  const { openCopilot, closeCopilot, mode } = useAan();
+  const { openCopilot, closePanel, mode } = useAan();
   const { openPanel: openInsights } = useInsights();
 
   const [enabled, setEnabledState] = useState<boolean>(loadEnabled);
@@ -200,7 +200,7 @@ export function GestureProvider({ children }: { children: React.ReactNode }) {
           openInsights();
           break;
         case "toggle-aan":
-          if (mode === "copilot") closeCopilot();
+          if (mode === "copilot") closePanel();
           else openCopilot();
           break;
         case "refresh":
@@ -216,7 +216,7 @@ export function GestureProvider({ children }: { children: React.ReactNode }) {
           break;
       }
     },
-    [closeCopilot, closeDataPanel, dataPanel, mode, openCopilot, openInsights, setDataPanel]
+    [closePanel, closeDataPanel, dataPanel, mode, openCopilot, openInsights, setDataPanel]
   );
 
   /* Edge swipe (touchscreen, single finger) */
