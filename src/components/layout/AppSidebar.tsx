@@ -193,7 +193,10 @@ export function AppSidebar() {
 
   return (
     <Sidebar className={cn("border-r border-sidebar-border bg-sidebar transition-all duration-200", collapsed ? "w-14" : "w-56")} collapsible="icon">
-      <SidebarContent className="flex flex-col h-full">
+      {/* overflow-hidden defeats shadcn SidebarContent's default overflow-auto so
+          header/Aan/marketplace/footer stay pinned and only the nav-groups
+          section scrolls (critical for tablet portrait viewports). */}
+      <SidebarContent className="flex flex-col h-full overflow-hidden">
         {/* Header: Logo left, Toggle right */}
         <div className={cn(
           "flex items-center h-12 border-b border-border/30 shrink-0",
