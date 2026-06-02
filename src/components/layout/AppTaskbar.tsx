@@ -43,9 +43,11 @@ const DATE_PRESET_GROUPS: { label: string; presets: DatePreset[] }[] = [
     presets: [
       { label: "Today", getRange: () => ({ from: today(), to: today() }) },
       { label: "Yesterday", getRange: () => { const d = subDays(today(), 1); return { from: d, to: d }; } },
+      { label: "Last 3 days", getRange: () => ({ from: subDays(today(), 2), to: today() }) },
       { label: "Last 7 days", getRange: () => ({ from: subDays(today(), 6), to: today() }) },
       { label: "Last 14 days", getRange: () => ({ from: subDays(today(), 13), to: today() }) },
       { label: "Last 30 days", getRange: () => ({ from: subDays(today(), 29), to: today() }) },
+      { label: "Last 60 days", getRange: () => ({ from: subDays(today(), 59), to: today() }) },
     ],
   },
   {
