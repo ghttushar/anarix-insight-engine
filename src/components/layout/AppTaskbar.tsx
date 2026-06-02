@@ -237,7 +237,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
           <div className="flex items-center gap-3 flex-1 min-w-0 flex-wrap">
             {showAdType && (
               <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
-                <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
+                <span className="taskbar-filter-label text-sm font-medium text-muted-foreground whitespace-nowrap">Ad Type</span>
                 <Select value={adType} onValueChange={(v) => setAdType(v as any)}>
                   <SelectTrigger className="h-8 w-[110px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
                     <SelectValue />
@@ -255,7 +255,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
 
             {showFrequency && (
               <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
-                <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Frequency</span>
+                <span className="taskbar-filter-label text-sm font-medium text-muted-foreground whitespace-nowrap">Frequency</span>
                 <Select value={frequency} onValueChange={(v) => setFrequency(v as any)}>
                   <SelectTrigger className="h-8 w-[90px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer">
                     <SelectValue />
@@ -271,7 +271,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
 
             {showDateRange && (
               <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
-                <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Date Range</span>
+                <span className="taskbar-filter-label text-sm font-medium text-muted-foreground whitespace-nowrap">Date Range</span>
                 <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-sm font-normal px-1.5 cursor-pointer">
