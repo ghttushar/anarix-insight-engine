@@ -143,8 +143,6 @@ export function AddProductAdsModal({ open, onOpenChange }: AddProductAdsModalPro
                     <tr className="border-b border-border text-muted-foreground">
                       <th className="text-left px-3 py-2 font-medium">Status</th>
                       <th className="text-left px-3 py-2 font-medium">Product</th>
-                      <th className="text-right px-3 py-2 font-medium">Suggested Bid</th>
-                      <th className="text-right px-3 py-2 font-medium">Bid</th>
                       <th className="w-8 px-2 py-2"></th>
                     </tr>
                   </thead>
@@ -155,18 +153,8 @@ export function AddProductAdsModal({ open, onOpenChange }: AddProductAdsModalPro
                         <td className="px-3 py-2">
                           <div className="flex items-center gap-2">
                             <img src={product.image} alt={product.name} className="h-6 w-6 rounded object-cover bg-muted" />
-                            <span className="truncate max-w-[120px]">{product.name}</span>
+                            <span className="truncate max-w-[260px]">{product.name}</span>
                           </div>
-                        </td>
-                        <td className="text-right px-3 py-2 text-muted-foreground">{formatCurrency(product.suggestedBid)}</td>
-                        <td className="text-right px-3 py-2">
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={product.bid}
-                            onChange={(e) => updateBid(product.id, parseFloat(e.target.value) || 0)}
-                            className="h-7 w-20 text-right text-sm ml-auto"
-                          />
                         </td>
                         <td className="px-2 py-2">
                           <button onClick={() => removeStaged(product.id)} className="text-muted-foreground hover:text-foreground cursor-pointer">
