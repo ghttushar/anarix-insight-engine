@@ -21,6 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { MetricFrequencyChart, MetricKey, Frequency } from "./MetricFrequencyChart";
 
 interface ProfitabilityHeroCardProps {
   summaries: ProfitabilitySummary[];
@@ -402,6 +403,8 @@ export function ProfitabilityHeroCard({
   const { formatCurrency } = useCurrency();
   const [activeView, setActiveView] = useState<"overview" | "breakdown" | "efficiency">("overview");
   const [selectedCardIndex, setSelectedCardIndex] = useState(0);
+  const [chartMetrics, setChartMetrics] = useState<MetricKey[]>(["gmv", "netProfit", "adCost", "orders"]);
+  const [chartFrequency, setChartFrequency] = useState<Frequency>("daily");
 
   // Per-card dates
   const [todayDate, setTodayDate] = useState<Date>(new Date());
@@ -513,16 +516,31 @@ export function ProfitabilityHeroCard({
               />
             </div>
 
-            {/* Full-width chart */}
-            <ComparisonChart
-              datasets={[
-                { data: todayTrend, label: "Today", color: ACCENT_COLORS[0] },
-                { data: yesterdayTrend, label: "Yesterday", color: ACCENT_COLORS[1] },
-                { data: thisMonthTrend, label: "This Month", color: ACCENT_COLORS[2] },
-                { data: lastMonthTrend, label: "Last Month", color: ACCENT_COLORS[3] },
-                { data: forecastTrend, label: "Forecast", color: ACCENT_COLORS[4], dashed: true },
-              ]}
-            />
+            {/* Metric/Frequency-driven chart bound to the selected card */}
+            {(() => {
+              const selectedCfg = cardConfigs[selectedCardIndex] ?? cardConfigs[0];
+              const trend =
+                selectedCardIndex === 0 ? todayTrend :
+                selectedCardIndex === 1 ? yesterdayTrend :
+                selectedCardIndex === 2 ? thisMonthTrend :
+                selectedCardIndex === 3 ? lastMonthTrend :
+                forecastTrend;
+              const summaryForChart = selectedCardIndex === 4 ? { ...thisMonthSummary, dateLabel: "Forecast" } : selectedCfg.summary;
+              const compareForChart = selectedCardIndex === 4 ? thisMonthSummary : selectedCfg.compareTo;
+              return (
+                <MetricFrequencyChart
+                  summary={summaryForChart}
+                  compareTo={compareForChart}
+                  trendData={trend}
+                  selectedMetrics={chartMetrics}
+                  onSelectedMetricsChange={setChartMetrics}
+                  frequency={chartFrequency}
+                  onFrequencyChange={setChartFrequency}
+                  formatCurrency={formatCurrency}
+                  contextLabel={selectedCardIndex === 4 ? "Forecast" : selectedCfg.label}
+                />
+              );
+            })()}
           </>
         )}
 
