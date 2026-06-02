@@ -229,6 +229,15 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleZoomIn} title="Zoom in"><ZoomIn className="h-3.5 w-3.5" /></Button>
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleZoomOut} title="Zoom out"><ZoomOut className="h-3.5 w-3.5" /></Button>
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleReset} title="Reset zoom"><RotateCcw className="h-3.5 w-3.5" /></Button>
+          <Button
+            variant={areaSelectMode ? "default" : "ghost"}
+            size="sm"
+            className="h-7 w-7 p-0"
+            onClick={() => setAreaSelectMode((v) => !v)}
+            title={areaSelectMode ? "Exit area select" : "Area select"}
+          >
+            <BoxSelect className="h-3.5 w-3.5" />
+          </Button>
           <div className="w-px h-4 bg-border mx-0.5" />
         </>
       )}
