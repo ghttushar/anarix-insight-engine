@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import { ScatterDataPoint } from "@/types/profitability";
 import { cn } from "@/lib/utils";
-import { Maximize2, Minimize2, ZoomIn, ZoomOut, RotateCcw, Download, BarChart3, Activity, Target } from "lucide-react";
+import { Maximize2, Minimize2, ZoomIn, ZoomOut, RotateCcw, Download, BarChart3, Activity, Target, BoxSelect } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
