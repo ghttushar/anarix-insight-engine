@@ -9,7 +9,7 @@ import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { TablePagination } from "@/components/tables/TablePagination";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 
 
 const breadcrumbItems = [
@@ -39,7 +39,7 @@ export default function KeywordSOV() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
         <PageHeader
           title="Keyword Share of Voice"
           subtitle="Track SOV performance by keyword"

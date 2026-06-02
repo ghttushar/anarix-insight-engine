@@ -9,7 +9,7 @@ import { mockCreativeAssets, mockCreativeInsights } from "@/data/mockCreativeAna
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 
 const impactColors: Record<string, string> = { high: "bg-destructive/10 text-destructive border-destructive/20", medium: "bg-warning/10 text-warning border-warning/20", low: "bg-primary/10 text-primary border-primary/20" };
 
@@ -23,7 +23,7 @@ export default function CreativeAnalyzer() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
         <PageHeader
           title="Creative Performance Analyzer"
           subtitle="Analyze which visual elements correlate with higher CTR and CVR across your ad creatives"

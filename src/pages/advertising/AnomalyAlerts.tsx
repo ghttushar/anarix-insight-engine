@@ -10,7 +10,7 @@ import { mockAnomalyAlerts, type AnomalyAlert } from "@/data/mockAnomalyAlerts";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 
 const severityStyles: Record<string, string> = {
   critical: "border-l-destructive bg-destructive/5",
@@ -49,7 +49,7 @@ export default function AnomalyAlerts() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
         <PageHeader
           title="Aan Anomaly Alerts"
           subtitle="Proactive AI-powered alerts when metrics deviate significantly from expected patterns"

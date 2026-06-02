@@ -5,7 +5,7 @@ import { WidgetCanvas } from "@/components/workspace/WidgetCanvas";
 import { AddWidgetModal } from "@/components/workspace/AddWidgetModal";
 import { Button } from "@/components/ui/button";
 import { Plus, RotateCcw, Pencil, FilePlus } from "lucide-react";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 export type WidgetType = "metric" | "chart" | "table" | "annotation" | "task";
 
 export interface Widget {
