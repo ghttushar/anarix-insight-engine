@@ -204,7 +204,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
   const hasRow2 = showAdType || showFrequency || showDateRange || showRunButton || children || islandOff;
 
   return (
-    <div className="flex flex-col rounded-lg border bg-card shrink-0 sticky top-0 z-30 border-primary">
+    <div data-app-taskbar className="flex flex-col rounded-lg border bg-card shrink-0 sticky top-0 z-30 border-primary">
       {/* Row 1: Breadcrumb left, Account + Sync right */}
       {hasRow1 && (
         <div className={cn(
@@ -220,11 +220,11 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
               {renderMarketplaceLogo()}
             </div>
             <StatusDot status={accountStatus} className="h-1.5 w-1.5" />
-            <span className="text-xs font-medium text-foreground truncate max-w-[120px]">{accountName}</span>
-            <div className="h-3.5 w-px bg-border" />
+            <span className="taskbar-account-name text-xs font-medium text-foreground truncate max-w-[120px]">{accountName}</span>
+            <div className="h-3.5 w-px bg-border taskbar-account-name" />
             {/* Last synced */}
-            <Clock className="h-3 w-3 text-muted-foreground" />
-            <span className="text-[11px] text-muted-foreground whitespace-nowrap">Last synced: {lastSyncTime}</span>
+            <Clock className="h-3 w-3 text-muted-foreground taskbar-last-synced" />
+            <span className="taskbar-last-synced text-[11px] text-muted-foreground whitespace-nowrap">Last synced: {lastSyncTime}</span>
             <div className="h-3.5 w-px bg-border" />
             <ViewBadge />
           </div>
