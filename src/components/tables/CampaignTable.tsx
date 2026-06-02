@@ -10,7 +10,7 @@ import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { cn } from "@/lib/utils";
-import { ArrowUpDown, ArrowUp, ArrowDown, CalendarIcon } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, CalendarIcon, AlertCircle } from "lucide-react";
 import { CampaignTablePagination } from "./CampaignTablePagination";
 import { CampaignTableTotalRow } from "./CampaignTableTotalRow";
 import { useCurrency } from "@/contexts/CurrencyContext";
