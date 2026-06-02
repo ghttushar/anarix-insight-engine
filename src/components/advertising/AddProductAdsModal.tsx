@@ -17,12 +17,9 @@ interface StagedProduct {
   name: string;
   image: string;
   itemId: string;
-  suggestedBid: number;
-  bid: number;
 }
 
 export function AddProductAdsModal({ open, onOpenChange }: AddProductAdsModalProps) {
-  const { formatCurrency } = useCurrency();
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [stagedProducts, setStagedProducts] = useState<StagedProduct[]>([]);
@@ -46,8 +43,6 @@ export function AddProductAdsModal({ open, onOpenChange }: AddProductAdsModalPro
           name: product.name,
           image: product.image,
           itemId: product.itemId,
-          suggestedBid: 0.75,
-          bid: 0.75,
         },
       ]);
     }
@@ -63,11 +58,6 @@ export function AddProductAdsModal({ open, onOpenChange }: AddProductAdsModalPro
     });
   };
 
-  const updateBid = (id: string, bid: number) => {
-    setStagedProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, bid } : p))
-    );
-  };
 
   const handleAdd = () => {
     onOpenChange(false);
