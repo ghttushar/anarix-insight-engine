@@ -399,6 +399,38 @@ export const pnlData: PnLRow[] = [
     weeklyValues: { "Week-01": 5.2, "Week-02": 4.58, "Week-04": 57.17, "Week-05": 5.21 },
     total: 5.48,
   },
+  {
+    id: "gross-profit",
+    parameter: "Gross Profit",
+    isParent: false,
+    indent: 0,
+    weeklyValues: { "Week-01": 863.95, "Week-02": 819.96, "Week-04": -69.01, "Week-05": 420.97 },
+    total: 2035.87,
+  },
+  {
+    id: "profit-margin",
+    parameter: "Profit Margin %",
+    isParent: false,
+    indent: 0,
+    weeklyValues: { "Week-01": 84.88, "Week-02": 83.79, "Week-04": -506.72, "Week-05": 84.76 },
+    total: 78.63,
+  },
+  {
+    id: "contribution-margin",
+    parameter: "Contribution Margin",
+    isParent: false,
+    indent: 0,
+    weeklyValues: { "Week-01": 690.20, "Week-02": 651.46, "Week-04": -120.36, "Week-05": 320.67 },
+    total: 1541.97,
+  },
+  {
+    id: "aov",
+    parameter: "Average Order Value",
+    isParent: false,
+    indent: 0,
+    weeklyValues: { "Week-01": 172.99, "Week-02": 207.49, "Week-04": 20.99, "Week-05": 140.66 },
+    total: 164.45,
+  },
 ];
 
 export const trendData: TrendDataPoint[] = [
