@@ -6,7 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Search, X } from "lucide-react";
 import { StatusBadge } from "@/components/status/StatusBadge";
 import { catalogProducts } from "@/data/mockCatalog";
-import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface AddProductAdsModalProps {
   open: boolean;
