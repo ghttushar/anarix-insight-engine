@@ -64,13 +64,7 @@ export default function ImpactAnalysis() {
   const [{ previous, impact }, setRanges] = useState(defaultRanges());
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [selectionByTab, setSelectionByTab] = useState<Record<ImpactTab, Set<string>>>({
-    "campaigns": new Set(),
-    "ad-groups": new Set(),
-    "products": new Set(),
-    "keywords": new Set(),
-    "search-terms": new Set(),
-  });
+  const [activeFilters, setActiveFilters] = useState<{ id: string; field: string; operator: string; value: string }[]>([]);
 
   const data = useMemo(() => {
     switch (activeTab) {
