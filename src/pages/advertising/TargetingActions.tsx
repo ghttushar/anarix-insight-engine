@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -11,15 +11,32 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, Archive, DollarSign } from "lucide-react";
+import { Plus, Archive, DollarSign, MoreHorizontal } from "lucide-react";
 import { mockTargetingActions, mockTargetCampaigns, mockTargetAdGroups } from "@/data/mockTargetingActions";
 import { MatchTypePicker } from "@/components/advertising/MatchTypePicker";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
-type ActionTab = "keyword-action" | "history" | "archive";
+import { useMarketplace } from "@/contexts/MarketplaceContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-const tabs = [
+type AmazonTab = "product-action" | "keyword-negation" | "product-negation" | "history" | "archive";
+type WalmartTab = "keyword-action" | "history" | "archive";
+
+const AMAZON_TABS = [
+  { value: "product-action", label: "Product Action" },
+  { value: "keyword-negation", label: "Keyword Negation" },
+  { value: "product-negation", label: "Product Negation" },
+  { value: "history", label: "History" },
+  { value: "archive", label: "Archive" },
+];
+
+const WALMART_TABS = [
   { value: "keyword-action", label: "Keyword Action" },
   { value: "history", label: "History" },
   { value: "archive", label: "Archive" },
@@ -36,13 +53,17 @@ const SORTABLE_FIELDS = [
   { id: "roas", label: "ROAS" },
 ];
 
-
 const breadcrumbItems = [
   { label: "Advertising", href: "/advertising/targeting" },
   { label: "Targeting Actions" },
 ];
+
 export default function TargetingActions() {
-  const [activeTab, setActiveTab] = useState<ActionTab>("keyword-action");
+  const { isWalmart } = useMarketplace();
+  const tabs = isWalmart ? WALMART_TABS : AMAZON_TABS;
+  const defaultTab = (isWalmart ? "keyword-action" : "product-action") as AmazonTab | WalmartTab;
+
+  const [activeTab, setActiveTab] = useState<AmazonTab | WalmartTab>(defaultTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [bidAction, setBidAction] = useState("increase_pct");
   const [bidValue, setBidValue] = useState("");
@@ -54,13 +75,25 @@ export default function TargetingActions() {
   const [matchTypeState, setMatchTypeState] = useState<Record<string, any>>(() =>
     Object.fromEntries(mockTargetingActions.map((a) => [a.id, a.matchTypes]))
   );
+  const [archivedIds, setArchivedIds] = useState<Set<string>>(
+    () => new Set(mockTargetingActions.filter((a) => a.archived).map((a) => a.id))
+  );
+  const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
+
+  // Switch tab when marketplace switches
+  useMemo(() => {
+    setActiveTab(defaultTab);
+    setSelectedRowIds(new Set());
+  }, [defaultTab]);
 
   const filteredActions = mockTargetingActions.filter((action) => {
     const matchesSearch =
       action.searchTerm.toLowerCase().includes(searchQuery.toLowerCase()) ||
       action.normalizedTerm.toLowerCase().includes(searchQuery.toLowerCase());
-    if (activeTab === "archive") return matchesSearch && action.archived;
-    return matchesSearch && !action.archived;
+    const isArchived = archivedIds.has(action.id);
+    if (activeTab === "archive") return matchesSearch && isArchived;
+    if (activeTab === "history") return matchesSearch;
+    return matchesSearch && !isArchived;
   });
 
   const { formatCurrency } = useCurrency();
@@ -74,9 +107,42 @@ export default function TargetingActions() {
     toast.success(`Bid adjustment applied: ${bidAction === "set_to" ? "Set to" : bidAction === "increase_pct" ? "Increase by" : "Decrease by"} ${bidValue}${bidAction !== "set_to" ? "%" : ""}`);
     setBidValue("");
   };
-  const handleAddKeywords = (keywords: any[], campaignId: string, adGroupId: string) => {
+  const handleAddKeywords = (keywords: any[], _campaignId: string, _adGroupId: string) => {
     toast.success(`Added ${keywords.length} keyword(s) to target campaign`);
+    setSelectedRowIds(new Set());
   };
+
+  const toggleRow = (id: string) => {
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const toggleAll = () => {
+    const ids = filteredActions.map((a) => a.id);
+    const allSelected = ids.length > 0 && ids.every((id) => selectedRowIds.has(id));
+    if (allSelected) setSelectedRowIds(new Set());
+    else setSelectedRowIds(new Set(ids));
+  };
+
+  const archiveOne = (id: string) => {
+    setArchivedIds((prev) => { const next = new Set(prev); next.add(id); return next; });
+    toast.success("Moved to Archive");
+  };
+  const unarchiveOne = (id: string) => {
+    setArchivedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+    toast.success("Restored from Archive");
+  };
+  const archiveSelected = () => {
+    setArchivedIds((prev) => { const next = new Set(prev); selectedRowIds.forEach((id) => next.add(id)); return next; });
+    toast.success(`Archived ${selectedRowIds.size} item(s)`);
+    setSelectedRowIds(new Set());
+  };
+
+  const hasSelection = selectedRowIds.size > 0;
+  const allSelected = filteredActions.length > 0 && filteredActions.every((a) => selectedRowIds.has(a.id));
+  const someSelected = filteredActions.some((a) => selectedRowIds.has(a.id));
 
   return (
     <AppLayout>
@@ -85,7 +151,7 @@ export default function TargetingActions() {
           title="Targeting Actions"
           subtitle="Convert search terms into keyword targets across your campaigns"
         />
-        <AppTaskbar breadcrumbItems={breadcrumbItems}>
+        <AppTaskbar showDateRange breadcrumbItems={breadcrumbItems}>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Action Type</span>
@@ -113,7 +179,7 @@ export default function TargetingActions() {
           <Button size="sm" className="gap-1.5 h-8" onClick={handleFetchKeywords}>Fetch</Button>
         </AppTaskbar>
 
-        <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as ActionTab)} />
+        <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as any)} />
 
         <DataTableToolbar
           searchValue={searchQuery}
@@ -133,9 +199,14 @@ export default function TargetingActions() {
           onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
           rightContent={
             <>
+              {hasSelection && activeTab !== "archive" && (
+                <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={archiveSelected}>
+                  <Archive className="h-3.5 w-3.5" />Archive ({selectedRowIds.size})
+                </Button>
+              )}
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" disabled={!hasSelection}>
                     <DollarSign className="h-3.5 w-3.5" />Custom Bid
                   </Button>
                 </PopoverTrigger>
@@ -156,8 +227,14 @@ export default function TargetingActions() {
                   </div>
                 </PopoverContent>
               </Popover>
-              <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => setAddKeywordsOpen(true)}>
-                <Plus className="h-3.5 w-3.5" />Add Keywords
+              <Button
+                size="sm"
+                className="h-8 gap-1.5 text-xs"
+                onClick={() => setAddKeywordsOpen(true)}
+                disabled={!hasSelection}
+                title={hasSelection ? "Add selected search terms as keyword targets" : "Select at least one search term to enable"}
+              >
+                <Plus className="h-3.5 w-3.5" />Add Keyword{hasSelection ? ` (${selectedRowIds.size})` : ""}
               </Button>
             </>
           }
@@ -168,14 +245,20 @@ export default function TargetingActions() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted hover:bg-muted">
-                  <TableHead className="min-w-[200px] sticky left-0 z-10 bg-muted">Search Term</TableHead>
+                  <TableHead className="w-10 sticky left-0 z-10 bg-muted">
+                    <Checkbox
+                      checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                      onCheckedChange={toggleAll}
+                      aria-label="Select all rows"
+                    />
+                  </TableHead>
+                  <TableHead className="min-w-[200px] sticky left-10 z-10 bg-muted">Search Term</TableHead>
                   <TableHead className="min-w-[160px]">Normalized Term</TableHead>
                   <TableHead className="min-w-[140px]">Source Campaign</TableHead>
                   <TableHead className="min-w-[130px]">Source AdGroup</TableHead>
                   <TableHead className="min-w-[150px]">Target Campaign</TableHead>
                   <TableHead className="min-w-[150px]">Target Ad Group</TableHead>
                   <TableHead className="min-w-[200px]">Match Types</TableHead>
-                  <TableHead className="w-14 text-center">Archive</TableHead>
                   <TableHead className="text-right">Impressions</TableHead>
                   <TableHead className="text-right">Clicks</TableHead>
                   <TableHead className="text-right">CTR</TableHead>
@@ -186,14 +269,20 @@ export default function TargetingActions() {
                   <TableHead className="text-right">CVR</TableHead>
                   <TableHead className="text-right">ROAS</TableHead>
                   <TableHead className="text-right">ACOS</TableHead>
+                  <TableHead className="w-12 text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredActions.map((action) => {
                   const acos = action.adSales > 0 ? (action.adSpend / action.adSales) * 100 : 0;
+                  const isSelected = selectedRowIds.has(action.id);
+                  const isArchived = archivedIds.has(action.id);
                   return (
-                    <TableRow key={action.id}>
-                      <TableCell className="sticky left-0 z-10 bg-background">
+                    <TableRow key={action.id} data-state={isSelected ? "selected" : undefined} className={cn("group data-[state=selected]:bg-primary/5")}>
+                      <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted group-data-[state=selected]:bg-primary/5 transition-colors">
+                        <Checkbox checked={isSelected} onCheckedChange={() => toggleRow(action.id)} aria-label={`Select ${action.searchTerm}`} />
+                      </TableCell>
+                      <TableCell className="sticky left-10 z-10 bg-background group-hover:bg-muted group-data-[state=selected]:bg-primary/5 transition-colors">
                         <div className="space-y-1">
                           <span className="font-medium text-sm text-foreground">{action.searchTerm}</span>
                           <Select defaultValue={action.termType}>
@@ -227,9 +316,6 @@ export default function TargetingActions() {
                           onChange={(next) => setMatchTypeState((s) => ({ ...s, [action.id]: next }))}
                         />
                       </TableCell>
-                      <TableCell className="text-center">
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><Archive className="h-3.5 w-3.5 text-muted-foreground" /></Button>
-                      </TableCell>
                       <TableCell className="text-right tabular-nums text-foreground">{formatNumber(action.impressions)}</TableCell>
                       <TableCell className="text-right tabular-nums text-foreground">{formatNumber(action.clicks)}</TableCell>
                       <TableCell className="text-right tabular-nums text-foreground">{formatPercent(action.ctr)}</TableCell>
@@ -240,6 +326,26 @@ export default function TargetingActions() {
                       <TableCell className="text-right tabular-nums text-foreground">{formatPercent(action.cvr)}</TableCell>
                       <TableCell className="text-right tabular-nums font-medium text-foreground">{action.roas.toFixed(2)}</TableCell>
                       <TableCell className="text-right tabular-nums text-foreground">{formatPercent(acos)}</TableCell>
+                      <TableCell className="text-center">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Row actions">
+                              <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {isArchived ? (
+                              <DropdownMenuItem className="text-xs cursor-pointer" onClick={() => unarchiveOne(action.id)}>
+                                <Archive className="mr-2 h-3.5 w-3.5" /> Restore
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem className="text-xs cursor-pointer" onClick={() => archiveOne(action.id)}>
+                                <Archive className="mr-2 h-3.5 w-3.5" /> Archive
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -257,6 +363,6 @@ export default function TargetingActions() {
       </div>
 
       <AddKeywordTargetModal isOpen={addKeywordsOpen} onClose={() => setAddKeywordsOpen(false)} onAdd={handleAddKeywords} />
-</AppLayout>
+    </AppLayout>
   );
 }
