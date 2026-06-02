@@ -6,7 +6,7 @@ import {
 } from "recharts";
 import { ScatterDataPoint } from "@/types/profitability";
 import { cn } from "@/lib/utils";
-import { Maximize2, Minimize2, ZoomIn, ZoomOut, RotateCcw, Download, BarChart3, Activity, Target } from "lucide-react";
+import { Maximize2, Minimize2, ZoomIn, ZoomOut, RotateCcw, Download, BarChart3, Activity, Target, BoxSelect } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -67,6 +67,9 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
   const [expanded, setExpanded] = useState(false);
   const [chartView, setChartView] = useState<ChartView>("scatter");
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [areaSelectMode, setAreaSelectMode] = useState(false);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
+  const [dragEnd, setDragEnd] = useState<{ x: number; y: number } | null>(null);
   const hasSelection = (selectedIds?.length ?? 0) > 0;
 
   const maxSales = Math.max(...data.map((d) => d.totalSales)) * 1.1;
@@ -79,7 +82,35 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
 
   const handleZoomIn = () => setZoomLevel((z) => Math.min(z * 1.3, 4));
   const handleZoomOut = () => setZoomLevel((z) => Math.max(z / 1.3, 0.5));
-  const handleReset = () => setZoomLevel(1);
+  const handleReset = () => { setZoomLevel(1); setDragStart(null); setDragEnd(null); };
+
+  const handleMouseDown = (e: any) => {
+    if (!areaSelectMode || !e || e.xValue == null || e.yValue == null) return;
+    setDragStart({ x: e.xValue, y: e.yValue });
+    setDragEnd({ x: e.xValue, y: e.yValue });
+  };
+  const handleMouseMove = (e: any) => {
+    if (!areaSelectMode || !dragStart || !e || e.xValue == null || e.yValue == null) return;
+    setDragEnd({ x: e.xValue, y: e.yValue });
+  };
+  const handleMouseUp = () => {
+    if (!areaSelectMode || !dragStart || !dragEnd || !onPointToggle) {
+      setDragStart(null); setDragEnd(null); return;
+    }
+    const x1 = Math.min(dragStart.x, dragEnd.x);
+    const x2 = Math.max(dragStart.x, dragEnd.x);
+    const y1 = Math.min(dragStart.y, dragEnd.y);
+    const y2 = Math.max(dragStart.y, dragEnd.y);
+    let count = 0;
+    data.forEach((d) => {
+      if (d.profitMargin >= x1 && d.profitMargin <= x2 && d.totalSales >= y1 && d.totalSales <= y2) {
+        if (!selectedIds?.includes(d.id)) { onPointToggle(d.id); count++; }
+      }
+    });
+    if (count > 0) toast.success(`Selected ${count} product${count === 1 ? "" : "s"}`);
+    setDragStart(null); setDragEnd(null);
+  };
+
 
   // Aggregate data for bar/line views
   const quadrantAggregates = Object.keys(quadrantLabels).map((q) => {
@@ -95,7 +126,14 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
 
   const renderScatter = (height: number) => (
     <ResponsiveContainer width="100%" height={height}>
-      <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
+      <ScatterChart
+        margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ cursor: areaSelectMode ? "crosshair" : undefined }}
+      >
         <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
         <ReferenceArea x1={0} x2={midMargin} y1={midSales} y2={zoomedMaxSales} fill={quadrantColors.optimize} fillOpacity={0.1} />
         <ReferenceArea x1={midMargin} x2={zoomedMaxMargin} y1={midSales} y2={zoomedMaxSales} fill={quadrantColors.winners} fillOpacity={0.1} />
@@ -106,7 +144,7 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
         <XAxis type="number" dataKey="profitMargin" name="Profit Margin" unit="%" domain={[0, zoomedMaxMargin]} tick={{ fontSize: 12 }} className="text-muted-foreground" label={{ value: "Profit Margin (%)", position: "bottom", offset: 0 }} />
         <YAxis type="number" dataKey="totalSales" name="Total Sales" domain={[0, zoomedMaxSales]} tick={{ fontSize: 12 }} className="text-muted-foreground" tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} label={{ value: "Total Sales ($)", angle: -90, position: "insideLeft" }} />
         <ZAxis range={[80, 200]} />
-        <Tooltip content={<CustomTooltip />} />
+        {!areaSelectMode && <Tooltip content={<CustomTooltip />} />}
         {Object.keys(quadrantColors).map((quadrant) => {
           const quadrantData = data.filter((d) => d.quadrant === quadrant);
           return (
@@ -116,8 +154,8 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
               data={quadrantData}
               fill={quadrantColors[quadrant as keyof typeof quadrantColors]}
               fillOpacity={hasSelection ? 0.25 : 1}
-              onClick={(p: any) => onPointToggle?.(p?.id)}
-              style={{ cursor: onPointToggle ? "pointer" : "default" }}
+              onClick={(p: any) => !areaSelectMode && onPointToggle?.(p?.id)}
+              style={{ cursor: areaSelectMode ? "crosshair" : (onPointToggle ? "pointer" : "default") }}
             />
           );
         })}
@@ -126,13 +164,27 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
             name="Selected"
             data={data.filter((d) => selectedIds!.includes(d.id))}
             fill="hsl(var(--primary))"
-            onClick={(p: any) => onPointToggle?.(p?.id)}
-            style={{ cursor: onPointToggle ? "pointer" : "default" }}
+            onClick={(p: any) => !areaSelectMode && onPointToggle?.(p?.id)}
+            style={{ cursor: areaSelectMode ? "crosshair" : (onPointToggle ? "pointer" : "default") }}
+          />
+        )}
+        {dragStart && dragEnd && (
+          <ReferenceArea
+            x1={Math.min(dragStart.x, dragEnd.x)}
+            x2={Math.max(dragStart.x, dragEnd.x)}
+            y1={Math.min(dragStart.y, dragEnd.y)}
+            y2={Math.max(dragStart.y, dragEnd.y)}
+            stroke="hsl(var(--primary))"
+            strokeOpacity={0.8}
+            fill="hsl(var(--primary))"
+            fillOpacity={0.15}
+            strokeDasharray="4 4"
           />
         )}
       </ScatterChart>
     </ResponsiveContainer>
   );
+
 
   const renderBar = (height: number) => (
     <ResponsiveContainer width="100%" height={height}>
@@ -177,6 +229,15 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleZoomIn} title="Zoom in"><ZoomIn className="h-3.5 w-3.5" /></Button>
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleZoomOut} title="Zoom out"><ZoomOut className="h-3.5 w-3.5" /></Button>
           <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleReset} title="Reset zoom"><RotateCcw className="h-3.5 w-3.5" /></Button>
+          <Button
+            variant={areaSelectMode ? "default" : "ghost"}
+            size="sm"
+            className="h-7 w-7 p-0"
+            onClick={() => setAreaSelectMode((v) => !v)}
+            title={areaSelectMode ? "Exit area select" : "Area select"}
+          >
+            <BoxSelect className="h-3.5 w-3.5" />
+          </Button>
           <div className="w-px h-4 bg-border mx-0.5" />
         </>
       )}

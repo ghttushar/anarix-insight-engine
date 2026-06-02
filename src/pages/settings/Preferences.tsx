@@ -13,7 +13,7 @@ import { useTrial } from "@/contexts/TrialContext";
 import { cn } from "@/lib/utils";
 import { Pencil, RotateCcw, Globe, Monitor, Tablet, Smartphone } from "lucide-react";
 import { toast } from "sonner";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { useViewport, AppView } from "@/contexts/ViewportContext";
 import { useNavigate } from "react-router-dom";
 
@@ -189,7 +189,7 @@ export default function Preferences() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-3xl space-y-8">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
         <div>
           <h1 className="font-heading text-2xl font-semibold text-foreground">Preferences</h1>
           <p className="text-sm text-muted-foreground">Customize how Anarix looks and behaves</p>

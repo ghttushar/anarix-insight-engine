@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
+import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,7 +52,7 @@ export default function Integrations() {
   return (
     <AppLayout>
       <div className="space-y-6 max-w-5xl">
-        <PageBreadcrumb items={breadcrumbItems} />
+        <AppTaskbar breadcrumbItems={breadcrumbItems} />
 
         <div>
           <h1 className="text-2xl font-heading font-semibold text-foreground">Integrations</h1>
