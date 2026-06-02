@@ -104,14 +104,16 @@ export function ImpactTable({ data, searchQuery = "", selectedIds, onSelectionCh
         <Table>
           <TableHeader>
             <TableRow className="bg-muted hover:bg-muted">
-              <TableHead className="w-10 sticky left-0 z-10 bg-muted">
-                <Checkbox
-                  checked={allOnPageSelected ? true : someOnPageSelected ? "indeterminate" : false}
-                  onCheckedChange={toggleAllOnPage}
-                  aria-label="Select all rows on this page"
-                />
-              </TableHead>
-              <SortableTableHead field="name" {...sp} isFixed className="min-w-[250px] sticky left-10 z-10 bg-muted">Name</SortableTableHead>
+              {!hideSelection && (
+                <TableHead className="w-10 sticky left-0 z-10 bg-muted">
+                  <Checkbox
+                    checked={allOnPageSelected ? true : someOnPageSelected ? "indeterminate" : false}
+                    onCheckedChange={toggleAllOnPage}
+                    aria-label="Select all rows on this page"
+                  />
+                </TableHead>
+              )}
+              <SortableTableHead field="name" {...sp} isFixed className={cn("min-w-[250px] sticky z-10 bg-muted", hideSelection ? "left-0" : "left-10")}>Name</SortableTableHead>
               <SortableTableHead field="impactPercentage" {...sp} className={cn("w-28 text-center", pc("impactPercentage", true))} style={ps("impactPercentage")} align="center">Impact</SortableTableHead>
               <SortableTableHead field="impressions" {...sp} className={cn("min-w-[180px] text-right", pc("impressions", true))} style={ps("impressions")} align="right">Impressions</SortableTableHead>
               <SortableTableHead field="clicks" {...sp} className={cn("min-w-[150px] text-right", pc("clicks", true))} style={ps("clicks")} align="right">Clicks</SortableTableHead>
