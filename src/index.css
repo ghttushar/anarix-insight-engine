@@ -619,6 +619,11 @@ html[data-view="mobile"] [data-app-taskbar] {
   row-gap: 0.5rem;
   padding: 8px 12px !important;
 }
+/* Hide noisy account/sync details on mobile taskbar row 1 */
+html[data-view="mobile"] .taskbar-account-name,
+html[data-view="mobile"] .taskbar-last-synced {
+  display: none !important;
+}
 /* Hide toolbar action labels (icons only), keep search visible */
 html[data-view="mobile"] [data-tb-actions] [data-tb-label] { display: none !important; }
 /* Page paddings */
@@ -636,4 +641,10 @@ html[data-view="mobile"] [data-app-panel] {
 html[data-view="mobile"] nav button {
   min-height: 44px;
 }
+/* InlineKPIStrip: keep cards at usable min width and scroll horizontally */
+html[data-view="mobile"] [data-inline-kpi-strip] > * {
+  flex: 0 0 140px !important;
+  min-width: 140px;
+}
+
 

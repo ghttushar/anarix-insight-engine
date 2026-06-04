@@ -77,7 +77,7 @@ export function InlineKPIStrip({ items, availableMetrics, onMetricChange }: Inli
   const isSwappable = !!(availableMetrics && onMetricChange);
 
   return (
-    <div className="flex gap-1 rounded-lg bg-card p-1">
+    <div data-inline-kpi-strip className="flex gap-1 rounded-lg bg-card p-1 overflow-x-auto">
       {items.map((item, index) => {
         const delta = calculateDelta(item.value, item.previousValue);
         const isPositive = delta > 0;
