@@ -106,19 +106,37 @@ function ScatterCanvas({
   );
 
   const xTicks = useMemo(() => {
-    const step = niceStep(view.xMax - view.xMin, 10);
+    const span = view.xMax - view.xMin;
+    const targetCount = Math.max(4, Math.min(10, Math.floor(plotW / 90)));
+    const step = niceStep(span, targetCount);
     const ticks: number[] = [];
     const start = Math.ceil(view.xMin / step) * step;
-    for (let t = start; t <= view.xMax + 0.001; t += step) ticks.push(Math.round(t * 100) / 100);
+    const seen = new Set<number>();
+    for (let t = start; t <= view.xMax + 0.001; t += step) {
+      const rounded = Math.round(t * 100) / 100;
+      if (!seen.has(rounded)) {
+        seen.add(rounded);
+        ticks.push(rounded);
+      }
+    }
     return ticks;
-  }, [view]);
+  }, [view, plotW]);
   const yTicks = useMemo(() => {
-    const step = niceStep(view.yMax - view.yMin, 8);
+    const span = view.yMax - view.yMin;
+    const targetCount = Math.max(4, Math.min(8, Math.floor(plotH / 50)));
+    const step = niceStep(span, targetCount);
     const ticks: number[] = [];
     const start = Math.ceil(view.yMin / step) * step;
-    for (let t = start; t <= view.yMax + 0.001; t += step) ticks.push(Math.round(t));
+    const seen = new Set<number>();
+    for (let t = start; t <= view.yMax + 0.001; t += step) {
+      const rounded = span < 5 ? Math.round(t * 10) / 10 : Math.round(t);
+      if (!seen.has(rounded)) {
+        seen.add(rounded);
+        ticks.push(rounded);
+      }
+    }
     return ticks;
-  }, [view]);
+  }, [view, plotH]);
 
   const xToPx = (x: number) => PAD.l + ((x - view.xMin) / (view.xMax - view.xMin)) * plotW;
   const yToPx = (y: number) => PAD.t + plotH - ((y - view.yMin) / (view.yMax - view.yMin)) * plotH;
