@@ -249,7 +249,6 @@ export default function ProfitabilityTrends() {
             }}
           />
 
-          {(
 
           <div className="rounded-lg border border-border bg-card">
             <div className="overflow-x-auto">
@@ -351,7 +350,6 @@ export default function ProfitabilityTrends() {
               onPageSizeChange={setPageSize}
             />
           </div>
-          )}
 
         </div>
         </div>
