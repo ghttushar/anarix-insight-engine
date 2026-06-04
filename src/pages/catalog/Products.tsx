@@ -93,34 +93,13 @@ export default function CatalogProducts() {
           onSortChange={(field, dir) => { setSortField(field); setSortDirection(dir); }}
         />
 
-        {isMobile ? (
-          <MobileCardList>
-            {filteredProducts.map((p) => (
-              <MobileCard
-                key={p.id}
-                thumbnail={p.image}
-                title={p.name}
-                meta={`${p.sku} • ${p.itemId}`}
-                kpis={[
-                  { label: "GMV", value: formatCurrency(p.gmv) },
-                  { label: "Units", value: p.totalUnits.toLocaleString() },
-                  { label: "Inv", value: p.inventoryCount.toLocaleString() },
-                ]}
-              />
-            ))}
-            {filteredProducts.length === 0 && (
-              <div className="text-center py-10 text-sm text-muted-foreground">No products found</div>
-            )}
-          </MobileCardList>
-        ) : (
-          <CatalogProductsTable
-            products={catalogProducts}
-            searchQuery={searchQuery}
-            showDeltas={showDeltas}
-            sortField={sortField}
-            sortDirection={sortDirection}
-          />
-        )}
+        <CatalogProductsTable
+          products={catalogProducts}
+          searchQuery={searchQuery}
+          showDeltas={showDeltas}
+          sortField={sortField}
+          sortDirection={sortDirection}
+        />
       </div>
 </AppLayout>
   );
