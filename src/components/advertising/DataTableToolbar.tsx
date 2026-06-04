@@ -226,7 +226,7 @@ export function DataTableToolbar({
           {(showUpload || onUpload || onUploadClick) && (
             <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" onClick={() => (onUploadClick ? onUploadClick() : setUploadOpen(true))} title={uploadTitle || "Upload files"}>
               <Upload className="h-3.5 w-3.5" />
-              {uploadLabel || "Upload"}
+              <span data-tb-label>{uploadLabel || "Upload"}</span>
             </Button>
           )}
 
@@ -240,7 +240,7 @@ export function DataTableToolbar({
               title={showDeltas ? "Hide deltas" : "Show deltas"}
             >
               <TrendingUp className="h-3.5 w-3.5" />
-              Delta
+              <span data-tb-label>Delta</span>
             </Button>
           )}
 
@@ -261,7 +261,7 @@ export function DataTableToolbar({
                   ) : (
                     <ArrowDown className="h-3.5 w-3.5" />
                   )}
-                  Group By
+                  <span data-tb-label>Group By</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-[220px] p-2 space-y-0.5">
@@ -296,7 +296,7 @@ export function DataTableToolbar({
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" onClick={handleOpenFilter} title="Add or manage filters">
                   <Filter className="h-3.5 w-3.5" />
-                  Filter
+                  <span data-tb-label>Filter</span>
                   {activeFilters.length > 0 && (
                     <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
                       {activeFilters.length}
@@ -304,7 +304,7 @@ export function DataTableToolbar({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-[520px] p-3 space-y-2">
+              <PopoverContent align="end" className="w-[520px] max-w-[92vw] p-3 space-y-2">
                 <p className="text-xs font-medium text-foreground">Filters</p>
                 <div className="space-y-1.5">
                   {draftFilters.map((rule, idx) => (
@@ -353,7 +353,7 @@ export function DataTableToolbar({
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" title="Toggle column visibility">
                   <Columns className="h-3.5 w-3.5" />
-                  Columns
+                  <span data-tb-label>Columns</span>
                   {pinnedColumns.length > 0 && (
                     <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary/20 text-[10px] text-primary">
                       {pinnedColumns.length}
@@ -419,7 +419,7 @@ export function DataTableToolbar({
           {onDownload && (
             <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs cursor-pointer" onClick={onDownload} title="Export data">
               <Download className="h-3.5 w-3.5" />
-              Export
+              <span data-tb-label>Export</span>
             </Button>
           )}
 
