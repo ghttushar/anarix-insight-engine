@@ -425,6 +425,8 @@ function ScatterCanvas({
           y={hover.y}
           onAskAan={askAan}
           onViewDetails={onPointDetail ? (p) => onPointDetail(p.id) : undefined}
+          onHoverIn={cancelHoverClose}
+          onHoverOut={scheduleHoverClose}
         />
       )}
     </div>
