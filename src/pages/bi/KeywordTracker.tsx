@@ -11,6 +11,10 @@ import { trackedKeywords as initialKeywords } from "@/data/mockBrandSOV";
 import { TrackedKeyword } from "@/types/bi";
 import { toast } from "sonner";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
+import { useViewport } from "@/contexts/ViewportContext";
+import { MobileCard, MobileCardList } from "@/views/mobile/MobileCardList";
+import { Badge } from "@/components/ui/badge";
+
 
 
 const breadcrumbItems = [
@@ -68,9 +72,29 @@ export default function KeywordTracker() {
             <TabsTrigger value="active">Active ({activeKeywords.length})</TabsTrigger>
             <TabsTrigger value="inactive">Inactive ({inactiveKeywords.length})</TabsTrigger>
           </TabsList>
-          <TabsContent value="active" className="mt-4"><KeywordTrackerTable keywords={filteredKeywords} onStatusChange={handleStatusChange} onDelete={handleDelete} /></TabsContent>
-          <TabsContent value="inactive" className="mt-4"><KeywordTrackerTable keywords={filteredKeywords} onStatusChange={handleStatusChange} onDelete={handleDelete} /></TabsContent>
+          {(["active", "inactive"] as const).map((tab) => (
+            <TabsContent key={tab} value={tab} className="mt-4">
+              {isMobile ? (
+                <MobileCardList>
+                  {filteredKeywords.map((k) => (
+                    <MobileCard
+                      key={k.id}
+                      title={<span className="flex items-center gap-2"><span>{k.regionFlag}</span>{k.keyword}</span>}
+                      meta={`${k.region} • ${k.channels.join(", ")}`}
+                      kpis={[
+                        { label: "Status", value: <Badge variant="outline" className="capitalize">{k.status}</Badge> },
+                        { label: "Updated", value: new Date(k.updatedAt).toLocaleDateString() },
+                      ]}
+                    />
+                  ))}
+                </MobileCardList>
+              ) : (
+                <KeywordTrackerTable keywords={filteredKeywords} onStatusChange={handleStatusChange} onDelete={handleDelete} />
+              )}
+            </TabsContent>
+          ))}
         </Tabs>
+
 
         {filteredKeywords.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
