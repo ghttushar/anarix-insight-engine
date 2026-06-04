@@ -9,7 +9,10 @@ import { useTrial } from "@/contexts/TrialContext";
 import { useBillingFlow } from "@/contexts/BillingFlowContext";
 import { DataSyncingState } from "@/components/billing/DataSyncingState";
 import { TrialExpiredState } from "@/components/billing/TrialExpiredState";
+import { useViewport } from "@/contexts/ViewportContext";
+import { MobileShell } from "@/views/mobile/MobileShell";
 import { cn } from "@/lib/utils";
+
 
 const AanCopilotPanel = lazy(() => import("@/components/aan/AanCopilotPanel").then(m => ({ default: m.AanCopilotPanel })));
 const AskAanTooltip = lazy(() => import("@/components/aan/AskAanTooltip").then(m => ({ default: m.AskAanTooltip })));
