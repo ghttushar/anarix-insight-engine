@@ -30,7 +30,7 @@ export function MobileDrawerNav({ open, onOpenChange }: Props) {
   const { setView } = useViewport();
   const { newFeaturesVisible } = useFeatureToggle();
   const { theme, setTheme } = useTheme();
-  const { currency, setCurrency } = useCurrency();
+  const { displayCurrency, setDisplayCurrency, currencies } = useCurrency();
 
   const filteredGroups = navigationGroups
     .map((g) => ({
@@ -167,11 +167,11 @@ export function MobileDrawerNav({ open, onOpenChange }: Props) {
             </div>
             <div className="grid grid-cols-3 gap-1 rounded-md bg-muted/40 p-1">
               {(["USD", "INR", "EUR"] as const).map((c) => {
-                const selected = currency === c;
+                const selected = displayCurrency === c;
                 return (
                   <button
                     key={c}
-                    onClick={() => setCurrency(c)}
+                    onClick={() => setDisplayCurrency(c)}
                     className={cn(
                       "h-9 rounded text-[12px] font-medium",
                       selected
@@ -179,7 +179,7 @@ export function MobileDrawerNav({ open, onOpenChange }: Props) {
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    {c}
+                    {currencies[c]?.symbol} {c}
                   </button>
                 );
               })}
