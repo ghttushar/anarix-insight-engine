@@ -46,7 +46,7 @@ export function buildClusters({
   height,
   xDomain,
   yDomain,
-  cellPx = 28,
+  cellPx = 36,
 }: BuildArgs): ClusterItem[] {
   if (width <= 0 || height <= 0) return [];
   const [x0, x1] = xDomain;
@@ -56,7 +56,7 @@ export function buildClusters({
 
   const toPx = (p: ScatterDataPoint) => ({
     px: ((p.profitMargin - x0) / xSpan) * width,
-    py: height - ((p.totalSales - y0) / ySpan) * height,
+    py: height - ((p.adSpend - y0) / ySpan) * height,
   });
 
   const buckets = new Map<string, ScatterDataPoint[]>();
