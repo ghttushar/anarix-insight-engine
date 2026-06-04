@@ -190,12 +190,15 @@ function ScatterCanvas({
       const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
       const ax = v.xMin + ((cx - PAD.l) / plotW) * (v.xMax - v.xMin);
       const ay = v.yMin + ((PAD.t + plotH - cy) / plotH) * (v.yMax - v.yMin);
-      setView({
-        xMin: ax - (ax - v.xMin) / factor,
-        xMax: ax + (v.xMax - ax) / factor,
-        yMin: Math.max(0, ay - (ay - v.yMin) / factor),
-        yMax: ay + (v.yMax - ay) / factor,
-      });
+      let xMin = ax - (ax - v.xMin) / factor;
+      let xMax = ax + (v.xMax - ax) / factor;
+      let yMin = Math.max(0, ay - (ay - v.yMin) / factor);
+      let yMax = ay + (v.yMax - ay) / factor;
+      const xSpan = xMax - xMin;
+      const ySpan = yMax - yMin;
+      if (xSpan < MIN_X_SPAN || xSpan > MAX_X_SPAN) { xMin = v.xMin; xMax = v.xMax; }
+      if (ySpan < MIN_Y_SPAN || ySpan > MAX_Y_SPAN) { yMin = v.yMin; yMax = v.yMax; }
+      setView({ xMin, xMax, yMin, yMax });
     };
     const prevent = (e: Event) => e.preventDefault();
     svg.addEventListener("wheel", handleWheel, { passive: false });
