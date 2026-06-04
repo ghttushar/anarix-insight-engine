@@ -57,7 +57,7 @@ export default function KeywordTracker() {
           showDeltas={showDeltas}
           onShowDeltasChange={setShowDeltas}
           leftContent={
-            <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setIsAddModalOpen(true)}>
+            <Button data-write-action size="sm" className="gap-1.5 text-xs h-8" onClick={() => setIsAddModalOpen(true)}>
               <Plus className="h-3.5 w-3.5" />Add Keyword
             </Button>
           }

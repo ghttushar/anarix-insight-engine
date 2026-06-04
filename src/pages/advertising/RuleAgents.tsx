@@ -66,6 +66,7 @@ export default function RuleAgents() {
                 className="flex-1"
               />
               <Button
+                data-write-action
                 onClick={() => {
                   if (prompt.trim()) navigate("/advertising/rules/create");
                 }}

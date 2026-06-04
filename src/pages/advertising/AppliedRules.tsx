@@ -93,7 +93,7 @@ export default function AppliedRules() {
           subtitle="Manage and monitor all active automation rules"
         />
 
-        <div className="flex items-center justify-end">
+        <div data-write-action className="flex items-center justify-end">
           <Button size="sm" onClick={() => navigate("/advertising/rules/agents")}>
             <Plus className="mr-2 h-4 w-4" />
             Create Rule

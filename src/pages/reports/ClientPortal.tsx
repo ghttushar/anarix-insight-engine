@@ -96,7 +96,7 @@ export default function ClientPortal() {
           title="Reports"
           subtitle="Generate, schedule, and share branded reports"
           actions={
-            <Button size="sm" onClick={() => handleOpenCreate()}>
+            <Button data-write-action size="sm" onClick={() => handleOpenCreate()}>
               <Plus className="mr-2 h-4 w-4" />Create Report
             </Button>
           }
