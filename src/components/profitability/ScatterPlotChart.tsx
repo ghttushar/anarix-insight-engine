@@ -206,19 +206,25 @@ function ScatterCanvas({
   const handlePointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if ((e.target as Element).closest("[data-bubble]")) return;
     (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId);
-    dragRef.current = { sx: e.clientX, sy: e.clientY, view };
-    setIsDragging(true);
+    dragRef.current = { sx: e.clientX, sy: e.clientY, view, moved: false };
   };
   const handlePointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
     if (!dragRef.current) return;
     const dx = e.clientX - dragRef.current.sx;
     const dy = e.clientY - dragRef.current.sy;
+    if (!dragRef.current.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+    if (!dragRef.current.moved) {
+      dragRef.current.moved = true;
+      setIsDragging(true);
+      cancelHoverClose();
+      setHover(null);
+    }
     const sxData = (dx / plotW) * (dragRef.current.view.xMax - dragRef.current.view.xMin);
     const syData = (dy / plotH) * (dragRef.current.view.yMax - dragRef.current.view.yMin);
     setView({
       xMin: dragRef.current.view.xMin - sxData,
       xMax: dragRef.current.view.xMax - sxData,
-      yMin: dragRef.current.view.yMin + syData,
+      yMin: Math.max(0, dragRef.current.view.yMin + syData),
       yMax: dragRef.current.view.yMax + syData,
     });
   };
@@ -241,6 +247,8 @@ function ScatterCanvas({
         yMin: Math.max(0, c.bbox.y1 - padY),
         yMax: c.bbox.y2 + padY,
       });
+      cancelHoverClose();
+      setHover(null);
       return;
     }
     const p = c.points[0];
@@ -262,6 +270,7 @@ function ScatterCanvas({
       ref={containerRef}
       className="relative w-full"
       style={{ height, overscrollBehavior: "contain", touchAction: "none" }}
+      onMouseLeave={scheduleHoverClose}
     >
       <svg
         ref={svgRef}
@@ -270,8 +279,7 @@ function ScatterCanvas({
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        onPointerLeave={() => { setHover(null); }}
-        style={{ cursor: isDragging ? "grabbing" : "crosshair", touchAction: "none", display: "block" }}
+        style={{ cursor: isDragging ? "grabbing" : "grab", touchAction: "none", display: "block" }}
       >
         <defs>
           <marker id="arrow-x" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
