@@ -45,6 +45,9 @@ export default function ProfitabilityTrends() {
   const [productSearch, setProductSearch] = useState("");
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+
 
   const columns = frequencyColumns[frequency];
 
