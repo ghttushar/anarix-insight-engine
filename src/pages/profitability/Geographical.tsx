@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -11,6 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { geographicalData } from "@/data/mockProfitability";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useViewport } from "@/contexts/ViewportContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { MobileCard, MobileCardList } from "@/views/mobile/MobileCardList";
+
 const regionLookup: Record<string, typeof geographicalData[0]> = {
   US: geographicalData[0],
   CA: geographicalData[0].children?.[0] || geographicalData[0],
