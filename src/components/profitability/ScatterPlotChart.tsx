@@ -381,7 +381,7 @@ const quadrantLabels = {
   review: { title: "Review" },
 };
 
-export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPlotChartProps) {
+export function ScatterPlotChart({ data, selectedIds, onPointToggle, onPointDetail }: ScatterPlotChartProps) {
   const [expanded, setExpanded] = useState(false);
   const [chartView, setChartView] = useState<ChartView>("scatter");
 
@@ -427,7 +427,7 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
   const renderChart = (h: number) =>
     chartView === "bar" ? renderBar(h)
     : chartView === "line" ? renderLine(h)
-    : <ScatterCanvas data={data} selectedIds={selectedIds} onPointToggle={onPointToggle} height={h} />;
+    : <ScatterCanvas data={data} selectedIds={selectedIds} onPointToggle={onPointToggle} onPointDetail={onPointDetail} height={h} />;
 
   const tierLegend = [
     { tier: "loss" as const, label: "Loss (<0%)" },
@@ -488,7 +488,7 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
             <h3 className="font-semibold text-foreground">Product Performance</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               {chartView === "scatter"
-                ? "Profit margin vs total sales — clusters spread as you zoom"
+                ? "Profit margin vs ad spend — click a cluster to zoom; click a dot for details"
                 : `Aggregated by quadrant (${chartView} view)`}
             </p>
           </div>
