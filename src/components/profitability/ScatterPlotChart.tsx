@@ -373,8 +373,8 @@ function ScatterCanvas({
               key={c.key}
               data-bubble
               style={{ cursor: "pointer" }}
-              onMouseEnter={() => setHover({ cluster: c, x: c.cx + PAD.l, y: c.cy + PAD.t })}
-              onMouseLeave={() => setHover(null)}
+              onMouseEnter={() => { cancelHoverClose(); setHover({ cluster: c, x: c.cx + PAD.l, y: c.cy + PAD.t }); }}
+              onMouseLeave={scheduleHoverClose}
               onClick={(e) => { e.stopPropagation(); handleBubble(c); }}
             >
               <circle
