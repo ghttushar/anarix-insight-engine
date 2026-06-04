@@ -285,7 +285,7 @@ export default function HourlyData() {
                   showDeltas={showDeltas}
                   onShowDeltasChange={setShowDeltas}
                   leftContent={
-                    <Button size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createSchedule")}>
+                    <Button data-write-action size="sm" className="gap-1.5 text-xs h-8" onClick={() => setDataPanel("createSchedule")}>
                       <Plus className="h-3.5 w-3.5" />Create Schedule
                     </Button>
                   }
