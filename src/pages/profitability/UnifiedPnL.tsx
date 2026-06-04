@@ -80,7 +80,7 @@ export default function UnifiedPnL() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockUnifiedPnL.map((row, i) => (
+              {paginatedRows.map((row, i) => (
                 <TableRow key={i} className={cn(row.isTotal && "bg-muted/20 font-semibold border-t-2 border-border", row.isHeader && "bg-muted/10 font-medium")}>
                   <TableCell className={cn(row.indent && `pl-${4 + row.indent * 4}`)}>
                     <span className={cn(row.isTotal && "font-semibold text-foreground", row.isHeader && "font-medium text-foreground", !row.isTotal && !row.isHeader && "text-muted-foreground", row.indent && "text-sm")}>
@@ -100,7 +100,15 @@ export default function UnifiedPnL() {
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            page={page}
+            pageSize={pageSize}
+            totalItems={mockUnifiedPnL.length}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
         </div>
+
       </div>
 </AppLayout>
   );
