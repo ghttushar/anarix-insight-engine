@@ -599,12 +599,7 @@ html[data-view="mobile"] main > * {
   max-width: 100vw;
 }
 
-/* 4. Hide the desktop AppTaskbar on mobile (MobileTaskbar replaces it).
-   Pages still using <AppTaskbar/> will get the mobile taskbar in its place
-   when they render <MobileTaskbar/> in parallel.   */
-html[data-view="mobile"] [data-app-taskbar] {
-  display: none !important;
-}
+/* 4. AppTaskbar self-delegates to MobileTaskbar on mobile (Phase 2). */
 
 /* 5. Tables: only scroll context allowed to overflow horizontally.
    Wrap legacy <table> in a horizontally scrollable container. */
