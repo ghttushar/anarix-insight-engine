@@ -23,10 +23,17 @@ const breadcrumbItems = [
 ];
 export default function UnifiedPnL() {
   const { formatCurrency } = useCurrency();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
   const netProfit = mockUnifiedPnL.find((r) => r.label === "Net Profit");
   const grossRevenue = mockUnifiedPnL.find((r) => r.label === "Gross Revenue");
   const grossProfit = mockUnifiedPnL.find((r) => r.label === "Gross Profit");
   const adSpend = mockUnifiedPnL.find((r) => r.label === "Advertising Spend");
+  const paginatedRows = useMemo(
+    () => mockUnifiedPnL.slice((page - 1) * pageSize, page * pageSize),
+    [page, pageSize]
+  );
+
 
   return (
     <AppLayout>
