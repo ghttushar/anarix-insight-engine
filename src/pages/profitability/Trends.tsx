@@ -18,6 +18,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Info, TrendingUp, ChevronDown, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useViewport } from "@/contexts/ViewportContext";
+import { MobileCard, MobileCardList } from "@/views/mobile/MobileCardList";
+
 
 
 const breadcrumbItems = [
