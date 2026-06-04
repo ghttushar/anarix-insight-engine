@@ -161,7 +161,6 @@ export default function ClientPortal() {
           onSortChange={(f, d) => { setSortField(f); setSortDirection(d); }}
         />
 
-        {(
         <div className="rounded-lg border border-border bg-card overflow-auto">
           <Table>
             <TableHeader>
@@ -228,7 +227,6 @@ export default function ClientPortal() {
             onPageSizeChange={setPageSize}
           />
         </div>
-        )}
 </div>
 
       <CreateReportPanel initialTemplate={selectedTemplate} onSubmit={handleReportSubmit} />

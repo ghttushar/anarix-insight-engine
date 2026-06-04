@@ -294,7 +294,6 @@ export default function HourlyData() {
                     </Button>
                   }
                 />
-                {(
                 <div className="rounded-lg border border-border bg-card overflow-auto">
                   <Table>
                     <TableHeader>
@@ -378,7 +377,6 @@ export default function HourlyData() {
                     onPageSizeChange={setPageSize}
                   />
                 </div>
-                )}
               </div>
             </TabsContent>
 
