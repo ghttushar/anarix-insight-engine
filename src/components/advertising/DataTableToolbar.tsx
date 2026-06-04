@@ -196,6 +196,7 @@ export function DataTableToolbar({
           {/* Edit Mode Toggle — first position */}
           {showViewToggle && onViewModeChange && (
             <Button
+              data-write-action
               variant="ghost"
               size="sm"
               className={cn("h-8 gap-1 text-xs cursor-pointer shrink-0", viewMode === "edit" && "bg-destructive/10 text-destructive")}
