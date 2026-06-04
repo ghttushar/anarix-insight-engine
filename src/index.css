@@ -619,6 +619,11 @@ html[data-view="mobile"] [data-app-taskbar] {
   row-gap: 0.5rem;
   padding: 8px 12px !important;
 }
+/* Hide noisy account/sync details on mobile taskbar row 1 */
+html[data-view="mobile"] .taskbar-account-name,
+html[data-view="mobile"] .taskbar-last-synced {
+  display: none !important;
+}
 /* Hide toolbar action labels (icons only), keep search visible */
 html[data-view="mobile"] [data-tb-actions] [data-tb-label] { display: none !important; }
 /* Page paddings */
