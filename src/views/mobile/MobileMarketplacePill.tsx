@@ -31,7 +31,7 @@ export function MobileMarketplacePill() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="h-9 px-2.5 inline-flex items-center gap-1.5 rounded-md border border-border bg-card hover:bg-muted/60 active:bg-muted"
+        className="h-8 px-2 inline-flex items-center gap-1.5 rounded-md border border-border bg-card hover:bg-muted/60 active:bg-muted"
         aria-label="Switch marketplace"
       >
         {current.logo ? (
