@@ -22,6 +22,7 @@ interface ScatterPlotChartProps {
   data: ScatterDataPoint[];
   selectedIds?: string[];
   onPointToggle?: (id: string) => void;
+  onPointDetail?: (id: string) => void;
 }
 
 type ChartView = "scatter" | "bar" | "line";
