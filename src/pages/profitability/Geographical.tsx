@@ -49,7 +49,11 @@ const breadcrumbItems = [
   { label: "Geographical Data" },
 ];
 export default function Geographical() {
+  const { view } = useViewport();
+  const { formatCurrency } = useCurrency();
+  const isMobile = view === "mobile";
   const [selectedRegionCode, setSelectedRegionCode] = useState<string>("US");
+  const [drillRegionId, setDrillRegionId] = useState<string | null>(null);
   const [viewLevel, setViewLevel] = useState<"state" | "product">("state");
   const [searchValue, setSearchValue] = useState("");
   const [columns, setColumns] = useState(COLUMN_DEFS);
@@ -59,6 +63,13 @@ export default function Geographical() {
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const selectedRegion = regionLookup[selectedRegionCode] || geographicalData[0];
+
+  const mobileRegions = useMemo(() => {
+    if (!drillRegionId) return geographicalData;
+    const parent = geographicalData.find((r) => r.id === drillRegionId);
+    return parent?.children || [];
+  }, [drillRegionId]);
+
 
   const handleColumnToggle = (id: string) => {
     setColumns((prev) => prev.map((c) => c.id === id ? { ...c, visible: !c.visible } : c));
