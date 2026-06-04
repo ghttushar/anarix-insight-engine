@@ -58,9 +58,21 @@ function ScatterCanvas({
   const [view, setView] = useState({ xMin: -35, xMax: 100, yMin: 0, yMax: 90 });
   const [hover, setHover] = useState<Hover | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const dragRef = useRef<{ sx: number; sy: number; view: typeof view } | null>(null);
+  const dragRef = useRef<{ sx: number; sy: number; view: typeof view; moved: boolean } | null>(null);
   const viewRef = useRef(view);
   useEffect(() => { viewRef.current = view; }, [view]);
+  const hoverTimerRef = useRef<number | null>(null);
+  const scheduleHoverClose = () => {
+    if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = window.setTimeout(() => setHover(null), 180);
+  };
+  const cancelHoverClose = () => {
+    if (hoverTimerRef.current) {
+      window.clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  };
+  useEffect(() => () => { if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current); }, []);
   const aan = useAan();
 
   // baseline matches PDF exactly: X -30→100, Y 0→90 (Ad Spend $)
