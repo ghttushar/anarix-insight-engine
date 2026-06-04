@@ -100,7 +100,7 @@ export function MobileDrawerNav({ open, onOpenChange }: Props) {
         {/* Header band — 96px, brand mark + org + plan */}
         <div className="h-24 shrink-0 px-4 flex items-center gap-3 border-b border-border bg-card">
           <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <AnarixLogo variant="icon" className="h-6 w-6" />
+            <AnarixLogo variant="symbol" className="h-6 w-6" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[15px] font-semibold text-foreground truncate font-display">
