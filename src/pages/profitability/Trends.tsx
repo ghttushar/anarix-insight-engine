@@ -260,7 +260,7 @@ export default function ProfitabilityTrends() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProducts.map((product) => {
+                  {paginatedProducts.map((product) => {
                     const total = columns.reduce(
                       (sum, c, idx) => sum + valueForColumn(product, c, idx),
                       0
