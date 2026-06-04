@@ -58,9 +58,21 @@ function ScatterCanvas({
   const [view, setView] = useState({ xMin: -35, xMax: 100, yMin: 0, yMax: 90 });
   const [hover, setHover] = useState<Hover | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const dragRef = useRef<{ sx: number; sy: number; view: typeof view } | null>(null);
+  const dragRef = useRef<{ sx: number; sy: number; view: typeof view; moved: boolean } | null>(null);
   const viewRef = useRef(view);
   useEffect(() => { viewRef.current = view; }, [view]);
+  const hoverTimerRef = useRef<number | null>(null);
+  const scheduleHoverClose = () => {
+    if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = window.setTimeout(() => setHover(null), 180);
+  };
+  const cancelHoverClose = () => {
+    if (hoverTimerRef.current) {
+      window.clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  };
+  useEffect(() => () => { if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current); }, []);
   const aan = useAan();
 
   // baseline matches PDF exactly: X -30→100, Y 0→90 (Ad Spend $)
@@ -106,37 +118,62 @@ function ScatterCanvas({
   );
 
   const xTicks = useMemo(() => {
-    const step = niceStep(view.xMax - view.xMin, 10);
+    const span = view.xMax - view.xMin;
+    const targetCount = Math.max(4, Math.min(10, Math.floor(plotW / 90)));
+    const step = niceStep(span, targetCount);
     const ticks: number[] = [];
     const start = Math.ceil(view.xMin / step) * step;
-    for (let t = start; t <= view.xMax + 0.001; t += step) ticks.push(Math.round(t * 100) / 100);
+    const seen = new Set<number>();
+    for (let t = start; t <= view.xMax + 0.001; t += step) {
+      const rounded = Math.round(t * 100) / 100;
+      if (!seen.has(rounded)) {
+        seen.add(rounded);
+        ticks.push(rounded);
+      }
+    }
     return ticks;
-  }, [view]);
+  }, [view, plotW]);
   const yTicks = useMemo(() => {
-    const step = niceStep(view.yMax - view.yMin, 8);
+    const span = view.yMax - view.yMin;
+    const targetCount = Math.max(4, Math.min(8, Math.floor(plotH / 50)));
+    const step = niceStep(span, targetCount);
     const ticks: number[] = [];
     const start = Math.ceil(view.yMin / step) * step;
-    for (let t = start; t <= view.yMax + 0.001; t += step) ticks.push(Math.round(t));
+    const seen = new Set<number>();
+    for (let t = start; t <= view.yMax + 0.001; t += step) {
+      const rounded = span < 5 ? Math.round(t * 10) / 10 : Math.round(t);
+      if (!seen.has(rounded)) {
+        seen.add(rounded);
+        ticks.push(rounded);
+      }
+    }
     return ticks;
-  }, [view]);
+  }, [view, plotH]);
 
   const xToPx = (x: number) => PAD.l + ((x - view.xMin) / (view.xMax - view.xMin)) * plotW;
   const yToPx = (y: number) => PAD.t + plotH - ((y - view.yMin) / (view.yMax - view.yMin)) * plotH;
   const pxToX = (px: number) => view.xMin + ((px - PAD.l) / plotW) * (view.xMax - view.xMin);
   const pxToY = (py: number) => view.yMin + ((PAD.t + plotH - py) / plotH) * (view.yMax - view.yMin);
 
+  const MIN_X_SPAN = 4;   // %
+  const MIN_Y_SPAN = 2;   // $
+  const MAX_X_SPAN = (baseDomain.xMax - baseDomain.xMin) * 2;
+  const MAX_Y_SPAN = (baseDomain.yMax - baseDomain.yMin) * 2;
+  const applyZoom = (v: typeof view, factor: number, ax: number, ay: number) => {
+    let xMin = ax - (ax - v.xMin) / factor;
+    let xMax = ax + (v.xMax - ax) / factor;
+    let yMin = Math.max(0, ay - (ay - v.yMin) / factor);
+    let yMax = ay + (v.yMax - ay) / factor;
+    const xSpan = xMax - xMin;
+    const ySpan = yMax - yMin;
+    if (xSpan < MIN_X_SPAN || xSpan > MAX_X_SPAN) { xMin = v.xMin; xMax = v.xMax; }
+    if (ySpan < MIN_Y_SPAN || ySpan > MAX_Y_SPAN) { yMin = v.yMin; yMax = v.yMax; }
+    setView({ xMin, xMax, yMin, yMax });
+  };
   const zoom = (factor: number, cx?: number, cy?: number) => {
     const ax = cx == null ? (view.xMin + view.xMax) / 2 : pxToX(cx);
     const ay = cy == null ? (view.yMin + view.yMax) / 2 : pxToY(cy);
-    const xSpan = (view.xMax - view.xMin) / factor;
-    const ySpan = (view.yMax - view.yMin) / factor;
-    setView({
-      xMin: ax - (ax - view.xMin) / factor,
-      xMax: ax + (view.xMax - ax) / factor,
-      yMin: Math.max(0, ay - (ay - view.yMin) / factor),
-      yMax: ay + (view.yMax - ay) / factor,
-    });
-    void xSpan; void ySpan;
+    applyZoom(view, factor, ax, ay);
   };
 
   // Native non-passive wheel listener to actually preventDefault (React onWheel is passive)
@@ -153,12 +190,15 @@ function ScatterCanvas({
       const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
       const ax = v.xMin + ((cx - PAD.l) / plotW) * (v.xMax - v.xMin);
       const ay = v.yMin + ((PAD.t + plotH - cy) / plotH) * (v.yMax - v.yMin);
-      setView({
-        xMin: ax - (ax - v.xMin) / factor,
-        xMax: ax + (v.xMax - ax) / factor,
-        yMin: Math.max(0, ay - (ay - v.yMin) / factor),
-        yMax: ay + (v.yMax - ay) / factor,
-      });
+      let xMin = ax - (ax - v.xMin) / factor;
+      let xMax = ax + (v.xMax - ax) / factor;
+      let yMin = Math.max(0, ay - (ay - v.yMin) / factor);
+      let yMax = ay + (v.yMax - ay) / factor;
+      const xSpan = xMax - xMin;
+      const ySpan = yMax - yMin;
+      if (xSpan < MIN_X_SPAN || xSpan > MAX_X_SPAN) { xMin = v.xMin; xMax = v.xMax; }
+      if (ySpan < MIN_Y_SPAN || ySpan > MAX_Y_SPAN) { yMin = v.yMin; yMax = v.yMax; }
+      setView({ xMin, xMax, yMin, yMax });
     };
     const prevent = (e: Event) => e.preventDefault();
     svg.addEventListener("wheel", handleWheel, { passive: false });
@@ -171,24 +211,30 @@ function ScatterCanvas({
       svg.removeEventListener("gesturechange", prevent as EventListener);
       svg.removeEventListener("gestureend", prevent as EventListener);
     };
-  }, [plotW, plotH]);
+  }, [plotW, plotH, MAX_X_SPAN, MAX_Y_SPAN]);
 
   const handlePointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if ((e.target as Element).closest("[data-bubble]")) return;
     (e.currentTarget as SVGSVGElement).setPointerCapture(e.pointerId);
-    dragRef.current = { sx: e.clientX, sy: e.clientY, view };
-    setIsDragging(true);
+    dragRef.current = { sx: e.clientX, sy: e.clientY, view, moved: false };
   };
   const handlePointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
     if (!dragRef.current) return;
     const dx = e.clientX - dragRef.current.sx;
     const dy = e.clientY - dragRef.current.sy;
+    if (!dragRef.current.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+    if (!dragRef.current.moved) {
+      dragRef.current.moved = true;
+      setIsDragging(true);
+      cancelHoverClose();
+      setHover(null);
+    }
     const sxData = (dx / plotW) * (dragRef.current.view.xMax - dragRef.current.view.xMin);
     const syData = (dy / plotH) * (dragRef.current.view.yMax - dragRef.current.view.yMin);
     setView({
       xMin: dragRef.current.view.xMin - sxData,
       xMax: dragRef.current.view.xMax - sxData,
-      yMin: dragRef.current.view.yMin + syData,
+      yMin: Math.max(0, dragRef.current.view.yMin + syData),
       yMax: dragRef.current.view.yMax + syData,
     });
   };
@@ -211,6 +257,8 @@ function ScatterCanvas({
         yMin: Math.max(0, c.bbox.y1 - padY),
         yMax: c.bbox.y2 + padY,
       });
+      cancelHoverClose();
+      setHover(null);
       return;
     }
     const p = c.points[0];
@@ -232,6 +280,7 @@ function ScatterCanvas({
       ref={containerRef}
       className="relative w-full"
       style={{ height, overscrollBehavior: "contain", touchAction: "none" }}
+      onMouseLeave={scheduleHoverClose}
     >
       <svg
         ref={svgRef}
@@ -240,8 +289,7 @@ function ScatterCanvas({
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        onPointerLeave={() => { setHover(null); }}
-        style={{ cursor: isDragging ? "grabbing" : "crosshair", touchAction: "none", display: "block" }}
+        style={{ cursor: isDragging ? "grabbing" : "grab", touchAction: "none", display: "block" }}
       >
         <defs>
           <marker id="arrow-x" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
@@ -335,8 +383,8 @@ function ScatterCanvas({
               key={c.key}
               data-bubble
               style={{ cursor: "pointer" }}
-              onMouseEnter={() => setHover({ cluster: c, x: c.cx + PAD.l, y: c.cy + PAD.t })}
-              onMouseLeave={() => setHover(null)}
+              onMouseEnter={() => { cancelHoverClose(); setHover({ cluster: c, x: c.cx + PAD.l, y: c.cy + PAD.t }); }}
+              onMouseLeave={scheduleHoverClose}
               onClick={(e) => { e.stopPropagation(); handleBubble(c); }}
             >
               <circle
@@ -387,6 +435,8 @@ function ScatterCanvas({
           y={hover.y}
           onAskAan={askAan}
           onViewDetails={onPointDetail ? (p) => onPointDetail(p.id) : undefined}
+          onHoverIn={cancelHoverClose}
+          onHoverOut={scheduleHoverClose}
         />
       )}
     </div>
