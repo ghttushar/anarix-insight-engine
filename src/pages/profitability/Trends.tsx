@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -6,6 +6,7 @@ import { ScatterPlotChart } from "@/components/profitability/ScatterPlotChart";
 import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModal";
 import { ProductDetailPanel } from "@/components/profitability/ProductDetailPanel";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
+import { TablePagination } from "@/components/tables/TablePagination";
 import { scatterData, profitabilityProducts, profitabilityMetrics } from "@/data/mockProfitability";
 import { ProfitabilityProduct } from "@/types/profitability";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,6 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Info, TrendingUp, ChevronDown, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
+
 
 const breadcrumbItems = [
   { label: "Profitability", href: "/profitability/trends" },
