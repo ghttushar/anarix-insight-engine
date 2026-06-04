@@ -429,163 +429,72 @@ export const trendDataByPeriod: Record<string, TrendDataPoint[]> = {
   ],
 };
 
-export const profitabilityOrders: ProfitabilityOrder[] = [
-  {
-    id: "ord-001",
-    orderId: "WMT-ORD-78234561",
-    date: "Jan 30, 2026",
-    time: "2:34 PM",
-    status: "delivered",
-    price: 159.98,
-    country: "United States",
-    flag: "🇺🇸",
-    netProfit: 42.56,
-    gmv: 159.98,
-    units: 2,
-    cogs: 49.00,
-    wfsFulfillmentFee: 12.00,
-    shippingFees: 8.00,
-    commissionProduct: 24.00,
-    commissionShipping: 4.80,
-    additionalFee: 2.50,
-    refundUnits: 0,
-    adSpend: 12.45,
-    authSales: 159.98,
-    refundSales: 0,
-    cancelledSales: 0,
-    cancelledUnits: 0,
-    products: [
-      { ...profitabilityProducts[0], units: 1, gmv: 79.99, authSales: 79.99, netProfit: 22.34, refundUnits: 0, cancelledUnits: 0, refundSales: 0, cancelledSales: 0, adSpend: 6.23, commissionProduct: 12.00, commissionShipping: 2.40, wfsFulfillmentFee: 6.00, shippingFees: 4.00, additionalFee: 1.25 },
-      { ...profitabilityProducts[0], id: "ord-001-p2", units: 1, gmv: 79.99, authSales: 79.99, netProfit: 20.22, refundUnits: 0, cancelledUnits: 0, refundSales: 0, cancelledSales: 0, adSpend: 6.22, commissionProduct: 12.00, commissionShipping: 2.40, wfsFulfillmentFee: 6.00, shippingFees: 4.00, additionalFee: 1.25 },
-    ],
-  },
-  {
-    id: "ord-002",
-    orderId: "WMT-ORD-78234562",
-    date: "Jan 30, 2026",
-    time: "11:15 AM",
-    status: "shipped",
-    price: 149.99,
-    country: "Canada",
-    flag: "🇨🇦",
-    netProfit: 38.90,
-    gmv: 149.99,
-    units: 1,
-    cogs: 52.00,
-    wfsFulfillmentFee: 8.00,
-    shippingFees: 6.00,
-    commissionProduct: 22.50,
-    commissionShipping: 3.60,
-    additionalFee: 1.80,
-    refundUnits: 0,
-    adSpend: 8.90,
-    authSales: 149.99,
-    refundSales: 0,
-    cancelledSales: 0,
-    cancelledUnits: 0,
-    products: [
-      { ...profitabilityProducts[1], units: 1, gmv: 149.99, authSales: 149.99, netProfit: 38.90, refundUnits: 0, cancelledUnits: 0, refundSales: 0, cancelledSales: 0, adSpend: 8.90, commissionProduct: 22.50, commissionShipping: 3.60, wfsFulfillmentFee: 8.00, shippingFees: 6.00, additionalFee: 1.80 },
-    ],
-  },
-  {
-    id: "ord-003",
-    orderId: "WMT-ORD-78234563",
-    date: "Jan 29, 2026",
-    time: "4:52 PM",
-    status: "returned",
-    price: 89.99,
-    country: "United States",
-    flag: "🇺🇸",
-    netProfit: -15.20,
-    gmv: 89.99,
-    units: 1,
-    cogs: 28.00,
-    wfsFulfillmentFee: 6.00,
-    shippingFees: 4.00,
-    commissionProduct: 13.50,
-    commissionShipping: 2.70,
-    additionalFee: 1.20,
-    refundUnits: 1,
-    adSpend: 5.67,
-    authSales: 0,
-    refundSales: 89.99,
-    cancelledSales: 0,
-    cancelledUnits: 0,
-    products: [
-      { ...profitabilityProducts[2], units: 1, gmv: 89.99, authSales: 0, netProfit: -15.20, refundUnits: 1, cancelledUnits: 0, refundSales: 89.99, cancelledSales: 0, adSpend: 5.67, commissionProduct: 13.50, commissionShipping: 2.70, wfsFulfillmentFee: 6.00, shippingFees: 4.00, additionalFee: 1.20 },
-    ],
-  },
-  {
-    id: "ord-004",
-    orderId: "WMT-ORD-78234564",
-    date: "Jan 29, 2026",
-    time: "9:08 AM",
-    status: "delivered",
-    price: 64.98,
-    country: "Mexico",
-    flag: "🇲🇽",
-    netProfit: 18.45,
-    gmv: 64.98,
-    units: 2,
-    cogs: 19.00,
-    wfsFulfillmentFee: 8.00,
-    shippingFees: 6.00,
-    commissionProduct: 9.75,
-    commissionShipping: 1.95,
-    additionalFee: 0.90,
-    refundUnits: 0,
-    adSpend: 4.56,
-    authSales: 64.98,
-    refundSales: 0,
-    cancelledSales: 0,
-    cancelledUnits: 0,
-    products: [
-      { ...profitabilityProducts[4], units: 2, gmv: 49.98, authSales: 49.98, netProfit: 12.34, refundUnits: 0, cancelledUnits: 0, refundSales: 0, cancelledSales: 0, adSpend: 3.12, commissionProduct: 7.50, commissionShipping: 1.50, wfsFulfillmentFee: 6.00, shippingFees: 4.00, additionalFee: 0.60 },
-      { ...profitabilityProducts[3], id: "ord-004-p2", units: 1, gmv: 14.99, authSales: 14.99, netProfit: 6.11, refundUnits: 0, cancelledUnits: 0, refundSales: 0, cancelledSales: 0, adSpend: 1.44, commissionProduct: 2.25, commissionShipping: 0.45, wfsFulfillmentFee: 2.00, shippingFees: 2.00, additionalFee: 0.30 },
-    ],
-  },
-  {
-    id: "ord-005",
-    orderId: "WMT-ORD-78234565",
-    date: "Jan 28, 2026",
-    time: "7:23 PM",
-    status: "cancelled",
-    price: 39.99,
-    country: "United States",
-    flag: "🇺🇸",
-    netProfit: 0,
-    gmv: 39.99,
-    units: 1,
-    cogs: 0,
-    wfsFulfillmentFee: 0,
-    shippingFees: 0,
-    commissionProduct: 0,
-    commissionShipping: 0,
-    additionalFee: 0,
-    refundUnits: 0,
-    adSpend: 2.34,
-    authSales: 0,
-    refundSales: 0,
-    cancelledSales: 39.99,
-    cancelledUnits: 1,
-    products: [
-      { ...profitabilityProducts[3], units: 1, gmv: 39.99, authSales: 0, netProfit: 0, refundUnits: 0, cancelledUnits: 1, refundSales: 0, cancelledSales: 39.99, adSpend: 2.34, commissionProduct: 0, commissionShipping: 0, wfsFulfillmentFee: 0, shippingFees: 0, additionalFee: 0 },
-    ],
-  },
+// 30 orders generated from product templates with rotating status/country
+const ORDER_STATUSES: ProfitabilityOrder["status"][] = ["delivered", "shipped", "processing", "cancelled", "returned"];
+const ORDER_COUNTRIES = [
+  { c: "United States", f: "🇺🇸" },
+  { c: "Canada", f: "🇨🇦" },
+  { c: "Mexico", f: "🇲🇽" },
+  { c: "United Kingdom", f: "🇬🇧" },
+  { c: "Germany", f: "🇩🇪" },
 ];
 
-export const scatterData: ScatterDataPoint[] = [
-  { id: "prod-001", name: "Premium Wireless Earbuds", profitMargin: 28.0, totalSales: 11580, quadrant: "winners" },
-  { id: "prod-002", name: "Smart Home Hub Controller", profitMargin: 35.8, totalSales: 12749, quadrant: "winners" },
-  { id: "prod-003", name: "Organic Cotton Bedsheet Set", profitMargin: 30.2, totalSales: 19528, quadrant: "winners" },
-  { id: "prod-004", name: "Portable Power Bank", profitMargin: 27.2, totalSales: 15435, quadrant: "winners" },
-  { id: "prod-005", name: "Stainless Steel Water Bottle", profitMargin: 21.7, totalSales: 13319, quadrant: "optimize" },
-  { id: "prod-006", name: "Basic USB Cable 3-Pack", profitMargin: 45.0, totalSales: 2340, quadrant: "grow" },
-  { id: "prod-007", name: "Phone Case Standard", profitMargin: 52.0, totalSales: 1890, quadrant: "grow" },
-  { id: "prod-008", name: "Discount Clearance Item", profitMargin: 8.5, totalSales: 890, quadrant: "review" },
-  { id: "prod-009", name: "Legacy Product SKU", profitMargin: 12.0, totalSales: 1200, quadrant: "review" },
-  { id: "prod-010", name: "High Volume Low Margin", profitMargin: 15.0, totalSales: 25000, quadrant: "optimize" },
-];
+export const profitabilityOrders: ProfitabilityOrder[] = Array.from({ length: 30 }, (_, i) => {
+  const product = profitabilityProducts[i % profitabilityProducts.length];
+  const status = ORDER_STATUSES[i % ORDER_STATUSES.length];
+  const country = ORDER_COUNTRIES[i % ORDER_COUNTRIES.length];
+  const units = 1 + (i % 3);
+  const gmv = +(product.price * units).toFixed(2);
+  const authSales = status === "returned" || status === "cancelled" ? 0 : gmv;
+  const refundSales = status === "returned" ? gmv : 0;
+  const cancelledSales = status === "cancelled" ? gmv : 0;
+  const cogs = +(product.cogs * units).toFixed(2);
+  const adSpend = +(2 + ((i * 1.7) % 12)).toFixed(2);
+  const commissionProduct = +(authSales * 0.15).toFixed(2);
+  const commissionShipping = +(authSales * 0.02).toFixed(2);
+  const wfsFulfillmentFee = +(units * 6).toFixed(2);
+  const shippingFees = +(units * 4).toFixed(2);
+  const additionalFee = +(units * 1.25).toFixed(2);
+  const netProfit = status === "cancelled" ? 0 :
+    +(authSales - cogs - adSpend - commissionProduct - commissionShipping - wfsFulfillmentFee - shippingFees - additionalFee).toFixed(2);
+  const day = 30 - (i % 30);
+  return {
+    id: `ord-${String(i + 1).padStart(3, "0")}`,
+    orderId: `WMT-ORD-${78234500 + i}`,
+    date: `Jan ${day}, 2026`,
+    time: `${(i % 12) + 1}:${String((i * 7) % 60).padStart(2, "0")} ${i % 2 === 0 ? "PM" : "AM"}`,
+    status,
+    price: product.price,
+    country: country.c,
+    flag: country.f,
+    netProfit, gmv, units, cogs, wfsFulfillmentFee, shippingFees,
+    commissionProduct, commissionShipping, additionalFee,
+    refundUnits: status === "returned" ? units : 0,
+    adSpend, authSales, refundSales, cancelledSales,
+    cancelledUnits: status === "cancelled" ? units : 0,
+    products: [{
+      ...product, units, gmv, authSales, netProfit,
+      refundUnits: status === "returned" ? units : 0,
+      cancelledUnits: status === "cancelled" ? units : 0,
+      refundSales, cancelledSales, adSpend,
+      commissionProduct, commissionShipping, wfsFulfillmentFee, shippingFees, additionalFee,
+    }],
+  };
+});
+
+export const scatterData: ScatterDataPoint[] = profitabilityProducts.map((p) => {
+  const idx = parseInt(p.id.slice(-3), 10) - 1;
+  const layout = SCATTER_LAYOUT[idx];
+  const pm = p.profitMargin ?? 0;
+  return {
+    id: p.id,
+    name: p.name,
+    profitMargin: pm,
+    totalSales: p.totalSales ?? 0,
+    adSpend: layout.ad,
+    quadrant: pm < 0 ? "review" : pm < 30 ? "optimize" : "winners",
+  };
+});
 
 export const profitabilityMetrics = [
   "Total Sales",
