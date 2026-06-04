@@ -143,7 +143,6 @@ export default function AMCQueries() {
                 onDownload={() => toast.success("Exporting queries...")}
               />
             </div>
-            {(
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30 hover:bg-muted/30">
@@ -183,7 +182,6 @@ export default function AMCQueries() {
                 )}
               </TableBody>
             </Table>
-            )}
           </div>
         ) : (
           <div className="rounded-lg border border-border bg-card">
