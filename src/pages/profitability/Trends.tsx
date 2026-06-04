@@ -76,6 +76,14 @@ export default function ProfitabilityTrends() {
     [searchValue, selectedIds]
   );
 
+  const paginatedProducts = useMemo(
+    () => filteredProducts.slice((page - 1) * pageSize, page * pageSize),
+    [filteredProducts, page, pageSize]
+  );
+
+  useEffect(() => { setPage(1); }, [searchValue, selectedIds, frequency]);
+
+
   const pickerProducts = useMemo(
     () =>
       profitabilityProducts.filter((p) =>
