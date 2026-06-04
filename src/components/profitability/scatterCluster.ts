@@ -46,7 +46,7 @@ export function buildClusters({
   height,
   xDomain,
   yDomain,
-  cellPx = 28,
+  cellPx = 36,
 }: BuildArgs): ClusterItem[] {
   if (width <= 0 || height <= 0) return [];
   const [x0, x1] = xDomain;
@@ -56,7 +56,7 @@ export function buildClusters({
 
   const toPx = (p: ScatterDataPoint) => ({
     px: ((p.profitMargin - x0) / xSpan) * width,
-    py: height - ((p.totalSales - y0) / ySpan) * height,
+    py: height - ((p.adSpend - y0) / ySpan) * height,
   });
 
   const buckets = new Map<string, ScatterDataPoint[]>();
@@ -83,8 +83,8 @@ export function buildClusters({
       tierCounts[tierOf(p.profitMargin)]++;
       if (p.profitMargin < bx1) bx1 = p.profitMargin;
       if (p.profitMargin > bx2) bx2 = p.profitMargin;
-      if (p.totalSales < by1) by1 = p.totalSales;
-      if (p.totalSales > by2) by2 = p.totalSales;
+      if (p.adSpend < by1) by1 = p.adSpend;
+      if (p.adSpend > by2) by2 = p.adSpend;
     }
     const dominant: Tier =
       tierCounts.winner >= tierCounts.mid && tierCounts.winner >= tierCounts.loss
@@ -93,7 +93,7 @@ export function buildClusters({
           ? "mid"
           : "loss";
     const n = pts.length;
-    const r = n === 1 ? 5 : Math.min(22, 8 + Math.log2(n) * 4);
+    const r = n === 1 ? 6 : Math.min(26, 10 + Math.log2(n) * 5);
     clusters.push({
       key,
       cx: sx / n,

@@ -22,6 +22,7 @@ interface ScatterPlotChartProps {
   data: ScatterDataPoint[];
   selectedIds?: string[];
   onPointToggle?: (id: string) => void;
+  onPointDetail?: (id: string) => void;
 }
 
 type ChartView = "scatter" | "bar" | "line";
@@ -42,28 +43,30 @@ function ScatterCanvas({
   data,
   selectedIds,
   onPointToggle,
+  onPointDetail,
   height,
 }: {
   data: ScatterDataPoint[];
   selectedIds?: string[];
   onPointToggle?: (id: string) => void;
+  onPointDetail?: (id: string) => void;
   height: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(800);
-  const [view, setView] = useState({ xMin: -35, xMax: 100, yMin: 0, yMax: 0 });
+  const [view, setView] = useState({ xMin: -35, xMax: 100, yMin: 0, yMax: 90 });
   const [hover, setHover] = useState<Hover | null>(null);
   const dragRef = useRef<{ sx: number; sy: number; view: typeof view } | null>(null);
   const aan = useAan();
 
-  // baseline data extent
+  // baseline matches PDF exactly: X -30→100, Y 0→90 (Ad Spend $)
   const baseDomain = useMemo(() => {
     const margins = data.map((d) => d.profitMargin);
-    const sales = data.map((d) => d.totalSales);
+    const ads = data.map((d) => d.adSpend);
     const xMin = Math.min(-35, Math.floor(Math.min(...margins, 0) / 10) * 10);
     const xMax = Math.max(100, Math.ceil(Math.max(...margins) / 10) * 10);
     const yMin = 0;
-    const yMax = Math.ceil((Math.max(...sales) * 1.1) / 1000) * 1000;
+    const yMax = Math.max(90, Math.ceil(Math.max(...ads) / 10) * 10);
     return { xMin, xMax, yMin, yMax };
   }, [data]);
 
@@ -93,7 +96,7 @@ function ScatterCanvas({
         height: plotH,
         xDomain: [view.xMin, view.xMax],
         yDomain: [view.yMin, view.yMax],
-        cellPx: 28,
+        cellPx: 36,
       }),
     [data, plotW, plotH, view],
   );
@@ -168,9 +171,9 @@ function ScatterCanvas({
 
   const handleBubble = (c: ClusterItem) => {
     if (c.count > 1) {
-      // zoom into bbox with padding
-      const padX = Math.max(2, (c.bbox.x2 - c.bbox.x1) * 0.4);
-      const padY = Math.max(500, (c.bbox.y2 - c.bbox.y1) * 0.4);
+      // zoom into bbox with padding so cluster splits into individual dots
+      const padX = Math.max(4, (c.bbox.x2 - c.bbox.x1) * 0.6);
+      const padY = Math.max(6, (c.bbox.y2 - c.bbox.y1) * 0.6);
       setView({
         xMin: c.bbox.x1 - padX,
         xMax: c.bbox.x2 + padX,
@@ -180,9 +183,12 @@ function ScatterCanvas({
       return;
     }
     const p = c.points[0];
-    onPointToggle?.(p.id);
-    aan.setPendingPrompt(`Why is "${p.name}" (ID: ${p.id}) performing this way?`);
-    aan.openCopilot();
+    if (onPointDetail) onPointDetail(p.id);
+    else {
+      onPointToggle?.(p.id);
+      aan.setPendingPrompt(`Why is "${p.name}" (ID: ${p.id}) performing this way?`);
+      aan.openCopilot();
+    }
   };
 
   const askAan = (p: ScatterDataPoint) => {
@@ -266,7 +272,7 @@ function ScatterCanvas({
             key={`ty-${t}`} x={PAD.l - 8} y={yToPx(t) + 4}
             textAnchor="end" fontSize={11} fill="hsl(var(--muted-foreground))"
           >
-            ${(t / 1000).toFixed(t >= 1000 ? 0 : 1)}k
+            {t}
           </text>
         ))}
 
@@ -282,7 +288,7 @@ function ScatterCanvas({
           transform="rotate(-90)" textAnchor="middle"
           fontSize={12} fill="hsl(var(--foreground))" fontWeight={500}
         >
-          Total Sales ($)
+          Ad Spend ($)
         </text>
 
         {/* bubbles */}
@@ -375,7 +381,7 @@ const quadrantLabels = {
   review: { title: "Review" },
 };
 
-export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPlotChartProps) {
+export function ScatterPlotChart({ data, selectedIds, onPointToggle, onPointDetail }: ScatterPlotChartProps) {
   const [expanded, setExpanded] = useState(false);
   const [chartView, setChartView] = useState<ChartView>("scatter");
 
@@ -421,7 +427,7 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
   const renderChart = (h: number) =>
     chartView === "bar" ? renderBar(h)
     : chartView === "line" ? renderLine(h)
-    : <ScatterCanvas data={data} selectedIds={selectedIds} onPointToggle={onPointToggle} height={h} />;
+    : <ScatterCanvas data={data} selectedIds={selectedIds} onPointToggle={onPointToggle} onPointDetail={onPointDetail} height={h} />;
 
   const tierLegend = [
     { tier: "loss" as const, label: "Loss (<0%)" },
@@ -482,7 +488,7 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle }: ScatterPl
             <h3 className="font-semibold text-foreground">Product Performance</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               {chartView === "scatter"
-                ? "Profit margin vs total sales — clusters spread as you zoom"
+                ? "Profit margin vs ad spend — click a cluster to zoom; click a dot for details"
                 : `Aggregated by quadrant (${chartView} view)`}
             </p>
           </div>

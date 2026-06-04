@@ -1,68 +1,101 @@
 
-## 1. Trends Scatter Chart — Figma-aligned rebuild
+## Scope
 
-Target: `src/components/profitability/ScatterPlotChart.tsx` (replace scatter renderer; keep bar/line views).
+Bring the Trends page (desktop + tablet) to 100% parity with the attached PDF, populate every Profitability table to 30 rows with pagination, and wire the scatter → quick tooltip → right-panel full detail flow exactly as shown.
 
-**Visual spec (from PDF pages 1, 4, 5):**
-- Clean white plot area, no quadrant fill tints, light dashed grid.
-- Axes drawn with arrow heads. X = `Profit Margin (%)` from −30 → 100, Y = `Ad Spend ($)` from 0 → 90 (driven by data extents but rendered with axis arrows + neutral muted ticks).
-- A single dashed vertical reference at x=0 (profitability break-even). No quadrant background tints.
-- Dots are color-tiered by margin (NOT by sales quadrant):
-  - red (`hsl(0 75% 60%)`) for margin < 0
-  - amber (`hsl(38 92% 55%)`) for 0 ≤ margin < 30
-  - green (`hsl(142 70% 42%)`) for margin ≥ 30
-- Right-rail vertical button stack (Expand, Zoom In, Zoom Out, Reset) — replaces current top toolbar zoom row to match Figma placement.
+---
 
-**Clustering behavior (the key change):**
-- New helper `clusterPoints(points, viewport, cellPx)` that buckets points into a grid in *pixel space* given the current zoom viewBox. Cell size ~28px.
-- Buckets with `count >= 2` render as a single larger bubble at the cluster centroid with the count badge centered (`5`, `10`, etc. as shown). Cluster color = dominant tier of its members.
-- Buckets with `count === 1` render as the normal small dot.
-- On zoom-in the viewBox shrinks → cells map to smaller data ranges → clusters naturally split apart. On zoom-out they re-merge. Implemented by recomputing clusters from `zoomLevel` + chart width each render.
-- Bubble radius: 6px (single) → up to 22px (count ≥ 25), interpolated.
+## 1. Scatter chart — match PDF exactly
 
-**Interaction:**
-- Hover (desktop) / tap (tablet) on a single point or cluster opens a floating tooltip card matching Figma p2/p6:
-  - Thumbnail placeholder, `Product Name`, `ID: … | SKU: …`
-  - Highlighted chips: `Profit Margin: 113%` and `Ad Sale: $8.43`
-  - `✨ Ask Aan` chip → calls `useAan().openCopilot({ prompt: "Why is <Product Name> performing this way?", context: { id, sku } })`
-  - For clusters: header shows `N products` and a mini list (first 5 names, then "+ N more").
-- Click on dot/cluster:
-  - Single point → opens Aan right-panel pre-filled with the product context (matches Figma p4/p5 Aan workflow). Existing `onPointToggle` still fires for table linkage.
-  - Cluster → zooms in to that cluster's bbox (×1.6).
+File: `src/components/profitability/ScatterPlotChart.tsx`, `scatterCluster.ts`, `ScatterTooltipCard.tsx`
 
-**Zoom controls:**
-- `zoomLevel` + `panOffset {x,y}` state. Buttons: Expand (existing Dialog), Zoom In (×1.3), Zoom Out (÷1.3), Reset.
-- Wheel + pinch zoom on the SVG: scale around cursor / pinch midpoint. Pan via mouse drag when not in area-select mode.
+Axis change (most important):
+- **Y axis = Ad Spend ($)**, range **0 → 90**, ticks every 10. Plain dollar labels (`10`, `20`, …`90`), NOT `$k`.
+- X axis = Profit Margin (%), range **-30 → 100**, ticks every 10.
+- Axes drawn as two arrows meeting at origin (already present), dashed grid, dashed vertical zero line.
 
-**Implementation note:** Replace Recharts ScatterChart for the scatter view with a hand-rolled SVG (`<svg viewBox=…>`) because Recharts can't cleanly do per-render pixel-space clustering, custom arrow axes, or smooth wheel/pinch zoom. Bar/line views keep Recharts.
+Clustering / dots:
+- Switch input from `totalSales` → `adSpend`. Update `ScatterDataPoint` type to add `adSpend`, populate from the products' real adSpend (scaled into 0–90 range).
+- Cluster cell size 36px (slightly bigger than current 28). Singletons: small filled dot (r≈6) with no number. Clusters: big filled bubble (r 16–26 based on count) with white count badge centered (5, 10, 3 etc., as in PDF).
+- Tier colors stay: red <0, amber 0–30, green ≥30 — matches PDF.
+- Clicking a cluster: zoom into its bbox so it splits into smaller clusters / singletons. Already working, keep.
+- Wheel + drag pan stay.
 
-## 2. Tablet parity — port last round's fixes
+Quick tooltip (hover on a singleton OR after zooming into a single point):
+- Dark popover (`bg-popover` dark variant), exactly like PDF page 2: thumbnail · Product Name · `ID: … | SKU: …` · `Ask Aan` chip top-right · row with `Profit Margin: <green %>` and `Ad Sale: <blue $>` · subtle "Why is this product performing good or bad?" hint above on hover-hold.
+- Hovering a multi-point cluster: show "N products in this cluster — click to zoom" mini card (keep current behavior).
 
-Apply the calendar / sticky panel / opaque table / sidebar-cleanup work to tablet shell:
+Click on singleton dot → opens **right-side detail panel** (see §2), not Aan copilot. "Ask Aan" chip inside tooltip is what routes to Aan with the prefilled prompt.
 
-- **Calendar:** tablet uses the same `src/components/ui/calendar.tsx` already, so it inherits the fix. Verify `src/views/tablet/components/TabletDateRangePicker.tsx` (if present) wraps the same primitive; if it uses its own calendar, swap to the shared one.
-- **Sticky right-side panels in tablet:** apply the same `sticky top-0 self-start h-screen z-10` wrapper inside tablet Trends / Dashboard / ProfitLoss / Geographical / UnifiedPnL screens under `src/views/tablet/pages/profitability/*`. Parent flex container becomes `flex flex-1 h-full min-h-0`.
-- **Opaque table backgrounds:** add the same `bg-card` / `bg-muted` sticky-column fix to tablet table primitive (`src/views/tablet/components/TabletDataTable.tsx`) and any tablet Profitability tables.
-- **Sidebar theme switcher:** confirm tablet sidebar (`src/views/tablet/components/TabletSidebar.tsx` or equivalent) does not render the theme toggle; remove if present. Theme stays only in the Floating Action Island.
+Right-rail controls: Expand / Zoom in / Zoom out / Reset (already in place).
 
-## 3. Floating Action Island — hide Screenshot on tablet
+---
 
-`src/features/creative/FloatingActionIsland.tsx`:
-- Gate the Screenshot `<Button>` block with `{!isWebsite && !isTabletView && (...)}`. Native OS screenshot on tablet/mobile covers it.
+## 2. Product detail right panel (PDF pages 4–5)
 
-## 4. Memory updates
+Reuse `ProductDetailPanel` (already sticky to viewport). Add an "Ask Aan" handoff section at the bottom showing the same action chips from the PDF: `Apply Suggested Budget`, `Conditional Budget Boost`, `Increase Budget +20%`, `Enable Dayparting`. Clicking any chip opens AanCopilot prefilled with that action.
 
-- Add `mem://features/profitability-module/scatter-chart-v2` — clustering + tier coloring + Aan tooltip + zoom rules.
-- Append to `mem://features/viewport-variants/phase-5-tablet-profitability` — recent calendar / sticky panel / opaque table fixes also apply to tablet.
-- Append to `mem://architecture/navigation-and-layout-system/floating-action-island-v6` — Screenshot button hidden in tablet view.
+Open the panel from:
+- Click on a singleton scatter dot
+- "More" button in the trends table (already wired)
+
+Panel must stay independent of main scroll (already done last round).
+
+---
+
+## 3. Populate all Profitability tables to 30 rows + pagination (2 pages, 15/page)
+
+Data file: `src/data/mockProfitability.ts`
+- Expand `profitabilityProducts` from 5 → **30** real-looking SKUs (NapQueen-style names from PDF + variations). Each gets full P&L fields and weekly/daily/monthly numbers.
+- Expand `scatterData` to the same 30 entries with `adSpend` distributed across 5–80 and profit margins distributed across -30 to 95, so the chart naturally forms the cluster patterns shown in the PDF (one dense green cluster ~80% / $65, one amber cluster ~25% / $30, a smaller amber cluster ~22% / $40, and a red cluster ~-30% / $8).
+- Expand `profitabilityOrders` from 5 → **30** orders.
+
+Pagination:
+- `ProductsPnLTable` already has page logic; ensure pageSize default = 15 → 2 pages.
+- Trends table on `Trends.tsx` currently has no pagination. Add `TablePagination` (15 rows/page, 2 pages).
+- Same for `ProfitLoss`, `Geographical`, `UnifiedPnL`, `Dashboard` product lists where applicable — paginate at 15.
+
+---
+
+## 4. Tablet parity
+
+`Trends.tsx` is shared, so the new scatter + tables work in tablet. Verify:
+- Right-rail zoom buttons remain visible at tablet width.
+- Tooltip width clamps to viewport.
+- Pagination component is touch-friendly (existing buttons are 28px → bump to 36px on `useViewport().isTablet`).
+
+---
+
+## 5. Type + data changes (technical)
+
+```ts
+// types/profitability.ts
+interface ScatterDataPoint {
+  id: string;
+  name: string;
+  profitMargin: number;
+  totalSales: number; // keep for bar/line views
+  adSpend: number;    // NEW — drives Y axis in scatter
+  quadrant: "winners" | "grow" | "optimize" | "review";
+}
+```
+
+Update `scatterCluster.ts` to bucket by `adSpend` on Y (replace `totalSales` reference); default cell 36px.
+Update `ScatterPlotChart.tsx` Y axis formatter to plain integers, baseDomain Y = [0, 90].
+Update `ScatterTooltipCard.tsx` content: show `Profit Margin` green pill + `Ad Sale` blue pill (rename from "Total Sales"), thumbnail, ID/SKU row, "Ask Aan" chip top-right.
+
+---
 
 ## Files touched
 
-- rewrite: `src/components/profitability/ScatterPlotChart.tsx`
-- new: `src/components/profitability/scatterCluster.ts` (pure clustering util + tier helper)
-- new: `src/components/profitability/ScatterTooltipCard.tsx`
-- edit: `src/features/creative/FloatingActionIsland.tsx`
-- edit (tablet parity): files under `src/views/tablet/...` for date picker, panels, tables, sidebar (exact paths confirmed during build by reading the tablet tree)
-- memory: 3 files under `mem://`
+- `src/types/profitability.ts` (add `adSpend`)
+- `src/data/mockProfitability.ts` (30 products, 30 orders, 30 scatter points, adSpend values)
+- `src/components/profitability/ScatterPlotChart.tsx` (Y-axis = Ad Spend $, plain labels, bubble sizing)
+- `src/components/profitability/scatterCluster.ts` (use adSpend, cell 36)
+- `src/components/profitability/ScatterTooltipCard.tsx` (dark theme, Ad Sale pill, action hint)
+- `src/components/profitability/ProductDetailPanel.tsx` (add Aan action chips footer)
+- `src/components/profitability/ProductsPnLTable.tsx` (pageSize 15)
+- `src/pages/profitability/Trends.tsx` (add pagination + open detail panel on dot click)
+- `src/pages/profitability/{Dashboard,ProfitLoss,Geographical,UnifiedPnL}.tsx` (paginate to 15)
 
-No backend, no schema, no routing changes.
+No backend changes.
