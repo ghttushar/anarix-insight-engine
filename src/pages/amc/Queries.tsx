@@ -143,25 +143,7 @@ export default function AMCQueries() {
                 onDownload={() => toast.success("Exporting queries...")}
               />
             </div>
-            {isMobile ? (
-              <div className="p-3">
-                <MobileCardList>
-                  {filteredQueries.map((q) => (
-                    <MobileCard
-                      key={q.id}
-                      title={q.name}
-                      meta={`${q.createdBy} • ${q.lastRun}`}
-                      kpis={[
-                        { label: "Status", value: <Badge className={statusColors[q.status]}>{q.status}</Badge> },
-                      ]}
-                    />
-                  ))}
-                  {filteredQueries.length === 0 && (
-                    <div className="text-center py-10 text-sm text-muted-foreground">No queries found</div>
-                  )}
-                </MobileCardList>
-              </div>
-            ) : (
+            {(
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/30 hover:bg-muted/30">
