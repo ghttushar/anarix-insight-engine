@@ -243,7 +243,14 @@ export function DataTableToolbar({
             <Button
               variant="ghost"
               size="sm"
-              className={cn("h-8 gap-1 text-xs cursor-pointer", showDeltas && "bg-primary/10 text-primary")}
+              aria-pressed={showDeltas || undefined}
+              data-active={showDeltas || undefined}
+              className={cn(
+                "h-8 gap-1 text-xs cursor-pointer border",
+                showDeltas
+                  ? "bg-primary text-primary-foreground border-primary hover:bg-primary hover:text-primary-foreground"
+                  : "border-transparent"
+              )}
               onClick={() => onShowDeltasChange(!showDeltas)}
               title={showDeltas ? "Hide deltas" : "Show deltas"}
             >
