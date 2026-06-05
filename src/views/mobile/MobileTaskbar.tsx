@@ -111,7 +111,7 @@ export function MobileTaskbar({
   const onInsights = dataPanel === "insights";
   const onAlerts = dataPanel === "notifications";
 
-  const hasSecondRow = !!children || showRunButton;
+  void (showRunButton || children);
 
   return (
     <div
