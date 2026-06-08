@@ -1,132 +1,83 @@
 import { ReactNode } from "react";
-import { Search, Filter, Layers, Columns3, ArrowUpDown, Download } from "lucide-react";
+import { Search, Filter, Columns3 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 /**
- * Mobile table toolbar — two fixed rows, never wraps and never scrolls
- * horizontally. Row 1 is the primary action cluster (Search/Delta/Filter/
- * Columns), Row 2 is secondary chips (Group/Sort/Export).
+ * Mobile table toolbar — view-only row: live search input + filter icon +
+ * column icon. Write/edit/export actions are intentionally absent.
  */
 export function MobileTableToolbar({
-  onSearchClick,
+  searchValue,
+  onSearchChange,
+  searchPlaceholder = "Search…",
   onFilterClick,
   filterCount,
-  onGroupClick,
-  groupActive,
   onColumnsClick,
-  onSortClick,
-  sortActive,
-  onExportClick,
-  showDeltas,
-  onShowDeltasChange,
   extra,
 }: {
-  onSearchClick?: () => void;
+  searchValue?: string;
+  onSearchChange?: (v: string) => void;
+  searchPlaceholder?: string;
   onFilterClick?: () => void;
   filterCount?: number;
-  onGroupClick?: () => void;
-  groupActive?: boolean;
   onColumnsClick?: () => void;
-  onSortClick?: () => void;
-  sortActive?: boolean;
-  onExportClick?: () => void;
-  showDeltas?: boolean;
-  onShowDeltasChange?: (v: boolean) => void;
   extra?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-1.5 px-3 py-2">
-      <div className="flex items-center gap-1.5">
-        {onSearchClick && (
-          <Chip label="Search" onClick={onSearchClick} icon={<Search className="h-3.5 w-3.5" />} className="flex-1 justify-start" />
-        )}
-        {typeof showDeltas === "boolean" && onShowDeltasChange && (
-          <Chip
-            label="Delta"
-            onClick={() => onShowDeltasChange(!showDeltas)}
-            active={showDeltas}
-            icon={<ArrowUpDown className="h-3.5 w-3.5" />}
-          />
-        )}
-        {onFilterClick && (
-          <Chip
-            label="Filter"
-            onClick={onFilterClick}
-            badge={filterCount}
-            icon={<Filter className="h-3.5 w-3.5" />}
-          />
-        )}
-        {onColumnsClick && (
-          <Chip label="Columns" onClick={onColumnsClick} icon={<Columns3 className="h-3.5 w-3.5" />} />
-        )}
+    <div className="flex items-center gap-1.5 px-3 py-2">
+      <div className="relative flex-1 min-w-0">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <Input
+          value={searchValue ?? ""}
+          onChange={(e) => onSearchChange?.(e.target.value)}
+          placeholder={searchPlaceholder}
+          className="h-9 pl-8 text-[13px]"
+        />
       </div>
-      {(onGroupClick || onSortClick || onExportClick || extra) && (
-        <div className="flex items-center gap-1.5">
-          {onGroupClick && (
-            <Chip
-              label="Group"
-              onClick={onGroupClick}
-              active={groupActive}
-              icon={<Layers className="h-3.5 w-3.5" />}
-            />
-          )}
-          {onSortClick && (
-            <Chip
-              label="Sort"
-              onClick={onSortClick}
-              active={sortActive}
-              icon={<ArrowUpDown className="h-3.5 w-3.5" />}
-            />
-          )}
-          {onExportClick && (
-            <Chip
-              label="Export"
-              onClick={onExportClick}
-              icon={<Download className="h-3.5 w-3.5" />}
-            />
-          )}
-          {extra && <div className="ml-auto flex items-center gap-1.5">{extra}</div>}
-        </div>
+      {onFilterClick && (
+        <IconButton onClick={onFilterClick} label="Filter" badge={filterCount}>
+          <Filter className="h-4 w-4" />
+        </IconButton>
       )}
+      {onColumnsClick && (
+        <IconButton onClick={onColumnsClick} label="Columns">
+          <Columns3 className="h-4 w-4" />
+        </IconButton>
+      )}
+      {extra}
     </div>
   );
 }
 
-function Chip({
+function IconButton({
+  children,
   label,
-  icon,
-  onClick,
-  active,
   badge,
-  className,
+  onClick,
 }: {
+  children: ReactNode;
   label: string;
-  icon: ReactNode;
-  onClick?: () => void;
-  active?: boolean;
   badge?: number;
-  className?: string;
+  onClick?: () => void;
 }) {
+  const hasBadge = !!badge && badge > 0;
   return (
     <button
+      type="button"
       onClick={onClick}
-      aria-pressed={active || undefined}
-      data-active={active || undefined}
+      aria-label={label}
       className={cn(
-        "h-8 inline-flex items-center gap-1 px-2.5 rounded-md border text-[12px] font-medium shrink-0 tabular-nums transition-colors",
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : (badge && badge > 0)
-            ? "border-primary text-primary bg-primary/5"
-            : "border-border text-foreground",
-        className
+        "relative h-9 w-9 rounded-md border flex items-center justify-center shrink-0",
+        hasBadge ? "border-primary text-primary bg-primary/5" : "border-border text-foreground active:bg-muted"
       )}
     >
-      {icon}
-      <span>{label}</span>
-      {badge ? (
-        <span className={cn("text-[10px] rounded-full px-1", active ? "bg-primary-foreground/20" : "bg-primary/15")}>{badge}</span>
-      ) : null}
+      {children}
+      {hasBadge && (
+        <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] leading-4 text-center font-semibold">
+          {badge}
+        </span>
+      )}
     </button>
   );
 }

@@ -2,6 +2,8 @@ import { ReactNode, useState } from "react";
 import { X } from "lucide-react";
 import { MobileTopBar } from "./MobileTopBar";
 import { MobileDrawerNav } from "./MobileDrawerNav";
+import { MobileAccountSheet } from "./MobileAccountSheet";
+import { MobileAanFab } from "./MobileAanFab";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { InsightsPanel } from "@/components/insights/InsightsPanel";
 import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
@@ -9,12 +11,13 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * Mobile shell — sticky TopBar (hamburger + logo) and a sticky AppLevelBar
- * rendered per page through MobileTaskbar. Insights / Alerts open as
- * right-side sheets. No bottom bar.
+ * Mobile shell — sticky global top bar [☰ | Title | 👤], drawer nav, account
+ * sheet, floating Aan FAB. Insights/Alerts kept as right-side sheets for
+ * legacy entry points.
  */
 export function MobileShell({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const { dataPanel, closeDataPanel } = useActivePanel();
 
   const showInsights = dataPanel === "insights";
@@ -27,10 +30,16 @@ export function MobileShell({ children }: { children: ReactNode }) {
       data-mobile-shell
       className="flex flex-col min-h-[100dvh] w-full bg-background overflow-x-hidden"
     >
-      <MobileTopBar onOpenDrawer={() => setDrawerOpen(true)} />
+      <MobileTopBar
+        onOpenDrawer={() => setDrawerOpen(true)}
+        onOpenAccount={() => setAccountOpen(true)}
+      />
       <MobileDrawerNav open={drawerOpen} onOpenChange={setDrawerOpen} />
+      <MobileAccountSheet open={accountOpen} onOpenChange={setAccountOpen} />
 
-      <main className="flex-1 min-h-0 overflow-x-hidden pb-4">{children}</main>
+      <main className="flex-1 min-h-0 overflow-x-hidden pb-20">{children}</main>
+
+      <MobileAanFab />
 
       {anySheet && (
         <>
