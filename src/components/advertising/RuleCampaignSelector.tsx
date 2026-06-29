@@ -144,7 +144,25 @@ export function RuleCampaignSelector({ onBack, onSaveDraft: _onSaveDraft, onAppl
                 className="h-8 pl-8 text-xs"
               />
             </div>
+            <div className="inline-flex items-center rounded-md border border-border p-0.5 text-[11px]">
+              {(["active", "all"] as const).map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setStatusFilter(opt)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-sm capitalize transition-colors",
+                    statusFilter === opt
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {opt === "active" ? "Active" : "All"}
+                </button>
+              ))}
+            </div>
           </div>
+
 
           {/* Column header */}
           <div className="flex items-center gap-3 px-4 py-2 border-y border-border bg-muted/30">
