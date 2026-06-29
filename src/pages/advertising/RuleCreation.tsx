@@ -359,7 +359,20 @@ function CriteriaBlock({
               value={cond.value}
               onChange={(e) => onUpdateCondition(cond.id, { value: parseFloat(e.target.value) || 0 })}
               className="h-8 w-20 text-xs"
+              placeholder={cond.operator === "between" ? "Min" : undefined}
             />
+            {cond.operator === "between" && (
+              <>
+                <span className="text-xs text-muted-foreground">and</span>
+                <Input
+                  type="number"
+                  value={cond.maxValue ?? 0}
+                  onChange={(e) => onUpdateCondition(cond.id, { maxValue: parseFloat(e.target.value) || 0 })}
+                  className="h-8 w-20 text-xs"
+                  placeholder="Max"
+                />
+              </>
+            )}
             {criteria.conditions.length > 1 && (
               <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => onRemoveCondition(cond.id)} title="Remove condition">
                 <X className="h-3.5 w-3.5" />
