@@ -29,10 +29,11 @@ export function RuleCampaignSelector({ onBack, onSaveDraft: _onSaveDraft, onAppl
     return mockCampaigns.filter(
       (c) =>
         !addedIds.has(c.id) &&
+        (statusFilter === "all" || c.status === "live") &&
         (c.name.toLowerCase().includes(leftSearch.toLowerCase()) ||
           c.id.toLowerCase().includes(leftSearch.toLowerCase()))
     );
-  }, [leftSearch, addedIds]);
+  }, [leftSearch, addedIds, statusFilter]);
 
   const addedCampaigns = useMemo(() => {
     return mockCampaigns.filter(
@@ -284,12 +285,8 @@ export function RuleCampaignSelector({ onBack, onSaveDraft: _onSaveDraft, onAppl
 
       {/* Footer */}
       <div className="flex items-center justify-end gap-3 rounded-lg border border-border bg-card px-5 py-3">
-        <Button variant="outline" size="sm" onClick={onSaveDraft}>
-          <Save className="mr-1.5 h-3.5 w-3.5" />
-          Save as Draft
-        </Button>
         <Button size="sm" onClick={onApplyRule} disabled={addedIds.size === 0}>
-          Apply Rule
+          {isEdit ? "Update Campaigns" : "Apply Rule"}
           <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
         </Button>
       </div>
