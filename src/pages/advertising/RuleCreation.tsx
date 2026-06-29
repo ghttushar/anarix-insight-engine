@@ -263,13 +263,14 @@ export default function RuleCreation() {
                 Add Criteria
               </Button>
               <Button size="sm" onClick={() => setStep("campaigns")}>
-                Select Campaigns
+                {isEdit ? "Update Campaigns" : "Select Campaigns"}
                 <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
               </Button>
             </div>
           </>
         ) : (
           <RuleCampaignSelector
+            isEdit={isEdit}
             onBack={() => setStep("builder")}
             onSaveDraft={handleSaveDraft}
             onApplyRule={handleApplyRule}
