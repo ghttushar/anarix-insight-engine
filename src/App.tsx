@@ -31,6 +31,8 @@ import MobileRedirect from "@/views/mobile/MobileRedirect";
 import MobileGate from "@/views/mobile/MobileGate";
 import { toast } from "sonner";
 import NotFound from "./pages/NotFound";
+import AlertsPage from "./pages/Alerts";
+
 
 // Auth & Onboarding
 import Login from "./pages/auth/Login";
