@@ -282,12 +282,35 @@ export function ExecutionArtifact({ event, onClose }: Props) {
         </div>
       </ScrollArea>
 
-      {/* Talk to Aan about this event */}
-      <div className="border-t border-border p-3 shrink-0 bg-muted/20">
-        <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5">
-          Talk to Aan about this event
+      {/* Talk to Aan about this event — inline thread + composer */}
+      <div className="border-t border-border shrink-0 bg-muted/20 flex flex-col max-h-[45%]">
+        <div className="px-3 pt-2.5 pb-1 flex items-center gap-1.5 shrink-0">
+          <AanMascot size={16} state="idle" interactive={false} />
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+            Talk to Aan about this
+          </div>
         </div>
-        <div className="flex items-center gap-1.5">
+        {chatMsgs.length > 0 && (
+          <ScrollArea className="flex-1 min-h-0 px-3">
+            <div className="space-y-2 py-2">
+              {chatMsgs.map((m) => (
+                <div
+                  key={m.id}
+                  className={cn(
+                    "text-[12px] leading-relaxed rounded-md px-2.5 py-1.5 max-w-[92%]",
+                    m.role === "user"
+                      ? "ml-auto bg-primary text-primary-foreground"
+                      : "mr-auto bg-card border border-border text-foreground"
+                  )}
+                >
+                  {m.text}
+                </div>
+              ))}
+              <div ref={chatEndRef} />
+            </div>
+          </ScrollArea>
+        )}
+        <div className="p-3 pt-2 flex items-center gap-1.5 shrink-0">
           <Input
             value={chatDraft}
             onChange={(e) => setChatDraft(e.target.value)}
@@ -302,6 +325,7 @@ export function ExecutionArtifact({ event, onClose }: Props) {
           </Button>
         </div>
       </div>
+
       </div>
     </>
   );
