@@ -25,6 +25,7 @@ import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
 import { ViewBadge } from "@/components/layout/ViewBadge";
 import { AanAutonomyBadge } from "@/components/aan/autonomous/AanAutonomyBadge";
+import { useAanEvents } from "@/components/aan/autonomous/AanEventsContext";
 import { MobileTaskbar } from "@/views/mobile/MobileTaskbar";
 import { useViewport } from "@/contexts/ViewportContext";
 
