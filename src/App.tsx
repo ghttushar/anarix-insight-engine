@@ -265,6 +265,7 @@ function AppRoutes() {
       <Route path="/settings/team" element={<MobileGate title="Team settings are desktop-only"><SettingsTeam /></MobileGate>} />
       <Route path="/settings/system" element={<SettingsSystem />} />
       <Route path="/settings/aan-triggers" element={<AanTriggersPage />} />
+      <Route path="/settings/design-system" element={<DesignSystem />} />
       <Route path="/settings/design-system/:tab" element={<DesignSystem />} />
       <Route path="/settings/component-library" element={<ComponentLibrary />} />
       <Route path="/settings/component-library/:section" element={<ComponentLibrary />} />
