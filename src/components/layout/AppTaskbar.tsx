@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
 import { ViewBadge } from "@/components/layout/ViewBadge";
+import { AanAutonomyBadge } from "@/components/aan/autonomous/AanAutonomyBadge";
 import { MobileTaskbar } from "@/views/mobile/MobileTaskbar";
 import { useViewport } from "@/contexts/ViewportContext";
 
@@ -242,6 +243,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
             <Clock className="h-3 w-3 text-muted-foreground taskbar-last-synced" />
             <span className="taskbar-last-synced text-[11px] text-muted-foreground whitespace-nowrap">Last synced: {lastSyncTime}</span>
             <div className="h-3.5 w-px bg-border" />
+            <AanAutonomyBadge />
             <ViewBadge />
           </div>
         </div>

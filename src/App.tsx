@@ -87,6 +87,10 @@ import ClientPortal from "./pages/reports/ClientPortal";
 
 // Aan
 import AanWorkspacePage from "./pages/aan/Workspace";
+import AanFeedPage from "./pages/aan/Feed";
+import AanPoliciesPage from "./pages/aan/Policies";
+import AanTriggersPage from "./pages/settings/AanTriggers";
+import { AanEventsProvider } from "@/components/aan/autonomous/AanEventsContext";
 import TrialStateRoute from "./pages/_dev/TrialStateRoute";
 
 // Settings
@@ -245,6 +249,8 @@ function AppRoutes() {
 
       {/* Aan */}
       <Route path="/aan" element={<AanWorkspacePage />} />
+      <Route path="/aan/feed" element={<AanFeedPage />} />
+      <Route path="/aan/policies" element={<AanPoliciesPage />} />
 
       {/* Reports */}
       <Route path="/reports/client-portal" element={<ClientPortal />} />
@@ -258,6 +264,7 @@ function AppRoutes() {
       <Route path="/settings/accounts/connect/walmart" element={<MobileGate title="Connect on desktop"><ConnectWalmart /></MobileGate>} />
       <Route path="/settings/team" element={<MobileGate title="Team settings are desktop-only"><SettingsTeam /></MobileGate>} />
       <Route path="/settings/system" element={<SettingsSystem />} />
+      <Route path="/settings/aan-triggers" element={<AanTriggersPage />} />
       <Route path="/settings/design-system" element={<DesignSystem />} />
       <Route path="/settings/design-system/:tab" element={<DesignSystem />} />
       <Route path="/settings/component-library" element={<ComponentLibrary />} />
@@ -306,6 +313,7 @@ const App = () => (
             <FilterProvider>
               <ActivePanelProvider>
                 <AanProvider>
+                  <AanEventsProvider>
                   <InsightsProvider>
                     <VisualEffectsProvider>
                       <FeatureToggleProvider>
@@ -334,6 +342,7 @@ const App = () => (
                       </FeatureToggleProvider>
                     </VisualEffectsProvider>
                   </InsightsProvider>
+                  </AanEventsProvider>
                 </AanProvider>
               </ActivePanelProvider>
             </FilterProvider>
