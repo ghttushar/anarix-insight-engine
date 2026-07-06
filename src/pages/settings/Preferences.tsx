@@ -169,6 +169,21 @@ export default function Preferences() {
   const currencyList = Object.values(CURRENCIES);
   const [customShortcuts, setCustomShortcuts] = useState<Record<string, string[]>>(loadCustomShortcuts);
   const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [policies, setPolicies] = useState<Policy[]>(POLICIES);
+  const [howAanOpen, setHowAanOpen] = useState(false);
+
+  const togglePolicy = (id: string) =>
+    setPolicies((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)));
+
+  // Deep-link support: scroll to #edit-alerts on mount if the hash matches.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash === "#edit-alerts") {
+      requestAnimationFrame(() => {
+        document.getElementById("edit-alerts")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, []);
 
   const handleViewChange = (next: AppView) => {
     if (next === view) return;
