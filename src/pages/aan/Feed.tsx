@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -5,9 +6,10 @@ import { AanMascot } from "@/components/aan/AanMascot";
 import { FEED_ENTRIES, CONNECTED_SYSTEMS, FeedEntry } from "@/data/mockAanFeed";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Ear, Eye, Sparkles, Zap, Coffee, MessageSquare, Wrench, Video, Activity } from "lucide-react";
+import { Ear, Eye, Sparkles, Zap, Coffee, MessageSquare, Wrench, Video, Activity, ChevronDown } from "lucide-react";
 import { useAanEvents } from "@/components/aan/autonomous/AanEventsContext";
 import { AAN_PRESENCE_MESSAGES } from "@/components/aan/autonomous/AanEventsContext";
+
 
 const kindMeta: Record<FeedEntry["kind"], { icon: any; color: string; label: string }> = {
   briefing: { icon: Coffee, color: "text-primary", label: "Prepared" },
