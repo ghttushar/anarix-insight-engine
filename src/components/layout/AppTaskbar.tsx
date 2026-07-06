@@ -1,6 +1,6 @@
 import { useState, useEffect, ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { CalendarIcon, Play, Bell, Lightbulb, RefreshCw, Clock, ChevronRight } from "lucide-react";
+import { CalendarIcon, Play, Bell, Lightbulb, RefreshCw, Clock, ChevronRight, Inbox } from "lucide-react";
 import { AanGlyph } from "@/components/aan/AanGlyph";
 import { format, subDays, startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -25,6 +25,7 @@ import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
 import { ViewBadge } from "@/components/layout/ViewBadge";
 import { AanAutonomyBadge } from "@/components/aan/autonomous/AanAutonomyBadge";
+import { useAanEvents } from "@/components/aan/autonomous/AanEventsContext";
 import { MobileTaskbar } from "@/views/mobile/MobileTaskbar";
 import { useViewport } from "@/contexts/ViewportContext";
 
@@ -146,6 +147,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
   const { currentAccount } = useAccounts();
   const { openPanel: openAan } = useAan();
   const { openPanel: openInsights } = useInsights();
+  const { pendingCount: aanPendingCount, criticalCount: aanCriticalCount } = useAanEvents();
   const islandOff = !effects.floatingIsland;
 
   const [draftRange, setDraftRange] = useState<{ from: Date; to: Date }>(dateRange);
@@ -218,7 +220,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
   };
 
   const hasRow1 = true; // always show account/sync info
-  const hasRow2 = showAdType || showFrequency || showDateRange || showRunButton || children || islandOff;
+  const hasRow2 = showAdType || showFrequency || showDateRange || showRunButton || children || true;
 
   return (
     <div data-app-taskbar data-tour-id="taskbar" className="flex flex-col rounded-lg border bg-card shrink-0 sticky top-0 z-30 border-primary">
@@ -367,64 +369,61 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
             )}
           </div>
 
-          {/* Right: island-off actions + bell */}
-          {islandOff && (
-            <div className="flex items-center gap-0.5 ml-auto shrink-0">
-              {hasAnyPanel ? (
-                <>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => openAan()}>
-                        <AanGlyph className="h-4 w-4 text-primary" staticEyes />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom"><p>Ask Aan</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => openInsights()}>
-                        <Lightbulb className="h-3 w-3" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom"><p>Insights</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => toast.info("Refreshing data...")}>
-                        <RefreshCw className="h-3 w-3" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom"><p>Refresh</p></TooltipContent>
-                  </Tooltip>
-                </>
-              ) : (
-                <>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openAan()}>
-                    <AanGlyph className="h-4 w-4 text-primary" staticEyes />
-                    <span className="text-[11px]">Ask Aan</span>
+          {/* Right: utility cluster — always visible so features remain accessible when the Floating Island is off */}
+          <div className="flex items-center gap-0.5 ml-auto shrink-0">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => openInsights()}>
+                  <Lightbulb className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom"><p>Insights</p></TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 relative" onClick={() => setDataPanel("aan-inbox")}>
+                  <Inbox className="h-3.5 w-3.5" />
+                  {aanPendingCount > 0 && (
+                    <span className={cn(
+                      "absolute -top-0.5 -right-0.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full px-1 text-[9px] font-bold",
+                      aanCriticalCount > 0 ? "bg-destructive text-destructive-foreground" : "bg-primary text-primary-foreground"
+                    )}>
+                      {aanPendingCount}
+                    </span>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Aan Inbox{aanPendingCount > 0 ? ` (${aanPendingCount})` : ""}</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => openAan()}>
+                  <AanGlyph className="h-4 w-4 text-primary" staticEyes />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom"><p>Ask Aan</p></TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => toast.info("Refreshing data...")}>
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom"><p>Refresh</p></TooltipContent>
+            </Tooltip>
+            <div className="pl-1 border-l border-border ml-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDataPanel("notifications")}>
+                    <Bell className="h-3.5 w-3.5" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => openInsights()}>
-                    <Lightbulb className="h-3 w-3" />
-                    <span className="text-[11px]">Insights</span>
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 gap-1" onClick={() => toast.info("Refreshing data...")}>
-                    <RefreshCw className="h-3 w-3" />
-                    <span className="text-[11px]">Refresh</span>
-                  </Button>
-                </>
-              )}
-              <div className="pl-2 border-l border-border ml-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDataPanel("notifications")}>
-                      <Bell className="h-3.5 w-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom"><p>Alerts</p></TooltipContent>
-                </Tooltip>
-              </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom"><p>Alerts</p></TooltipContent>
+              </Tooltip>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>

@@ -1,24 +1,17 @@
 import { useState } from "react";
-import { X, Check, Loader2, ArrowRight, Slack, Mail, Video, FileText, Shield, ArrowUp, ArrowDown } from "lucide-react";
+import { X, Check, Loader2, ArrowRight, Slack, Mail, Video, FileText, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { AanEvent, Lifecycle, useAanEvents } from "./AanEventsContext";
+import { AanEvent, useAanEvents } from "./AanEventsContext";
 
 interface Props {
   event: AanEvent;
   onClose: () => void;
 }
 
-const STAGES: { key: "Input" | "Value" | "Action" | "Execution" | "Fulfillment"; matchLifecycles: Lifecycle[] }[] = [
-  { key: "Input", matchLifecycles: ["detected", "analyzing", "awaiting_approval", "executing", "fulfilled"] },
-  { key: "Value", matchLifecycles: ["analyzing", "awaiting_approval", "executing", "fulfilled"] },
-  { key: "Action", matchLifecycles: ["awaiting_approval", "executing", "fulfilled"] },
-  { key: "Execution", matchLifecycles: ["executing", "fulfilled"] },
-  { key: "Fulfillment", matchLifecycles: ["fulfilled"] },
-];
 
 const contextIcons = { slack: Slack, email: Mail, meeting: Video, doc: FileText };
 
@@ -44,25 +37,6 @@ export function ExecutionArtifact({ event, onClose }: Props) {
         </Button>
       </div>
 
-      {/* Lifecycle stages */}
-      <div className="flex items-center gap-1 px-4 py-2 border-b border-border bg-muted/30">
-        {STAGES.map((stage, i) => {
-          const active = stage.matchLifecycles.includes(event.lifecycle);
-          return (
-            <div key={stage.key} className="flex items-center gap-1">
-              <div
-                className={cn(
-                  "text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded transition-colors",
-                  active ? "text-primary bg-primary/10" : "text-muted-foreground/60"
-                )}
-              >
-                {stage.key}
-              </div>
-              {i < STAGES.length - 1 && <ArrowRight className="h-2.5 w-2.5 text-muted-foreground/40" />}
-            </div>
-          );
-        })}
-      </div>
 
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-4 space-y-5">
