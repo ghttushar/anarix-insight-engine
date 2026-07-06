@@ -91,6 +91,15 @@ import AanFeedPage from "./pages/aan/Feed";
 import AanPoliciesPage from "./pages/aan/Policies";
 import AanTriggersPage from "./pages/settings/AanTriggers";
 import { AanEventsProvider } from "@/components/aan/autonomous/AanEventsContext";
+import PanelIndex, {
+  AanInboxPanelRoute,
+  AanInboxMorningRoute,
+  AanInboxMeetingActionsRoute,
+  AanInboxCardRoute,
+  AanArtifactRoute,
+  InsightsPanelRoute,
+  NotificationsPanelRoute,
+} from "./pages/panels/PanelRoute";
 import TrialStateRoute from "./pages/_dev/TrialStateRoute";
 
 // Settings
