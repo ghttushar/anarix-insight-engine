@@ -37,25 +37,6 @@ export function ExecutionArtifact({ event, onClose }: Props) {
         </Button>
       </div>
 
-      {/* Lifecycle stages */}
-      <div className="flex items-center gap-1 px-4 py-2 border-b border-border bg-muted/30">
-        {STAGES.map((stage, i) => {
-          const active = stage.matchLifecycles.includes(event.lifecycle);
-          return (
-            <div key={stage.key} className="flex items-center gap-1">
-              <div
-                className={cn(
-                  "text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded transition-colors",
-                  active ? "text-primary bg-primary/10" : "text-muted-foreground/60"
-                )}
-              >
-                {stage.key}
-              </div>
-              {i < STAGES.length - 1 && <ArrowRight className="h-2.5 w-2.5 text-muted-foreground/40" />}
-            </div>
-          );
-        })}
-      </div>
 
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-4 space-y-5">
