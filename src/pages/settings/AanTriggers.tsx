@@ -25,7 +25,7 @@ export default function AanTriggersPage() {
 
   return (
     <AppLayout>
-      <AppTaskbar breadcrumbs={[{ label: "Settings", href: "/settings/system" }, { label: "Aan Triggers" }]} />
+      <AppTaskbar breadcrumbItems={[{ label: "Settings", href: "/settings/system" }, { label: "Aan Triggers" }]} />
       <div className="p-6 max-w-[1100px] mx-auto">
         <header className="mb-6">
           <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider font-semibold text-primary">

@@ -15,7 +15,7 @@ export default function AanPoliciesPage() {
 
   return (
     <AppLayout>
-      <AppTaskbar breadcrumbs={[{ label: "Aan", href: "/aan" }, { label: "Automation Policies" }]} />
+      <AppTaskbar breadcrumbItems={[{ label: "Aan", href: "/aan" }, { label: "Automation Policies" }]} />
       <div className="p-6 max-w-[900px] mx-auto">
         <header className="mb-6">
           <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider font-semibold text-primary">

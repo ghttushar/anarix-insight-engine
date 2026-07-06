@@ -27,7 +27,7 @@ export default function AanFeedPage() {
   return (
     <AppLayout>
       <AppTaskbar
-        breadcrumbs={[{ label: "Aan", href: "/aan" }, { label: "Feed" }]}
+        breadcrumbItems={[{ label: "Aan", href: "/aan" }, { label: "Feed" }]}
       />
       <div className="p-6 max-w-[1200px] mx-auto">
         <header className="mb-6 flex items-start gap-4">
