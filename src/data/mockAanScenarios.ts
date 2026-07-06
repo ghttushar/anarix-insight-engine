@@ -25,6 +25,23 @@ export interface DiffField {
   after: string;
 }
 
+export interface MeetingActionItem {
+  owner: string;
+  due: string;
+  task: string;
+  done?: boolean;
+}
+
+export interface MeetingRef {
+  title: string;
+  when: string;
+  attendees: string[];
+  decisions: string[];
+  actionItems: MeetingActionItem[];
+  callouts: string[];
+  notes?: string;
+}
+
 export interface ScenarioTemplate {
   id: string;
   domain: ScenarioDomain;
@@ -35,6 +52,7 @@ export interface ScenarioTemplate {
   marketplace: string;
   impact: string; // e.g. "+$180 projected sales"
   confidence: number; // 0-100
+  tags?: string[];
   // Input
   signal: string;
   evidence: EvidenceRow[];
@@ -47,6 +65,7 @@ export interface ScenarioTemplate {
     when: string;
     quote: string;
   };
+  meetingRef?: MeetingRef;
   // Action
   recommendation: string;
   actionLabel: string; // "Approve +$45 budget"
@@ -57,6 +76,7 @@ export interface ScenarioTemplate {
   diff: DiffField[];
   fulfillmentNote: string;
 }
+
 
 export const SCENARIOS: ScenarioTemplate[] = [
   {
