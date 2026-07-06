@@ -172,6 +172,7 @@ export default function Preferences() {
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [policies, setPolicies] = useState<Policy[]>(POLICIES);
   const [howAanOpen, setHowAanOpen] = useState(false);
+  const { liveMode, setLiveMode } = useAanEvents();
 
   const togglePolicy = (id: string) =>
     setPolicies((prev) => prev.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)));
