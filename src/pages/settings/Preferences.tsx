@@ -520,7 +520,27 @@ export default function Preferences() {
             </div>
           </div>
 
+          {/* Live mode toggle — controls the Alerts stream */}
+          <div className="rounded-lg border border-border bg-card p-4 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h3 className="font-heading text-sm font-semibold text-foreground">Live mode</h3>
+                <span className={cn(
+                  "text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded",
+                  liveMode ? "bg-success/15 text-success" : "bg-muted text-muted-foreground"
+                )}>
+                  {liveMode ? "On" : "Off"}
+                </span>
+              </div>
+              <p className="text-[12.5px] text-muted-foreground mt-1 leading-relaxed">
+                Stream new alerts into the Alerts page in real time. Turn off to review at your own pace.
+              </p>
+            </div>
+            <Switch checked={liveMode} onCheckedChange={setLiveMode} />
+          </div>
+
           <ul className="space-y-3">
+
             {policies.map((p) => (
               <li key={p.id} className={cn("rounded-lg border bg-card p-4 transition-colors", p.enabled ? "border-primary/30" : "border-border")}>
                 <div className="flex items-start gap-3">
