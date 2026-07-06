@@ -1,5 +1,9 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { useAan } from "./AanContext";
+import { useAanEvents } from "./autonomous/AanEventsContext";
+import { useActivePanel } from "@/contexts/ActivePanelContext";
+import { SCENARIOS } from "@/data/mockAanScenarios";
+import { WORKSPACE_CORPUS } from "@/data/mockWorkspaceCorpus";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Square, X, Paperclip, ChevronDown, Check, Zap, Brain, Cpu, Gauge } from "lucide-react";
