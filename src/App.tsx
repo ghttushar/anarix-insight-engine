@@ -264,6 +264,17 @@ function AppRoutes() {
       {/* Reports */}
       <Route path="/reports/client-portal" element={<ClientPortal />} />
 
+      {/* Standalone panel routes — for figma export and shareable deep links */}
+      <Route path="/panels" element={<PanelIndex />} />
+      <Route path="/panels/aan-inbox" element={<AanInboxPanelRoute />} />
+      <Route path="/panels/aan-inbox/morning" element={<AanInboxMorningRoute />} />
+      <Route path="/panels/aan-inbox/meeting-actions" element={<AanInboxMeetingActionsRoute />} />
+      <Route path="/panels/aan-inbox/card/:scenarioId" element={<AanInboxCardRoute />} />
+      <Route path="/panels/aan-inbox/details/:scenarioId" element={<AanArtifactRoute />} />
+      <Route path="/panels/insights" element={<InsightsPanelRoute />} />
+      <Route path="/panels/notifications" element={<NotificationsPanelRoute />} />
+
+
       {/* Settings */}
       <Route path="/settings/appearance" element={<Preferences />} />
       <Route path="/profile" element={<MobileProfile />} />
