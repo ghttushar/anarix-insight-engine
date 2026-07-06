@@ -106,6 +106,8 @@ function formatFileSize(bytes: number): string {
 
 export function AanInput() {
   const { addMessage, setGenerationState, messages, selectedModel, setSelectedModel, pendingPrompt, setPendingPrompt, isGenerating, generationType, setInputFocused } = useAan();
+  const { fireScenario } = useAanEvents();
+  const { setDataPanel } = useActivePanel();
   const { newBranding } = useBranding();
   const { registerAnchor } = useAanPresence();
   const [input, setInput] = useState("");
