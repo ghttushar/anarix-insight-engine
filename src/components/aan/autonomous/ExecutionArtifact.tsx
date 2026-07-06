@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Check, Loader2, ArrowRight, Slack, Mail, Video, FileText, Shield, ArrowUp, ArrowDown } from "lucide-react";
+import { X, Check, Loader2, ArrowRight, Slack, Mail, Video, FileText, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
