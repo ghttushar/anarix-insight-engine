@@ -49,8 +49,9 @@ interface AanEventsContextType {
 const AanEventsContext = createContext<AanEventsContextType | undefined>(undefined);
 
 // ---- Seeded events so the demo has a story on first load ----
-// Note: IDs suffixed with `-mtgN` are chosen so hashString(id) % 7 === 0,
-// which maps them to the "meeting" channel in Alerts inferChannel().
+// Note: no meeting-hash seeding here. Meeting-originated tasks live in a
+// separate `meetingBundles` stream (Flow B). These events (Flow A) may
+// reference a meeting via `scenario.meetingRef` but appear in All/Live/Overnight.
 function seedEvents(): AanEvent[] {
   const now = Date.now();
   const HOUR = 60 * 60 * 1000;
@@ -59,15 +60,15 @@ function seedEvents(): AanEvent[] {
     { id: "buybox", life: "awaiting_approval", ago: 13 * HOUR },              // overnight · critical
     { id: "suppression", life: "awaiting_approval", ago: 11 * HOUR },         // overnight · critical
     { id: "daypart", life: "fulfilled", ago: 14 * HOUR, auto: true },         // overnight · fyi (done)
-    // From meetings — deterministic IDs that satisfy the meeting hash rule
-    { id: "launch-coverage", life: "awaiting_approval", ago: 2 * HOUR, eventId: "evt-launch-coverage-mtg5" },   // meeting · critical
-    { id: "event-campaign", life: "awaiting_approval", ago: 3 * HOUR, eventId: "evt-event-campaign-mtg4" },    // meeting · opportunity
-    { id: "reviews", life: "awaiting_approval", ago: 4 * HOUR, eventId: "evt-reviews-mtg1" },                    // meeting · opportunity
-    { id: "loss-making", life: "executing", ago: 1 * HOUR, eventId: "evt-loss-making-mtg0" },                    // meeting · critical (executing)
-    // Live (working day, non-meeting hash)
-    { id: "keyword-promotion", life: "awaiting_approval", ago: 20 * 60 * 1000 },  // live · opportunity
-    { id: "placement-opt", life: "awaiting_approval", ago: 45 * 60 * 1000 },      // live · opportunity
-    { id: "budget-optimization", life: "fulfilled", ago: 90 * 60 * 1000, auto: true }, // live · fyi (done)
+    // E-commerce alerts that also reference a past meeting (meetingRef chip)
+    { id: "launch-coverage", life: "awaiting_approval", ago: 2 * HOUR },
+    { id: "event-campaign", life: "awaiting_approval", ago: 3 * HOUR },
+    { id: "reviews", life: "awaiting_approval", ago: 4 * HOUR },
+    { id: "loss-making", life: "executing", ago: 1 * HOUR },
+    // Live
+    { id: "keyword-promotion", life: "awaiting_approval", ago: 20 * 60 * 1000 },
+    { id: "placement-opt", life: "awaiting_approval", ago: 45 * 60 * 1000 },
+    { id: "budget-optimization", life: "fulfilled", ago: 90 * 60 * 1000, auto: true },
   ];
   return seed
     .map(({ id, life, ago, auto, eventId }) => {
