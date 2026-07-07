@@ -10,6 +10,9 @@ import { DigestRow } from "@/components/actions/DigestRow";
 import { EmptyState } from "@/components/actions/EmptyState";
 import { SortMenu, type SortKey } from "@/components/actions/SortMenu";
 import { FilterSheet, EMPTY_FILTER, countActiveFilters, type FilterState } from "@/components/actions/FilterSheet";
+import { MeetingBundleRow } from "@/components/actions/MeetingBundleRow";
+import { MeetingWorkspace } from "@/components/actions/MeetingWorkspace";
+import { QuestionRow } from "@/components/actions/QuestionRow";
 import { valueMagnitude, formatValue } from "@/lib/decisions/valueFormat";
 import type { Decision } from "@/data/mockDecisions";
 
@@ -50,10 +53,11 @@ function bucketLabel(ts: number): string {
 }
 
 function AlertsInner() {
-  const { decisions, aboveThreshold, belowThreshold, digestItems } = useActionsStore();
+  const { decisions, aboveThreshold, belowThreshold, digestItems, meetings, openQuestionsCount, questions } = useActionsStore();
   const [tab, setTab] = useState<TabKey>("decide");
   const [sort, setSort] = useState<SortKey>("value");
   const [filter, setFilter] = useState<FilterState>(EMPTY_FILTER);
+  const [openBundleId, setOpenBundleId] = useState<string | null>(meetings[0]?.id ?? null);
 
   // ---- source pool per tab ----
   const pool: Decision[] = useMemo(() => {
@@ -104,12 +108,12 @@ function AlertsInner() {
   // ---- counts for tab badges ----
   const counts = useMemo(() => ({
     decide: aboveThreshold.filter((d) => d.status === "open").length,
-    meetings: 0, // Phase 2
-    questions: 0, // Phase 2
+    meetings: meetings.length,
+    questions: openQuestionsCount,
     in_flight: decisions.filter((d) => d.status === "in_flight" || d.status === "with_aan").length,
     handled: decisions.filter((d) => ["completed", "rejected", "expired"].includes(d.status)).length,
     digest: digestItems.length + belowThreshold.length,
-  }), [aboveThreshold, decisions, digestItems, belowThreshold]);
+  }), [aboveThreshold, decisions, digestItems, belowThreshold, meetings.length, openQuestionsCount]);
 
   // ---- greeting numbers ----
   const openTotalCents = aboveThreshold
@@ -214,15 +218,12 @@ function AlertsInner() {
             </div>
           )}
 
-          {(tab === "meetings" || tab === "questions") && (
-            <EmptyState
-              headline={tab === "meetings" ? "Meeting workspace lands in Phase 2." : "Questions lands in Phase 2."}
-              body={
-                tab === "meetings"
-                  ? "This tab will host meeting-derived task bundles with completion-language actions."
-                  : "This tab will host things I'd rather ask you about than guess."
-              }
-            />
+          {tab === "meetings" && (
+            <MeetingsBody openBundleId={openBundleId} onOpen={setOpenBundleId} />
+          )}
+
+          {tab === "questions" && (
+            <QuestionsBody />
           )}
         </ScrollArea>
       </div>
