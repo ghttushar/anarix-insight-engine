@@ -197,7 +197,26 @@ export default function AlertsPage() {
 
         {/* Timeline */}
         <ScrollArea className="h-[calc(100vh-260px)] pr-4">
-          {grouped.length === 0 ? (
+          {filter === "meetings" ? (
+            meetingBundles.length === 0 ? (
+              <div className="py-16 text-center text-[13px] text-muted-foreground/70 italic">
+                No meeting-derived tasks right now.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {meetingBundles
+                  .slice()
+                  .sort((a, b) => b.createdAt - a.createdAt)
+                  .map((b) => (
+                    <MeetingBundleCard
+                      key={b.bundleId}
+                      bundle={b}
+                      onOpenDetails={() => setBundleDetailFor(b)}
+                    />
+                  ))}
+              </div>
+            )
+          ) : grouped.length === 0 ? (
             <div className="py-16 text-center text-[13px] text-muted-foreground/70 italic">
               Nothing to show right now. Aan is watching.
             </div>
@@ -243,6 +262,9 @@ export default function AlertsPage() {
       </div>
 
       {detailFor && <ExecutionArtifact event={detailFor} onClose={() => setDetailFor(null)} />}
+      {bundleDetailFor && (
+        <MeetingBundleArtifact bundle={bundleDetailFor} onClose={() => setBundleDetailFor(null)} />
+      )}
     </AppLayout>
   );
 }
