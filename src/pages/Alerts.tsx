@@ -287,6 +287,68 @@ function FlatList({ grouped }: { grouped: [string, Decision[]][] }) {
   );
 }
 
+function MeetingsBody({ openBundleId, onOpen }: { openBundleId: string | null; onOpen: (id: string) => void }) {
+  const { meetings } = useActionsStore();
+  if (meetings.length === 0) {
+    return <EmptyState headline="No meeting bundles yet." body="When a meeting wraps, I'll bundle its action items and drop them here." />;
+  }
+  return (
+    <div className="space-y-4">
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
+        {meetings.map((m) => (
+          <MeetingBundleRow
+            key={m.id}
+            bundleId={m.id}
+            expanded={openBundleId === m.id}
+            onOpen={(id) => onOpen(openBundleId === id ? "" : id)}
+          />
+        ))}
+      </div>
+      {openBundleId && <MeetingWorkspace bundleId={openBundleId} />}
+    </div>
+  );
+}
+
+function QuestionsBody() {
+  const { questions } = useActionsStore();
+  const open = questions.filter((q) => q.status === "open");
+  const closed = questions.filter((q) => q.status !== "open");
+
+  if (questions.length === 0) {
+    return <EmptyState headline="No open questions." body="When I hit something I'd rather ask than guess, it lands here." />;
+  }
+  return (
+    <div className="space-y-6">
+      <section>
+        <div className="mb-2 flex items-center gap-2">
+          <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Waiting on you</span>
+          <span className="h-px flex-1 bg-border/60" />
+          <span className="text-[10.5px] text-muted-foreground">{open.length} open</span>
+        </div>
+        {open.length === 0 ? (
+          <div className="text-[12px] text-muted-foreground italic py-4 text-center">You're caught up. I'll only ask when it matters.</div>
+        ) : (
+          <div className="space-y-2.5">
+            {open.map((q) => <QuestionRow key={q.id} question={q} />)}
+          </div>
+        )}
+      </section>
+
+      {closed.length > 0 && (
+        <section>
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Recently answered</span>
+            <span className="h-px flex-1 bg-border/60" />
+          </div>
+          <div className="space-y-2.5">
+            {closed.map((q) => <QuestionRow key={q.id} question={q} />)}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
 export default function AlertsPage() {
   return (
     <ActionsProvider>
