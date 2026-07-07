@@ -21,6 +21,20 @@ type FilterKey =
   | "executing"
   | "done";
 
+type SortKey = "latest" | "value" | "critical";
+
+function impactMagnitude(impact: string): number {
+  const m = impact.match(/([\d.,]+)/);
+  if (!m) return 0;
+  const n = parseFloat(m[1].replace(/,/g, ""));
+  if (Number.isNaN(n)) return 0;
+  if (/k/i.test(impact)) return n * 1_000;
+  if (/m/i.test(impact)) return n * 1_000_000;
+  return n;
+}
+const severityRank: Record<string, number> = { critical: 0, opportunity: 1, fyi: 2 };
+
+
 const KEPT_DOMAINS = new Set(["campaign", "retail", "profitability", "inventory"]);
 
 type Channel = "overnight" | "meeting" | "live";
@@ -72,6 +86,7 @@ export default function AlertsPage() {
   const [detailFor, setDetailFor] = useState<AanEvent | null>(null);
   const [bundleDetailFor, setBundleDetailFor] = useState<MeetingTaskBundle | null>(null);
   const [filter, setFilter] = useState<FilterKey>("all");
+  const [sort, setSort] = useState<SortKey>("latest");
 
   const materialEvents = useMemo(
     () => events.filter((e) => KEPT_DOMAINS.has(e.scenario.domain)),
@@ -108,7 +123,18 @@ export default function AlertsPage() {
   }, [withChannel, filter]);
 
   const grouped = useMemo(() => {
-    const sorted = [...filtered].sort((a, b) => b.event.updatedAt - a.event.updatedAt);
+    const sorted = [...filtered].sort((a, b) => {
+      if (sort === "value") {
+        return impactMagnitude(b.event.scenario.impact) - impactMagnitude(a.event.scenario.impact);
+      }
+      if (sort === "critical") {
+        const ra = severityRank[a.event.scenario.severity] ?? 3;
+        const rb = severityRank[b.event.scenario.severity] ?? 3;
+        if (ra !== rb) return ra - rb;
+        return b.event.updatedAt - a.event.updatedAt;
+      }
+      return b.event.updatedAt - a.event.updatedAt;
+    });
     const map = new Map<string, typeof sorted>();
     for (const r of sorted) {
       const b = bucketLabel(r.event.createdAt);
@@ -116,21 +142,28 @@ export default function AlertsPage() {
       map.get(b)!.push(r);
     }
     return Array.from(map.entries());
-  }, [filtered]);
+  }, [filtered, sort]);
 
   const tabs: { key: FilterKey; label: string; count: number; tone?: "critical" | "meeting" }[] = [
-    { key: "all", label: "All", count: materialEvents.length },
-    { key: "approval", label: "Needs approval", count: approvalCount, tone: "critical" },
-    { key: "overnight", label: "Overnight", count: overnightCount },
-    { key: "meetings", label: "Meetings", count: meetingPendingCount, tone: "meeting" },
-    { key: "live", label: "Live", count: liveCount },
-    { key: "executing", label: "Executing", count: executingCount },
-    { key: "done", label: "Done", count: doneCount },
+    { key: "all", label: "Everything", count: materialEvents.length },
+    { key: "approval", label: "Waiting on you", count: approvalCount, tone: "critical" },
+    { key: "overnight", label: "Morning brief", count: overnightCount },
+    { key: "meetings", label: "From meetings", count: meetingPendingCount, tone: "meeting" },
+    { key: "live", label: "As it happens", count: liveCount },
+    { key: "executing", label: "I'm on it", count: executingCount },
+    { key: "done", label: "Wrapped up", count: doneCount },
   ];
+
+  const sortOptions: { key: SortKey; label: string }[] = [
+    { key: "latest", label: "Latest" },
+    { key: "value", label: "High value" },
+    { key: "critical", label: "Critical" },
+  ];
+
 
   return (
     <AppLayout>
-      <AppTaskbar breadcrumbItems={[{ label: "Alerts" }]} />
+      <AppTaskbar breadcrumbItems={[{ label: "Action Items" }]} />
       <div className="px-6 py-6 max-w-[1100px] mx-auto w-full">
         {/* Header */}
         <header className="mb-6 flex items-start justify-between gap-4">
@@ -139,12 +172,11 @@ export default function AlertsPage() {
               <AanMascot size={30} state={liveMode ? "listening" : "idle"} interactive={false} />
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-wider font-semibold text-primary">Alerts</div>
-              <h1 className="font-heading text-2xl font-semibold text-foreground">What Aan noticed for you</h1>
-              <p className="text-[13px] text-muted-foreground mt-1">
-                {pendingCount} awaiting approval
-                {criticalCount > 0 && <span className="text-destructive"> · {criticalCount} critical</span>}
-                {" · "}{doneCount} completed
+              <div className="text-[10px] uppercase tracking-wider font-semibold text-primary">Aan · Action Items</div>
+              <h1 className="font-heading text-2xl font-semibold text-foreground">Hi Tushar — here's what I'm watching.</h1>
+              <p className="text-[13px] text-muted-foreground mt-1 max-w-2xl">
+                I'm keeping an eye on your marketplaces and meetings in the background.
+                These need a decision from you.
                 {liveMode && <span className="text-success"> · Live</span>}
               </p>
             </div>
@@ -152,7 +184,7 @@ export default function AlertsPage() {
         </header>
 
         {/* Tabs */}
-        <div className="mb-5 flex flex-wrap items-center gap-1.5">
+        <div className="mb-3 flex flex-wrap items-center gap-1.5">
           {tabs.map((t) => (
             <button
               key={t.key}
@@ -194,6 +226,30 @@ export default function AlertsPage() {
             </Button>
           )}
         </div>
+
+        {/* Sort */}
+        {filter !== "meetings" && (
+          <div className="mb-5 flex items-center justify-end gap-1.5">
+            <span className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mr-1">
+              Sort
+            </span>
+            {sortOptions.map((o) => (
+              <button
+                key={o.key}
+                onClick={() => setSort(o.key)}
+                className={cn(
+                  "text-[11px] px-2.5 py-1 rounded-md border transition-colors",
+                  sort === o.key
+                    ? "bg-primary/10 border-primary/30 text-primary font-medium"
+                    : "bg-card border-border text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        )}
+
 
         {/* Timeline */}
         <ScrollArea className="h-[calc(100vh-260px)] pr-4">

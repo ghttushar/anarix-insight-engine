@@ -51,7 +51,7 @@ export function AanEventCard({ event, onOpenDetails, channelLabel, channel }: Pr
   const valueText = isFulfilled
     ? s.fulfillmentNote
     : isRejected
-    ? "Declined. Aan won't repeat this for 24h."
+    ? "I stood down. I won't repeat this for 24h."
     : s.impact;
 
   return (
@@ -109,16 +109,6 @@ export function AanEventCard({ event, onOpenDetails, channelLabel, channel }: Pr
         </div>
       </div>
 
-      {/* Tags */}
-      {s.tags && s.tags.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1">
-          {s.tags.map((t) => (
-            <span key={t} className="text-[10px] rounded bg-muted px-1.5 py-0.5 text-foreground/70">
-              {t}
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* Meeting chip */}
       {s.meetingRef && (
