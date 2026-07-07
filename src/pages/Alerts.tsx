@@ -87,7 +87,6 @@ export default function AlertsPage() {
     ["awaiting_approval", "detected", "analyzing"].includes(e.lifecycle)
   ).length;
   const overnightCount = withChannel.filter((r) => r.channel === "overnight").length;
-  const meetingCount = withChannel.filter((r) => r.channel === "meeting").length;
   const liveCount = withChannel.filter((r) => r.channel === "live").length;
   const executingCount = materialEvents.filter((e) => e.lifecycle === "executing").length;
   const doneCount = materialEvents.filter(
