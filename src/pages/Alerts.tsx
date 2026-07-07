@@ -7,6 +7,9 @@ import { AanMascot } from "@/components/aan/AanMascot";
 import { AanEventCard } from "@/components/aan/autonomous/AanInboxCard";
 import { ExecutionArtifact } from "@/components/aan/autonomous/ExecutionArtifact";
 import { useAanEvents, AanEvent } from "@/components/aan/autonomous/AanEventsContext";
+import { MeetingBundleCard } from "@/components/aan/autonomous/MeetingBundleCard";
+import { MeetingBundleArtifact } from "@/components/aan/autonomous/MeetingBundleArtifact";
+import { MeetingTaskBundle } from "@/data/mockMeetingTasks";
 import { cn } from "@/lib/utils";
 
 type FilterKey =
@@ -29,18 +32,17 @@ function hashString(s: string): number {
 }
 
 /**
- * Deterministic channel mix:
+ * Deterministic channel mix for e-commerce alerts (Flow A):
  *  - Overnight (morning brief): created before 8am OR older than ~10h ago.
- *  - Meeting: small stable subset (~1 in 7) of daytime events.
  *  - Live: everything else during the working day.
+ * Meeting-originated tasks (Flow B) are a separate stream — they never
+ * appear as "meeting" channel here.
  */
 function inferChannel(e: AanEvent): Channel {
   const created = new Date(e.createdAt);
   const hour = created.getHours();
   const ageHours = (Date.now() - e.createdAt) / 3_600_000;
   if (hour < 8 || ageHours > 10) return "overnight";
-  const h = hashString(e.eventId);
-  if (h % 7 === 0) return "meeting";
   return "live";
 }
 
@@ -66,8 +68,9 @@ function timeLabel(ts: number): string {
 }
 
 export default function AlertsPage() {
-  const { events, pendingCount, criticalCount, liveMode, clearFulfilled } = useAanEvents();
+  const { events, pendingCount, criticalCount, liveMode, clearFulfilled, meetingBundles, meetingPendingCount } = useAanEvents();
   const [detailFor, setDetailFor] = useState<AanEvent | null>(null);
+  const [bundleDetailFor, setBundleDetailFor] = useState<MeetingTaskBundle | null>(null);
   const [filter, setFilter] = useState<FilterKey>("all");
 
   const materialEvents = useMemo(
@@ -84,7 +87,6 @@ export default function AlertsPage() {
     ["awaiting_approval", "detected", "analyzing"].includes(e.lifecycle)
   ).length;
   const overnightCount = withChannel.filter((r) => r.channel === "overnight").length;
-  const meetingCount = withChannel.filter((r) => r.channel === "meeting").length;
   const liveCount = withChannel.filter((r) => r.channel === "live").length;
   const executingCount = materialEvents.filter((e) => e.lifecycle === "executing").length;
   const doneCount = materialEvents.filter(
@@ -120,7 +122,7 @@ export default function AlertsPage() {
     { key: "all", label: "All", count: materialEvents.length },
     { key: "approval", label: "Needs approval", count: approvalCount, tone: "critical" },
     { key: "overnight", label: "Overnight", count: overnightCount },
-    { key: "meetings", label: "Meetings", count: meetingCount, tone: "meeting" },
+    { key: "meetings", label: "Meetings", count: meetingPendingCount, tone: "meeting" },
     { key: "live", label: "Live", count: liveCount },
     { key: "executing", label: "Executing", count: executingCount },
     { key: "done", label: "Done", count: doneCount },
@@ -195,7 +197,26 @@ export default function AlertsPage() {
 
         {/* Timeline */}
         <ScrollArea className="h-[calc(100vh-260px)] pr-4">
-          {grouped.length === 0 ? (
+          {filter === "meetings" ? (
+            meetingBundles.length === 0 ? (
+              <div className="py-16 text-center text-[13px] text-muted-foreground/70 italic">
+                No meeting-derived tasks right now.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {meetingBundles
+                  .slice()
+                  .sort((a, b) => b.createdAt - a.createdAt)
+                  .map((b) => (
+                    <MeetingBundleCard
+                      key={b.bundleId}
+                      bundle={b}
+                      onOpenDetails={() => setBundleDetailFor(b)}
+                    />
+                  ))}
+              </div>
+            )
+          ) : grouped.length === 0 ? (
             <div className="py-16 text-center text-[13px] text-muted-foreground/70 italic">
               Nothing to show right now. Aan is watching.
             </div>
@@ -241,6 +262,9 @@ export default function AlertsPage() {
       </div>
 
       {detailFor && <ExecutionArtifact event={detailFor} onClose={() => setDetailFor(null)} />}
+      {bundleDetailFor && (
+        <MeetingBundleArtifact bundle={bundleDetailFor} onClose={() => setBundleDetailFor(null)} />
+      )}
     </AppLayout>
   );
 }

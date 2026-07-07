@@ -7,6 +7,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode } from "react";
 import { SCENARIOS, ScenarioTemplate, getScenario } from "@/data/mockAanScenarios";
+import { MEETING_TASK_BUNDLES, MeetingTaskBundle, MeetingItemStatus } from "@/data/mockMeetingTasks";
 import { toast } from "sonner";
 
 export type Lifecycle =
@@ -43,13 +44,21 @@ interface AanEventsContextType {
   presenceIndex: number;
   autonomyLevel: "advisory" | "assisted" | "autonomous";
   clearFulfilled: () => void;
+  // Meeting-originated action bundles (Flow B)
+  meetingBundles: MeetingTaskBundle[];
+  meetingPendingCount: number;
+  approveMeetingItem: (bundleId: string, itemId: string) => void;
+  rejectMeetingItem: (bundleId: string, itemId: string) => void;
+  approveAllMeetingItems: (bundleId: string) => void;
+  rejectAllMeetingItems: (bundleId: string) => void;
 }
 
 const AanEventsContext = createContext<AanEventsContextType | undefined>(undefined);
 
 // ---- Seeded events so the demo has a story on first load ----
-// Note: IDs suffixed with `-mtgN` are chosen so hashString(id) % 7 === 0,
-// which maps them to the "meeting" channel in Alerts inferChannel().
+// Note: no meeting-hash seeding here. Meeting-originated tasks live in a
+// separate `meetingBundles` stream (Flow B). These events (Flow A) may
+// reference a meeting via `scenario.meetingRef` but appear in All/Live/Overnight.
 function seedEvents(): AanEvent[] {
   const now = Date.now();
   const HOUR = 60 * 60 * 1000;
@@ -58,15 +67,15 @@ function seedEvents(): AanEvent[] {
     { id: "buybox", life: "awaiting_approval", ago: 13 * HOUR },              // overnight · critical
     { id: "suppression", life: "awaiting_approval", ago: 11 * HOUR },         // overnight · critical
     { id: "daypart", life: "fulfilled", ago: 14 * HOUR, auto: true },         // overnight · fyi (done)
-    // From meetings — deterministic IDs that satisfy the meeting hash rule
-    { id: "launch-coverage", life: "awaiting_approval", ago: 2 * HOUR, eventId: "evt-launch-coverage-mtg5" },   // meeting · critical
-    { id: "event-campaign", life: "awaiting_approval", ago: 3 * HOUR, eventId: "evt-event-campaign-mtg4" },    // meeting · opportunity
-    { id: "reviews", life: "awaiting_approval", ago: 4 * HOUR, eventId: "evt-reviews-mtg1" },                    // meeting · opportunity
-    { id: "loss-making", life: "executing", ago: 1 * HOUR, eventId: "evt-loss-making-mtg0" },                    // meeting · critical (executing)
-    // Live (working day, non-meeting hash)
-    { id: "keyword-promotion", life: "awaiting_approval", ago: 20 * 60 * 1000 },  // live · opportunity
-    { id: "placement-opt", life: "awaiting_approval", ago: 45 * 60 * 1000 },      // live · opportunity
-    { id: "budget-optimization", life: "fulfilled", ago: 90 * 60 * 1000, auto: true }, // live · fyi (done)
+    // E-commerce alerts that also reference a past meeting (meetingRef chip)
+    { id: "launch-coverage", life: "awaiting_approval", ago: 2 * HOUR },
+    { id: "event-campaign", life: "awaiting_approval", ago: 3 * HOUR },
+    { id: "reviews", life: "awaiting_approval", ago: 4 * HOUR },
+    { id: "loss-making", life: "executing", ago: 1 * HOUR },
+    // Live
+    { id: "keyword-promotion", life: "awaiting_approval", ago: 20 * 60 * 1000 },
+    { id: "placement-opt", life: "awaiting_approval", ago: 45 * 60 * 1000 },
+    { id: "budget-optimization", life: "fulfilled", ago: 90 * 60 * 1000, auto: true },
   ];
   return seed
     .map(({ id, life, ago, auto, eventId }) => {
@@ -99,6 +108,7 @@ const PRESENCE_MESSAGES = [
 
 export function AanEventsProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<AanEvent[]>(() => seedEvents());
+  const [meetingBundles, setMeetingBundles] = useState<MeetingTaskBundle[]>(() => MEETING_TASK_BUNDLES);
   const [liveMode, setLiveMode] = useState(false);
   const [presenceIndex, setPresenceIndex] = useState(0);
   const liveTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -192,6 +202,45 @@ export function AanEventsProvider({ children }: { children: ReactNode }) {
     setEvents((prev) => prev.filter((e) => e.lifecycle !== "fulfilled" && e.lifecycle !== "rejected"));
   }, []);
 
+  // --- Meeting bundle handlers ---
+  const setItemStatus = useCallback((bundleId: string, itemId: string, status: MeetingItemStatus) => {
+    setMeetingBundles((prev) =>
+      prev.map((b) =>
+        b.bundleId !== bundleId
+          ? b
+          : { ...b, actionItems: b.actionItems.map((it) => (it.id === itemId ? { ...it, status } : it)) }
+      )
+    );
+  }, []);
+  const approveMeetingItem = useCallback((bundleId: string, itemId: string) => {
+    setItemStatus(bundleId, itemId, "approved");
+    toast.success("Action approved. Aan will execute and report back.");
+  }, [setItemStatus]);
+  const rejectMeetingItem = useCallback((bundleId: string, itemId: string) => {
+    setItemStatus(bundleId, itemId, "rejected");
+    toast.info("Action rejected.");
+  }, [setItemStatus]);
+  const approveAllMeetingItems = useCallback((bundleId: string) => {
+    setMeetingBundles((prev) =>
+      prev.map((b) =>
+        b.bundleId !== bundleId
+          ? b
+          : { ...b, actionItems: b.actionItems.map((it) => (it.status === "pending" ? { ...it, status: "approved" } : it)) }
+      )
+    );
+    toast.success("All pending actions approved.");
+  }, []);
+  const rejectAllMeetingItems = useCallback((bundleId: string) => {
+    setMeetingBundles((prev) =>
+      prev.map((b) =>
+        b.bundleId !== bundleId
+          ? b
+          : { ...b, actionItems: b.actionItems.map((it) => (it.status === "pending" ? { ...it, status: "rejected" } : it)) }
+      )
+    );
+    toast.info("All pending actions rejected.");
+  }, []);
+
   // Live-mode timer — fires a random unused scenario every ~30s
   useEffect(() => {
     if (!liveMode) {
@@ -222,8 +271,11 @@ export function AanEventsProvider({ children }: { children: ReactNode }) {
 
   const pendingCount = useMemo(() => events.filter((e) => e.lifecycle === "awaiting_approval" || e.lifecycle === "detected" || e.lifecycle === "analyzing").length, [events]);
   const criticalCount = useMemo(() => events.filter((e) => (e.lifecycle === "awaiting_approval" || e.lifecycle === "detected") && e.scenario.severity === "critical").length, [events]);
+  const meetingPendingCount = useMemo(
+    () => meetingBundles.filter((b) => b.actionItems.some((it) => it.status === "pending")).length,
+    [meetingBundles]
+  );
   const autonomyLevel: "advisory" | "assisted" | "autonomous" = useMemo(() => {
-    // Static for mockup; will be driven by real policy count in the future.
     return "assisted";
   }, []);
 
@@ -240,6 +292,12 @@ export function AanEventsProvider({ children }: { children: ReactNode }) {
     presenceIndex,
     autonomyLevel,
     clearFulfilled,
+    meetingBundles,
+    meetingPendingCount,
+    approveMeetingItem,
+    rejectMeetingItem,
+    approveAllMeetingItems,
+    rejectAllMeetingItems,
   };
 
   return <AanEventsContext.Provider value={value}>{children}</AanEventsContext.Provider>;
