@@ -321,6 +321,7 @@ function AlertsInner() {
               onOpenFilter={() => setFilterSheetOpen(true)}
               digestItems={digestItems}
               digestTotal={digestTotal}
+              viewMode={viewMode}
             />
           )}
 
@@ -330,21 +331,21 @@ function AlertsInner() {
                 headline="Nothing running right now."
                 body="When you approve or hand me something, it shows up here with live progress."
               />
-            ) : <FlatList bucketed={bucketed} />
+            ) : <FlatList bucketed={bucketed} viewMode={viewMode} />
           )}
 
           {tab === "handled" && (
             bucketed.length === 0 ? (
               <EmptyState headline="Your handled ledger is empty." body="Everything you close in the last 14 days lives here." />
-            ) : <FlatList bucketed={bucketed} />
+            ) : <FlatList bucketed={bucketed} viewMode={viewMode} />
           )}
 
           {tab === "meetings" && (
-            <MeetingsBody onOpen={setOpenBundleId} />
+            <MeetingsBody onOpen={setOpenBundleId} viewMode={viewMode} />
           )}
 
           {tab === "questions" && (
-            <QuestionsBody />
+            <QuestionsBody viewMode={viewMode} />
           )}
         </ScrollArea>
       </div>
