@@ -20,9 +20,25 @@ import { useDecideKeyboard } from "@/components/actions/useDecideKeyboard";
 import { OverloadBanner } from "@/components/actions/OverloadBanner";
 import { HandledFilters, type HandledResolution } from "@/components/actions/HandledFilters";
 import { UndoToast } from "@/components/actions/UndoToast";
+import { ViewModeToggle, type ViewMode } from "@/components/actions/ViewModeToggle";
+import { DecisionCard } from "@/components/actions/DecisionCard";
+import { MeetingBundleCard } from "@/components/actions/MeetingBundleCard";
+import { QuestionCard } from "@/components/actions/QuestionCard";
 import { valueMagnitude, formatValue } from "@/lib/decisions/valueFormat";
 import { Button } from "@/components/ui/button";
 import type { Decision } from "@/data/mockDecisions";
+
+function useViewMode(): [ViewMode, (m: ViewMode) => void] {
+  const [mode, setMode] = useState<ViewMode>(() => {
+    if (typeof window === "undefined") return "stack";
+    return (sessionStorage.getItem("action-items:view-mode") as ViewMode) || "stack";
+  });
+  const persist = (m: ViewMode) => {
+    setMode(m);
+    sessionStorage.setItem("action-items:view-mode", m);
+  };
+  return [mode, persist];
+}
 
 type TabKey = "decide" | "meetings" | "questions" | "in_flight" | "handled";
 
@@ -119,6 +135,7 @@ function AlertsInner() {
   const [handledRes, setHandledRes] = useState<HandledResolution>("all");
   const [showAllOverflow, setShowAllOverflow] = useState(false);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [viewMode, setViewMode] = useViewMode();
 
   useDecideKeyboard(tab === "decide");
   useEffect(() => { if (tab !== "decide") clear(); }, [tab, clear]);
@@ -271,6 +288,7 @@ function AlertsInner() {
           </nav>
 
           <div className="ml-auto flex items-center gap-2">
+            <ViewModeToggle value={viewMode} onChange={setViewMode} />
             {(tab === "decide" || tab === "handled" || tab === "in_flight") && (
               <>
                 <FilterSheet
@@ -303,6 +321,7 @@ function AlertsInner() {
               onOpenFilter={() => setFilterSheetOpen(true)}
               digestItems={digestItems}
               digestTotal={digestTotal}
+              viewMode={viewMode}
             />
           )}
 
@@ -312,21 +331,21 @@ function AlertsInner() {
                 headline="Nothing running right now."
                 body="When you approve or hand me something, it shows up here with live progress."
               />
-            ) : <FlatList bucketed={bucketed} />
+            ) : <FlatList bucketed={bucketed} viewMode={viewMode} />
           )}
 
           {tab === "handled" && (
             bucketed.length === 0 ? (
               <EmptyState headline="Your handled ledger is empty." body="Everything you close in the last 14 days lives here." />
-            ) : <FlatList bucketed={bucketed} />
+            ) : <FlatList bucketed={bucketed} viewMode={viewMode} />
           )}
 
           {tab === "meetings" && (
-            <MeetingsBody onOpen={setOpenBundleId} />
+            <MeetingsBody onOpen={setOpenBundleId} viewMode={viewMode} />
           )}
 
           {tab === "questions" && (
-            <QuestionsBody />
+            <QuestionsBody viewMode={viewMode} />
           )}
         </ScrollArea>
       </div>
@@ -348,10 +367,29 @@ function AlertsInner() {
   );
 }
 
+function DecisionList({ list, interactive, viewMode }: { list: GroupedDecision[]; interactive?: boolean; viewMode: ViewMode }) {
+  if (viewMode === "card") {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {list.map((g) => (
+          <DecisionCard key={g.primary.id} decision={g.primary} duplicates={g.duplicates} interactive={interactive} />
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-lg border border-border bg-card overflow-hidden">
+      {list.map((g) => (
+        <DecisionRow key={g.primary.id} decision={g.primary} duplicates={g.duplicates} interactive={interactive} />
+      ))}
+    </div>
+  );
+}
+
 function DecideBody({
   bucketed, hiddenCount, hiddenValueCents,
   onShowAll, onSortByValue, onOpenFilter,
-  digestItems, digestTotal,
+  digestItems, digestTotal, viewMode,
 }: {
   bucketed: [string, GroupedDecision[]][];
   hiddenCount: number;
@@ -361,6 +399,7 @@ function DecideBody({
   onOpenFilter: () => void;
   digestItems: ReturnType<typeof useActionsStore>["digestItems"];
   digestTotal: number;
+  viewMode: ViewMode;
 }) {
   if (bucketed.length === 0 && digestItems.length === 0) {
     return <EmptyState headline="You're clear." body="I'll surface something the moment it matters." />;
@@ -373,16 +412,7 @@ function DecideBody({
             <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{bucket}</span>
             <span className="h-px flex-1 bg-border/60" />
           </div>
-          <div className="rounded-lg border border-border bg-card overflow-hidden">
-            {list.map((g) => (
-              <DecisionRow
-                key={g.primary.id}
-                decision={g.primary}
-                duplicates={g.duplicates}
-                interactive
-              />
-            ))}
-          </div>
+          <DecisionList list={list} interactive viewMode={viewMode} />
         </section>
       ))}
 
@@ -415,7 +445,7 @@ function DecideBody({
   );
 }
 
-function FlatList({ bucketed }: { bucketed: [string, GroupedDecision[]][] }) {
+function FlatList({ bucketed, viewMode }: { bucketed: [string, GroupedDecision[]][]; viewMode: ViewMode }) {
   return (
     <div className="space-y-8">
       {bucketed.map(([bucket, list]) => (
@@ -424,19 +454,26 @@ function FlatList({ bucketed }: { bucketed: [string, GroupedDecision[]][] }) {
             <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{bucket}</span>
             <span className="h-px flex-1 bg-border/60" />
           </div>
-          <div className="rounded-lg border border-border bg-card overflow-hidden">
-            {list.map((g) => <DecisionRow key={g.primary.id} decision={g.primary} duplicates={g.duplicates} />)}
-          </div>
+          <DecisionList list={list} viewMode={viewMode} />
         </section>
       ))}
     </div>
   );
 }
 
-function MeetingsBody({ onOpen }: { onOpen: (id: string) => void }) {
+function MeetingsBody({ onOpen, viewMode }: { onOpen: (id: string) => void; viewMode: ViewMode }) {
   const { meetings } = useActionsStore();
   if (meetings.length === 0) {
     return <EmptyState headline="No meeting bundles yet." body="When a meeting wraps, I bundle its action items and drop them here." />;
+  }
+  if (viewMode === "card") {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {meetings.map((m) => (
+          <MeetingBundleCard key={m.id} bundleId={m.id} onOpen={onOpen} />
+        ))}
+      </div>
+    );
   }
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
@@ -447,7 +484,7 @@ function MeetingsBody({ onOpen }: { onOpen: (id: string) => void }) {
   );
 }
 
-function QuestionsBody() {
+function QuestionsBody({ viewMode }: { viewMode: ViewMode }) {
   const { questions } = useActionsStore();
   const open = questions.filter((q) => q.status === "open");
   const closed = questions.filter((q) => q.status !== "open");
@@ -455,6 +492,17 @@ function QuestionsBody() {
   if (questions.length === 0) {
     return <EmptyState headline="No open questions." body="When I hit something I'd rather ask than guess, it lands here." />;
   }
+  const renderList = (items: typeof questions) =>
+    viewMode === "card" ? (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {items.map((q) => <QuestionCard key={q.id} question={q} />)}
+      </div>
+    ) : (
+      <div className="space-y-2.5">
+        {items.map((q) => <QuestionRow key={q.id} question={q} />)}
+      </div>
+    );
+
   return (
     <div className="space-y-6">
       <section>
@@ -465,9 +513,7 @@ function QuestionsBody() {
         {open.length === 0 ? (
           <div className="text-[12px] text-muted-foreground italic py-4 text-center">You're caught up. I'll only ask when it matters.</div>
         ) : (
-          <div className="space-y-2.5">
-            {open.map((q) => <QuestionRow key={q.id} question={q} />)}
-          </div>
+          renderList(open)
         )}
       </section>
 
@@ -477,9 +523,7 @@ function QuestionsBody() {
             <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Recently answered</span>
             <span className="h-px flex-1 bg-border/60" />
           </div>
-          <div className="space-y-2.5">
-            {closed.map((q) => <QuestionRow key={q.id} question={q} />)}
-          </div>
+          {renderList(closed)}
         </section>
       )}
     </div>
