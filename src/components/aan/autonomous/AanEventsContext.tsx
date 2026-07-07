@@ -44,6 +44,13 @@ interface AanEventsContextType {
   presenceIndex: number;
   autonomyLevel: "advisory" | "assisted" | "autonomous";
   clearFulfilled: () => void;
+  // Meeting-originated action bundles (Flow B)
+  meetingBundles: MeetingTaskBundle[];
+  meetingPendingCount: number;
+  approveMeetingItem: (bundleId: string, itemId: string) => void;
+  rejectMeetingItem: (bundleId: string, itemId: string) => void;
+  approveAllMeetingItems: (bundleId: string) => void;
+  rejectAllMeetingItems: (bundleId: string) => void;
 }
 
 const AanEventsContext = createContext<AanEventsContextType | undefined>(undefined);
