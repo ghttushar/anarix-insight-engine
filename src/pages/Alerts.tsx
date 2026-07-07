@@ -163,7 +163,7 @@ export default function AlertsPage() {
 
   return (
     <AppLayout>
-      <AppTaskbar breadcrumbItems={[{ label: "Alerts" }]} />
+      <AppTaskbar breadcrumbItems={[{ label: "Action Items" }]} />
       <div className="px-6 py-6 max-w-[1100px] mx-auto w-full">
         {/* Header */}
         <header className="mb-6 flex items-start justify-between gap-4">
@@ -172,12 +172,11 @@ export default function AlertsPage() {
               <AanMascot size={30} state={liveMode ? "listening" : "idle"} interactive={false} />
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-wider font-semibold text-primary">Alerts</div>
-              <h1 className="font-heading text-2xl font-semibold text-foreground">What Aan noticed for you</h1>
-              <p className="text-[13px] text-muted-foreground mt-1">
-                {pendingCount} awaiting approval
-                {criticalCount > 0 && <span className="text-destructive"> · {criticalCount} critical</span>}
-                {" · "}{doneCount} completed
+              <div className="text-[10px] uppercase tracking-wider font-semibold text-primary">Aan · Action Items</div>
+              <h1 className="font-heading text-2xl font-semibold text-foreground">Hi Tushar — here's what I'm watching.</h1>
+              <p className="text-[13px] text-muted-foreground mt-1 max-w-2xl">
+                I'm keeping an eye on your marketplaces and meetings in the background.
+                These need a decision from you.
                 {liveMode && <span className="text-success"> · Live</span>}
               </p>
             </div>
@@ -185,7 +184,7 @@ export default function AlertsPage() {
         </header>
 
         {/* Tabs */}
-        <div className="mb-5 flex flex-wrap items-center gap-1.5">
+        <div className="mb-3 flex flex-wrap items-center gap-1.5">
           {tabs.map((t) => (
             <button
               key={t.key}
@@ -227,6 +226,30 @@ export default function AlertsPage() {
             </Button>
           )}
         </div>
+
+        {/* Sort */}
+        {filter !== "meetings" && (
+          <div className="mb-5 flex items-center justify-end gap-1.5">
+            <span className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mr-1">
+              Sort
+            </span>
+            {sortOptions.map((o) => (
+              <button
+                key={o.key}
+                onClick={() => setSort(o.key)}
+                className={cn(
+                  "text-[11px] px-2.5 py-1 rounded-md border transition-colors",
+                  sort === o.key
+                    ? "bg-primary/10 border-primary/30 text-primary font-medium"
+                    : "bg-card border-border text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        )}
+
 
         {/* Timeline */}
         <ScrollArea className="h-[calc(100vh-260px)] pr-4">
