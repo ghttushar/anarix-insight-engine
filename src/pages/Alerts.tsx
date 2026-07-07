@@ -126,7 +126,7 @@ function useSortForTab(tab: TabKey): [SortKey, (k: SortKey) => void] {
 }
 
 function AlertsInner() {
-  const { decisions, aboveThreshold, belowThreshold, digestItems, meetings, openQuestionsCount } = useActionsStore();
+  const { decisions, aboveThreshold, digestItems, meetings, openQuestionsCount } = useActionsStore();
   const { registerOrder, clear } = useSelection();
   const [tab, setTab] = useState<TabKey>("decide");
   const [sort, setSort] = useSortForTab(tab);
@@ -137,7 +137,7 @@ function AlertsInner() {
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [viewMode, setViewMode] = useViewMode();
 
-  useDecideKeyboard(tab === "decide");
+  useDecideKeyboard(tab === "decide" && viewMode === "stack");
   useEffect(() => { if (tab !== "decide") clear(); }, [tab, clear]);
 
   const pool: Decision[] = useMemo(() => {
@@ -238,116 +238,120 @@ function AlertsInner() {
       <AppTaskbar breadcrumbItems={[{ label: "Action Items" }]} />
       <div className="px-6 py-6 max-w-[1360px] mx-auto w-full">
 
-        {/* Greeting */}
-        <header className="mb-6 flex items-start gap-3">
-          <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
-            <AanMascot size={30} state="idle" interactive={false} />
-          </div>
-          <div className="flex-1">
-            <div className="text-[10px] uppercase tracking-wider font-semibold text-primary">Action Items</div>
-            <h1 className="font-heading text-2xl font-semibold text-foreground leading-tight">
-              Hi Tushar — I have {openCount} decision{openCount === 1 ? "" : "s"} for you today worth <span className="text-primary">{openTotalFmt}</span>
-              {criticalCount > 0 && <span className="text-muted-foreground text-base font-normal">, {criticalCount} critical</span>}
-              .
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-              I'm watching your marketplaces, meetings, and inboxes in the background. These are the calls I need from you.
-            </p>
-          </div>
-        </header>
-
-        {/* Tabs + controls */}
-        <div className="mb-4 flex items-center gap-2 flex-wrap">
-          <nav className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
-            {(Object.keys(TAB_LABELS) as TabKey[]).map((k) => {
-              const active = tab === k;
-              const c = counts[k];
-              return (
-                <button
-                  key={k}
-                  onClick={() => setTab(k)}
-                  className={cn(
-                    "text-[13px] px-3.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5",
-                    active
-                      ? "bg-primary text-primary-foreground font-medium"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  )}
-                >
-                  {TAB_LABELS[k]}
-                  {c > 0 && (
-                    <span className={cn(
-                      "text-[10.5px] font-semibold px-1.5 rounded-full leading-4",
-                      active ? "bg-primary-foreground/20" : "bg-muted-foreground/15"
-                    )}>
-                      {c}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className="ml-auto flex items-center gap-2">
-            <ViewModeToggle value={viewMode} onChange={setViewMode} />
-            {(tab === "decide" || tab === "handled" || tab === "in_flight") && (
-              <>
-                <FilterSheet
-                  value={filter}
-                  onChange={setFilter}
-                  activeCount={countActiveFilters(filter)}
-                  externalOpen={filterSheetOpen}
-                  onExternalOpenChange={setFilterSheetOpen}
-                />
-                <SortMenu value={sort} onChange={setSort} />
-              </>
-            )}
-          </div>
+        <div className="mb-4 flex items-center justify-end">
+          <ViewModeToggle value={viewMode} onChange={setViewMode} />
         </div>
 
-        {tab === "handled" && counts.handled > 0 && (
-          <div className="mb-3">
-            <HandledFilters value={handledRes} onChange={setHandledRes} counts={handledCounts} />
-          </div>
+        {viewMode === "card" ? (
+          <CardView onOpenBundle={setOpenBundleId} />
+        ) : (
+          <>
+            {/* Greeting */}
+            <header className="mb-6 flex items-start gap-3">
+              <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
+                <AanMascot size={30} state="idle" interactive={false} />
+              </div>
+              <div className="flex-1">
+                <div className="text-[10px] uppercase tracking-wider font-semibold text-primary">Action Items</div>
+                <h1 className="font-heading text-2xl font-semibold text-foreground leading-tight">
+                  Hi Tushar — I have {openCount} decision{openCount === 1 ? "" : "s"} for you today worth <span className="text-primary">{openTotalFmt}</span>
+                  {criticalCount > 0 && <span className="text-muted-foreground text-base font-normal">, {criticalCount} critical</span>}
+                  .
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+                  I'm watching your marketplaces, meetings, and inboxes in the background. These are the calls I need from you.
+                </p>
+              </div>
+            </header>
+
+            {/* Tabs + controls */}
+            <div className="mb-4 flex items-center gap-2 flex-wrap">
+              <nav className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
+                {(Object.keys(TAB_LABELS) as TabKey[]).map((k) => {
+                  const active = tab === k;
+                  const c = counts[k];
+                  return (
+                    <button
+                      key={k}
+                      onClick={() => setTab(k)}
+                      className={cn(
+                        "text-[13px] px-3.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5",
+                        active
+                          ? "bg-primary text-primary-foreground font-medium"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      )}
+                    >
+                      {TAB_LABELS[k]}
+                      {c > 0 && (
+                        <span className={cn(
+                          "text-[10.5px] font-semibold px-1.5 rounded-full leading-4",
+                          active ? "bg-primary-foreground/20" : "bg-muted-foreground/15"
+                        )}>
+                          {c}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <div className="ml-auto flex items-center gap-2">
+                {(tab === "decide" || tab === "handled" || tab === "in_flight") && (
+                  <>
+                    <FilterSheet
+                      value={filter}
+                      onChange={setFilter}
+                      activeCount={countActiveFilters(filter)}
+                      externalOpen={filterSheetOpen}
+                      onExternalOpenChange={setFilterSheetOpen}
+                    />
+                    <SortMenu value={sort} onChange={setSort} />
+                  </>
+                )}
+              </div>
+            </div>
+
+            {tab === "handled" && counts.handled > 0 && (
+              <div className="mb-3">
+                <HandledFilters value={handledRes} onChange={setHandledRes} counts={handledCounts} />
+              </div>
+            )}
+
+            <ScrollArea className="h-[calc(100vh-280px)] pr-3">
+              {tab === "decide" && (
+                <DecideBody
+                  bucketed={bucketed}
+                  hiddenCount={hiddenGroups.length}
+                  hiddenValueCents={hiddenValueCents}
+                  onShowAll={() => setShowAllOverflow(true)}
+                  onSortByValue={() => setSort("value")}
+                  onOpenFilter={() => setFilterSheetOpen(true)}
+                  digestItems={digestItems}
+                  digestTotal={digestTotal}
+                />
+              )}
+
+              {tab === "in_flight" && (
+                bucketed.length === 0 ? (
+                  <EmptyState
+                    headline="Nothing running right now."
+                    body="When you approve or hand me something, it shows up here with live progress."
+                  />
+                ) : <FlatList bucketed={bucketed} />
+              )}
+
+              {tab === "handled" && (
+                bucketed.length === 0 ? (
+                  <EmptyState headline="Your handled ledger is empty." body="Everything you close in the last 14 days lives here." />
+                ) : <FlatList bucketed={bucketed} />
+              )}
+
+              {tab === "meetings" && <MeetingsBody onOpen={setOpenBundleId} />}
+
+              {tab === "questions" && <QuestionsBody />}
+            </ScrollArea>
+          </>
         )}
-
-        <ScrollArea className="h-[calc(100vh-280px)] pr-3">
-          {tab === "decide" && (
-            <DecideBody
-              bucketed={bucketed}
-              hiddenCount={hiddenGroups.length}
-              hiddenValueCents={hiddenValueCents}
-              onShowAll={() => setShowAllOverflow(true)}
-              onSortByValue={() => setSort("value")}
-              onOpenFilter={() => setFilterSheetOpen(true)}
-              digestItems={digestItems}
-              digestTotal={digestTotal}
-              viewMode={viewMode}
-            />
-          )}
-
-          {tab === "in_flight" && (
-            bucketed.length === 0 ? (
-              <EmptyState
-                headline="Nothing running right now."
-                body="When you approve or hand me something, it shows up here with live progress."
-              />
-            ) : <FlatList bucketed={bucketed} viewMode={viewMode} />
-          )}
-
-          {tab === "handled" && (
-            bucketed.length === 0 ? (
-              <EmptyState headline="Your handled ledger is empty." body="Everything you close in the last 14 days lives here." />
-            ) : <FlatList bucketed={bucketed} viewMode={viewMode} />
-          )}
-
-          {tab === "meetings" && (
-            <MeetingsBody onOpen={setOpenBundleId} viewMode={viewMode} />
-          )}
-
-          {tab === "questions" && (
-            <QuestionsBody viewMode={viewMode} />
-          )}
-        </ScrollArea>
       </div>
 
       {/* Meeting workspace sheet */}
@@ -367,16 +371,11 @@ function AlertsInner() {
   );
 }
 
-function DecisionList({ list, interactive, viewMode }: { list: GroupedDecision[]; interactive?: boolean; viewMode: ViewMode }) {
-  if (viewMode === "card") {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        {list.map((g) => (
-          <DecisionCard key={g.primary.id} decision={g.primary} duplicates={g.duplicates} interactive={interactive} />
-        ))}
-      </div>
-    );
-  }
+/* ============================================================
+   STACK-view helpers (unchanged behavior)
+   ============================================================ */
+
+function DecisionList({ list, interactive }: { list: GroupedDecision[]; interactive?: boolean }) {
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       {list.map((g) => (
@@ -389,7 +388,7 @@ function DecisionList({ list, interactive, viewMode }: { list: GroupedDecision[]
 function DecideBody({
   bucketed, hiddenCount, hiddenValueCents,
   onShowAll, onSortByValue, onOpenFilter,
-  digestItems, digestTotal, viewMode,
+  digestItems, digestTotal,
 }: {
   bucketed: [string, GroupedDecision[]][];
   hiddenCount: number;
@@ -399,7 +398,6 @@ function DecideBody({
   onOpenFilter: () => void;
   digestItems: ReturnType<typeof useActionsStore>["digestItems"];
   digestTotal: number;
-  viewMode: ViewMode;
 }) {
   if (bucketed.length === 0 && digestItems.length === 0) {
     return <EmptyState headline="You're clear." body="I'll surface something the moment it matters." />;
@@ -412,7 +410,7 @@ function DecideBody({
             <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{bucket}</span>
             <span className="h-px flex-1 bg-border/60" />
           </div>
-          <DecisionList list={list} interactive viewMode={viewMode} />
+          <DecisionList list={list} interactive />
         </section>
       ))}
 
@@ -445,7 +443,7 @@ function DecideBody({
   );
 }
 
-function FlatList({ bucketed, viewMode }: { bucketed: [string, GroupedDecision[]][]; viewMode: ViewMode }) {
+function FlatList({ bucketed }: { bucketed: [string, GroupedDecision[]][] }) {
   return (
     <div className="space-y-8">
       {bucketed.map(([bucket, list]) => (
@@ -454,26 +452,17 @@ function FlatList({ bucketed, viewMode }: { bucketed: [string, GroupedDecision[]
             <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{bucket}</span>
             <span className="h-px flex-1 bg-border/60" />
           </div>
-          <DecisionList list={list} viewMode={viewMode} />
+          <DecisionList list={list} />
         </section>
       ))}
     </div>
   );
 }
 
-function MeetingsBody({ onOpen, viewMode }: { onOpen: (id: string) => void; viewMode: ViewMode }) {
+function MeetingsBody({ onOpen }: { onOpen: (id: string) => void }) {
   const { meetings } = useActionsStore();
   if (meetings.length === 0) {
     return <EmptyState headline="No meeting bundles yet." body="When a meeting wraps, I bundle its action items and drop them here." />;
-  }
-  if (viewMode === "card") {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        {meetings.map((m) => (
-          <MeetingBundleCard key={m.id} bundleId={m.id} onOpen={onOpen} />
-        ))}
-      </div>
-    );
   }
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
@@ -484,7 +473,7 @@ function MeetingsBody({ onOpen, viewMode }: { onOpen: (id: string) => void; view
   );
 }
 
-function QuestionsBody({ viewMode }: { viewMode: ViewMode }) {
+function QuestionsBody() {
   const { questions } = useActionsStore();
   const open = questions.filter((q) => q.status === "open");
   const closed = questions.filter((q) => q.status !== "open");
@@ -492,16 +481,11 @@ function QuestionsBody({ viewMode }: { viewMode: ViewMode }) {
   if (questions.length === 0) {
     return <EmptyState headline="No open questions." body="When I hit something I'd rather ask than guess, it lands here." />;
   }
-  const renderList = (items: typeof questions) =>
-    viewMode === "card" ? (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        {items.map((q) => <QuestionCard key={q.id} question={q} />)}
-      </div>
-    ) : (
-      <div className="space-y-2.5">
-        {items.map((q) => <QuestionRow key={q.id} question={q} />)}
-      </div>
-    );
+  const renderList = (items: typeof questions) => (
+    <div className="space-y-2.5">
+      {items.map((q) => <QuestionRow key={q.id} question={q} />)}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -526,6 +510,190 @@ function QuestionsBody({ viewMode }: { viewMode: ViewMode }) {
           {renderList(closed)}
         </section>
       )}
+    </div>
+  );
+}
+
+/* ============================================================
+   CARD VIEW — matches attached screenshot exactly.
+   ============================================================ */
+
+type CardTabKey = "all" | "needs_approval" | "overnight" | "meetings" | "live" | "executing" | "done";
+const CARD_TAB_LABEL: Record<CardTabKey, string> = {
+  all: "All",
+  needs_approval: "Needs approval",
+  overnight: "Overnight",
+  meetings: "Meetings",
+  live: "Live",
+  executing: "Executing",
+  done: "Done",
+};
+
+function isOvernight(ts: number): boolean {
+  const h = new Date(ts).getHours();
+  return h >= 22 || h < 8;
+}
+
+function fmtTime(ts: number): string {
+  return new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function CardView({ onOpenBundle }: { onOpenBundle: (id: string) => void }) {
+  const { decisions, meetings } = useActionsStore();
+  const [tab, setTab] = useState<CardTabKey>("all");
+  const [hiddenDone, setHiddenDone] = useState<Set<string>>(new Set());
+
+  const openCount = decisions.filter((d) => d.status === "open").length;
+  const criticalCount = decisions.filter((d) => d.status === "open" && d.severity === "critical").length;
+  const doneCount = decisions.filter((d) => d.status === "completed").length;
+
+  const counts = useMemo<Record<CardTabKey, number>>(() => {
+    const overnight = decisions.filter((d) => d.status === "open" && isOvernight(d.createdAt)).length;
+    const live = decisions.filter((d) => d.status === "open" && !isOvernight(d.createdAt) && d.source !== "meeting").length;
+    const needs = decisions.filter((d) => d.status === "open").length;
+    const executing = decisions.filter((d) => d.status === "in_flight" || d.status === "with_aan").length;
+    const done = decisions.filter((d) => ["completed", "rejected", "expired"].includes(d.status) && !hiddenDone.has(d.id)).length;
+    const meetingsC = meetings.length;
+    const all = needs + executing + done + meetingsC;
+    return { all, needs_approval: needs, overnight, meetings: meetingsC, live, executing, done };
+  }, [decisions, meetings, hiddenDone]);
+
+  // Build a heterogeneous timeline: decisions + meetings (as bundles) sorted by ts desc.
+  type Item =
+    | { kind: "decision"; ts: number; d: Decision }
+    | { kind: "meeting"; ts: number; id: string };
+
+  const items: Item[] = useMemo(() => {
+    let ds: Decision[] = decisions.filter((d) => !hiddenDone.has(d.id));
+    if (tab === "needs_approval") ds = ds.filter((d) => d.status === "open");
+    else if (tab === "overnight") ds = ds.filter((d) => d.status === "open" && isOvernight(d.createdAt));
+    else if (tab === "live") ds = ds.filter((d) => d.status === "open" && !isOvernight(d.createdAt) && d.source !== "meeting");
+    else if (tab === "executing") ds = ds.filter((d) => d.status === "in_flight" || d.status === "with_aan");
+    else if (tab === "done") ds = ds.filter((d) => ["completed", "rejected", "expired"].includes(d.status));
+    else if (tab === "meetings") ds = [];
+    // all: keep as is
+
+    const decisionItems: Item[] = ds.map((d) => ({ kind: "decision" as const, ts: d.createdAt, d }));
+    const meetingItems: Item[] =
+      tab === "all" || tab === "meetings"
+        ? meetings.map((m) => ({ kind: "meeting" as const, ts: m.ts, id: m.id }))
+        : [];
+    return [...decisionItems, ...meetingItems].sort((a, b) => b.ts - a.ts);
+  }, [tab, decisions, meetings, hiddenDone]);
+
+  // Group by bucket label (Today/Yesterday/Earlier)
+  const bucketed = useMemo(() => {
+    const m = new Map<string, Item[]>();
+    for (const it of items) {
+      const b = bucketLabel(it.ts);
+      if (!m.has(b)) m.set(b, []);
+      m.get(b)!.push(it);
+    }
+    return Array.from(m.entries());
+  }, [items]);
+
+  const clearCompleted = () => {
+    const doneIds = decisions.filter((d) => d.status === "completed").map((d) => d.id);
+    setHiddenDone((prev) => {
+      const n = new Set(prev);
+      doneIds.forEach((id) => n.add(id));
+      return n;
+    });
+  };
+
+  return (
+    <div>
+      {/* Header */}
+      <header className="mb-5 flex items-start gap-3">
+        <div className="h-11 w-11 rounded-lg bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
+          <AanMascot size={28} state="idle" interactive={false} />
+        </div>
+        <div className="flex-1">
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Alerts</div>
+          <h1 className="font-heading text-2xl font-semibold text-foreground leading-tight">
+            What Aan noticed for you
+          </h1>
+          <p className="text-[12.5px] text-muted-foreground mt-1">
+            {openCount} awaiting approval
+            {criticalCount > 0 && <> · <span className="text-destructive font-medium">{criticalCount} critical</span></>}
+            {doneCount > 0 && <> · {doneCount} completed</>}
+          </p>
+        </div>
+      </header>
+
+      {/* Tabs */}
+      <div className="mb-4 flex items-center gap-2 flex-wrap">
+        <nav className="flex items-center gap-1 flex-wrap">
+          {(Object.keys(CARD_TAB_LABEL) as CardTabKey[]).map((k) => {
+            const active = tab === k;
+            const c = counts[k];
+            return (
+              <button
+                key={k}
+                onClick={() => setTab(k)}
+                className={cn(
+                  "text-[12.5px] px-3 py-1.5 rounded-md border transition-colors flex items-center gap-1.5",
+                  active
+                    ? "border-primary/50 bg-primary/10 text-primary font-medium"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                {CARD_TAB_LABEL[k]}
+                {c > 0 && (
+                  <span className={cn(
+                    "text-[10.5px] font-semibold px-1.5 rounded-full leading-4",
+                    active ? "bg-primary/20 text-primary" : "bg-muted-foreground/15 text-muted-foreground"
+                  )}>
+                    {c}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+        {counts.done > 0 && (
+          <button
+            type="button"
+            onClick={clearCompleted}
+            className="ml-auto text-[12.5px] text-muted-foreground hover:text-foreground hover:underline"
+          >
+            Clear completed
+          </button>
+        )}
+      </div>
+
+      <ScrollArea className="h-[calc(100vh-320px)] pr-3">
+        {tab === "questions" as string && null}
+        {items.length === 0 ? (
+          <EmptyState headline="Nothing here yet." body="Aan will surface things the moment they matter." />
+        ) : (
+          <div className="space-y-6">
+            {bucketed.map(([bucket, list]) => (
+              <section key={bucket}>
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{bucket}</span>
+                  <span className="h-px flex-1 bg-border/60" />
+                </div>
+                <div className="space-y-3">
+                  {list.map((it) => (
+                    <div key={it.kind === "decision" ? it.d.id : it.id} className="flex items-start gap-3">
+                      <div className="w-14 shrink-0 pt-3 text-[11px] text-muted-foreground tabular-nums text-right">
+                        {fmtTime(it.ts)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        {it.kind === "decision"
+                          ? <DecisionCard decision={it.d} />
+                          : <MeetingBundleCard bundleId={it.id} onOpen={onOpenBundle} />
+                        }
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+      </ScrollArea>
     </div>
   );
 }
