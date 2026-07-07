@@ -20,9 +20,25 @@ import { useDecideKeyboard } from "@/components/actions/useDecideKeyboard";
 import { OverloadBanner } from "@/components/actions/OverloadBanner";
 import { HandledFilters, type HandledResolution } from "@/components/actions/HandledFilters";
 import { UndoToast } from "@/components/actions/UndoToast";
+import { ViewModeToggle, type ViewMode } from "@/components/actions/ViewModeToggle";
+import { DecisionCard } from "@/components/actions/DecisionCard";
+import { MeetingBundleCard } from "@/components/actions/MeetingBundleCard";
+import { QuestionCard } from "@/components/actions/QuestionCard";
 import { valueMagnitude, formatValue } from "@/lib/decisions/valueFormat";
 import { Button } from "@/components/ui/button";
 import type { Decision } from "@/data/mockDecisions";
+
+function useViewMode(): [ViewMode, (m: ViewMode) => void] {
+  const [mode, setMode] = useState<ViewMode>(() => {
+    if (typeof window === "undefined") return "stack";
+    return (sessionStorage.getItem("action-items:view-mode") as ViewMode) || "stack";
+  });
+  const persist = (m: ViewMode) => {
+    setMode(m);
+    sessionStorage.setItem("action-items:view-mode", m);
+  };
+  return [mode, persist];
+}
 
 type TabKey = "decide" | "meetings" | "questions" | "in_flight" | "handled";
 
