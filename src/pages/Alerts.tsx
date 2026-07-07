@@ -86,6 +86,7 @@ export default function AlertsPage() {
   const [detailFor, setDetailFor] = useState<AanEvent | null>(null);
   const [bundleDetailFor, setBundleDetailFor] = useState<MeetingTaskBundle | null>(null);
   const [filter, setFilter] = useState<FilterKey>("all");
+  const [sort, setSort] = useState<SortKey>("latest");
 
   const materialEvents = useMemo(
     () => events.filter((e) => KEPT_DOMAINS.has(e.scenario.domain)),
@@ -122,7 +123,18 @@ export default function AlertsPage() {
   }, [withChannel, filter]);
 
   const grouped = useMemo(() => {
-    const sorted = [...filtered].sort((a, b) => b.event.updatedAt - a.event.updatedAt);
+    const sorted = [...filtered].sort((a, b) => {
+      if (sort === "value") {
+        return impactMagnitude(b.event.scenario.impact) - impactMagnitude(a.event.scenario.impact);
+      }
+      if (sort === "critical") {
+        const ra = severityRank[a.event.scenario.severity] ?? 3;
+        const rb = severityRank[b.event.scenario.severity] ?? 3;
+        if (ra !== rb) return ra - rb;
+        return b.event.updatedAt - a.event.updatedAt;
+      }
+      return b.event.updatedAt - a.event.updatedAt;
+    });
     const map = new Map<string, typeof sorted>();
     for (const r of sorted) {
       const b = bucketLabel(r.event.createdAt);
@@ -130,17 +142,24 @@ export default function AlertsPage() {
       map.get(b)!.push(r);
     }
     return Array.from(map.entries());
-  }, [filtered]);
+  }, [filtered, sort]);
 
   const tabs: { key: FilterKey; label: string; count: number; tone?: "critical" | "meeting" }[] = [
-    { key: "all", label: "All", count: materialEvents.length },
-    { key: "approval", label: "Needs approval", count: approvalCount, tone: "critical" },
-    { key: "overnight", label: "Overnight", count: overnightCount },
-    { key: "meetings", label: "Meetings", count: meetingPendingCount, tone: "meeting" },
-    { key: "live", label: "Live", count: liveCount },
-    { key: "executing", label: "Executing", count: executingCount },
-    { key: "done", label: "Done", count: doneCount },
+    { key: "all", label: "Everything", count: materialEvents.length },
+    { key: "approval", label: "Waiting on you", count: approvalCount, tone: "critical" },
+    { key: "overnight", label: "Morning brief", count: overnightCount },
+    { key: "meetings", label: "From meetings", count: meetingPendingCount, tone: "meeting" },
+    { key: "live", label: "As it happens", count: liveCount },
+    { key: "executing", label: "I'm on it", count: executingCount },
+    { key: "done", label: "Wrapped up", count: doneCount },
   ];
+
+  const sortOptions: { key: SortKey; label: string }[] = [
+    { key: "latest", label: "Latest" },
+    { key: "value", label: "High value" },
+    { key: "critical", label: "Critical" },
+  ];
+
 
   return (
     <AppLayout>
