@@ -1,82 +1,144 @@
-import { ArrowRight, PenLine, XCircle } from "lucide-react";
+import { ArrowRight, ChevronDown, MoreHorizontal, PenLine, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AanMark } from "@/components/branding/AanMark";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import type { Decision } from "@/data/mockDecisions";
+import { deriveAlternateActions } from "@/lib/decisions/deriveAlternateActions";
 
-export interface ActionOption {
-  id: string;
-  label: string;
-  hint?: string;
-  kind: "primary" | "safe" | "aan" | "destructive";
-  onClick: () => void;
-}
-
-/**
- * Derives 3 typed options + one "Write your own" from a Decision.
- * No mock-data changes required — everything is synthesized from
- * the existing actionVerb + status.
- */
-export function deriveActionOptions(
-  d: Decision,
-  handlers: {
-    approve: () => void;
-    delegate: () => void;
-    reject: () => void;
-    custom: () => void;
-  },
-): ActionOption[] {
-  const primaryVerb = d.actionVerb || "Approve";
-  return [
-    { id: "approve", label: primaryVerb, hint: "I execute the steps and report back.", kind: "primary", onClick: handlers.approve },
-    { id: "delegate", label: "Aan handles it", hint: "I draft, execute, and post the outcome.", kind: "aan", onClick: handlers.delegate },
-    { id: "reject", label: "Reject", hint: "Stand down for 24h.", kind: "destructive", onClick: handlers.reject },
-    { id: "custom", label: "Write your own", hint: "Tell me exactly how to handle it.", kind: "safe", onClick: handlers.custom },
-  ];
+export interface ActionHandlers {
+  approve: () => void;
+  approveVariant?: (id: string, label: string) => void;
+  reject: () => void;
+  custom: () => void;
+  viewMore: () => void;
 }
 
 interface Props {
-  options: ActionOption[];
+  decision: Decision;
+  handlers: ActionHandlers;
   layout?: "horizontal" | "vertical";
   className?: string;
+  compact?: boolean;
 }
 
-export function ActionChoiceRow({ options, layout = "horizontal", className }: Props) {
+/**
+ * Three-slot action bar — same fixed order across Stack and Grid so cards align:
+ *   [ Primary verb ▾ ]   [ Reject ]   [ View more ]
+ *
+ * Primary is a split button:
+ *   - click        → runs `actionVerb` as-is
+ *   - caret click  → alternates + "Write custom action…"
+ *
+ * "Aan handles it" has been removed. Delegation happens only when a user
+ * submits a custom instruction from the right-side panel.
+ */
+export function ActionChoiceRow({ decision: d, handlers, layout = "horizontal", className, compact }: Props) {
+  const alternates = deriveAlternateActions(d);
+  const primaryVerb = d.actionVerb || "Approve";
+  const btnH = compact ? "h-8" : "h-9";
+  const btnText = compact ? "text-[12.5px]" : "text-[13px]";
+
   return (
     <div
       className={cn(
-        layout === "horizontal" ? "flex flex-wrap items-center gap-2" : "flex flex-col gap-2",
+        layout === "horizontal" ? "flex items-center gap-1.5" : "flex flex-col gap-2",
         className,
       )}
     >
-      {options.map((opt) => {
-        const isPrimary = opt.kind === "primary";
-        const isAan = opt.kind === "aan";
-        const isDestructive = opt.kind === "destructive";
-        const isCustom = opt.id === "custom";
-        return (
-          <Button
-            key={opt.id}
-            size="sm"
-            variant={isPrimary ? "default" : "outline"}
-            onClick={(e) => { e.stopPropagation(); opt.onClick(); }}
-            title={opt.hint}
-            className={cn(
-              "h-9 px-3.5 text-[13px] gap-1.5 font-medium justify-start",
-              layout === "vertical" && "w-full",
-              isAan && !isPrimary && "border-primary/40 text-primary hover:bg-primary/10",
-              isDestructive && "text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30",
-              isCustom && "border-dashed text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {isPrimary && <ArrowRight className="h-3.5 w-3.5" />}
-            {isAan && <AanMark size={13} className={isPrimary ? "text-primary-foreground" : "text-primary"} />}
-            {isDestructive && <XCircle className="h-3.5 w-3.5" />}
-            {isCustom && <PenLine className="h-3.5 w-3.5" />}
-            <span>{opt.label}</span>
-          </Button>
-        );
-      })}
+      {/* Primary — split button */}
+      <div className={cn("flex items-stretch", layout === "vertical" && "w-full")}>
+        <Button
+          size="sm"
+          onClick={(e) => { e.stopPropagation(); handlers.approve(); }}
+          className={cn(
+            btnH, btnText,
+            "gap-1.5 font-medium rounded-r-none pr-2.5 pl-3.5",
+            layout === "vertical" && "flex-1 justify-start",
+          )}
+          title={`Run "${primaryVerb}" as proposed`}
+        >
+          <ArrowRight className="h-3.5 w-3.5" />
+          <span>{primaryVerb}</span>
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="sm"
+              onClick={(e) => e.stopPropagation()}
+              className={cn(
+                btnH, "px-1.5 rounded-l-none border-l border-primary-foreground/25",
+              )}
+              title="More ways to run this"
+              aria-label="More action options"
+            >
+              <ChevronDown className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuLabel className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              Choose how to run
+            </DropdownMenuLabel>
+            {alternates.map((alt) => (
+              <DropdownMenuItem
+                key={alt.id}
+                onSelect={() => handlers.approveVariant?.(alt.id, alt.label) ?? handlers.approve()}
+                className="flex flex-col items-start gap-0.5 py-2"
+              >
+                <span className="text-[13px] font-medium text-foreground">{alt.label}</span>
+                {alt.hint && <span className="text-[11.5px] text-muted-foreground">{alt.hint}</span>}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onSelect={handlers.custom}
+              className="flex items-center gap-2 py-2 text-primary focus:text-primary"
+            >
+              <PenLine className="h-3.5 w-3.5" />
+              <div className="flex flex-col">
+                <span className="text-[13px] font-medium">Write custom action…</span>
+                <span className="text-[11.5px] text-muted-foreground">Tell me exactly how to handle it.</span>
+              </div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Reject */}
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={(e) => { e.stopPropagation(); handlers.reject(); }}
+        className={cn(
+          btnH, btnText,
+          "gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive px-3",
+          layout === "vertical" && "w-full justify-start",
+        )}
+      >
+        <XCircle className="h-3.5 w-3.5" />
+        <span>Reject</span>
+      </Button>
+
+      {/* View more */}
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={(e) => { e.stopPropagation(); handlers.viewMore(); }}
+        className={cn(
+          btnH, btnText,
+          "gap-1.5 text-muted-foreground hover:text-foreground px-3",
+          layout === "vertical" && "w-full justify-start",
+        )}
+      >
+        <MoreHorizontal className="h-3.5 w-3.5" />
+        <span>View more</span>
+      </Button>
     </div>
   );
 }
