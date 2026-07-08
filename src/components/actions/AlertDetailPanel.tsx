@@ -8,8 +8,11 @@ import { AanMark } from "@/components/branding/AanMark";
 import { ArrowRight, ExternalLink, MessageSquare, Send } from "lucide-react";
 import { SourceGlyph } from "./SourceGlyph";
 import { ValueBlock } from "./ValueBlock";
+import { SettledStrip, settledTintClasses } from "./SettledStrip";
+import { useUndoFor } from "./useUndoFor";
 import { useActionsStore } from "@/state/actionsStore";
 import type { Decision } from "@/data/mockDecisions";
+
 
 export type PanelMode = "detail" | "ask_aan" | "custom";
 
