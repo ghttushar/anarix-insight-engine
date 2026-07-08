@@ -10,6 +10,8 @@ import { ValueBlock } from "./ValueBlock";
 import { SourceGlyph } from "./SourceGlyph";
 import { ActionChoiceRow } from "./ActionChoiceRow";
 import { ShareMenu } from "./ShareMenu";
+import { SettledStrip, settledTintClasses } from "./SettledStrip";
+
 import { useActionsStore } from "@/state/actionsStore";
 import { useSelection } from "@/state/selectionStore";
 import { formatValue } from "@/lib/decisions/valueFormat";
