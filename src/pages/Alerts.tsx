@@ -220,7 +220,7 @@ function AlertsInner() {
           onSortChange={setSort}
           filterSheetOpen={filterSheetOpen}
           onFilterSheetOpenChange={setFilterSheetOpen}
-          onOpenShortcuts={() => setHelpOpen(true)}
+          onOpenShortcuts={undefined}
           onClearCompleted={counts.done > 0 ? () => setTab("done") : undefined}
         />
 
