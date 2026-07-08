@@ -237,10 +237,8 @@ export function ActionsProvider({ children }: { children: ReactNode }) {
       qUndoRef.current.set(id, { timer, prev: target.status, prevChoice: target.chosenId });
       return prev.map((q) => (q.id === id ? { ...q, status: "answered", chosenId: choiceId } : q));
     });
-    toast.success("Answer recorded. I'll remember for next time.", {
-      duration: UNDO_MS,
-      action: { label: "Undo", onClick: () => rollbackQuestion(id) },
-    });
+    toast.success("Answer recorded.");
+    publishUndoable({ id: `q:${id}:answer`, label: "Answer recorded.", onUndo: () => rollbackQuestion(id) });
   }, [rollbackQuestion]);
 
   const skipQuestion = useCallback((id: string) => {
@@ -253,11 +251,10 @@ export function ActionsProvider({ children }: { children: ReactNode }) {
       qUndoRef.current.set(id, { timer, prev: target.status, prevChoice: target.chosenId });
       return prev.map((q) => (q.id === id ? { ...q, status: "skipped" } : q));
     });
-    toast.message("Skipped. I'll guess safely and note it in Handled.", {
-      duration: UNDO_MS,
-      action: { label: "Undo", onClick: () => rollbackQuestion(id) },
-    });
+    toast.message("Skipped.");
+    publishUndoable({ id: `q:${id}:skip`, label: "Skipped. I'll guess safely and note it.", onUndo: () => rollbackQuestion(id) });
   }, [rollbackQuestion]);
+
 
   const openQuestionsCount = useMemo(
     () => questions.filter((q) => q.status === "open").length,
