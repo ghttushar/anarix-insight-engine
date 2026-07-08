@@ -192,7 +192,7 @@ function AlertsInner() {
 
   return (
     <AppLayout>
-      <AppTaskbar breadcrumbItems={[{ label: "Alerts" }]} />
+      <AppTaskbar breadcrumbItems={[{ label: "Alerts" }]} showDateRange />
       <div className="px-4 py-4 max-w-[1480px] mx-auto w-full">
 
         {/* Hero — compact, single line */}
