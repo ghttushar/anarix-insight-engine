@@ -166,6 +166,12 @@ export function GridCard({ decision: d, expanded, focused, onToggleExpand, onTog
               </div>
             )}
 
+            {!isActionable && (
+              <div className="mt-4">
+                <SettledStrip decision={d} />
+              </div>
+            )}
+
             {isFyi && isActionable && (
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-[12.5px] text-muted-foreground">Notification only — no action required.</span>
@@ -173,6 +179,7 @@ export function GridCard({ decision: d, expanded, focused, onToggleExpand, onTog
                   Got it
                 </Button>
               </div>
+
             )}
 
             <div className="mt-4 flex items-center justify-end border-t border-border/40 pt-3">
