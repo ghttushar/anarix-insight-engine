@@ -76,6 +76,7 @@ function inWindow(ts: number, win: FilterState["window"]): boolean {
 
 function AlertsInner() {
   const { decisions } = useActionsStore();
+  const { dateRange } = useFilter();
 
   const [viewMode, setViewMode] = useViewMode();
   const [tab, setTab] = useTab();
@@ -83,14 +84,21 @@ function AlertsInner() {
   const [filter, setFilter] = useState<FilterState>(EMPTY_FILTER);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [panel, setPanel] = useState<PanelState>(CLOSED_PANEL);
+  const [meetingBundleId, setMeetingBundleId] = useState<string | null>(null);
 
   // Grid state — expanded card ids + optional focused id
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [focusedId, setFocusedId] = useState<string | null>(null);
 
   const openDetail = useCallback((id: string, mode: PanelMode = "detail") => {
+    // Meeting-sourced alerts open the meeting workspace instead of the generic panel.
+    const d = decisions.find((x) => x.id === id);
+    if (d?.meetingRef && mode === "detail") {
+      setMeetingBundleId(d.meetingRef.bundleId);
+      return;
+    }
     setPanel({ decisionId: id, mode });
-  }, []);
+  }, [decisions]);
 
   const closePanel = useCallback(() => setPanel(CLOSED_PANEL), []);
 
@@ -98,12 +106,21 @@ function AlertsInner() {
 
   const pool = useMemo(() => filterByTab(decisions, tab), [decisions, tab]);
 
+  // Custom date-range filter from AppTaskbar (inclusive of `to` end-of-day).
+  const dateFrom = dateRange.from.getTime();
+  const dateToEnd = (() => {
+    const d = new Date(dateRange.to);
+    d.setHours(23, 59, 59, 999);
+    return d.getTime();
+  })();
+
   const filtered = useMemo(() => pool.filter((d) => {
+    if (d.createdAt < dateFrom || d.createdAt > dateToEnd) return false;
     if (filter.sources.size && !filter.sources.has(d.source)) return false;
     if (filter.domains.size && !filter.domains.has(d.domain)) return false;
     if (!inWindow(d.createdAt, filter.window)) return false;
     return true;
-  }), [pool, filter]);
+  }), [pool, filter, dateFrom, dateToEnd]);
 
   const sorted = useMemo(() => {
     const s = [...filtered];
