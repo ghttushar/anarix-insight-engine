@@ -79,7 +79,7 @@ export const MOCK_MEETING_BUNDLES: MeetingBundle[] = [
       "Winter Push efficiency has slipped 3 weeks running; team aligned on reallocating to Launch S4 and tightening evergreen day-parting.",
     transcriptExcerpt:
       "Priya: Winter Push TACoS is 41% over target — three weeks in a row.\nRahul: Launch S4 has headroom, ROAS ceiling is 4.1×.\nYou: Let's shift budget and tighten day-parting on Evergreen.",
-    taskIds: ["mt-perf-1", "mt-perf-2"],
+    taskIds: ["mt-perf-1", "mt-perf-2", "mt-perf-3", "mt-perf-4", "mt-perf-5"],
   },
   {
     id: "mtg-amazon-sync",
