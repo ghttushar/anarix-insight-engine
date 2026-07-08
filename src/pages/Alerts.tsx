@@ -138,7 +138,7 @@ function AlertsInner() {
     ? formatValue({ cents: openValueCents, kind: "gain" }).text.replace("+ ", "")
     : null;
 
-  const [helpOpen, setHelpOpen] = useState(false);
+  
 
   const toggleExpand = useCallback((id: string) => {
     setExpandedIds((prev) => {
