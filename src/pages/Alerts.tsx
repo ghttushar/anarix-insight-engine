@@ -276,6 +276,12 @@ function AlertsInner() {
         onModeChange={(m) => setPanel((p) => ({ ...p, mode: m }))}
       />
 
+      <MeetingWorkspace
+        bundleId={meetingBundleId}
+        onClose={() => setMeetingBundleId(null)}
+      />
+
+
       <KeyboardHelpOverlay />
       <UndoToast />
     </AppLayout>
