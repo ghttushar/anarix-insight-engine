@@ -134,6 +134,10 @@ export function GridCard({ decision: d, expanded, focused, onToggleExpand, onTog
                 Expand for actions
               </span>
             )}
+            {!expanded && !isActionable && (
+              <SettledStrip decision={d} size="sm" className="px-0 py-0" />
+            )}
+
           </div>
         </div>
 
