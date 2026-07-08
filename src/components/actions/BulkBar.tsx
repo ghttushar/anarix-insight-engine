@@ -1,7 +1,9 @@
 import { useMemo } from "react";
-import { CheckCircle2, X, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronDown, PenLine, X, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AanMark } from "@/components/branding/AanMark";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useSelection } from "@/state/selectionStore";
 import { useActionsStore } from "@/state/actionsStore";
 import { valueMagnitude, formatValue } from "@/lib/decisions/valueFormat";
@@ -20,6 +22,7 @@ export function BulkBar() {
 
   const totalCents = items.reduce((s, d) => s + valueMagnitude(d.valueKind, d.valueCents), 0);
   const totalFmt = totalCents > 0 ? formatValue({ cents: totalCents, kind: "gain" }).text.replace("+ ", "") : null;
+  const ids = items.map((i) => i.id);
 
   return (
     <div
@@ -36,26 +39,41 @@ export function BulkBar() {
         )}
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
-        <Button
-          size="sm"
-          onClick={() => { bulkApprove(items.map((i) => i.id)); clear(); }}
-          className="h-8 text-[12.5px] gap-1.5"
-        >
-          <CheckCircle2 className="h-3.5 w-3.5" /> Approve all
-        </Button>
+      <div className="ml-auto flex items-center gap-1.5">
+        {/* Approve all — split */}
+        <div className="flex items-stretch">
+          <Button
+            size="sm"
+            onClick={() => { bulkApprove(ids); clear(); }}
+            className="h-8 text-[12.5px] gap-1.5 rounded-r-none pr-2.5"
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" /> Approve all
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" className="h-8 px-1.5 rounded-l-none border-l border-primary-foreground/25" aria-label="More">
+                <ChevronDown className="h-3.5 w-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-60">
+              <DropdownMenuItem onSelect={() => { bulkApprove(ids); clear(); }}>
+                Approve all as-is
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => { ids.forEach(delegateToAan); clear(); }}
+                className="flex flex-col items-start gap-0.5 py-2"
+              >
+                <span className="flex items-center gap-1.5"><PenLine className="h-3.5 w-3.5" /> Custom instruction for all</span>
+                <span className="text-[11px] text-muted-foreground">I'll follow the note you leave in the panel.</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
         <Button
           size="sm"
           variant="outline"
-          onClick={() => { items.forEach((i) => delegateToAan(i.id)); clear(); }}
-          className="h-8 text-[12.5px] gap-1.5 border-primary/40 text-primary hover:bg-primary/10"
-        >
-          <AanMark size={13} className="text-primary" /> Aan handles all
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => { items.forEach((i) => reject(i.id)); clear(); }}
+          onClick={() => { ids.forEach(reject); clear(); }}
           className="h-8 text-[12.5px] gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
         >
           <XCircle className="h-3.5 w-3.5" /> Reject
