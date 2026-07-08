@@ -23,9 +23,9 @@ import { AlertDetailPanel, CLOSED_PANEL, type PanelState, type PanelMode } from 
 import { MeetingWorkspace } from "@/components/actions/MeetingWorkspace";
 import type { ViewMode } from "@/components/actions/ViewSwitcher";
 import { filterByTab, computeTabCounts, type AlertTabKey } from "@/components/actions/tabs";
-import { valueMagnitude, formatValue } from "@/lib/decisions/valueFormat";
-import { useFilter } from "@/contexts/FilterContext";
+import { valueMagnitude } from "@/lib/decisions/valueFormat";
 import type { Decision } from "@/data/mockDecisions";
+
 
 /* ---------- persistence hooks ---------- */
 
