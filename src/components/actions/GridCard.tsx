@@ -191,36 +191,6 @@ export function GridCard({ decision: d, expanded, onToggleExpand, onOpenDetail }
               />
             )}
 
-            <div className="px-4 py-2 flex items-center justify-end border-t border-border/40">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" title="More">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  {d.deepLink && (
-                    <DropdownMenuItem onSelect={() => window.location.assign(d.deepLink!.href)}>
-                      {d.deepLink.label} <ExternalLink className="h-3 w-3 ml-auto" />
-                    </DropdownMenuItem>
-                  )}
-                  <div className="px-2 py-1">
-                    <ShareMenu itemLabel={d.insight} />
-                  </div>
-                  {isActionable && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onSelect={() => reject(d.id)}
-                        className="text-destructive focus:text-destructive"
-                      >
-                        Dismiss
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
           </div>
         )}
       </div>
