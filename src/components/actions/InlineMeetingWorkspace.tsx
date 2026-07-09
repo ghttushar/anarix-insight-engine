@@ -5,7 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { AttendeePill } from "./AttendeePill";
 import { ValueBlock } from "./ValueBlock";
 import { ActionChoiceRow } from "./ActionChoiceRow";
-import { SettledStrip } from "./SettledStrip";
+
 import { useActionsStore } from "@/state/actionsStore";
 import type { Decision } from "@/data/mockDecisions";
 
