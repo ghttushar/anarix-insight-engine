@@ -127,7 +127,14 @@ export function InlineMeetingWorkspace({ bundleId, onDiscuss }: Props) {
                       compact
                     />
                   ) : (
-                    <SettledStrip decision={t as unknown as Decision} size="sm" />
+                    <span className={cn(
+                      "text-[10.5px] uppercase tracking-wider font-semibold px-2 py-1 rounded",
+                      t.status === "completed" && "text-success bg-success/10",
+                      t.status === "with_aan" && "text-primary bg-primary/10",
+                      t.status === "not_completed" && "text-muted-foreground bg-muted",
+                    )}>
+                      {t.status === "completed" ? "Completed" : t.status === "with_aan" ? "Custom action set" : "Dismissed"}
+                    </span>
                   )}
                 </div>
               </div>
