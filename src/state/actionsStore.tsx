@@ -95,7 +95,14 @@ export function ActionsProvider({ children }: { children: ReactNode }) {
       if (["with_aan", "in_flight", "rejected", "completed", "snoozed"].includes(status)) {
         const existing = undoTimersRef.current.get(id);
         if (existing) clearTimeout(existing.timer);
-        const timer = setTimeout(() => undoTimersRef.current.delete(id), UNDO_MS);
+        const timer = setTimeout(() => {
+          undoTimersRef.current.delete(id);
+          // Auto-migrate transient statuses into the Done bucket once the
+          // undo window elapses so the card leaves the active queue.
+          if (status === "in_flight" || status === "with_aan") {
+            setDecisions((p) => p.map((d) => (d.id === id ? { ...d, status: "completed", updatedAt: Date.now() } : d)));
+          }
+        }, UNDO_MS);
         undoTimersRef.current.set(id, { timer, prev: target.status });
       }
       return prev.map((d) => (d.id === id ? { ...d, status, updatedAt: Date.now(), ...extras } : d));

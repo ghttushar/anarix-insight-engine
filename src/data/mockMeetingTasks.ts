@@ -38,7 +38,7 @@ const now = Date.now();
 export const MEETING_TASK_BUNDLES: MeetingTaskBundle[] = [
   {
     bundleId: "mtg-staples-qbr",
-    meetingTitle: "Staples QBR — Q4 Planning",
+    meetingTitle: "Staples QBR - Q4 Planning",
     meetingWhen: "Today · 10:00 AM",
     createdAt: now - 1.5 * HOUR,
     duration: "47m",
@@ -51,13 +51,13 @@ export const MEETING_TASK_BUNDLES: MeetingTaskBundle[] = [
     summary:
       "Reviewed Q3 performance and locked Q4 priorities: relist the suppressed hero SKU on Staples portal, front-load Prime Day bids, and share a competitor pricing memo before Friday. Team agreed to hold TACoS at 18% while pushing new-to-brand growth.",
     transcriptExcerpt: [
-      "Dorothy: Q3 came in 6% under plan on Staples — mostly from the SKU-X suppression.",
+      "Dorothy: Q3 came in 6% under plan on Staples - mostly from the SKU-X suppression.",
       "Mike: I'll get SKU-X relisted by Friday. Portal ticket already open.",
       "Priya: For Prime Day, let's front-load bids on the top 12 hero SKUs.",
       "You: Agreed. I'll have Aan draft the bid adjustments for review.",
       "Dorothy: Buyer wants a competitor pricing memo before the Friday sync.",
       "Priya: We should also refresh creative on the 3 lowest-CTR SKUs.",
-      "Mike: I'll own the buyer forecast update — Monday.",
+      "Mike: I'll own the buyer forecast update - Monday.",
       "You: Aan can pull the pricing memo automatically. I'll approve before send.",
     ],
     tags: ["Staples", "Q4 Planning", "Prime Day"],
@@ -67,7 +67,7 @@ export const MEETING_TASK_BUNDLES: MeetingTaskBundle[] = [
         title: "Relist SKU-X on Staples portal",
         owner: "Mike",
         due: "Fri",
-        detail: "Suppressed since Oct 12. Portal ticket #48291 is open — needs updated compliance docs attached.",
+        detail: "Suppressed since Oct 12. Portal ticket #48291 is open - needs updated compliance docs attached.",
         status: "pending",
       },
       {
@@ -118,11 +118,11 @@ export const MEETING_TASK_BUNDLES: MeetingTaskBundle[] = [
     summary:
       "Discussed the past week's ad performance. TACoS crept up 2.1pt vs prior week driven by two under-performing campaigns. Agreed to pause the worst offender and reallocate budget to the launch campaign that's over-pacing on efficiency.",
     transcriptExcerpt: [
-      "Sam: TACoS is up 2.1pt — the 'Winter Push' campaign is the main drag.",
-      "Priya: Let's pause it and shift the budget to 'Launch — Series 4'.",
+      "Sam: TACoS is up 2.1pt - the 'Winter Push' campaign is the main drag.",
+      "Priya: Let's pause it and shift the budget to 'Launch - Series 4'.",
       "You: I'll get Aan to draft the reallocation.",
       "Sam: Also, the negative keyword list on 'Evergreen' hasn't been refreshed in 3 weeks.",
-      "You: Adding to the list — Aan can propose negatives from search terms.",
+      "You: Adding to the list - Aan can propose negatives from search terms.",
     ],
     tags: ["Advertising", "TACoS", "Budget"],
     actionItems: [
@@ -136,7 +136,7 @@ export const MEETING_TASK_BUNDLES: MeetingTaskBundle[] = [
       },
       {
         id: "t-2",
-        title: "Reallocate $2.4K/day to 'Launch — Series 4'",
+        title: "Reallocate $2.4K/day to 'Launch - Series 4'",
         owner: "Aan → You",
         due: "Today",
         detail: "Launch campaign is pacing 22% under target ROAS ceiling. Room to scale.",
@@ -167,9 +167,9 @@ export const MEETING_TASK_BUNDLES: MeetingTaskBundle[] = [
     summary:
       "Monthly review with the agency. Agreed the Amazon business is on plan; Walmart is the miss. Decided to launch two new SB campaigns on Walmart, tighten day-parting on Amazon, and start a monthly profit-by-SKU report for the founder.",
     transcriptExcerpt: [
-      "Aisha: Walmart is where we're bleeding — 34% under plan.",
+      "Aisha: Walmart is where we're bleeding - 34% under plan.",
       "Priya: Let's stand up two SB campaigns on Walmart this week.",
-      "You: I'll draft them — Aan can pre-fill audiences from the Amazon setup.",
+      "You: I'll draft them - Aan can pre-fill audiences from the Amazon setup.",
       "Aisha: On Amazon, day-parting is loose after 10pm. Tighten it.",
       "Priya: I want a monthly profit-by-SKU report from now on.",
     ],
