@@ -1,7 +1,5 @@
 // /alerts — final rebuild. Stack + Grid views share tabs, filters, sort,
-// selection, bulk bar, and a single right-side detail panel.
-//
-// Store/data unchanged; multi-action options are synthesized per row.
+// selection, bulk bar, and a single right-side Aan chat panel.
 
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -20,14 +18,10 @@ import { BulkBar } from "@/components/actions/BulkBar";
 import { StackRow } from "@/components/actions/StackRow";
 import { GridCard } from "@/components/actions/GridCard";
 import { AlertDetailPanel, CLOSED_PANEL, type PanelState, type PanelMode } from "@/components/actions/AlertDetailPanel";
-import { MeetingWorkspace } from "@/components/actions/MeetingWorkspace";
 import type { ViewMode } from "@/components/actions/ViewSwitcher";
 import { filterByTab, computeTabCounts, type AlertTabKey } from "@/components/actions/tabs";
 import { valueMagnitude } from "@/lib/decisions/valueFormat";
 import type { Decision } from "@/data/mockDecisions";
-
-
-/* ---------- persistence hooks ---------- */
 
 function useViewMode(): [ViewMode, (m: ViewMode) => void] {
   const [mode, setMode] = useState<ViewMode>(() => {
@@ -44,8 +38,6 @@ function useTab(): [AlertTabKey, (t: AlertTabKey) => void] {
   });
   return [tab, (t) => { setTab(t); sessionStorage.setItem("alerts:tab", t); }];
 }
-
-/* ---------- date bucketing ---------- */
 
 function bucketLabel(ts: number): string {
   const d = new Date(ts);
@@ -71,8 +63,6 @@ function inWindow(ts: number, win: FilterState["window"]): boolean {
   if (win === "week") return Date.now() - ts < 7 * 24 * 3600 * 1000;
   return true;
 }
-
-/* ============================================================ */
 
 function useAlertsDateRange(): [{ from: Date; to: Date }, (r: { from: Date; to: Date }) => void] {
   const [range, setRange] = useState<{ from: Date; to: Date }>(() => {
@@ -109,29 +99,18 @@ function AlertsInner() {
   const [filter, setFilter] = useState<FilterState>(EMPTY_FILTER);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [panel, setPanel] = useState<PanelState>(CLOSED_PANEL);
-  const [meetingBundleId, setMeetingBundleId] = useState<string | null>(null);
 
-  // Grid state — expanded card ids + optional focused id
+  // Grid expanded ids
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const [focusedId, setFocusedId] = useState<string | null>(null);
 
-  const openDetail = useCallback((id: string, mode: PanelMode = "detail") => {
-    // Meeting-sourced alerts open the meeting workspace instead of the generic panel.
-    const d = decisions.find((x) => x.id === id);
-    if (d?.meetingRef && mode === "detail") {
-      setMeetingBundleId(d.meetingRef.bundleId);
-      return;
-    }
+  const openDetail = useCallback((id: string, mode: PanelMode = "custom") => {
     setPanel({ decisionId: id, mode });
-  }, [decisions]);
-
+  }, []);
   const closePanel = useCallback(() => setPanel(CLOSED_PANEL), []);
 
   const counts = useMemo(() => computeTabCounts(decisions), [decisions]);
-
   const pool = useMemo(() => filterByTab(decisions, tab), [decisions, tab]);
 
-  // Custom date-range filter (alerts-local; taskbar override).
   const dateFrom = alertsDateRange.from.getTime();
   const dateToEnd = (() => {
     const d = new Date(alertsDateRange.to);
@@ -172,10 +151,6 @@ function AlertsInner() {
     return Array.from(m.entries());
   }, [sorted]);
 
-
-
-  
-
   const toggleExpand = useCallback((id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
@@ -183,29 +158,15 @@ function AlertsInner() {
       else next.add(id);
       return next;
     });
-    if (focusedId && focusedId !== id) setFocusedId(null);
-  }, [focusedId]);
-
-  const toggleFocus = useCallback((id: string) => {
-    setFocusedId((prev) => (prev === id ? null : id));
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
   }, []);
 
-  // ESC closes panel + focus
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (panel.decisionId) closePanel();
-        else if (focusedId) setFocusedId(null);
-      }
+      if (e.key === "Escape" && panel.decisionId) closePanel();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [panel.decisionId, focusedId, closePanel]);
+  }, [panel.decisionId, closePanel]);
 
   return (
     <AppLayout>
@@ -215,9 +176,7 @@ function AlertsInner() {
         dateRangeOverride={alertsDateRange}
         onDateRangeOverrideChange={setAlertsDateRange}
       />
-      <div className="px-4 py-4 max-w-[1480px] mx-auto w-full">
-
-        {/* Hero — compact, single line */}
+      <div className="px-3 py-4 max-w-[1480px] mx-auto w-full">
         <header className="mb-4 flex items-center gap-3">
           <div className="h-9 w-9 rounded-md bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
             <AanMascot size={24} state="idle" interactive={false} />
@@ -232,8 +191,6 @@ function AlertsInner() {
           </div>
         </header>
 
-
-        {/* Toolbar */}
         <AlertsToolbar
           tab={tab}
           onTabChange={setTab}
@@ -246,21 +203,17 @@ function AlertsInner() {
           onSortChange={setSort}
           filterSheetOpen={filterSheetOpen}
           onFilterSheetOpenChange={setFilterSheetOpen}
-          onOpenShortcuts={undefined}
-          onClearCompleted={counts.done > 0 ? () => setTab("done") : undefined}
         />
 
-        {/* Bulk bar */}
         <BulkBar />
 
-        {/* Body */}
         <ScrollArea className="h-[calc(100vh-240px)] pr-2">
           {sorted.length === 0 ? (
             <EmptyState
               headline={tab === "all" ? "You're clear." : "Nothing in this view."}
               body={tab === "all"
                 ? "Aan will surface something the moment it matters."
-                : "Try a different tab — Aan is still watching."}
+                : "Try a different tab, Aan is still watching."}
             />
           ) : viewMode === "stack" ? (
             <StackBody bucketed={bucketed} onOpenDetail={openDetail} />
@@ -268,9 +221,7 @@ function AlertsInner() {
             <GridBody
               bucketed={bucketed}
               expandedIds={expandedIds}
-              focusedId={focusedId}
               onToggleExpand={toggleExpand}
-              onToggleFocus={toggleFocus}
               onOpenDetail={openDetail}
             />
           )}
@@ -280,22 +231,13 @@ function AlertsInner() {
       <AlertDetailPanel
         state={panel}
         onOpenChange={(o) => { if (!o) closePanel(); }}
-        onModeChange={(m) => setPanel((p) => ({ ...p, mode: m }))}
       />
-
-      <MeetingWorkspace
-        bundleId={meetingBundleId}
-        onClose={() => setMeetingBundleId(null)}
-      />
-
 
       <KeyboardHelpOverlay />
       <UndoToast />
     </AppLayout>
   );
 }
-
-/* ============================================================ */
 
 function BucketHeader({ label }: { label: string }) {
   return (
@@ -331,71 +273,36 @@ function StackBody({
 }
 
 function GridBody({
-  bucketed, expandedIds, focusedId, onToggleExpand, onToggleFocus, onOpenDetail,
+  bucketed, expandedIds, onToggleExpand, onOpenDetail,
 }: {
   bucketed: [string, Decision[]][];
   expandedIds: Set<string>;
-  focusedId: string | null;
   onToggleExpand: (id: string) => void;
-  onToggleFocus: (id: string) => void;
   onOpenDetail: (id: string, mode?: PanelMode) => void;
 }) {
   return (
     <div className="space-y-6">
-      {bucketed.map(([bucket, list]) => {
-        const focusedInBucket = focusedId && list.some((d) => d.id === focusedId);
-        return (
-          <section key={bucket}>
-            <BucketHeader label={bucket} />
-            <div
-              className={
-                focusedInBucket
-                  ? "grid grid-cols-1 gap-3"
-                  : "grid grid-cols-1 lg:grid-cols-2 gap-3"
-              }
-            >
-              {list.map((d) => {
-                const isFocused = focusedId === d.id;
-                if (focusedInBucket && !isFocused) {
-                  // Render dimmed compact placeholder for siblings when one is focused
-                  return (
-                    <div
-                      key={d.id}
-                      onClick={() => onToggleFocus(d.id)}
-                      className="cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
-                    >
-                      <GridCard
-                        decision={d}
-                        expanded={false}
-                        focused={false}
-                        onToggleExpand={() => onToggleExpand(d.id)}
-                        onToggleFocus={() => onToggleFocus(d.id)}
-                        onOpenDetail={onOpenDetail}
-                      />
-                    </div>
-                  );
-                }
-                return (
-                  <GridCard
-                    key={d.id}
-                    decision={d}
-                    expanded={expandedIds.has(d.id) || isFocused}
-                    focused={isFocused}
-                    onToggleExpand={() => onToggleExpand(d.id)}
-                    onToggleFocus={() => onToggleFocus(d.id)}
-                    onOpenDetail={onOpenDetail}
-                  />
-                );
-              })}
-            </div>
-          </section>
-        );
-      })}
+      {bucketed.map(([bucket, list]) => (
+        <section key={bucket}>
+          <BucketHeader label={bucket} />
+          {/* CSS columns: expanding a card in one column only pushes cards
+              below it in the same column. */}
+          <div className="columns-1 lg:columns-2 gap-3">
+            {list.map((d) => (
+              <GridCard
+                key={d.id}
+                decision={d}
+                expanded={expandedIds.has(d.id)}
+                onToggleExpand={() => onToggleExpand(d.id)}
+                onOpenDetail={onOpenDetail}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }
-
-/* ============================================================ */
 
 export default function AlertsPage() {
   return (

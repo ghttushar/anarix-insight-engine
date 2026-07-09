@@ -1,4 +1,4 @@
-// Meeting bundles (Flow B) — a meeting happens, I produce a bundle of
+// Meeting bundles (Flow B) - a meeting happens, I produce a bundle of
 // action items. Each task carries the same value/insight/action grammar
 // as a Decision, but lives inside a bundle. Action buttons use the task's
 // action verb (Send forecast, Approve refund, Pause keyword, Draft memo…).
@@ -50,7 +50,7 @@ const now = Date.now();
 export const MOCK_MEETING_BUNDLES: MeetingBundle[] = [
   {
     id: "mtg-staples-qbr",
-    title: "Staples QBR — Q4 Planning",
+    title: "Staples QBR - Q4 Planning",
     ts: now - 2 * HOUR,
     durationMin: 47,
     attendees: [
@@ -62,7 +62,7 @@ export const MOCK_MEETING_BUNDLES: MeetingBundle[] = [
     summary:
       "Buyer confirmed Q4 hero-SKU commitment and asked us to relist SKU-X before Friday. Pricing memo and forecast refresh due same week.",
     transcriptExcerpt:
-      "Dorothy: We're holding the Q4 tier if you can get SKU-X back on shelf before Friday.\nMike: Portal ticket #48291 is open — needs compliance docs from your side.\nPriya: We'll send a competitor pricing memo across the 20 hero SKUs before EOW.\nDorothy: Also want the refreshed forecast so we can lock the buyer commit.",
+      "Dorothy: We're holding the Q4 tier if you can get SKU-X back on shelf before Friday.\nMike: Portal ticket #48291 is open - needs compliance docs from your side.\nPriya: We'll send a competitor pricing memo across the 20 hero SKUs before EOW.\nDorothy: Also want the refreshed forecast so we can lock the buyer commit.",
     taskIds: ["mt-staples-1", "mt-staples-2", "mt-staples-3", "mt-staples-4", "mt-staples-5"],
   },
   {
@@ -78,7 +78,7 @@ export const MOCK_MEETING_BUNDLES: MeetingBundle[] = [
     summary:
       "Winter Push efficiency has slipped 3 weeks running; team aligned on reallocating to Launch S4 and tightening evergreen day-parting.",
     transcriptExcerpt:
-      "Priya: Winter Push TACoS is 41% over target — three weeks in a row.\nRahul: Launch S4 has headroom, ROAS ceiling is 4.1×.\nYou: Let's shift budget and tighten day-parting on Evergreen.",
+      "Priya: Winter Push TACoS is 41% over target - three weeks in a row.\nRahul: Launch S4 has headroom, ROAS ceiling is 4.1×.\nYou: Let's shift budget and tighten day-parting on Evergreen.",
     taskIds: ["mt-perf-1", "mt-perf-2", "mt-perf-3", "mt-perf-4", "mt-perf-5"],
   },
   {
@@ -96,12 +96,12 @@ export const MOCK_MEETING_BUNDLES: MeetingBundle[] = [
     summary:
       "Amazon AM walked us through Q4 deal windows, DSP audiences, and Vine gaps on hero SKUs. Three decisions land in the queue this week.",
     transcriptExcerpt:
-      "Ari: You have Vine gaps on 4 hero SKUs — enroll before the Nov cutoff.\nPriya: DSP audience refresh from AMC is ready to push.\nAri: Prime-day-lite window opens Nov 12 — hero SKU coupons should be locked by Nov 8.\nKai: Ops can support up to +30% velocity if we know 10 days out.",
+      "Ari: You have Vine gaps on 4 hero SKUs - enroll before the Nov cutoff.\nPriya: DSP audience refresh from AMC is ready to push.\nAri: Prime-day-lite window opens Nov 12 - hero SKU coupons should be locked by Nov 8.\nKai: Ops can support up to +30% velocity if we know 10 days out.",
     taskIds: ["mt-amz-1", "mt-amz-2", "mt-amz-3", "mt-amz-4"],
   },
   {
     id: "mtg-ops-standup",
-    title: "Ops Standup — Weekly",
+    title: "Ops Standup - Weekly",
     ts: now - 50 * HOUR,
     durationMin: 22,
     attendees: [
@@ -112,7 +112,7 @@ export const MOCK_MEETING_BUNDLES: MeetingBundle[] = [
     summary:
       "3PL Reno throwing damage claims on batch #B-2214. Warehouse Sam has evidence and wants CS to fast-track refunds while ops files a carrier claim.",
     transcriptExcerpt:
-      "Sam: Batch #B-2214 came through Reno lane — photos show packaging failure.\nKai: I'll file the carrier claim; you push CS to refund customers today.\nYou: Let's also flag the Reno lane for a 30-day watch.",
+      "Sam: Batch #B-2214 came through Reno lane - photos show packaging failure.\nKai: I'll file the carrier claim; you push CS to refund customers today.\nYou: Let's also flag the Reno lane for a 30-day watch.",
     taskIds: ["mt-ops-1", "mt-ops-2", "mt-ops-3"],
   },
 ];
@@ -127,7 +127,7 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     valueCaption: "buyer commit at risk",
     valueBasis:
       "SKU-X ran $12k/mo before suppression on Oct 12; buyer wants it back on shelf before Friday. Missing that unlocks-back the Q4 tier commitment.",
-    insight: "Relist SKU-X on Staples before Friday — Q4 tier hinges on it.",
+    insight: "Relist SKU-X on Staples before Friday - Q4 tier hinges on it.",
     insightDetail:
       "Portal ticket #48291 has been open 26 days waiting on compliance docs. Dorothy is holding the tier commit until the SKU is live again. Mike has the ticket queued on his side.",
     actionVerb: "Relist SKU-X",
@@ -143,7 +143,7 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     bundleId: "mtg-staples-qbr",
     valueCents: 0,
     valueKind: "info",
-    valueCaption: "informational — blocks buyer sync",
+    valueCaption: "informational - blocks buyer sync",
     valueBasis: "Buyer asked for a competitor pricing memo across 20 hero SKUs by EOW.",
     insight: "Draft competitor pricing memo across 20 hero SKUs before Friday sync.",
     actionVerb: "Draft memo",
@@ -162,7 +162,7 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     cadence: "monthly",
     valueCaption: "unlocks $220k/mo buyer tier",
     valueBasis: "Unlocks Q4 buyer commit at the $220k/mo tier once forecast is refreshed and shared with Dorothy.",
-    insight: "Send Q4 unit forecast refresh to Dorothy — unlocks the $220k/mo tier.",
+    insight: "Send Q4 unit forecast refresh to Dorothy - unlocks the $220k/mo tier.",
     actionVerb: "Send forecast",
     owner: "Priya Shah",
     domain: "profitability",
@@ -177,7 +177,7 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     valueKind: "cost",
     cadence: "one_time",
     valueCaption: "one-time compliance work",
-    valueBasis: "Compliance docs pack for portal ticket #48291 — required for the relist.",
+    valueBasis: "Compliance docs pack for portal ticket #48291 - required for the relist.",
     insight: "Attach compliance docs to portal ticket #48291.",
     actionVerb: "Attach docs",
     owner: "Mike Reyes",
@@ -191,7 +191,7 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     bundleId: "mtg-staples-qbr",
     valueCents: 15_000,
     valueKind: "info",
-    valueCaption: "informational — internal follow-up",
+    valueCaption: "informational - internal follow-up",
     valueBasis: "Recap and next steps for internal circulation before Friday.",
     insight: "Circulate meeting recap to internal Slack.",
     actionVerb: "Circulate recap",
@@ -210,7 +210,7 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     cadence: "monthly",
     valueCaption: "monthly reclaimable spend",
     valueBasis: "Reclaims 22% wasted spend on Winter Push; Launch S4 has 4.1× ROAS ceiling with $2.4k/day headroom.",
-    insight: "Reallocate Winter Push budget to Launch S4 — 22% wasted spend recovery.",
+    insight: "Reallocate Winter Push budget to Launch S4 - 22% wasted spend recovery.",
     actionVerb: "Reallocate",
     owner: "You Own",
     domain: "campaign",
@@ -242,7 +242,7 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     cadence: "monthly",
     valueCaption: "monthly negatives lift",
     valueBasis: "Adds 142 candidate negatives on Evergreen from the last 21 days of search terms; cuts wasted spend ~$62k/mo.",
-    insight: "Refresh negative keywords on Evergreen — 142 candidates from last 21 days.",
+    insight: "Refresh negative keywords on Evergreen - 142 candidates from last 21 days.",
     actionVerb: "Add negatives",
     owner: "Rahul Menon",
     domain: "campaign",
@@ -272,8 +272,8 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     valueKind: "at_risk",
     cadence: "monthly",
     valueCaption: "monthly brand-defense exposure",
-    valueBasis: "Brand-defense on secondary term slipping — impression share down 12pt vs baseline.",
-    insight: "Raise bids on secondary brand-defense term — impression share slipped 12pt.",
+    valueBasis: "Brand-defense on secondary term slipping - impression share down 12pt vs baseline.",
+    insight: "Raise bids on secondary brand-defense term - impression share slipped 12pt.",
     actionVerb: "Raise bids",
     owner: "Priya Shah",
     domain: "campaign",
@@ -289,13 +289,13 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     valueKind: "gain",
     cadence: "monthly",
     valueCaption: "monthly review-halo lift",
-    valueBasis: "Vine enrollment on 4 hero SKUs before Nov cutoff — 10 units each; drives ~12% CVR lift once reviews land.",
+    valueBasis: "Vine enrollment on 4 hero SKUs before Nov cutoff - 10 units each; drives ~12% CVR lift once reviews land.",
     insight: "Enroll 4 hero SKUs in Vine before the Nov cutoff.",
     actionVerb: "Enroll Vine",
     owner: "Nora Kim",
     domain: "retail",
     status: "open",
-    transcriptExcerpt: "Ari: You have Vine gaps on 4 hero SKUs — enroll before the Nov cutoff.",
+    transcriptExcerpt: "Ari: You have Vine gaps on 4 hero SKUs - enroll before the Nov cutoff.",
     createdAt: now - 4 * HOUR,
     updatedAt: now - 4 * HOUR,
   },
@@ -354,7 +354,7 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     valueKind: "cost",
     cadence: "one_time",
     valueCaption: "one-time refund cost",
-    valueBasis: "Same batch #B-2214 as the CS escalation — refund 3 orders to close the loop.",
+    valueBasis: "Same batch #B-2214 as the CS escalation - refund 3 orders to close the loop.",
     insight: "Approve refunds on 3 orders from damaged batch #B-2214.",
     actionVerb: "Approve refunds",
     owner: "You Own",
@@ -384,7 +384,7 @@ export const MOCK_MEETING_TASKS: MeetingTask[] = [
     bundleId: "mtg-ops-standup",
     valueCents: 0,
     valueKind: "info",
-    valueCaption: "informational — hygiene",
+    valueCaption: "informational - hygiene",
     valueBasis: "30-day watch on Reno lane to catch further failures early.",
     insight: "Flag Reno 3PL lane for 30-day damage watch.",
     actionVerb: "Flag lane",

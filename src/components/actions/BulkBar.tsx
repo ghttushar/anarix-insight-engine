@@ -76,7 +76,7 @@ export function BulkBar() {
           onClick={() => { ids.forEach(reject); clear(); }}
           className="h-8 text-[12.5px] gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
         >
-          <XCircle className="h-3.5 w-3.5" /> Reject
+          <XCircle className="h-3.5 w-3.5" /> Dismiss
         </Button>
         <Button
           size="sm"
