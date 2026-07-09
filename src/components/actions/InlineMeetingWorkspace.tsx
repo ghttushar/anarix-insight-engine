@@ -111,60 +111,6 @@ export function InlineMeetingWorkspace({ bundleId, onDiscuss }: Props) {
                     </div>
                   )}
                 </div>
-
-      {/* Summary */}
-      <div className="px-3.5 py-2.5 border-b border-border/60">
-        <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">
-          Summary
-        </div>
-        <p className="text-[12.5px] text-foreground/85 leading-relaxed">{bundle.summary}</p>
-        <Collapsible open={transcriptOpen} onOpenChange={setTranscriptOpen} className="mt-2">
-          <CollapsibleTrigger className="flex items-center gap-1.5 text-[11.5px] text-primary hover:underline">
-            {transcriptOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-            Transcript excerpt
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-1.5 rounded-md border border-border/60 bg-muted/30 px-3 py-2 text-[12px] text-muted-foreground italic whitespace-pre-line">
-            {bundle.transcriptExcerpt}
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
-
-      {/* Action items */}
-      <div>
-        <div className="px-3.5 py-2 border-b border-border/40 flex items-center justify-between">
-          <span className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground">
-            Action items
-          </span>
-          <span className="text-[11px] text-muted-foreground">{tasks.length} total</span>
-        </div>
-        {tasks.length === 0 ? (
-          <div className="px-4 py-5 text-center text-[12.5px] text-muted-foreground">
-            No action items from this meeting.
-          </div>
-        ) : (
-          tasks.map((t) => {
-            const isOpen = t.status === "open";
-            return (
-              <div
-                key={t.id}
-                className="flex items-center gap-3 px-3.5 py-2.5 border-b border-border/40 last:border-b-0"
-              >
-                <div className="shrink-0 w-[76px]">
-                  <ValueBlock cents={t.valueCents} kind={t.valueKind} size="sm" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className={cn(
-                    "text-[13px] leading-snug",
-                    !isOpen && t.status === "completed" ? "line-through text-muted-foreground" : "text-foreground",
-                  )}>
-                    {t.insight}
-                  </div>
-                  {t.owner && (
-                    <div className="mt-1 flex items-center gap-1.5">
-                      <AttendeePill name={t.owner} size={16} />
-                    </div>
-                  )}
-                </div>
                 <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
                   {isOpen ? (
                     <ActionChoiceRow
