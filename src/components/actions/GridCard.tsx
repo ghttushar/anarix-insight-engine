@@ -48,7 +48,7 @@ interface Props {
 }
 
 export function GridCard({ decision: d, expanded, onToggleExpand, onOpenDetail }: Props) {
-  const { approve, reject } = useActionsStore();
+  const { approve, reject, meetings, tasksForBundle } = useActionsStore();
   let sel: ReturnType<typeof useSelection> | null = null;
   try { sel = useSelection(); } catch { sel = null; }
   const isSelected = sel ? sel.isSelected(d.id) : false;
