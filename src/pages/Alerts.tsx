@@ -280,12 +280,12 @@ function GridBody({
 }) {
   return (
     <div className="space-y-6">
-      {bucketed.map(([bucket, list]) => (
-        <section key={bucket}>
-          <BucketHeader label={bucket} />
-          {/* Grid: rows share the tallest card height so cards stay aligned. */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 auto-rows-fr items-stretch">
-            {list.map((d) => (
+      {bucketed.map(([bucket, list]) => {
+        const left = list.filter((_, i) => i % 2 === 0);
+        const right = list.filter((_, i) => i % 2 === 1);
+        const renderCol = (col: Decision[]) => (
+          <div className="flex-1 min-w-0 flex flex-col gap-3">
+            {col.map((d) => (
               <GridCard
                 key={d.id}
                 decision={d}
@@ -295,11 +295,22 @@ function GridBody({
               />
             ))}
           </div>
-        </section>
-      ))}
+        );
+        return (
+          <section key={bucket}>
+            <BucketHeader label={bucket} />
+            {/* Two independent columns: expanding a card only pushes cards below it in the same column. */}
+            <div className="flex gap-3 items-start">
+              {renderCol(left)}
+              {renderCol(right)}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }
+
 
 export default function AlertsPage() {
   return (
