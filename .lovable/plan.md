@@ -1,65 +1,91 @@
+## Scope
+Rebuild Stack and Grid views on `/alerts` to fix alignment, terminology, expand behavior, action layout, and undo. Match the earlier "Phase 2 Meetings" layout inside both views. No business-logic changes — presentation only.
 
-## Why the page is empty
+## Global changes (both views)
 
-`AlertsInner` filters by the shared `FilterContext.dateRange`, which persists in `localStorage` (`anarix-dateRange`) as **Apr 01 – May 30, 2026** (visible in the taskbar screenshot). Every decision in `mockDecisions.ts` uses `createdAt: now - N * MIN/HOUR`, so with today = Jul 8, 2026 **every alert falls outside the stored range** and gets stripped by the `filtered` memo. Tabs still show counts because `computeTabCounts` runs on the raw `decisions`, not on `filtered`.
+### Value rendering
+- `ValueBlock.tsx`: remove the `Protect` / `+` prefix labels and the `/mo`, `/wk` cadence suffix. Render pure amount only: `$12k`, `$4.8k`, `$1.6k`. Color still driven by `kind` (gain=green, at_risk/cost=red-ish, info=muted). Caption line (e.g., "buyer commit at risk") kept as-is.
+- Keep monospace tabular-nums; unchanged sizes.
 
-## Changes
+### Source icon
+- `SourceGlyph.tsx`: default size bumped from 11 → 14px; container padding adjusted so it reads clearly next to the meta line.
 
-### 1. Isolate the alerts date filter (fixes the empty page)
+### Terminology sweep
+- Global rename in `src/data/*.ts` and any label strings: `monitor` → `agent` (case-preserving: `Monitor`→`Agent`, `monitor`→`agent`). Examples: `Buy Box monitor` → `Buy Box agent`, `Inventory monitor` → `Inventory agent`, `Campaign monitor` → `Campaign agent`, `Buybox monitor` → `Buybox agent`.
+- Em-dash sweep: replace every `—` in decision/meeting/task copy with ` - ` (regular hyphen surrounded by spaces). Applies to `mockDecisions.ts`, `mockMeetings.ts`, `mockMeetingTasks.ts`, and any inline strings in the alert components.
 
-- Add optional `dateRange` + `onDateRangeChange` props to `AppTaskbar` (both parts). When provided, the taskbar reads/writes those instead of `FilterContext` — no other page is affected.
-- In `Alerts.tsx`: hold local `alertsDateRange` state (persisted to `sessionStorage` under `alerts:date-range`) defaulting to **last 30 days ending today**, and pass it into `AppTaskbar`. Use this range (not `useFilter().dateRange`) in the `filtered` memo.
-- Result: the taskbar date picker still works on /alerts, but starts on a range that actually contains data.
+### Action row (`ActionChoiceRow.tsx`)
+- Rename "Reject" → "Dismiss" everywhere (button label, aria-labels, dropdown items, bulk bar, detail panel footer). Store status stays `rejected` internally.
+- Remove the standalone "View more" button from the action row.
+- Consolidate custom-action + Ask Aan: single secondary item labeled **"Write custom action / Discuss with Aan"**. Clicking it opens the right-side Aan chat panel (mini Aan panel already used app-wide), pre-seeded with the decision context. No separate Ask Aan button, no Ask Aan menu item.
+- Left-align the action cluster in Stack rows (currently right-aligned). Order: `[Primary action] [caret variants] [Dismiss] [Custom/Discuss with Aan] [⋯ overflow]`. Buttons in a fixed-width slot so rows line up column-wise.
 
-### 2. Remove the "46 open · $70k at stake / 19 critical" block
+### Expand behavior
+- Remove separate expand icon + chevron pair. Single chevron toggle only. Remove the `Maximize2`/`Minimize2` "focus" control that swapped Grid→Stack — that behavior is gone.
+- Card expands **in place**. No layout jump between views.
 
-Delete the right-side stats column inside the hero `<header>` in `Alerts.tsx`. Keep only the Aan mascot + "ANARIX · AAN / Alerts" title. Drop the now-unused `openCount` / `criticalCount` / `openValueCents` / `totalValueFmt` calculations.
+### Undo / completion
+- Remove "Clear completed" concept from Stack + Grid toolbars and any bulk bar affordances tied to it.
+- On action: card stays in place, shows subtle status gradient + `SettledStrip` with 30s `CountdownRing` and inline **Undo**.
+- After 30s: card auto-moves to the **Done** tab (filter reclassification only — decision already has terminal status). No manual clear step.
 
-### 3. Professional card-level confirmation ("instant gratification")
+### Toolbar alignment
+- `AlertsToolbar` + tabs row: unify to a single flex row with consistent 12px vertical padding, aligned to the card container's left/right edges (same horizontal inset as cards). Fixes the "toolbar wider than cards" misalignment visible in screenshots.
+- Right-side controls (Filter, Sort, Stack/Grid switcher, overflow) share the same baseline; overflow `⋯` sits flush with card right edge.
 
-Goal: after an approve / reject / delegate / snooze on a row or card, the user sees a mature, subtle success state — no confetti, no bounce.
+## Stack view (`StackRow.tsx`)
+- Actions cluster moves to **left-aligned** slot immediately after the insight text block (not far-right). Meta row (source, time, meeting ref) sits below insight, action cluster to the right of insight but left-anchored within a fixed 420px zone so all rows align.
+- No "View more" button. Clicking the row body opens **inline expansion** below the row (not the right panel). Expanded region contains: `insightDetail`, meeting excerpt if any, and the same action row.
+- Right panel opens **only** when user clicks "Write custom action / Discuss with Aan".
+- Ambient completion gradient stays; SettledStrip with 30s timer + Undo lives in the row itself.
 
-Implementation:
+## Grid view (`GridCard.tsx`)
+- Remove `Maximize2` focus button (was swapping to stack). Keep single chevron.
+- Expanded card = exactly **2× collapsed height** (measured via CSS `min-h` set from collapsed measurement, or fixed heights: collapsed ~140px, expanded ~280px).
+- Two-column CSS grid changed to **column-based masonry** using `columns-2 gap-4` with `break-inside-avoid` on cards. This way expanding a left-column card only pushes cards below it in the same column; the right column is untouched. Same for right-column expands.
+- Action row: left-aligned inside expanded body, same button set as Stack. "Dismiss" replaces "Reject". No "View more".
+- Right panel opens only for "Write custom action / Discuss with Aan".
+- SettledStrip w/ 30s undo lives in the card; auto-migrates to Done tab after timer.
 
-- **`StackRow.tsx` and `GridCard.tsx`**: when `decision.status !== "open"` (i.e. `in_flight`, `with_aan`, `rejected`, `completed`, `snoozed`), render a **subtle horizontal gradient** using existing semantic tokens:
-  - success-flavored: `bg-gradient-to-r from-success/[0.06] via-success/[0.03] to-transparent` + `border-success/25`
-  - rejected: `from-destructive/[0.05] via-destructive/[0.02] to-transparent` + `border-destructive/25`
-  - snoozed: `from-muted/60 to-transparent`
-- Replace the action row on completed items with a small inline confirmation strip:
-  - Check icon + one-line status (`"Approved — executing in 28s"`, `"Handed to Aan"`, `"Rejected"`, `"Snoozed until tomorrow"`)
-  - Live 30s countdown ring reused from `UndoToast` (extracted into `src/components/actions/CountdownRing.tsx` so both places share it)
-  - Inline `Undo` button (calls the existing rollback via a new `useUndoFor(id)` hook that listens to `action-item:undoable` events already dispatched by the store)
-  - After 30s the strip fades out and the row keeps the muted "settled" appearance (no removal — items already move to their tab via `filterByTab`).
-- Apply the same treatment to the settled state inside `AlertDetailPanel` ("View more"):
-  - When the underlying decision transitions from `open`, swap the footer action bar for the same confirmation strip (icon + label + countdown + Undo).
-  - After the 30s window elapses, auto-close the sheet (`onOpenChange(false)`).
+## Meeting layout in Stack + Grid
+Match the older Phase 2 Meetings design (screenshots `image-219`, `image-220`, `image-221`) but rendered as native rows/cards.
 
-### 4. Move undo out of sonner toasts
+### Meeting summary row/card (parent)
+- Left: purple `M` avatar (28px rounded).
+- Title: `Meeting name` + meta line: date · time · duration.
+- Attendee pills: initial chip (colored) + name + role, e.g., `PS Priya Shah · Anarix account lead`.
+- Right-side stats: `N attendees · N tasks · N open · $X committed`.
+- Thin progress bar on the far right with % completed.
+- Clicking expands **inline**:
 
-In `src/state/actionsStore.tsx`:
-- Remove the `action: { label: "Undo" | "Undo all", … }` options from every `toast.success` / `toast.message` call (`approve`, `reject`, `delegateToAan`, `snooze`, `bulkApprove`, `markTaskCompleted`, `markTaskNotCompleted`, `delegateTaskToAan`, `bulkCompleteBundle`, `answerQuestion`, `skipQuestion`).
-- Keep the `publishUndoable(...)` calls — they already drive the on-screen `UndoToast` pill and the new inline card strip.
-- Add `publishUndoable` for the four spots that currently only have a sonner `action` (bulk approve, bulk complete bundle, answer question, skip question) so bulk undo is also on-screen.
-- Trim the toast copy so it just confirms ("Approved.", "Rejected.", "Snoozed until tomorrow.") — the countdown/undo lives on the card and in the bottom pill only.
+### Expanded meeting body
+- `MEETING WORKSPACE` eyebrow, title, datetime.
+- Attendee pills row.
+- Three-up stat cards: TASKS / OPEN / COMMITTED.
+- SUMMARY paragraph + collapsible "Transcript excerpt".
+- `ACTION ITEMS` list — each item is a compact row with:
+  - Value chip (`+ $4.8k /mo` style — note: meetings keep the value chip with cadence since screenshots show it; this is the one exception to the value-simplification rule, per the reference design).
+  - Task text, owner pill.
+  - Right-side actions: `Mark completed` primary + `Write custom action / Discuss with Aan` secondary + `⋯`.
+- Header action: `Mark all completed`.
+- Remove "You take care of it" / "With Aan" labels — replace with the unified custom-action button.
 
-### 5. Small housekeeping
+### Grid variant
+- Same content, laid out as a wider card spanning both columns when expanded (via `column-span: all` on the masonry container).
 
-- Extract shared countdown ring into `src/components/actions/CountdownRing.tsx` (used by `UndoToast`, `StackRow`, `GridCard`, `AlertDetailPanel`).
-- New tiny hook `src/components/actions/useUndoFor.ts` — subscribes to the `action-item:undoable` events and returns `{ active, secondsLeft, undo }` for a given decision id, so the row/card/panel strips stay in sync with the pill without duplicating timers.
+## Files touched (edits only, no new files unless noted)
+- `src/components/actions/ValueBlock.tsx` — strip prefix/cadence.
+- `src/components/actions/SourceGlyph.tsx` — larger default size.
+- `src/components/actions/ActionChoiceRow.tsx` — Dismiss rename, remove View more, unified custom/Aan button, left-align layout.
+- `src/components/actions/StackRow.tsx` — left-align actions, inline expansion, remove View more/focus, meeting-row variant.
+- `src/components/actions/GridCard.tsx` — remove focus button, single chevron, 2× expand height, column-safe layout, meeting-card variant.
+- `src/components/actions/AlertsToolbar.tsx` + `src/pages/Alerts.tsx` — toolbar/card alignment, remove Clear completed, masonry container for grid, auto-migrate-to-Done after 30s.
+- `src/components/actions/AlertDetailPanel.tsx` — repurposed to Ask-Aan-only mini panel (opens only on custom-action click). Rename/trim accordingly.
+- `src/components/actions/BulkBar.tsx` — Dismiss rename, drop clear-completed action.
+- `src/components/actions/MeetingWorkspace.tsx` + `MeetingTaskRow.tsx` — refit as inline expansion body used by both Stack and Grid; drop "You take care of it".
+- `src/data/mockDecisions.ts`, `src/data/mockMeetings.ts`, `src/data/mockMeetingTasks.ts` — monitor→agent and em-dash sweep.
 
-### Files touched
-
-- edit `src/pages/Alerts.tsx` (local date state, remove stats block)
-- edit `src/components/layout/AppTaskbar.tsx` (optional dateRange override props)
-- edit `src/components/actions/StackRow.tsx` (success tint + inline confirmation strip)
-- edit `src/components/actions/GridCard.tsx` (same)
-- edit `src/components/actions/AlertDetailPanel.tsx` (confirmation strip + auto-close after 30s)
-- edit `src/components/actions/UndoToast.tsx` (use shared CountdownRing)
-- edit `src/state/actionsStore.tsx` (strip sonner undo actions, add missing publishUndoable calls)
-- new `src/components/actions/CountdownRing.tsx`
-- new `src/components/actions/useUndoFor.ts`
-
-### Explicitly not changing
-
-- Tabs, filters, sort, bulk bar layout, meeting workspace, data files, action store logic beyond the toast-actions strip.
-- The bottom-center `UndoToast` pill stays — it's the global fallback. Only the sonner-embedded Undo buttons are removed.
+## Out of scope
+- Filters, sort, tab logic, data schema, store logic beyond the auto-migrate timer.
+- No visual changes to the hero/header.
+- No changes outside `/alerts`.
