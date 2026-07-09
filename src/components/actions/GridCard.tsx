@@ -151,20 +151,53 @@ export function GridCard({ decision: d, expanded, onToggleExpand, onOpenDetail }
           )}
         </div>
 
+        {/* Meeting preview (collapsed only) — fills empty space with summary + attendee avatars */}
+        {isMeeting && !expanded && bundle && (
+          <div className="px-4 pb-3 flex flex-col gap-2.5" onClick={onToggleExpand}>
+            <p className="text-[13px] leading-relaxed text-muted-foreground line-clamp-2">
+              {bundle.summary}
+            </p>
+            <div className="flex items-center gap-1.5">
+              <div className="flex -space-x-1.5">
+                {bundle.attendees.slice(0, 5).map((a) => (
+                  <AttendeePill key={a.name} name={a.name} role={a.role} size={22} />
+                ))}
+              </div>
+              {bundle.attendees.length > 5 && (
+                <span className="text-[11.5px] text-muted-foreground ml-1">
+                  +{bundle.attendees.length - 5}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Overview actions — left-aligned; hidden for meetings (per-item actions live in the expanded workspace) */}
         {!isMeeting && (
           <div className="px-4 pb-3 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             {!isActionable ? (
               <SettledStrip decision={d} size="sm" className="px-0" />
             ) : isFyi ? (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => approve(d.id)}
-                className="h-9 text-[13px] px-3"
-              >
-                Got it
-              </Button>
+              undo.active ? (
+                <button
+                  onClick={(e) => { e.stopPropagation(); undo.undo(); }}
+                  className="h-9 text-[13px] inline-flex items-center gap-2 rounded-md border border-success/40 bg-success/10 text-success px-2.5 pr-3 font-medium hover:bg-success/15 transition-colors"
+                  title="Undo — reverts the action"
+                >
+                  <CountdownRing pct={undo.pct} secs={undo.secondsLeft} size={22} />
+                  <Undo2 className="h-3.5 w-3.5" />
+                  <span>Undo</span>
+                </button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => approve(d.id)}
+                  className="h-9 text-[13px] px-3"
+                >
+                  Got it
+                </Button>
+              )
             ) : (
               <ActionChoiceRow
                 decision={d}
@@ -178,6 +211,7 @@ export function GridCard({ decision: d, expanded, onToggleExpand, onOpenDetail }
             )}
           </div>
         )}
+
 
         {/* Expanded body — shares card background so it reads as the card growing taller */}
         {expanded && (
