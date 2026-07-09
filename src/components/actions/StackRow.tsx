@@ -144,7 +144,9 @@ export function StackRow({ decision: d, onOpenDetail, interactive = true }: Prop
               {isMeeting && (
                 <>
                   <span className="text-border">·</span>
-                  <span className="text-foreground/70 truncate max-w-[240px]">{d.insight}</span>
+                  <span className="text-foreground/70">{meetingTaskCount} action items</span>
+                  <span className="text-border">·</span>
+                  <span className="text-foreground/70">{meetingAttendeeCount} attendees</span>
                 </>
               )}
               {tag && (
