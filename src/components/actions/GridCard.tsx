@@ -125,7 +125,9 @@ export function GridCard({ decision: d, expanded, onToggleExpand, onOpenDetail }
               {isMeeting && (
                 <>
                   <span className="text-border">·</span>
-                  <span className="text-foreground/70 truncate">{d.insight}</span>
+                  <span className="text-foreground/70">{meetingTaskCount} action items</span>
+                  <span className="text-border">·</span>
+                  <span className="text-foreground/70">{meetingAttendeeCount} attendees</span>
                 </>
               )}
               {tag && (
@@ -136,17 +138,11 @@ export function GridCard({ decision: d, expanded, onToggleExpand, onOpenDetail }
             </div>
           </div>
 
-          <div className="shrink-0 flex flex-col items-end gap-1">
-            <Button
-              variant="ghost" size="icon"
-              onClick={(e) => { e.stopPropagation(); onToggleExpand(); }}
-              className="h-7 w-7 text-muted-foreground"
-              title={expanded ? "Collapse" : "Expand"}
-              aria-label={expanded ? "Collapse" : "Expand"}
-            >
-              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
-            </Button>
-          </div>
+          {expanded && (
+            <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+              <ShareMenu itemLabel={isMeeting ? d.meetingRef!.title : d.insight} />
+            </div>
+          )}
         </div>
 
         {/* Overview actions — left-aligned; hidden for meetings (per-item actions live in the expanded workspace) */}
