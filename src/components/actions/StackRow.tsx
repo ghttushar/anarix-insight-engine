@@ -51,7 +51,7 @@ interface Props {
 }
 
 export function StackRow({ decision: d, onOpenDetail, interactive = true }: Props) {
-  const { approve, reject } = useActionsStore();
+  const { approve, reject, meetings, tasksForBundle } = useActionsStore();
   let sel: ReturnType<typeof useSelection> | null = null;
   try { sel = useSelection(); } catch { sel = null; }
   const isSelected = interactive && sel ? sel.isSelected(d.id) : false;
