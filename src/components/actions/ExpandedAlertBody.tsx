@@ -1,7 +1,6 @@
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SourceGlyph } from "./SourceGlyph";
-import { AanMark } from "@/components/branding/AanMark";
 import type { Decision } from "@/data/mockDecisions";
 
 interface Props {
@@ -10,6 +9,7 @@ interface Props {
   onApprove: () => void;
   onDiscuss: () => void;
 }
+
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
