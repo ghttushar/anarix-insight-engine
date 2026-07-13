@@ -1,77 +1,167 @@
-/* Living OS — scoped tokens. Applied only inside .livingos-scope. */
+/* Living OS — scoped tokens.
+   Only bites within [data-livingos]. Warm paper light / warm graphite dark.
+   Rebinds shadcn semantic variables so duplicated components inherit the
+   Living OS material without per-component rewrites. */
 
-.livingos-scope {
-  --los-ink: #1a1614;
-  --los-ink-muted: #6b6058;
-  --los-ink-faint: #a89e94;
-  --los-paper: #f4efe6;
-  --los-paper-warm: #faf6ec;
-  --los-paper-deep: #e8e0d1;
-  --los-line: #d9cfbf;
-  --los-warm: #c8875a;      /* Standing warmth */
-  --los-amber: #b56b2c;     /* Critical (never red) */
-  --los-signal: #4a3f36;    /* Aan authored voice */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
-  --los-serif: "Fraunces", "Cormorant Garamond", Georgia, serif;
-  --los-sans: "IBM Plex Sans", system-ui, sans-serif;
-  --los-mono: "IBM Plex Mono", ui-monospace, monospace;
+[data-livingos] {
+  /* Paper (light) */
+  --los-paper: 40 33% 94%;         /* #F5F1E8 */
+  --los-paper-raised: 40 30% 97%;
+  --los-ink: 30 12% 10%;           /* #1A1815 */
+  --los-muted: 30 8% 40%;          /* #6B6558 */
+  --los-line: 30 15% 82%;
+  --los-hairline: 30 15% 88%;
 
-  --los-ease: cubic-bezier(0.2, 0, 0, 1);
+  /* Desaturated dollar-impact */
+  --los-loss: 5 45% 42%;           /* muted brick */
+  --los-gain: 145 25% 32%;         /* muted moss */
+  --los-info: 30 8% 40%;
 
-  font-family: var(--los-sans);
-  color: var(--los-ink);
-  background: var(--los-paper);
+  /* Aan accent — quiet ink-blue */
+  --los-aan: 220 35% 40%;
+
+  /* Rebind shadcn vars within scope */
+  --background: var(--los-paper);
+  --foreground: var(--los-ink);
+  --card: var(--los-paper-raised);
+  --card-foreground: var(--los-ink);
+  --popover: var(--los-paper-raised);
+  --popover-foreground: var(--los-ink);
+  --primary: var(--los-ink);
+  --primary-foreground: var(--los-paper);
+  --secondary: 30 15% 88%;
+  --secondary-foreground: var(--los-ink);
+  --muted: 30 20% 91%;
+  --muted-foreground: var(--los-muted);
+  --accent: 30 15% 88%;
+  --accent-foreground: var(--los-ink);
+  --destructive: var(--los-loss);
+  --destructive-foreground: var(--los-paper);
+  --border: var(--los-line);
+  --input: var(--los-line);
+  --ring: var(--los-aan);
+
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  color: hsl(var(--los-ink));
+  background-color: hsl(var(--los-paper));
+  letter-spacing: -0.005em;
 }
 
-/* Dark mode variant — warm graphite */
-.dark .livingos-scope,
-.livingos-scope.livingos-dark {
-  --los-ink: #ede6da;
-  --los-ink-muted: #a89e94;
-  --los-ink-faint: #6b6058;
-  --los-paper: #17140f;
-  --los-paper-warm: #1e1a14;
-  --los-paper-deep: #0f0d0a;
-  --los-line: #2f2a22;
-  --los-warm: #d9955e;
-  --los-amber: #d8843a;
-  --los-signal: #cdbfa6;
+/* Dark = warm graphite */
+.dark [data-livingos],
+[data-livingos].dark {
+  --los-paper: 30 8% 10%;          /* #1C1A17 */
+  --los-paper-raised: 30 8% 13%;
+  --los-ink: 40 30% 92%;
+  --los-muted: 40 10% 60%;
+  --los-line: 30 8% 22%;
+  --los-hairline: 30 8% 18%;
+  --los-loss: 5 40% 60%;
+  --los-gain: 145 22% 55%;
+  --los-info: 40 10% 60%;
+  --los-aan: 220 35% 68%;
+
+  --background: var(--los-paper);
+  --foreground: var(--los-ink);
+  --card: var(--los-paper-raised);
+  --card-foreground: var(--los-ink);
+  --popover: var(--los-paper-raised);
+  --popover-foreground: var(--los-ink);
+  --primary: var(--los-ink);
+  --primary-foreground: var(--los-paper);
+  --secondary: 30 8% 20%;
+  --secondary-foreground: var(--los-ink);
+  --muted: 30 8% 18%;
+  --muted-foreground: var(--los-muted);
+  --accent: 30 8% 20%;
+  --accent-foreground: var(--los-ink);
+  --destructive: var(--los-loss);
+  --destructive-foreground: var(--los-paper);
+  --border: var(--los-line);
+  --input: var(--los-line);
+  --ring: var(--los-aan);
 }
 
-/* Subtle paper grain, applied to the workspace surface */
-.livingos-grain {
-  background-image:
-    radial-gradient(rgba(0,0,0,0.018) 1px, transparent 1px),
-    radial-gradient(rgba(0,0,0,0.012) 1px, transparent 1px);
-  background-size: 3px 3px, 7px 7px;
-  background-position: 0 0, 1px 2px;
+/* Typography roles within scope */
+[data-livingos] .los-authored,
+[data-livingos] h1,
+[data-livingos] h2 {
+  font-family: "Fraunces", ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
 }
-.dark .livingos-grain {
-  background-image:
-    radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    radial-gradient(rgba(255,255,255,0.012) 1px, transparent 1px);
+[data-livingos] .los-mono,
+[data-livingos] time {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Ambient breathing dot for Aan presence */
-@keyframes losBreath {
-  0%, 100% { opacity: 0.55; transform: scale(1); }
-  50%      { opacity: 1;    transform: scale(1.15); }
+/* Paper grain — subtle, non-repeating feel */
+[data-livingos] .los-grain {
+  position: relative;
 }
-.livingos-breath { animation: losBreath 3.4s var(--los-ease) infinite; }
+[data-livingos] .los-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(hsl(var(--los-ink) / 0.03) 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  z-index: 0;
+}
+.dark [data-livingos] .los-grain::before,
+[data-livingos].dark .los-grain::before {
+  mix-blend-mode: screen;
+  opacity: 0.35;
+}
 
-/* Warm bloom on entry */
-@keyframes losBloom {
-  0%   { opacity: 0; }
-  40%  { opacity: 0.6; }
-  100% { opacity: 0; }
+/* Motion — Living OS transitions resolve to stillness */
+[data-livingos] .los-breathe {
+  transition: opacity 320ms cubic-bezier(0.2, 0, 0, 1),
+              transform 320ms cubic-bezier(0.2, 0, 0, 1),
+              background-color 260ms cubic-bezier(0.2, 0, 0, 1);
 }
-.livingos-bloom { animation: losBloom 1600ms var(--los-ease) forwards; }
 
-/* Orbiting agent indicator */
-@keyframes losOrbit {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+/* Registers — quiet tab replacement */
+[data-livingos] .los-register {
+  font-family: "Fraunces", ui-serif, Georgia, serif;
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: hsl(var(--los-muted));
+  padding: 6px 2px;
+  border-bottom: 1px solid transparent;
+  transition: color 220ms, border-color 220ms;
 }
-.livingos-orbit { animation: losOrbit 2.4s linear infinite; }
+[data-livingos] .los-register:hover {
+  color: hsl(var(--los-ink));
+}
+[data-livingos] .los-register[aria-selected="true"] {
+  color: hsl(var(--los-ink));
+  border-bottom-color: hsl(var(--los-ink));
+}
+[data-livingos] .los-register-count {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  color: hsl(var(--los-muted));
+  margin-left: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Breathing dot */
+@keyframes los-breathe {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.15); }
+}
+[data-livingos] .los-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: hsl(var(--los-aan));
+  animation: los-breathe 3.6s ease-in-out infinite;
+}
