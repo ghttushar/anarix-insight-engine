@@ -1,5 +1,5 @@
 import { LivingOSShell } from "@/livingos/shell/LivingOSShell";
-import { LivingOSAlerts } from "@/livingos/pages/Alerts";
+import LivingOSAlerts from "@/livingos/pages/Alerts";
 
 export default function LivingOSWorkspace() {
   return (
@@ -8,3 +8,4 @@ export default function LivingOSWorkspace() {
     </LivingOSShell>
   );
 }
+

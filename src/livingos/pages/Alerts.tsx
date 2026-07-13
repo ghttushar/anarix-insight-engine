@@ -1,12 +1,10 @@
-// /alerts — final rebuild. Stack + Grid views share tabs, filters, sort,
-// selection, bulk bar, and a single right-side Aan chat panel.
+// Living OS — Alerts as the supervisory surface.
+// Same functionality as /alerts, re-authored: paper aesthetic, registers instead
+// of tabs, no Anarix chrome. Wrapped by LivingOSShell.
 
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AanMascot } from "@/components/aan/AanMascot";
 import { ActionsProvider, useActionsStore } from "@/livingos/state/actionsStore";
 import { SelectionProvider } from "@/state/selectionStore";
 import { EmptyState } from "@/livingos/actions/EmptyState";
@@ -27,11 +25,10 @@ import type { Decision } from "@/livingos/data/mockDecisions";
 function useTab(): [AlertTabKey, (t: AlertTabKey) => void] {
   const [tab, setTab] = useState<AlertTabKey>(() => {
     if (typeof window === "undefined") return "all";
-    return (sessionStorage.getItem("alerts:tab") as AlertTabKey) || "all";
+    return (sessionStorage.getItem("livingos:alerts:tab") as AlertTabKey) || "all";
   });
-  return [tab, (t) => { setTab(t); sessionStorage.setItem("alerts:tab", t); }];
+  return [tab, (t) => { setTab(t); sessionStorage.setItem("livingos:alerts:tab", t); }];
 }
-
 
 function bucketLabel(ts: number): string {
   const d = new Date(ts);
@@ -58,47 +55,18 @@ function inWindow(ts: number, win: FilterState["window"]): boolean {
   return true;
 }
 
-function useAlertsDateRange(): [{ from: Date; to: Date }, (r: { from: Date; to: Date }) => void] {
-  const [range, setRange] = useState<{ from: Date; to: Date }>(() => {
-    if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem("alerts:date-range");
-      if (stored) {
-        try {
-          const p = JSON.parse(stored);
-          return { from: new Date(p.from), to: new Date(p.to) };
-        } catch { /* fall through */ }
-      }
-    }
-    const to = new Date();
-    const from = new Date();
-    from.setDate(from.getDate() - 29);
-    return { from, to };
-  });
-  return [
-    range,
-    (r) => {
-      setRange(r);
-      sessionStorage.setItem("alerts:date-range", JSON.stringify({ from: r.from.toISOString(), to: r.to.toISOString() }));
-    },
-  ];
-}
-
 function AlertsInner() {
   const { decisions } = useActionsStore();
   const params = useParams<{ viewMode?: string }>();
   const navigate = useNavigate();
   const viewMode: ViewMode = params.viewMode === "grid" ? "grid" : "stack";
-  const setViewMode = useCallback((m: ViewMode) => navigate(`/alerts/${m}`), [navigate]);
-  const [alertsDateRange, setAlertsDateRange] = useAlertsDateRange();
-
+  const setViewMode = useCallback((m: ViewMode) => navigate(`/livingos/${m}`), [navigate]);
 
   const [tab, setTab] = useTab();
   const [sort, setSort] = useState<SortKey>("value");
   const [filter, setFilter] = useState<FilterState>(EMPTY_FILTER);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [panel, setPanel] = useState<PanelState>(CLOSED_PANEL);
-
-  // Grid expanded ids
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const openDetail = useCallback((id: string, mode: PanelMode = "custom") => {
@@ -109,20 +77,12 @@ function AlertsInner() {
   const counts = useMemo(() => computeTabCounts(decisions), [decisions]);
   const pool = useMemo(() => filterByTab(decisions, tab), [decisions, tab]);
 
-  const dateFrom = alertsDateRange.from.getTime();
-  const dateToEnd = (() => {
-    const d = new Date(alertsDateRange.to);
-    d.setHours(23, 59, 59, 999);
-    return d.getTime();
-  })();
-
   const filtered = useMemo(() => pool.filter((d) => {
-    if (d.createdAt < dateFrom || d.createdAt > dateToEnd) return false;
     if (filter.sources.size && !filter.sources.has(d.source)) return false;
     if (filter.domains.size && !filter.domains.has(d.domain)) return false;
     if (!inWindow(d.createdAt, filter.window)) return false;
     return true;
-  }), [pool, filter, dateFrom, dateToEnd]);
+  }), [pool, filter]);
 
   const sorted = useMemo(() => {
     const s = [...filtered];
@@ -167,64 +127,42 @@ function AlertsInner() {
   }, [panel.decisionId, closePanel]);
 
   return (
-    <AppLayout>
-      <AppTaskbar
-        breadcrumbItems={[{ label: "Alerts" }]}
-        showDateRange
-        dateRangeOverride={alertsDateRange}
-        onDateRangeOverrideChange={setAlertsDateRange}
+    <>
+      <AlertsToolbar
+        tab={tab}
+        onTabChange={setTab}
+        counts={counts}
+        viewMode={viewMode}
+        onViewChange={setViewMode}
+        filter={filter}
+        onFilterChange={setFilter}
+        sort={sort}
+        onSortChange={setSort}
+        filterSheetOpen={filterSheetOpen}
+        onFilterSheetOpenChange={setFilterSheetOpen}
       />
-      <div className="px-3 py-4 max-w-[1480px] mx-auto w-full">
-        <header className="mb-4 flex items-center gap-3">
-          <div className="h-9 w-9 rounded-md bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center shrink-0">
-            <AanMascot size={24} state="idle" interactive={false} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground">
-              Anarix · Aan
-            </div>
-            <h1 className="font-heading text-[20px] font-semibold text-foreground leading-tight">
-              Alerts
-            </h1>
-          </div>
-        </header>
 
-        <AlertsToolbar
-          tab={tab}
-          onTabChange={setTab}
-          counts={counts}
-          viewMode={viewMode}
-          onViewChange={setViewMode}
-          filter={filter}
-          onFilterChange={setFilter}
-          sort={sort}
-          onSortChange={setSort}
-          filterSheetOpen={filterSheetOpen}
-          onFilterSheetOpenChange={setFilterSheetOpen}
-        />
+      <BulkBar />
 
-        <BulkBar />
-
-        <ScrollArea className="h-[calc(100vh-240px)] pr-2">
-          {sorted.length === 0 ? (
-            <EmptyState
-              headline={tab === "all" ? "You're clear." : "Nothing in this view."}
-              body={tab === "all"
-                ? "Aan will surface something the moment it matters."
-                : "Try a different tab, Aan is still watching."}
-            />
-          ) : viewMode === "stack" ? (
-            <StackBody bucketed={bucketed} onOpenDetail={openDetail} />
-          ) : (
-            <GridBody
-              bucketed={bucketed}
-              expandedIds={expandedIds}
-              onToggleExpand={toggleExpand}
-              onOpenDetail={openDetail}
-            />
-          )}
-        </ScrollArea>
-      </div>
+      <ScrollArea className="min-h-[60vh]">
+        {sorted.length === 0 ? (
+          <EmptyState
+            headline={tab === "all" ? "You're clear." : "Nothing in this register."}
+            body={tab === "all"
+              ? "Aan will surface something the moment it matters."
+              : "Try another register — Aan is still watching."}
+          />
+        ) : viewMode === "stack" ? (
+          <StackBody bucketed={bucketed} onOpenDetail={openDetail} />
+        ) : (
+          <GridBody
+            bucketed={bucketed}
+            expandedIds={expandedIds}
+            onToggleExpand={toggleExpand}
+            onOpenDetail={openDetail}
+          />
+        )}
+      </ScrollArea>
 
       <AlertDetailPanel
         state={panel}
@@ -233,17 +171,17 @@ function AlertsInner() {
 
       <KeyboardHelpOverlay />
       <UndoToast />
-    </AppLayout>
+    </>
   );
 }
 
 function BucketHeader({ label }: { label: string }) {
   return (
-    <div className="mb-2 mt-1 flex items-center gap-2">
-      <span className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+    <div className="mb-3 mt-2 flex items-baseline gap-3">
+      <span className="los-mono text-[10px] uppercase tracking-[0.18em] text-[hsl(var(--los-muted))]">
         {label}
       </span>
-      <span className="h-px flex-1 bg-border/60" />
+      <span className="h-px flex-1 bg-[hsl(var(--los-hairline))]" />
     </div>
   );
 }
@@ -255,11 +193,11 @@ function StackBody({
   onOpenDetail: (id: string, mode?: PanelMode) => void;
 }) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       {bucketed.map(([bucket, list]) => (
         <section key={bucket}>
           <BucketHeader label={bucket} />
-          <div className="rounded-lg border border-border bg-card overflow-hidden">
+          <div className="overflow-hidden rounded-sm border border-[hsl(var(--los-hairline))] bg-[hsl(var(--los-paper-raised))]">
             {list.map((d) => (
               <StackRow key={d.id} decision={d} onOpenDetail={onOpenDetail} />
             ))}
@@ -279,12 +217,12 @@ function GridBody({
   onOpenDetail: (id: string, mode?: PanelMode) => void;
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {bucketed.map(([bucket, list]) => {
         const left = list.filter((_, i) => i % 2 === 0);
         const right = list.filter((_, i) => i % 2 === 1);
         const renderCol = (col: Decision[]) => (
-          <div className="flex-1 min-w-0 flex flex-col gap-3">
+          <div className="flex min-w-0 flex-1 flex-col gap-3">
             {col.map((d) => (
               <GridCard
                 key={d.id}
@@ -299,8 +237,7 @@ function GridBody({
         return (
           <section key={bucket}>
             <BucketHeader label={bucket} />
-            {/* Two independent columns: expanding a card only pushes cards below it in the same column. */}
-            <div className="flex gap-3 items-start">
+            <div className="flex items-start gap-3">
               {renderCol(left)}
               {renderCol(right)}
             </div>
@@ -311,8 +248,7 @@ function GridBody({
   );
 }
 
-
-export default function AlertsPage() {
+export default function LivingOSAlerts() {
   return (
     <ActionsProvider>
       <SelectionProvider>
