@@ -1,107 +1,157 @@
-// The single shared morning scenario, rendered six ways.
-// If you change these values, all six directions change in lockstep.
+// Living OS — the single authored scenario. Tuesday morning, 08:14.
+// Every rendering across Phase 1 & Phase 2 reads from this file.
 
-export const scenario = {
-  when: {
-    weekday: "Tuesday",
-    date: "14 October 2026",
-    week: "Week 41",
-    time: "08:14",
-    edition: "No. 428",
-  },
-  standing: {
-    // The one-sentence Standing, used by editorial/paper/room directions.
-    sentence:
-      "Advertising is holding, but Q4 spend authority runs out Thursday.",
-    // The status-code Standing, used by command surface.
-    codes: [
-      { key: "AD", value: "HOLD", tone: "hold" as const },
-      { key: "INV", value: "FIRM", tone: "firm" as const },
-      { key: "CASH", value: "FIRM", tone: "firm" as const },
-      { key: "AUTH", value: "Q4-03D", tone: "hazard" as const },
-      { key: "AGENTS", value: "1", tone: "firm" as const },
-    ],
-  },
-  figures: [
-    { label: "Spend, MTD", value: "$847,210", delta: "+2.1%", frame: "vs. plan" },
-    { label: "ROAS, 7d", value: "4.62", delta: "−0.08", frame: "vs. 14d" },
-    { label: "Authority remaining", value: "3 days", delta: "$186k", frame: "unspent" },
-  ],
+export type DomainState =
+  | "holding"
+  | "watching"
+  | "firm"
+  | "soft"
+  | "silent"
+  | "recovering";
+
+export interface Domain {
+  id: string;
+  name: string;
+  state: DomainState;
+  /** Deliberate loose composition — percentages of the workspace, stable across sessions. */
+  x: number;
+  y: number;
+  /** Relative visual weight — 1.0 baseline, larger = more mass. */
+  weight: number;
+  /** True when this Domain is producing the next proposal. */
+  leaning: boolean;
+  /** Short authored narrative Aan wrote about this Domain this morning. */
+  narrative: string;
+  /** One-line relationships shown to the side when expanded. */
+  relationships: string[];
+}
+
+export interface Proposal {
+  domainId: string;
+  sentence: string;
+  why: string;
+  evidence: string[];
+  expectedImpact: string;
+  confidence: number; // 0-1
+  alternatives: number;
+}
+
+export interface RunningAgent {
+  id: string;
+  label: string;
+  remainingMinutes: number;
+  domainId: string;
+}
+
+export interface Scenario {
+  day: string;
+  time: string;
+  standing: string;
+  greeting: string;
+  domains: Domain[];
+  proposal: Proposal;
+  agent: RunningAgent;
+}
+
+export const scenario: Scenario = {
+  day: "Tuesday",
+  time: "08:14",
+  standing: "You're standing well. Advertising is watching. Inventory recovered overnight.",
+  greeting:
+    "Good morning. You're standing well — nothing requires judgment for another two hours. Advertising is leaning toward one.",
   domains: [
-    { key: "advertising", label: "Advertising", weight: 0.82, tone: "hold" as const, note: "Holding. Authority runs out Thursday." },
-    { key: "inventory",   label: "Inventory",   weight: 0.34, tone: "firm" as const, note: "Firm. 41 days cover across top ASINs." },
-    { key: "cash",        label: "Cash",        weight: 0.28, tone: "firm" as const, note: "Firm. $2.1M operating headroom." },
-    { key: "aan",         label: "Aan",         weight: 0.50, tone: "soft" as const, note: "Thinking about Thursday." },
+    {
+      id: "advertising",
+      name: "Advertising",
+      state: "watching",
+      x: 34,
+      y: 42,
+      weight: 1.35,
+      leaning: true,
+      narrative:
+        "Sponsored Products is holding at 3.1× ROAS, but Q4 spend authority runs out Thursday. Aan is watching the last-72-hour pacing and has drafted one move — a 12% shift from SP into SB to protect brand share through the window's close.",
+      relationships: [
+        "3 running campaigns · 1 delegated",
+        "watched by Marketing",
+        "linked to Cash · Inventory",
+      ],
+    },
+    {
+      id: "inventory",
+      name: "Inventory",
+      state: "recovering",
+      x: 62,
+      y: 30,
+      weight: 1.05,
+      leaning: false,
+      narrative:
+        "The West-coast fulfillment gap from last week has closed. Stock levels on the top 8 SKUs are back inside their guardrails. Aan is no longer proposing intervention here.",
+      relationships: ["8 SKUs · firm", "linked to Advertising · Cash"],
+    },
+    {
+      id: "cash",
+      name: "Cash",
+      state: "firm",
+      x: 78,
+      y: 55,
+      weight: 1.0,
+      leaning: false,
+      narrative:
+        "$412k runway with 47 days of cover on current burn. Two receivables clear Friday. Nothing to attend to.",
+      relationships: ["47 days cover · firm", "linked to Advertising"],
+    },
+    {
+      id: "customers",
+      name: "Customers",
+      state: "holding",
+      x: 50,
+      y: 68,
+      weight: 0.95,
+      leaning: false,
+      narrative:
+        "NPS steady at 62. Two enterprise conversations are in-flight — one closing this week, one on hold. No immediate signal.",
+      relationships: ["2 open · 1 closing", "watched by Sales"],
+    },
+    {
+      id: "operations",
+      name: "Operations",
+      state: "silent",
+      x: 22,
+      y: 66,
+      weight: 0.9,
+      leaning: false,
+      narrative:
+        "All pipelines green. Last incident was 11 days ago. Aan has nothing to say here today.",
+      relationships: ["green · 11d since incident"],
+    },
+    {
+      id: "people",
+      name: "People",
+      state: "holding",
+      x: 15,
+      y: 30,
+      weight: 0.9,
+      leaning: false,
+      narrative:
+        "One hire closing Thursday. One 1:1 flagged for follow-up from last week's meeting notes. No urgency.",
+      relationships: ["1 hire closing · 1 follow-up"],
+    },
   ],
   proposal: {
-    title: "Shift 12% of Sponsored Products budget into Sponsored Brands",
-    body:
-      "For the last three days of the Q4 authority window. Recovers ~$22k of unspent authority and lifts branded impression share by an estimated 6–9 points at unchanged ACoS.",
-    aanNote: "Worth doing before Thursday.",
-    signature: "— A",
-    est: { spendMoved: "$102,400", recovered: "$22,300", risk: "Soft" },
+    domainId: "advertising",
+    sentence:
+      "Shift 12% of Sponsored Products budget into Sponsored Brands for the last three days of the Q4 window.",
+    why: "SP is efficient but saturated at current spend. SB share-of-voice on branded terms has drifted 4 points below its trailing average, and Q4 competitor pressure typically peaks in the final 72 hours. Reallocation protects brand defensive share without adding net spend.",
+    evidence: ["SP ROAS 3.1×", "SB SoV −4pts", "Q4 window · 03d left"],
+    expectedImpact:
+      "Standing holds. Brand SoV recovers to trailing average by Thursday close.",
+    confidence: 0.78,
+    alternatives: 2,
   },
   agent: {
-    label: "Bid-cap rebalance",
-    scope: "US · Sponsored Products",
-    etaMinutes: 6,
-    started: "08:07",
+    id: "bid-cap-rebalance",
+    label: "rebalancing US-Sponsored bid caps",
+    remainingMinutes: 6,
+    domainId: "advertising",
   },
-  lede:
-    "Advertising is holding, but the Q4 spend authority runs out Thursday, and roughly $186,000 of it will lapse if nothing changes. Inventory and cash are firm — this is a timing problem, not a health problem. Aan has drafted a single move worth doing before the window closes; the rest of the desk is quiet.",
-} as const;
-
-export type Scenario = typeof scenario;
-
-export const directions = [
-  {
-    slug: "quiet-architecture",
-    name: "Quiet Architecture",
-    philosophy: "A well-run desk at a serious institution.",
-    verdict: "Timeless",
-    checksum: 8,
-    mood: "/src/assets/livingos/moods/1-quiet-architecture.jpg",
-  },
-  {
-    slug: "gravity-field",
-    name: "Gravity Field",
-    philosophy: "You don't navigate. You fall toward what matters.",
-    verdict: "Novel",
-    checksum: 7,
-    mood: "/src/assets/livingos/moods/2-gravity-field.jpg",
-  },
-  {
-    slug: "living-canvas",
-    name: "Living Canvas",
-    philosophy: "The surface breathes. Aan is weather.",
-    verdict: "Ambient",
-    checksum: 8,
-    mood: "/src/assets/livingos/moods/3-living-canvas.jpg",
-  },
-  {
-    slug: "command-surface",
-    name: "Command Surface",
-    philosophy: "For people supervising money in real time.",
-    verdict: "Trustworthy",
-    checksum: 5,
-    mood: "/src/assets/livingos/moods/4-command-surface.jpg",
-  },
-  {
-    slug: "ambient-room",
-    name: "Ambient Room",
-    philosophy: "The OS is the room you are in.",
-    verdict: "Emotional",
-    checksum: 10,
-    mood: "/src/assets/livingos/moods/5-ambient-room.jpg",
-  },
-  {
-    slug: "editorial-intelligence",
-    name: "Editorial Intelligence",
-    philosophy: "A publication written for one person this morning.",
-    verdict: "Authored",
-    checksum: 8,
-    mood: "/src/assets/livingos/moods/6-editorial-intelligence.jpg",
-  },
-] as const;
-
-export type DirectionSlug = (typeof directions)[number]["slug"];
+};
