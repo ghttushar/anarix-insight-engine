@@ -1,3 +1,4 @@
+import { useLocation } from "react-router-dom";
 import { CommandPalette } from "./CommandPalette";
 import { FloatingActionIsland } from "./FloatingActionIsland";
 import { AmbientBackground } from "./AmbientBackground";
@@ -11,6 +12,11 @@ interface CreativeFeaturesProps {
 
 export function CreativeFeatures({ children }: CreativeFeaturesProps) {
   const { effects } = useVisualEffects();
+  const { pathname } = useLocation();
+  // Living OS exploration surfaces run outside the product: no dock, no ambient bg, no command palette.
+  const isLivingOS = pathname.startsWith("/livingos");
+
+  if (isLivingOS) return <>{children}</>;
 
   let content = <>{children}</>;
 
@@ -31,3 +37,4 @@ export function CreativeFeatures({ children }: CreativeFeaturesProps) {
     </>
   );
 }
+
