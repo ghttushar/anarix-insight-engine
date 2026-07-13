@@ -33,6 +33,15 @@ import { toast } from "sonner";
 import NotFound from "./pages/NotFound";
 import AlertsPage from "./pages/Alerts";
 
+// Living OS — visual language exploration (isolated, no app chrome)
+import DirectionsIndex from "./pages/livingos/DirectionsIndex";
+import QuietArchitecture from "./pages/livingos/directions/QuietArchitecture";
+import GravityField from "./pages/livingos/directions/GravityField";
+import LivingCanvas from "./pages/livingos/directions/LivingCanvas";
+import CommandSurface from "./pages/livingos/directions/CommandSurface";
+import AmbientRoom from "./pages/livingos/directions/AmbientRoom";
+import EditorialIntelligence from "./pages/livingos/directions/EditorialIntelligence";
+
 
 // Auth & Onboarding
 import Login from "./pages/auth/Login";
