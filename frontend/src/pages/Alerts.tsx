@@ -1,5 +1,5 @@
 // /alerts — Decision OS. Lifecycle-grouped queue + in-pane Review Workspace.
-// No ViewSwitcher, no SortMenu, no severity dots, no AanMascot header.
+// Situations merge duplicate/related decisions. No ViewSwitcher, no SortMenu.
 
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -17,22 +17,42 @@ import { BulkBar } from "@/components/actions/BulkBar";
 import { GreetingHeader } from "@/components/actions/GreetingHeader";
 import { QueueSection, MAX_VISIBLE } from "@/components/actions/QueueSection";
 import { DecisionRowLite } from "@/components/actions/DecisionRowLite";
+import { SituationRow } from "@/components/actions/SituationRow";
 import { ReviewWorkspace } from "@/components/actions/ReviewWorkspace";
 import { AlertDetailPanel, CLOSED_PANEL, type PanelState } from "@/components/actions/AlertDetailPanel";
 import { filterByTab, computeTabCounts, type AlertTabKey } from "@/components/actions/tabs";
 import { useDecideKeyboard } from "@/components/actions/useDecideKeyboard";
 import {
-  lifecycleFor, LIFECYCLE_ORDER, LIFECYCLE_DEFAULT_EXPANDED, importanceScore, type Lifecycle,
+  lifecycleFor,
+  LIFECYCLE_ORDER,
+  LIFECYCLE_DEFAULT_EXPANDED,
+  importanceScore,
+  type Lifecycle,
 } from "@/lib/decisions/lifecycle";
+import { groupBySituation, type Situation } from "@/lib/decisions/groupSituations";
 import type { Decision } from "@/data/mockDecisions";
 
 function usePersistedState<T>(key: string, initial: T): [T, (v: T) => void] {
   const [v, setV] = useState<T>(() => {
     if (typeof window === "undefined") return initial;
-    try { const raw = sessionStorage.getItem(key); return raw ? (JSON.parse(raw) as T) : initial; }
-    catch { return initial; }
+    try {
+      const raw = sessionStorage.getItem(key);
+      return raw ? (JSON.parse(raw) as T) : initial;
+    } catch {
+      return initial;
+    }
   });
-  return [v, (n) => { setV(n); sessionStorage.setItem(key, JSON.stringify(n)); }];
+  return [
+    v,
+    (n) => {
+      setV(n);
+      try {
+        sessionStorage.setItem(key, JSON.stringify(n));
+      } catch {
+        /* noop */
+      }
+    },
+  ];
 }
 
 function AlertsInner() {
@@ -41,12 +61,28 @@ function AlertsInner() {
 
   const [tab, setTab] = usePersistedState<AlertTabKey>("alerts:tab", "needs_me");
   const [query, setQuery] = usePersistedState<string>("alerts:query", "");
-  const [density, setDensity] = usePersistedState<"comfortable" | "compact">("alerts:density", "comfortable");
+  const [density, setDensity] = usePersistedState<"comfortable" | "compact">(
+    "alerts:density",
+    "comfortable",
+  );
   const [filter, setFilter] = useState<FilterState>(EMPTY_FILTER);
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [panel, setPanel] = useState<PanelState>(CLOSED_PANEL);
   const closePanel = useCallback(() => setPanel(CLOSED_PANEL), []);
+
+  // Per-section "show all" toggle for the Show N more tail.
+  const [expandedSections, setExpandedSections] = useState<Set<Lifecycle>>(
+    () => new Set(),
+  );
+  const toggleExpanded = useCallback((lc: Lifecycle) => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(lc)) next.delete(lc);
+      else next.add(lc);
+      return next;
+    });
+  }, []);
 
   useDecideKeyboard(true);
 
@@ -55,22 +91,36 @@ function AlertsInner() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return pool.filter((d) => {
-      if (filter.sources.size && !filter.sources.has(d.source)) return false;
-      if (filter.domains.size && !filter.domains.has(d.domain)) return false;
-      if (q && !(`${d.insight} ${d.sourceRef.label} ${d.domain}`).toLowerCase().includes(q)) return false;
-      return true;
-    }).sort((a, b) => importanceScore(b) - importanceScore(a));
+    return pool
+      .filter((d) => {
+        if (filter.sources.size && !filter.sources.has(d.source)) return false;
+        if (filter.domains.size && !filter.domains.has(d.domain)) return false;
+        if (
+          q &&
+          !`${d.insight} ${d.sourceRef.label} ${d.domain}`
+            .toLowerCase()
+            .includes(q)
+        )
+          return false;
+        return true;
+      })
+      .sort((a, b) => importanceScore(b) - importanceScore(a));
   }, [pool, filter, query]);
 
+  // Group by lifecycle, then within each lifecycle, group by situation.
   const groups = useMemo(() => {
-    const m = new Map<Lifecycle, Decision[]>();
+    const byLc = new Map<Lifecycle, Decision[]>();
     for (const d of filtered) {
       const lc = lifecycleFor(d);
-      if (!m.has(lc)) m.set(lc, []);
-      m.get(lc)!.push(d);
+      if (!byLc.has(lc)) byLc.set(lc, []);
+      byLc.get(lc)!.push(d);
     }
-    return m;
+    const out = new Map<Lifecycle, Situation[]>();
+    for (const [lc, list] of byLc) {
+      const sits = groupBySituation(list).sort((a, b) => b.totalCents - a.totalCents);
+      out.set(lc, sits);
+    }
+    return out;
   }, [filtered]);
 
   const selectedDecision = useMemo(
@@ -98,7 +148,11 @@ function AlertsInner() {
     <AppLayout>
       <AppTaskbar breadcrumbItems={[{ label: "Alerts" }]} />
 
-      <div className={`px-4 py-5 max-w-[1600px] mx-auto w-full ${density === "compact" ? "text-[13px]" : ""}`}>
+      <div
+        className={`px-4 py-5 max-w-[1600px] mx-auto w-full ${
+          density === "compact" ? "text-[13px]" : ""
+        }`}
+      >
         <GreetingHeader name="Tushar" />
 
         <AlertsToolbar
@@ -122,35 +176,78 @@ function AlertsInner() {
           <ScrollArea className="h-[calc(100vh-260px)] pr-2">
             {isEmpty ? (
               <EmptyState
-                variant={isSearchEmpty ? "search" : tab === "needs_me" ? "needs_me" : tab === "watching" ? "watching" : "none"}
+                variant={
+                  isSearchEmpty
+                    ? "search"
+                    : tab === "needs_me"
+                    ? "needs_me"
+                    : tab === "watching"
+                    ? "watching"
+                    : "none"
+                }
               />
             ) : (
               LIFECYCLE_ORDER.map((lc) => {
-                const list = groups.get(lc) || [];
-                if (list.length === 0) return null;
+                const situations = groups.get(lc) || [];
+                if (situations.length === 0) return null;
+                const totalDecisions = situations.reduce(
+                  (n, s) => n + s.decisions.length,
+                  0,
+                );
                 const max = MAX_VISIBLE[lc];
-                const visible = list.slice(0, max);
-                const hidden = list.length - visible.length;
+                const showAll = expandedSections.has(lc);
+                const visibleSituations = showAll ? situations : situations.slice(0, max);
+                const hidden = situations.length - visibleSituations.length;
                 return (
                   <QueueSection
                     key={lc}
                     lifecycle={lc}
-                    count={list.length}
+                    count={totalDecisions}
                     defaultOpen={LIFECYCLE_DEFAULT_EXPANDED[lc]}
                   >
-                    {visible.map((d) => (
-                      <DecisionRowLite
-                        key={d.id}
-                        decision={d}
-                        selected={selectedId === d.id}
-                        onSelect={() => setSelectedId(d.id)}
-                        onReview={() => setSelectedId(d.id)}
-                      />
-                    ))}
+                    {visibleSituations.map((sit) => {
+                      if (sit.merged) {
+                        return (
+                          <SituationRow
+                            key={sit.key}
+                            situation={sit}
+                            selectedId={selectedId}
+                            onSelect={(id) => setSelectedId(id)}
+                          />
+                        );
+                      }
+                      const d = sit.decisions[0];
+                      return (
+                        <DecisionRowLite
+                          key={d.id}
+                          decision={d}
+                          selected={selectedId === d.id}
+                          onSelect={() => setSelectedId(d.id)}
+                          onReview={() => setSelectedId(d.id)}
+                        />
+                      );
+                    })}
                     {hidden > 0 && (
                       <div className="px-4 py-2 border-t border-border/50 bg-muted/20">
-                        <Button variant="ghost" size="sm" className="h-7 text-[12px] text-muted-foreground">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-[12px] text-muted-foreground hover:text-foreground"
+                          onClick={() => toggleExpanded(lc)}
+                        >
                           Show {hidden} more
+                        </Button>
+                      </div>
+                    )}
+                    {showAll && situations.length > max && (
+                      <div className="px-4 py-2 border-t border-border/50 bg-muted/20">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-[12px] text-muted-foreground hover:text-foreground"
+                          onClick={() => toggleExpanded(lc)}
+                        >
+                          Collapse
                         </Button>
                       </div>
                     )}
@@ -166,6 +263,7 @@ function AlertsInner() {
               decision={selectedDecision}
               onClose={() => setSelectedId(null)}
               onDiscussAan={(id) => setPanel({ decisionId: id, mode: "custom" })}
+              onOpenDecision={(id) => setSelectedId(id)}
             />
           </div>
         </div>
@@ -178,13 +276,16 @@ function AlertsInner() {
             decision={selectedDecision}
             onClose={() => setSelectedId(null)}
             onDiscussAan={(id) => setPanel({ decisionId: id, mode: "custom" })}
+            onOpenDecision={(id) => setSelectedId(id)}
           />
         </div>
       )}
 
       <AlertDetailPanel
         state={panel}
-        onOpenChange={(o) => { if (!o) closePanel(); }}
+        onOpenChange={(o) => {
+          if (!o) closePanel();
+        }}
       />
 
       <KeyboardHelpOverlay />

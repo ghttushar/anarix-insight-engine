@@ -101,3 +101,134 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Continuation of the Anarix Alerts → Decision OS redesign. In this session the user
+  requested clusters (a) Situation grouping + Show N more + Living verbs and
+  (b) Review Workspace deepening (structured Recommendation, Alternatives, typed
+  Related Decisions, Previous Outcomes, Audit trail, working Replay + Compare tabs).
+
+frontend:
+  - task: "Situation grouping in Alerts queue (dupeKey / meetingRef / entity+domain)"
+    implemented: true
+    working: true
+    file: "src/lib/decisions/groupSituations.ts, src/components/actions/SituationRow.tsx, src/pages/Alerts.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Grouping keys on dupeKey → meetingRef → entity+domain+4h bucket. Merged groups render as collapsible SituationRow with count + aggregate impact + single Review CTA. Verified via screenshot: 3 merged situations (Staples QBR, SKU-B12, batch #B-2214) appearing in the Needs You section."
+
+  - task: "Show N more tail per lifecycle section"
+    implemented: true
+    working: true
+    file: "src/pages/Alerts.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Per-section expandedSections set toggles between max slice and full list; Collapse button appears once expanded. Needs You not truncated per spec (MAX_VISIBLE 999)."
+
+  - task: "Review Workspace — structured RecommendationBlock (7 fields)"
+    implemented: true
+    working: true
+    file: "src/components/actions/review/RecommendationBlock.tsx, src/lib/decisions/recommendationStructure.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Summary / Reason / Impact / Tradeoff / Risk / Undoability / Confidence derived from Decision fields. Verified in ReviewWorkspace on Winter Push decision."
+
+  - task: "AlternativeBlock with Snooze/Delegate/Reject and Reversible chip"
+    implemented: true
+    working: true
+    file: "src/components/actions/review/AlternativeBlock.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Clicking an alternative invokes the corresponding store action. Verified rendering."
+
+  - task: "Typed Related Decisions (blocks/depends_on/duplicates/merged_into/caused_by/related)"
+    implemented: true
+    working: true
+    file: "src/lib/decisions/relationships.ts, src/components/actions/review/RelatedDecisionChip.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "relationshipsFor derives typed edges from dupeKey, meetingRef, domain+status+magnitude. Chips are color-toned by type and clickable — clicking swaps the reviewed decision without reloading the pane. Verified 6 typed 'Blocks' chips on Winter Push."
+
+  - task: "Previous Outcomes section in ReviewWorkspace"
+    implemented: true
+    working: true
+    file: "src/components/actions/ReviewWorkspace.tsx"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Shows up to 3 completed/in-flight peers in the same domain."
+
+  - task: "Real AuditTrail component (timeline events)"
+    implemented: true
+    working: true
+    file: "src/components/actions/review/AuditTrail.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Collapsed by default; expands to a vertical timeline with who/what/when/from→to."
+
+  - task: "ReplayView for completed decisions"
+    implemented: true
+    working: true
+    file: "src/components/actions/review/ReplayView.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Replay tab disabled for open decisions; enabled once status is in_flight/completed/rejected. Renders original recommendation, user action, outcome, and full audit trail."
+
+  - task: "CompareView side-by-side"
+    implemented: true
+    working: true
+    file: "src/components/actions/review/CompareView.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Peer picker (from relationshipsFor) + two-column side-by-side RecommendationBlocks. Verified rendering with 6 candidate peers on Winter Push."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus: []
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Phase A + B of the Alerts → Decision OS spec shipped. Situation grouping (dupeKey/meetingRef/entity), Show N more, and the 7-field structured Recommendation + Alternatives + typed Related Decisions + Previous Outcomes + Audit trail + working Replay/Compare tabs are live. No backend changes. Verified visually via 4 screenshots. Awaiting user confirmation before starting cluster (c) Toolbar power features and (d) Watchlist/Personalization."
