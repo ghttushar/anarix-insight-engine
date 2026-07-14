@@ -217,6 +217,21 @@ frontend:
           agent: "main"
           comment: "Peer picker (from relationshipsFor) + two-column side-by-side RecommendationBlocks. Verified rendering with 6 candidate peers on Winter Push."
 
+  - task: "Vite allowedHosts bug fix for external URL access"
+    implemented: true
+    working: true
+    file: "vite.config.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Added allowedHosts: true to vite.config.ts server config to fix 'Blocked request. This host is not allowed' error on external URL."
+        - working: true
+          agent: "testing"
+          comment: "VERIFIED via comprehensive Playwright testing. Test A (Internal/localhost:3000/alerts): ✅ Page renders (5070 chars), ✅ Greeting text present, ✅ Judgment text present, ✅ All 3 tabs (Needs Me/Watching/Everything), ✅ Decision rows (Winter Push & Buy Box), ✅ Review Workspace opens with all tabs (Decide/Replay/Compare/Audit), ✅ No 'Blocked request' error. Test B (External URL https://aan-workflow.preview.emergentagent.com/alerts): ✅ HTTP 200 response, ✅ No 'Blocked request' string in HTML, ✅ No 'not allowed' string, ✅ No 'server.allowedHosts' string, ✅ No Cloudflare challenge, ✅ Page loads successfully. Bug fix is VERIFIED and WORKING."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
@@ -232,3 +247,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Phase A + B of the Alerts → Decision OS spec shipped. Situation grouping (dupeKey/meetingRef/entity), Show N more, and the 7-field structured Recommendation + Alternatives + typed Related Decisions + Previous Outcomes + Audit trail + working Replay/Compare tabs are live. No backend changes. Verified visually via 4 screenshots. Awaiting user confirmation before starting cluster (c) Toolbar power features and (d) Watchlist/Personalization."
+  - agent: "testing"
+    message: "Vite allowedHosts bug fix VERIFIED. Comprehensive testing completed on both internal (localhost:3000) and external URL (https://aan-workflow.preview.emergentagent.com/alerts). Internal test (authoritative): All 7 verification points passed including page rendering, greeting text, tabs, decision rows, Review Workspace interaction, and no blocked request error. External URL test: HTTP 200 response with no 'Blocked request', 'not allowed', or 'server.allowedHosts' strings in response body. No Cloudflare challenge detected. The fix is working correctly."
