@@ -1,97 +1,107 @@
-import { useMemo, useState } from "react";
-import { X, Check, Reply, Ban, Clock, UserPlus, Sparkles } from "lucide-react";
+// Review Workspace \u2014 3-page carousel: Summary / Details / Metrics.
+// One dominant action: Execute Selected Strategy. Plus Modify (opens Aan drawer),
+// Assign (menu), Reject, Snooze.
+import { useMemo, useState, useEffect } from "react";
+import { X, Check, Ban, Clock, Share2, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { ImpactChip } from "./chips/ImpactChip";
-import { ConfidenceChip } from "./chips/ConfidenceChip";
-import { IfIgnoredChip } from "./chips/IfIgnoredChip";
-import { SourceGlyph } from "./SourceGlyph";
-import { RecommendationBlock } from "./review/RecommendationBlock";
-import { AlternativeBlock } from "./review/AlternativeBlock";
-import { RelatedDecisionChip } from "./review/RelatedDecisionChip";
-import { AuditTrail } from "./review/AuditTrail";
-import { ReplayView } from "./review/ReplayView";
-import { CompareView } from "./review/CompareView";
+import { PageIndicator } from "./review/PageIndicator";
+import { SummaryPage } from "./review/SummaryPage";
+import { DetailsPage } from "./review/DetailsPage";
+import { MetricsPage } from "./review/MetricsPage";
+import { AssignMenu } from "./review/AssignMenu";
+import { DiscussDrawer } from "./review/DiscussDrawer";
 import { useActionsStore } from "@/state/actionsStore";
-import { lifecycleFor, LIFECYCLE_LABEL } from "@/lib/decisions/lifecycle";
-import { recommendationFor, alternativesFor } from "@/lib/decisions/recommendationStructure";
-import { relationshipsFor } from "@/lib/decisions/relationships";
+import { strategiesFor, type Strategy } from "@/lib/decisions/strategies";
+import { sourcePillFor, PILL_TONE_CLASS } from "@/lib/decisions/sourcePill";
 import type { Decision } from "@/data/mockDecisions";
+import { toast } from "sonner";
 
 interface Props {
   decision: Decision | null;
   onClose: () => void;
-  onDiscussAan: (id: string) => void;
   onOpenDecision?: (id: string) => void;
+  /** Which page to default to when a new decision is opened. */
+  defaultPage?: 0 | 1 | 2;
 }
 
-type Tab = "decide" | "replay" | "compare" | "audit";
+const PAGE_LABELS = ["Summary", "Details", "Metrics"];
 
-function Block({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
-  return (
-    <section>
-      <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5">
-        {eyebrow}
-      </div>
-      <div className="text-[13.5px] leading-relaxed text-foreground/90">{children}</div>
-    </section>
-  );
-}
-
-export function ReviewWorkspace({ decision: d, onClose, onDiscussAan, onOpenDecision }: Props) {
+export function ReviewWorkspace({ decision: d, onClose, onOpenDecision, defaultPage = 1 }: Props) {
   const { decisions, approve, reject, delegateToAan, snooze } = useActionsStore();
-  const [tab, setTab] = useState<Tab>("decide");
+  const [page, setPage] = useState<number>(defaultPage);
+  const [discuss, setDiscuss] = useState(false);
 
-  const relationships = useMemo(() => (d ? relationshipsFor(d, decisions) : []), [d, decisions]);
-  const relatedById = useMemo(() => new Map(decisions.map((x) => [x.id, x] as const)), [decisions]);
-  const previousOutcomes = useMemo(() => {
-    if (!d) return [] as Decision[];
-    return decisions
-      .filter(
-        (x) =>
-          x.id !== d.id &&
-          x.domain === d.domain &&
-          (x.status === "completed" || x.status === "in_flight"),
-      )
-      .slice(0, 3);
-  }, [d, decisions]);
+  const strategies = useMemo(() => (d ? strategiesFor(d) : []), [d]);
+  const [selectedStrategyId, setSelectedStrategyId] = useState<string>("");
 
-  if (!d) {
-    return (
-      <div className="flex-1 min-h-0 flex items-center justify-center border border-dashed border-border rounded-lg bg-card/50">
-        <p className="text-[13.5px] text-muted-foreground">Pick a decision on the left to review.</p>
-      </div>
-    );
-  }
+  // When the decision changes: reset carousel to defaultPage and re-pick the
+  // recommended strategy.
+  useEffect(() => {
+    if (!d) return;
+    setPage(defaultPage);
+    const recommended = strategies.find((s) => s.recommended) || strategies[0];
+    if (recommended) setSelectedStrategyId(recommended.id);
+  }, [d?.id, defaultPage, strategies]);
 
-  const lc = lifecycleFor(d);
-  const isTerminal = lc === "completed_today" || lc === "history";
-  const isCompleted = d.status === "completed" || d.status === "in_flight" || d.status === "rejected";
-  const parts = recommendationFor(d);
-  const alts = alternativesFor(d);
+  // Keyboard nav between carousel pages.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!d) return;
+      if (e.target && (e.target as HTMLElement).tagName === "INPUT") return;
+      if (e.key === "ArrowLeft") setPage((p) => Math.max(0, p - 1));
+      else if (e.key === "ArrowRight") setPage((p) => Math.min(2, p + 1));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [d]);
+
+  if (!d) return null;
+
+  const pill = sourcePillFor(d);
+  const isTerminal = d.status === "completed" || d.status === "rejected";
+  const isRunning = d.status === "in_flight" || d.status === "with_aan";
+  const selectedStrategy = strategies.find((s) => s.id === selectedStrategyId);
+
+  const onExecute = () => {
+    if (!selectedStrategy) return;
+    // Wait \u2192 snooze, Aan \u2192 delegate, else \u2192 approve.
+    if (selectedStrategy.id.endsWith(":wait")) snooze(d.id, "tomorrow");
+    else if (selectedStrategy.id.endsWith(":aan")) delegateToAan(d.id);
+    else approve(d.id);
+  };
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 rounded-lg border border-border bg-card overflow-hidden">
+    <div className="flex flex-col flex-1 min-h-0 rounded-xl border border-border/70 bg-card overflow-hidden shadow-[0_1px_0_hsl(var(--border)/0.5),0_30px_60px_-30px_hsl(var(--primary)/0.25)]">
       {/* Header */}
-      <header className="px-5 pt-4 pb-3 border-b border-border">
-        <div className="flex items-start gap-3">
+      <header className="relative px-5 pt-4 pb-3 border-b border-border">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-primary/[0.04] to-transparent" />
+        <div className="relative flex items-start gap-3">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5">
-              <span>{d.domain}</span>
-              <span className="text-border">·</span>
-              <span>{d.sourceRef.label}</span>
-              <span className="text-border">·</span>
-              <span className="text-primary">{LIFECYCLE_LABEL[lc]}</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={cn(
+                "inline-flex items-center gap-1.5 h-6 px-2 rounded-full border text-[11px] font-medium",
+                PILL_TONE_CLASS[pill.tone],
+              )}>
+                <pill.Icon size={12} /> {pill.label}
+              </span>
+              <span className="text-[11px] text-muted-foreground uppercase tracking-widest">
+                {d.domain}
+              </span>
+              {isRunning && (
+                <span className="inline-flex items-center gap-1 h-6 px-2 rounded-full border border-primary/25 bg-primary/5 text-[11px] text-primary">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60 animate-ping" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+                  </span>
+                  Running
+                </span>
+              )}
             </div>
-            <h2 className="font-heading text-[18px] font-semibold text-foreground leading-snug">
+            <h2 className="mt-2 font-heading text-[18px] font-semibold text-foreground leading-snug tracking-tight line-clamp-2">
               {d.insight}
             </h2>
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <ImpactChip decision={d} />
-              <ConfidenceChip decision={d} />
-              <IfIgnoredChip decision={d} />
-            </div>
           </div>
           <button
             onClick={onClose}
@@ -102,173 +112,87 @@ export function ReviewWorkspace({ decision: d, onClose, onDiscussAan, onOpenDeci
           </button>
         </div>
 
-        {/* Tabs */}
-        <div role="tablist" className="mt-3 flex items-center gap-1 border-b border-transparent -mb-3">
-          {(["decide", "replay", "compare", "audit"] as Tab[]).map((k) => {
-            const active = tab === k;
-            const disabled = k === "replay" && !isCompleted;
-            return (
-              <button
-                key={k}
-                role="tab"
-                aria-selected={active}
-                disabled={disabled}
-                onClick={() => setTab(k)}
-                className={cn(
-                  "h-8 px-3 text-[12.5px] rounded-t-md capitalize transition-colors",
-                  active
-                    ? "text-foreground border-b-2 border-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground",
-                  disabled && "opacity-40 cursor-not-allowed",
-                )}
-              >
-                {k}
-              </button>
-            );
-          })}
+        {/* Carousel indicator */}
+        <div className="mt-3 flex items-center justify-between">
+          <button
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="h-7 w-7 rounded-md hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground flex items-center justify-center"
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+          </button>
+          <PageIndicator count={3} value={page} onChange={setPage} labels={PAGE_LABELS} />
+          <button
+            onClick={() => setPage((p) => Math.min(2, p + 1))}
+            disabled={page === 2}
+            className="h-7 w-7 rounded-md hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground flex items-center justify-center"
+            aria-label="Next page"
+          >
+            <ChevronRight className="h-3.5 w-3.5" />
+          </button>
         </div>
       </header>
 
-      {/* Body */}
+      {/* Body \u2014 sliding pages */}
       <ScrollArea className="flex-1 min-h-0">
-        <div className="px-5 py-4 space-y-5">
-          {tab === "decide" && (
-            <>
-              <Block eyebrow="Why this matters">
-                {d.insightDetail || d.valueBasis || "This decision affects revenue trajectory over the next reporting window."}
-              </Block>
-
-              <section>
-                <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5">
-                  Recommendation
-                </div>
-                <RecommendationBlock parts={parts} />
-              </section>
-
-              {alts.length > 0 && (
-                <section>
-                  <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5">
-                    Alternative actions
-                  </div>
-                  <AlternativeBlock
-                    alternatives={alts}
-                    onPick={(key) => {
-                      if (key === "snooze") snooze(d.id, "tomorrow");
-                      else if (key === "delegate") delegateToAan(d.id);
-                      else if (key === "reject") reject(d.id);
-                    }}
-                  />
-                </section>
-              )}
-
-              {d.valueInputs && d.valueInputs.length > 0 && (
-                <Block eyebrow="Evidence">
-                  <ul className="space-y-1.5">
-                    {d.valueInputs.map((line, i) => (
-                      <li key={i} className="flex gap-2 text-[12.5px] text-muted-foreground">
-                        <SourceGlyph source={d.source} refLabel={d.sourceRef.label} size={12} />
-                        <span>{line}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </Block>
-              )}
-
-              {relationships.length > 0 && (
-                <section>
-                  <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5">
-                    Related decisions
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {relationships.map((r) => {
-                      const other = relatedById.get(r.otherId);
-                      if (!other) return null;
-                      return (
-                        <RelatedDecisionChip
-                          key={r.otherId + r.type}
-                          decision={other}
-                          type={r.type}
-                          onOpen={(id) => onOpenDecision?.(id)}
-                        />
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
-
-              {previousOutcomes.length > 0 && (
-                <section>
-                  <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5">
-                    Previous outcomes
-                  </div>
-                  <ul className="space-y-1.5">
-                    {previousOutcomes.map((p) => (
-                      <li key={p.id} className="text-[12.5px] text-muted-foreground">
-                        <span className="text-foreground/85">Last time</span>
-                        {" · "}
-                        {p.status === "rejected" ? "you rejected" : "you approved"}
-                        {" · "}
-                        {p.insight.slice(0, 90)}
-                        {p.insight.length > 90 ? "…" : ""}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-
-              <AuditTrail decision={d} />
-            </>
+        <div className="px-5 py-5">
+          {page === 0 && <SummaryPage decision={d} />}
+          {page === 1 && (
+            <DetailsPage
+              decision={d}
+              all={decisions}
+              onOpenDecision={(id) => onOpenDecision?.(id)}
+              onStrategyChange={(s: Strategy) => setSelectedStrategyId(s.id)}
+            />
           )}
-
-          {tab === "replay" && isCompleted && <ReplayView decision={d} />}
-          {tab === "replay" && !isCompleted && (
-            <div className="text-[13px] text-muted-foreground py-8">
-              Replay opens once this decision has been resolved. It will show the original recommendation, your action, and the final outcome.
-            </div>
-          )}
-
-          {tab === "compare" && <CompareView subject={d} all={decisions} />}
-
-          {tab === "audit" && <AuditTrail decision={d} defaultOpen />}
+          {page === 2 && <MetricsPage decision={d} />}
         </div>
       </ScrollArea>
 
-      {/* Footer — actions */}
-      {tab === "decide" && (
-        <footer className="border-t border-border p-3 flex flex-wrap items-center gap-2">
-          {isTerminal ? (
-            <span className="text-[12.5px] text-muted-foreground px-1">This decision is closed.</span>
-          ) : (
-            <>
-              <Button size="sm" onClick={() => approve(d.id)} className="h-8 text-[12.5px] gap-1.5">
-                <Check className="h-3.5 w-3.5" /> Approve
+      {/* Footer */}
+      <footer className="border-t border-border p-3 flex flex-wrap items-center gap-2 bg-gradient-to-t from-muted/20 to-transparent">
+        {isTerminal ? (
+          <span className="text-[12.5px] text-muted-foreground px-1">This decision is closed.</span>
+        ) : (
+          <>
+            <Button size="sm" onClick={onExecute} className="h-9 px-3 text-[13px] gap-1.5 font-medium">
+              <Check className="h-3.5 w-3.5" />
+              Execute Selected Strategy
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setDiscuss(true)} className="h-9 text-[12.5px] gap-1.5">
+              <Sparkles className="h-3.5 w-3.5" /> Modify
+            </Button>
+            <AssignMenu
+              onAssign={(_key, label) => {
+                if (label === "Aan") delegateToAan(d.id);
+                else toast.success(`Assigned to ${label}.`);
+              }}
+            />
+            <Button size="sm" variant="ghost" onClick={() => reject(d.id)} className="h-9 text-[12.5px] gap-1.5">
+              <Ban className="h-3.5 w-3.5" /> Reject
+            </Button>
+            <div className="ml-auto flex items-center gap-1">
+              <Button size="sm" variant="ghost" onClick={() => snooze(d.id, "tomorrow")} className="h-8 text-[12px] gap-1.5">
+                <Clock className="h-3.5 w-3.5" /> Snooze
               </Button>
-              <Button size="sm" variant="outline" onClick={() => onDiscussAan(d.id)} className="h-8 text-[12.5px] gap-1.5">
-                <Sparkles className="h-3.5 w-3.5" /> Modify
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  navigator.clipboard?.writeText(window.location.href + "#" + d.id);
+                  toast.success("Link copied.");
+                }}
+                className="h-8 text-[12px] gap-1.5"
+              >
+                <Share2 className="h-3.5 w-3.5" /> Share
               </Button>
-              <Button size="sm" variant="outline" onClick={() => reject(d.id)} className="h-8 text-[12.5px] gap-1.5">
-                <Ban className="h-3.5 w-3.5" /> Reject
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => delegateToAan(d.id)} className="h-8 text-[12.5px] gap-1.5">
-                <Reply className="h-3.5 w-3.5" /> Delegate
-              </Button>
-              <div className="ml-auto flex items-center gap-2">
-                <Button size="sm" variant="ghost" className="h-8 text-[12.5px] gap-1.5" disabled>
-                  <UserPlus className="h-3.5 w-3.5" /> Assign
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => snooze(d.id, "tomorrow")}
-                  className="h-8 text-[12.5px] gap-1.5"
-                >
-                  <Clock className="h-3.5 w-3.5" /> Snooze
-                </Button>
-              </div>
-            </>
-          )}
-        </footer>
-      )}
+            </div>
+          </>
+        )}
+      </footer>
+
+      <DiscussDrawer decision={d} open={discuss} onOpenChange={setDiscuss} />
     </div>
   );
 }

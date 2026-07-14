@@ -1,5 +1,4 @@
-import { Search, SlidersHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { ALERT_TABS, type AlertTabKey } from "./tabs";
@@ -21,8 +20,8 @@ interface Props {
 
 export function AlertsToolbar(p: Props) {
   return (
-    <div className="mb-3 flex flex-wrap items-center gap-2">
-      <nav role="tablist" aria-label="Registers" className="flex items-center gap-1">
+    <div className="mb-4 flex flex-wrap items-center gap-2">
+      <nav role="tablist" aria-label="Alerts tabs" className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-border/50">
         {ALERT_TABS.map((t) => {
           const active = p.tab === t.key;
           const c = p.counts[t.key];
@@ -33,17 +32,17 @@ export function AlertsToolbar(p: Props) {
               aria-selected={active}
               onClick={() => p.onTabChange(t.key)}
               className={cn(
-                "h-8 px-3 rounded-md text-[13px] transition-colors flex items-center gap-1.5",
+                "h-8 px-3 rounded-md text-[13px] transition-all flex items-center gap-1.5",
                 active
-                  ? "bg-foreground text-background font-medium"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                  ? "bg-background text-foreground shadow-sm font-medium"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {t.label}
               {c > 0 && (
                 <span className={cn(
                   "text-[11px] font-semibold px-1.5 rounded-full leading-[18px] min-w-[18px] text-center tabular-nums",
-                  active ? "bg-background/20" : "bg-muted-foreground/15",
+                  active ? "bg-primary/12 text-primary" : "bg-muted-foreground/15 text-muted-foreground",
                 )}>
                   {c}
                 </span>

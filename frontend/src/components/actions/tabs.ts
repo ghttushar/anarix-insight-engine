@@ -1,30 +1,46 @@
-// Register tabs — collapsed to Needs Me / Watching / Everything.
-// Old keys are mapped internally so nothing else in the store breaks.
+// New Alerts tabs — All / From Meetings / FYI / Done.
+// "Watching" is removed as a user-facing concept.
 import type { Decision } from "@/data/mockDecisions";
-import { lifecycleFor } from "@/lib/decisions/lifecycle";
 
-export type AlertTabKey = "needs_me" | "watching" | "everything";
+export type AlertTabKey = "all" | "meetings" | "fyi" | "done";
 
 export const ALERT_TABS: { key: AlertTabKey; label: string }[] = [
-  { key: "needs_me", label: "Needs Me" },
-  { key: "watching", label: "Watching" },
-  { key: "everything", label: "Everything" },
+  { key: "all", label: "All" },
+  { key: "meetings", label: "From Meetings" },
+  { key: "fyi", label: "FYI" },
+  { key: "done", label: "Done" },
 ];
 
+function isDone(d: Decision): boolean {
+  return (
+    d.status === "completed" ||
+    d.status === "rejected" ||
+    d.status === "in_flight" ||
+    d.status === "with_aan"
+  );
+}
+
+function isFyi(d: Decision): boolean {
+  return d.severity === "fyi" && d.status === "open";
+}
+
+function isMeeting(d: Decision): boolean {
+  return !!d.meetingRef;
+}
+
 export function filterByTab(all: Decision[], tab: AlertTabKey): Decision[] {
-  if (tab === "everything") return all;
-  return all.filter((d) => {
-    const lc = lifecycleFor(d);
-    if (tab === "needs_me") return lc === "needs_me" || lc === "needs_review";
-    if (tab === "watching") return lc === "watching" || lc === "aan_working";
-    return true;
-  });
+  if (tab === "done") return all.filter(isDone);
+  if (tab === "meetings") return all.filter((d) => isMeeting(d) && !isDone(d));
+  if (tab === "fyi") return all.filter(isFyi);
+  // "all" == every active (non-done) decision — including FYIs so nothing hides.
+  return all.filter((d) => !isDone(d));
 }
 
 export function computeTabCounts(all: Decision[]): Record<AlertTabKey, number> {
   return {
-    needs_me: filterByTab(all, "needs_me").length,
-    watching: filterByTab(all, "watching").length,
-    everything: all.length,
+    all: filterByTab(all, "all").length,
+    meetings: filterByTab(all, "meetings").length,
+    fyi: filterByTab(all, "fyi").length,
+    done: filterByTab(all, "done").length,
   };
 }
