@@ -1,138 +1,130 @@
+## Reality check
 
-# Living OS — Re-authoring around the PDF philosophy
+The prior turn *claimed* to ship the Decision OS but only the plan doc was written. `src/pages/Alerts.tsx` is still the old AanMascot + ViewSwitcher + GridCard + AlertDetailPanel page. `GreetingHeader`, `QueueSection`, `ReviewWorkspace`, `chips/*`, `groupSituations` — none exist on disk. This pass actually builds it.
 
-We keep every capability that the duplicated Aan Alerts system already provides (decisions, approvals, meetings, bundles, questions, undo, keyboard shortcuts, bulk, search/filter/sort). Nothing gets deleted. We change the *interaction model* around it so it stops feeling like "Alerts, restyled" and starts feeling like an operating layer that is already running the business.
+## Scope
 
-All work stays inside `src/livingos/`. No Anarix files change.
+Everything lives in `src/pages/Alerts.tsx`, `src/state/actionsStore.tsx`, `src/components/actions/**`, `src/lib/decisions/**`, `src/index.css`. No new routes, no backend, no new mock files, no Living OS edits, no sidebar/website/mobile changes. `/alerts/:viewMode` still resolves; `viewMode` is ignored.
 
----
+## 1. Lifecycle model (store)
 
-## North star (from the PDF)
+Add to `actionsStore.tsx`:
+- `Lifecycle = "needs_me" | "reviewing" | "approved" | "undo_window" | "executing" | "waiting" | "delegated" | "snoozed" | "rejected" | "completed" | "archived" | "history"`
+- Derive `lifecycle` per decision from existing `status` + `updatedAt` + snooze/delegate flags
+- `transition(id, next)` — writes lifecycle + timestamp, drives auto-move between queue sections
+- Selectors: `needsMe`, `needsReview`, `watching`, `aanWorking`, `completedToday`, `historical`, `groupBySituation`, `lastOutcomeFor(id)`, `relationsFor(id)`
+- `savedViews`, `watchlist`, `pinned`, `density`, `notificationRules` persisted to `sessionStorage`
+- Priority is separate from importance: `priority: "critical"|"high"|"medium"|"low"|"background"` derived from severity × valueCents × deadline
+- Confidence relabeled `firm | soft | watching` (+ numeric % kept internally)
 
-- Home answers *"What deserves my judgment?"* not *"What do you want to ask?"*
-- Money-first, then reason, then evidence, then action.
-- Standing is the **state**, not the interface. The interface is Inbox + Workspace + Tools + Actions + Memory.
-- The user supervises. Aan works. Everything is explainable and reversible.
-- One measurable metric: **time to confident decision**.
+## 2. Page structure — new Alerts.tsx
 
-## The seven layers we build toward
-
-```text
-1  Ambient Strip     Standing sentence, time, search, avatar, running-agents pulse
-2  Standing panel    "You're standing well" + counts (proposals / agents / opportunities)
-3  Operational Inbox Requires judgment · Requires review · AI waiting · Cooling · Running · Completed · Watching
-4  Workspace         One fluid surface. Selecting an inbox item expands it here in place.
-5  Tools             Inspect · Compare · Replay · Simulate · Present · Share · Watch · Bookmark
-6  Actions           Approve · Modify · Reject · Delegate · Undo (with cooling window)
-7  Memory / Context  Timeline, related domains, evidence chain, prior decisions
+```
+GreetingHeader (name, "3 need your judgment · 24 handled automatically")
+AlertsToolbar  (3 tabs · Search · ⌘K · Density · More filters ▾ · Saved Views)
+BulkBar/SelectionToolbar (only when selection.size > 0)
+┌── ≥1200px ────────────────────────────────────────┐
+│ 34% QueueColumn         │ 66% ReviewWorkspace     │
+│  QueueSection Needs You │  (in-page, not sheet)   │
+│  QueueSection Needs Review                        │
+│  QueueSection Watching (collapsed)                │
+│  QueueSection Aan Working (collapsed)             │
+│  QueueSection Completed Today (collapsed)         │
+│  QueueSection History (link)                      │
+└───────────────────────────────────────────────────┘
+900–1199px: single column, Review = 520px overlay
+<900px: Review = full-screen sheet
 ```
 
-Constellation of Domains is **demoted** to a "Spatial view" tool, not the home.
+State persisted to `sessionStorage`: tab, query, density, section expansion, selected id, saved view, watchlist, pinned.
 
----
+## 3. Situation grouping (`src/lib/decisions/groupSituations.ts`)
 
-## Phase 1 — Shell + Home + Inbox (usable product)
+Merge decisions when any match: `campaign · sku · product · supplier · meeting · domain · marketplace · rootCause` (derived from `domain` + normalized `sourceRef.label` + 4h time bucket). Duplicates never appear standalone. Groups >7 render a `Show N more` tail. Needs You is never truncated.
 
-Goal: opening `/livingos` immediately answers *what changed, what needs me, what is already handled, what can I do*.
+## 4. Card model (StackRow rewrite)
 
-### 1.1 Ambient Strip (rebuild)
-Top 48px band. Contents, left→right:
-- Day + short standing sentence, generated from current decisions (e.g. *"Tuesday · You're standing well. Advertising needs one decision. Inventory recovered overnight."*).
-- Middle: `RunningAgents` pulse — 3–6 tiny dots with labels on hover (*"Watching Buy Box", "Reading meeting", "Preparing QBR"*). Sourced from open decisions + meetings.
-- Right: `⌘K` search hint, avatar.
+Single CTA `Review →`. Body = title (natural language, one sentence) + supporting line ≤12 words + three chips: `ImpactChip · ConfidenceChip · IfIgnoredChip`. Card states: default · hover · selected · keyboard-focused · expanded · loading · processing · completed · undo-available · disabled — all animated ≤200ms.
 
-No numbers, no charts, no chrome. Text only.
+Hover quick actions (right-aligned on hover only): Approve · Reject · Delegate · Archive — no Review open needed.
 
-### 1.2 Standing panel (new, replaces empty canvas)
-Directly under the strip, a single quiet block:
-- One-line standing verdict.
-- A row of muted counts derived from `actionsStore`: *N need judgment · N in cooling · N running · N settled today · $X protected · $Y at risk*.
-- No cards. Editorial spacing, Fraunces headline, Plex Sans body.
+Universal overflow menu on every card: Open · Copy Link · Watch · Pin · Share · Archive · Replay · Compare · Audit.
 
-### 1.3 Operational Inbox (replaces current Registers/tabs)
-Same data as today, re-grouped by **operational state**, not by source category:
-- Requires judgment (open, actionable, non-fyi)
-- Requires review (fyi + questions)
-- AI waiting / cooling (in_flight + cooling window)
-- Running (custom actions set)
-- Settled today (completed, rejected — collapsed by default)
-- Watching (meetings + bundles)
+## 5. Review Workspace (`review/ReviewWorkspace.tsx`)
 
-Rendering: reuse `StackRow` / `GridCard` verbatim; only the tab layer + counts change. Money value stays the leading token per row. Tabs become quiet register labels, not pill buttons.
+Replaces `AlertDetailPanel`. Sections top-to-bottom:
 
-### 1.4 Workspace in place (replaces right-side `AlertDetailPanel`)
-Selecting a row no longer opens a right sheet. It expands the row into a **workspace block** that pushes the list down. Inside the block:
-- Narrative (`ExpandedAlertBody` reused).
-- Evidence chain, source, related decisions.
-- Action rail (Approve · Modify · Reject · Delegate · Simulate · Compare) with the 12s cooling window we already have.
-- Close returns to the inbox without losing scroll.
+1. `DecisionHeader` — title · situation · owner · lifecycle chip
+2. `WhyThisMatters`
+3. `RecommendationBlock` — Summary · Reason · Impact · Tradeoff · Risk · Undoability · Confidence
+4. `AlternativeBlock` — compressed list, each with same structure
+5. Impact · IfIgnored · Confidence chips row
+6. `EvidenceRow[]` (collapsed by default)
+7. `RelatedDecisionChip[]` — typed relationships: blocks · depends_on · duplicates · merged_into · caused_by · related
+8. Previous Outcomes (`lastOutcomeFor`)
+9. `DecisionTimeline` — multi-step progress (Approve → Waiting → Confirm → Executing → Completed)
+10. `AuditTrail` — collapsed strip: who · when · why · previous → new · source · AI involvement
+11. `ReviewFooter` — Approve ▾ · Modify · Reject · Delegate · Assign · Snooze · overflow (Watch · Pin · Share · Replay · Compare)
 
-The right sheet is kept only for `Ask Aan` invoked from `⌥Space`.
+Approve → 30s `UndoBanner` in footer → auto-transition to `executing`.
 
-### 1.5 Universal Command (`⌘K`)
-Centered palette. Natural-language input plus grouped results: Domains · Proposals · Memory · Signals · People. Phase 1 delivers the palette shell + local search across current decisions/meetings/questions and view/sort/filter commands. LLM routing is out of scope for phase 1.
+Tabs inside workspace: **Decide · Replay · Compare · Audit** (Replay/Compare/Audit read-only, Replay only for completed).
 
-### 1.6 Context Dock (bottom, 72px)
-Persistent dock:
-- Recently opened decisions/meetings
-- Pinned items (bookmark from row menu)
-- Running agents (mirrors ambient strip, expanded)
-- Notifications become **state changes** here, not toasts.
+## 6. Toolbar (`AlertsToolbar` rewrite)
 
-### 1.7 Cleanups inside `src/livingos/`
-- Remove Anarix-styled taskbar/date-picker leftovers in `AlertsToolbar` (already partially done).
-- `EmptyState` uses Fraunces/Plex, no Sparkles.
-- Drop `Aan: Assisted` badge, "Last synced" chip, mascot header — the Standing sentence is the identity.
-- Keep `actionsStore`, `selectionStore`, keyboard shortcuts, undo, mock data files untouched.
+Tabs: `Needs Me · Watching · Everything` (map old keys internally so store stays intact). Add: universal Search, ⌘K palette, `DensityToggle`, `SavedViewsMenu` (Finance · Marketing · Inventory · My Team · High Impact · Awaiting Approval), `More filters ▾` opens extended `FilterSheet` (Marketplace · Team · Owner · Revenue Impact · Risk · Confidence · Automation Status · Date · Meeting · Campaign · Product · Domain). Remove ViewSwitcher, ViewModeToggle, SortMenu, severity dots, raw timestamps, marketplace/category badge stack. Sort is fixed importance: `revenue*4 + deadline + risk + waitingOnYou*2 + info`. Times bucket to Now/Today/Yesterday/Earlier/Scheduled/Waiting/Paused/Expired/Recurring.
 
----
+## 7. Keyboard model (extend `useDecideKeyboard`)
 
-## Phase 2 — Domains, Tools, Memory, Delegation
+`J/K` next/prev · `Enter` open Review · `Esc` close · `Space` select · `Shift+Space` range · `A` approve · `M` modify · `R` reject · `D` delegate · `S` snooze · `/` or `⌘K` search. `KeyboardHelpOverlay` updated.
 
-Goal: turn the inbox item into a real operating object with the universal behaviors the PDF requires.
+## 8. States
 
-### 2.1 Domain surface
-Each decision belongs to a Domain (Advertising / Inventory / Cash / Customers / Operations). Derive from `decision.domain` field already present in mock data. Domain view is a full-workspace mode reachable from any row or `⌘K`:
-- Top: Standing for that domain (one sentence + counts).
-- Body: proposal list, running actions, running agents, evidence.
-- Right rail (integrated, no sidebar chrome): Relationships, Delegations, Recent memory.
+- **Empty** — one-sentence variants: no decisions · nothing needs review · nothing watching · search empty · no permissions · workspace disconnected · offline. No illustrations.
+- **Loading** — skeletons at queue · situation · workspace · search · evidence · recommendation. Spinners only inside a committing button.
+- **Error** — inline recovery card with next action for: Amazon unavailable · Meeting unavailable · Slack disconnected · connector timeout · permission denied · decision already resolved (`ConflictBanner`) · network failure. No raw strings.
 
-### 2.2 Tools bar (universal, inside any Domain / open item)
-Row of quiet verbs: **Inspect · Compare · Replay · Simulate · Present · Share · Watch · Bookmark**. Implemented as small overlays over the workspace:
-- **Replay**: dissolve current state, step through prior versions of the same domain/decision using `actionsStore` history.
-- **Compare**: pick two decisions or two moments; workspace splits adaptively.
-- **Simulate**: renders projected Standing + tradeoffs; nothing executes.
-- **Present**: read-only, typography scaled up, chrome hidden.
-- **Inspect**: click any value/sentence → opens reasoning inline (no navigation).
-- **Watch / Bookmark / Share**: persistent flags on the decision.
+## 9. Motion (`src/index.css` + `framer-motion` already present)
 
-### 2.3 Proposal object (upgrade of current row action)
-Every actionable decision is a Proposal supporting: Accept · Modify · Reject · Simulate · Explain · Compare Alternatives · Delegate · Cooling · Undo. Rebuild `ActionChoiceRow` into a `ProposalRail` component used both inline and inside Domain view.
+120–240ms `cubic-bezier(0.2,0,0,1)` for: queue reorder (`layout`) · section expand/collapse · review open/close · approval commit · undo rewind · completion slide · watching pulse (opacity) · Aan execution shimmer (one pass) · history archive slide-out. `prefers-reduced-motion` respected.
 
-### 2.4 Memory / Timeline
-`DomainTimeline` component driven by decision + meeting history. Not always visible; opens via Replay tool or `⌘K → "history of …"`. Vertical list of past decisions, meetings, executions, learnings.
+## 10. Search
 
-### 2.5 Delegation face
-"Flip" on a Domain/Proposal: front = business, back = delegation rules, authority, confidence, history, undo. Persists to `actionsStore`.
+Universal input searches decisions · situations · meetings · questions · campaigns · products · SKUs · keywords · people · teams from existing mock files. Ranked by relevance × recency. `SearchResultCard` per hit. Local only.
 
-### 2.6 Constellation (demoted)
-Small "Spatial view" tool inside the Tools bar. Not the home. Purely visual — grouped domains + gravity between related ones. Read-only.
+## 11. Bulk mode
 
-### 2.7 Motion & language rules (enforced project-wide inside `[data-livingos]`)
-- Motion only communicates thinking, working, confidence. No decorative animation.
-- 120–240ms max. Fade + subtle translate/scale. No bounce, parallax, or persistent glow (except one Aan breathing dot in the strip).
-- Copy tone: authored, terse, first-person from Aan when explaining. Never marketing.
+`SelectionToolbar` (extends BulkBar) — Next · Prev · Approve Similar · Skip · Delegate · Archive · Review Individually. Only visible when selection.size > 0. `Smart Suggestions` banner: after 30 repeat approvals surface "Delegate these to Aan".
 
----
+## 12. Reusable primitives (all created under `src/components/actions/`)
 
-## Explicitly not doing
+`chips/`: `ImpactChip · ConfidenceChip · IfIgnoredChip · LivingStatusChip · OutcomeBadge · KeyboardShortcutBadge`
+`review/`: `ReviewWorkspace · DecisionHeader · SituationHeader · RecommendationBlock · AlternativeBlock · EvidenceRow · RelatedDecisionChip · SimilarDecisionRow · LearningBanner · ConflictBanner · UndoBanner · DecisionTimeline · ReviewFooter · AuditTrail · ReplayView · CompareView`
+`queue/`: `GreetingHeader · QueueSection · QueueCounter · SectionCounter · SituationRow · SavedViewsMenu · DensityToggle · SelectionToolbar · SearchResultCard`
 
-- No new pages in `src/pages/`; single `/livingos` route stays.
-- No changes to Anarix Alerts, sidebar entry text, or any file outside `src/livingos/` and `src/pages/livingos/`.
-- No new mock data; derive everything from existing `mockDecisions/mockMeetings/mockQuestions`.
-- No backend, no AI calls in phase 1. `⌘K` search is local. LLM standing-sentence generation is deferred.
+Locked component rules: chip 24px, button 32px (compact) / 40px (comfortable), row 48px/64px, radius 6/8, focus ring 2px `--ring`.
 
-## Deliverable checkpoints
+## 13. Design tokens (`src/index.css`)
 
-- **End of Phase 1**: open `/livingos` → strip + standing + operational inbox + inline workspace expand + `⌘K` + context dock, all working over existing store.
-- **End of Phase 2**: any inbox item can be opened as a Domain with the full Tools bar, Proposal rail, Replay, Compare, Simulate, Delegation face, Memory timeline.
+Add token scales: `--space-{1..8}`, `--radius-{sm,md,lg}`, `--elev-{1,2,3}`, `--border-{hair,solid}`, `--motion-{fast,base,slow}`, `--opacity-{muted,disabled}`, `--blur-{soft}`, `--shadow-{card,pop}`, `--icon-{sm,md,lg}`, typography scale (Page/Section/Situation/DecisionTitle/Supporting/Meta/Evidence/System).
+
+## 14. Files
+
+**Edit**: `src/pages/Alerts.tsx` (full rewrite) · `src/state/actionsStore.tsx` (lifecycle + selectors + savedViews/watchlist/pinned/density) · `src/components/actions/AlertsToolbar.tsx` · `src/components/actions/tabs.ts` · `src/components/actions/StackRow.tsx` · `src/components/actions/ExpandedAlertBody.tsx` · `src/components/actions/ActionChoiceRow.tsx` → ReviewFooter host · `src/components/actions/FilterSheet.tsx` (extended filters) · `src/components/actions/BulkBar.tsx` → `SelectionToolbar` · `src/components/actions/EmptyState.tsx` (variants, no art) · `src/components/actions/KeyboardHelpOverlay.tsx` · `src/components/actions/useDecideKeyboard.ts` · `src/lib/decisions/valueFormat.ts` (add `formatImpact · formatIfIgnored · formatConfidence · livingStatusPhrase · bucketTime · priorityFor · confidenceLabel`) · `src/index.css` (tokens + motion).
+
+**Create**: all primitives above + `src/lib/decisions/groupSituations.ts` + `src/lib/decisions/relationships.ts` + `src/lib/decisions/importance.ts` + `src/lib/decisions/search.ts` + `src/hooks/useLivingClock.ts` + `src/hooks/useAiSummary.ts`.
+
+**Delete**: `src/components/actions/ViewSwitcher.tsx` · `src/components/actions/ViewModeToggle.tsx` · `src/components/actions/SortMenu.tsx` · `src/components/actions/GridCard.tsx` · `src/components/actions/AlertDetailPanel.tsx` (replaced by ReviewWorkspace).
+
+## Acceptance
+
+- `/alerts` renders GreetingHeader + 3-tab toolbar + lifecycle-grouped Queue + in-page ReviewWorkspace on desktop
+- Every scan card = one CTA (`Review →`) + hover quick actions
+- Approve triggers 30s Undo, then card auto-moves Needs Me → Executing → Completed Today with animation
+- Reject → Archived → History; Delegate → Waiting → Executing
+- Situations merge duplicates; groups >7 collapse with `Show N more`; Needs You never truncated
+- Full keyboard model works with no mouse; `KeyboardHelpOverlay` lists it
+- No ViewSwitcher, SortMenu, severity dots, raw timestamps, empty-state art, GridCard, or AanMascot header remain
+- Review Workspace exposes Decide · Replay · Compare · Audit tabs
+- Saved Views, Watchlist, Pinned, Density persist across reloads
+- `prefers-reduced-motion` disables non-essential animation
