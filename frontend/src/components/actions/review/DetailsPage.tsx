@@ -17,11 +17,14 @@ interface Props {
   onStrategyChange?: (s: Strategy) => void;
 }
 
-function Block({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
+function Block({ eyebrow, children, hint }: { eyebrow: string; children: React.ReactNode; hint?: string }) {
   return (
     <section>
-      <div className="text-[10.5px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">
-        {eyebrow}
+      <div className="flex items-baseline justify-between mb-2">
+        <div className="text-[10.5px] uppercase tracking-widest font-semibold text-muted-foreground">
+          {eyebrow}
+        </div>
+        {hint && <div className="text-[10.5px] text-muted-foreground">{hint}</div>}
       </div>
       {children}
     </section>
@@ -42,10 +45,15 @@ export function DetailsPage({ decision: d, all, onOpenDecision, onStrategyChange
     if (s) onStrategyChange?.(s);
   };
 
+  const recommendedCount = strategies.filter((s) => s.recommended).length;
+  const strategyHint = `${strategies.length} option${strategies.length === 1 ? "" : "s"}${recommendedCount ? ` · ${recommendedCount} recommended` : ""}`;
+
   return (
     <div className="space-y-6">
-      <Block eyebrow="Strategy">
-        <StrategyPicker strategies={strategies} selectedId={selectedId} onSelect={handleSelect} />
+      <Block eyebrow="Choose your strategy" hint={strategyHint}>
+        <div className="rounded-xl border border-primary/25 bg-gradient-to-br from-primary/[0.06] via-transparent to-transparent p-3 shadow-[0_1px_0_hsl(var(--border)/0.5),0_20px_50px_-30px_hsl(var(--primary)/0.35)]">
+          <StrategyPicker strategies={strategies} selectedId={selectedId} onSelect={handleSelect} />
+        </div>
       </Block>
 
       <Block eyebrow="Execution plan">
