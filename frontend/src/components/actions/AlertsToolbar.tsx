@@ -58,7 +58,7 @@ export function AlertsToolbar(p: Props) {
           <Input
             value={p.query}
             onChange={(e) => p.onQueryChange(e.target.value)}
-            placeholder="Search decisions, situations, meetings…"
+            placeholder="Search signals, meetings, decisions…"
             className="h-8 w-[280px] pl-7 text-[12.5px]"
           />
         </div>

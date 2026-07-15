@@ -156,9 +156,11 @@ export function ReviewWorkspace({ decision: d, onClose, onOpenDecision, defaultP
           <span className="text-[12.5px] text-muted-foreground px-1">This decision is closed.</span>
         ) : (
           <>
-            <Button size="sm" onClick={onExecute} className="h-9 px-3 text-[13px] gap-1.5 font-medium">
-              <Check className="h-3.5 w-3.5" />
-              Execute Selected Strategy
+            <Button size="sm" onClick={onExecute} className="h-9 px-3 text-[13px] gap-1.5 font-medium max-w-[60%]">
+              <Check className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">
+                Execute{selectedStrategy ? `: ${selectedStrategy.title}` : " selected strategy"}
+              </span>
             </Button>
             <Button size="sm" variant="outline" onClick={() => setDiscuss(true)} className="h-9 text-[12.5px] gap-1.5">
               <Sparkles className="h-3.5 w-3.5" /> Modify

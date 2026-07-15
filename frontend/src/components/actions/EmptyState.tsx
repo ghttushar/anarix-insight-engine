@@ -10,13 +10,13 @@ export type EmptyVariant =
   | "offline";
 
 const COPY: Record<EmptyVariant, { title: string; cta?: string }> = {
-  none: { title: "You're clear. Aan will surface something the moment it matters." },
-  needs_me: { title: "Nothing needs your judgment right now." },
+  none: { title: "You're clear. Aan will surface a signal the moment it matters." },
+  needs_me: { title: "No signals need your judgment right now." },
   watching: { title: "Nothing on the watchlist. Aan is monitoring quietly." },
-  search: { title: "No results for that search." },
-  permissions: { title: "You don't have permission to view these decisions.", cta: "Request access" },
+  search: { title: "No signals match that search." },
+  permissions: { title: "You don't have permission to view these signals.", cta: "Request access" },
   disconnected: { title: "Workspace disconnected.", cta: "Reconnect" },
-  offline: { title: "You're offline. Reconnect to load new decisions." },
+  offline: { title: "You're offline. Reconnect to load new signals." },
 };
 
 export function EmptyState({

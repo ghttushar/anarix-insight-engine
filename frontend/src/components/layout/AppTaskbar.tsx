@@ -405,7 +405,7 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Alerts{aanPendingCount > 0 ? ` (${aanPendingCount})` : ""}</p>
+                  <p>Signals{aanPendingCount > 0 ? ` (${aanPendingCount})` : ""}</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
