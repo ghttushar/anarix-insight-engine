@@ -138,13 +138,11 @@ function AlertsInner() {
 
   return (
     <AppLayout>
-      <AppTaskbar breadcrumbItems={[{ label: "Alerts" }]} />
+      <AppTaskbar breadcrumbItems={[{ label: "Signals" }]} />
 
-      {/* Ambient background layer for the living aesthetic */}
+      {/* Ambient background — dimmed for lower visual load */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-40 -right-40 h-[560px] w-[560px] rounded-full bg-primary/[0.05] blur-[120px]" />
-        <div className="absolute top-1/3 -left-40 h-[520px] w-[520px] rounded-full bg-emerald-400/[0.04] blur-[120px]" />
-        <div className="absolute inset-0 [background-image:radial-gradient(hsl(var(--foreground)/0.03)_1px,transparent_1px)] [background-size:28px_28px] opacity-40" />
+        <div className="absolute -top-40 -right-40 h-[520px] w-[520px] rounded-full bg-primary/[0.03] blur-[140px]" />
       </div>
 
       <div className={`px-4 py-5 max-w-[1600px] mx-auto w-full ${density === "compact" ? "text-[13px]" : ""}`}>
