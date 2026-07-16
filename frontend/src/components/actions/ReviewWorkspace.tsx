@@ -493,7 +493,7 @@ export function ReviewWorkspace({ decision: d, onClose, onOpenDecision }: Props)
       </ScrollArea>
 
       {/* Footer — hidden after execute (in-body confirmation handles CTAs) */}
-      {!executed && (
+      {!executed && !inlineDraft && (
         <footer className="border-t border-border p-3 flex flex-wrap items-center gap-2 bg-gradient-to-t from-muted/20 to-transparent shrink-0 min-h-[68px]">
           {isTerminal ? (
             <span className="text-[12.5px] text-muted-foreground px-1">This decision is closed.</span>
