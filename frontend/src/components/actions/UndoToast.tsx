@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { Undo2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { CountdownRing } from "./CountdownRing";
+
 
 /**
  * Bottom-center undo pill. Listens for `action-item:undoable` CustomEvents
@@ -58,40 +56,10 @@ export function UndoToast() {
     return () => clearInterval(id);
   }, [stack.length]);
 
-  if (stack.length === 0) return null;
-
-  return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 items-center pointer-events-none">
-      {stack.map((u) => {
-        const dur = u.durationMs ?? 30_000;
-        const remaining = Math.max(0, dur - (Date.now() - u.startedAt));
-        const pct = remaining / dur;
-        const secs = Math.ceil(remaining / 1000);
-        return (
-          <div
-            key={u.id + u.startedAt}
-            className="pointer-events-auto flex items-center gap-3 rounded-full border border-border bg-card shadow-lg px-3 py-2 min-w-[280px]"
-          >
-            <CountdownRing pct={pct} secs={secs} />
-            <div className="flex-1 min-w-0 text-[12.5px] text-foreground truncate">{u.label}</div>
-            <button
-              onClick={() => {
-                u.onUndo();
-                window.dispatchEvent(new CustomEvent("action-item:undo-consumed", { detail: { id: u.id } }));
-                setStack((s) => s.filter((x) => x.id !== u.id));
-              }}
-              className={cn(
-                "shrink-0 inline-flex items-center gap-1 rounded-full border border-border bg-background text-foreground",
-                "text-[11.5px] font-medium h-7 px-2.5 hover:bg-muted transition-colors",
-              )}
-            >
-              <Undo2 className="h-3 w-3" /> Undo
-            </button>
-          </div>
-        );
-      })}
-    </div>
-  );
+  // Global 30s undo toast intentionally disabled — inline 5s undo lives on
+  // the review card itself. Kept as no-op renderer so existing mounts work.
+  void stack; void force;
+  return null;
 }
 
 /** Helper for stores/components to publish an undoable action. */

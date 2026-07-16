@@ -1,6 +1,6 @@
 // New card design: value is the visual headline. Caption — title — source pill.
 // One CTA (Review →) preserved for now. No "Firm", no "Lose …" chip.
-import { ArrowRight, MoreHorizontal, Layers } from "lucide-react";
+import { ArrowRight, MoreHorizontal, Layers, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
@@ -76,8 +76,8 @@ export function DecisionValueCard({ decision: d, selected, onSelect, grouped, on
           {d.insight}
         </div>
 
-        {/* Living status OR source pill */}
-        <div className="mt-2.5 flex items-center gap-1.5">
+        {/* Living status OR source pill + severity badge */}
+        <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
           {isAanWorking ? (
             <span className="inline-flex items-center gap-1.5 h-6 px-2 rounded-full border border-primary/25 bg-primary/5 text-[11.5px] text-primary">
               <span className="relative flex h-1.5 w-1.5">
@@ -88,6 +88,11 @@ export function DecisionValueCard({ decision: d, selected, onSelect, grouped, on
             </span>
           ) : (
             <SourcePill decision={d} />
+          )}
+          {d.severity === "critical" && (
+            <span className="inline-flex items-center gap-1 h-6 px-2 rounded-full border border-destructive/30 bg-destructive/10 text-[11px] font-semibold text-destructive uppercase tracking-wider">
+              <AlertTriangle className="h-3 w-3" /> Critical
+            </span>
           )}
         </div>
       </div>

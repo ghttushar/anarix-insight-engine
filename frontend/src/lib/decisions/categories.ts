@@ -32,7 +32,6 @@ const ALL_ORDER: string[] = [
   "Customer Service",
   "Buyer / Accounts",
   "Retail Listings",
-  "Pending This Week",
   "Automated",
 ];
 
@@ -117,10 +116,9 @@ export function categorize(tab: AlertTabKey, list: Decision[]): CategorizedGroup
       if (isAutomated(d)) add("Automated", d);
       else if (isThisWeekPending(d)) add("Pending This Week", d);
     } else {
-      // all
+      // all — signals appear only in their domain bucket (no dedupe into "Pending This Week")
       add(DOMAIN_LABEL[d.domain] || "Other", d);
       if (isAutomated(d)) add("Automated", d);
-      else if (isThisWeekPending(d)) add("Pending This Week", d);
     }
   }
 
