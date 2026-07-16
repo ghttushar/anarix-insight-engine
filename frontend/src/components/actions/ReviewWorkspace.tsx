@@ -23,6 +23,9 @@ import { formatValue } from "@/lib/decisions/valueFormat";
 import { livingStatusPhrase } from "@/lib/decisions/lifecycle";
 import { useLivingTick } from "@/hooks/useLivingClock";
 import { useAan } from "@/components/aan/AanContext";
+import { useAanPanel } from "@/contexts/AanPanelContext";
+import { InlineEmailCompose, type EmailDraft } from "./review/inline/InlineEmailCompose";
+import { InlineDraftChat } from "./review/inline/InlineDraftChat";
 import type { Decision } from "@/data/mockDecisions";
 import { toast } from "sonner";
 
