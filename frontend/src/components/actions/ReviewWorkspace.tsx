@@ -219,8 +219,14 @@ export function ReviewWorkspace({ decision: d, onClose, onOpenDecision }: Props)
       className="flex flex-col flex-1 min-h-0 rounded-xl border border-border/70 bg-card overflow-hidden shadow-[0_1px_0_hsl(var(--border)/0.5),0_30px_60px_-30px_hsl(var(--primary)/0.25)]"
     >
       {/* Header */}
-      <header className="relative px-5 pt-4 pb-3 border-b border-border shrink-0">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-primary/[0.04] to-transparent" />
+      <header className={cn(
+        "relative px-5 pt-4 pb-3 border-b border-border shrink-0 transition-shadow duration-500",
+        executed && "shadow-[inset_0_0_0_1px_hsl(var(--success)/0.35),0_0_40px_-10px_hsl(var(--success)/0.45)]",
+      )}>
+        <div className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b to-transparent",
+          executed ? "from-success/[0.10]" : "from-primary/[0.04]",
+        )} />
         <div className="relative flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -251,211 +257,198 @@ export function ReviewWorkspace({ decision: d, onClose, onOpenDecision }: Props)
       {/* Body */}
       <ScrollArea className="flex-1 min-h-0">
         <div className="px-5 py-5 space-y-6">
-          {/* Current state */}
-          <Block eyebrow="Current state">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className={cn(
-                "inline-flex items-center gap-1 h-7 px-2.5 rounded-full border text-[12px] font-medium",
-                STATE_TONE[state],
-              )}>
-                <Activity className="h-3 w-3" /> {STATE_LABEL[state]}
-              </span>
-              {isRunning && (
-                <span className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-primary/25 bg-primary/5 text-[12px] text-primary">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60 animate-ping" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+          {executed ? (
+            /* Post-execute: large centered confirmation replaces strategy picker */
+            <div className="flex flex-col items-center justify-center text-center py-10 gap-4">
+              <div
+                className="relative h-20 w-20 rounded-full flex items-center justify-center"
+                style={{ background: `conic-gradient(hsl(var(--success)) ${progressPct}%, hsl(var(--muted)) 0)` }}
+              >
+                <div className="absolute inset-[4px] rounded-full bg-card flex items-center justify-center">
+                  <Check className="h-9 w-9 text-success" />
+                </div>
+              </div>
+              <div>
+                <div className="font-heading text-[26px] font-semibold text-foreground leading-tight">
+                  Executed: {executed.strategyTitle}
+                </div>
+                <p className="mt-2 text-[14.5px] text-muted-foreground max-w-md mx-auto leading-relaxed">
+                  {executed.verifyMsg}
+                </p>
+              </div>
+              <div className="flex items-center gap-3 mt-1">
+                {executed.canUndo && (
+                  <Button variant="outline" size="sm" onClick={onUndo} className="gap-1.5">
+                    <Undo2 className="h-3.5 w-3.5" /> Undo ({countdown}s)
+                  </Button>
+                )}
+                <Button variant="ghost" size="sm" onClick={onClose} className="text-muted-foreground">
+                  Close
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Current state */}
+              <Block eyebrow="Current state">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={cn(
+                    "inline-flex items-center gap-1 h-7 px-2.5 rounded-full border text-[12px] font-medium",
+                    STATE_TONE[state],
+                  )}>
+                    <Activity className="h-3 w-3" /> {STATE_LABEL[state]}
                   </span>
-                  {livingStatusPhrase(d.domain, tick)}
-                </span>
-              )}
-            </div>
-            <p className="mt-3 text-[14px] leading-relaxed text-foreground/90">
-              {d.insightDetail || d.insight}
-            </p>
-          </Block>
-
-          {/* Why it matters */}
-          <Block eyebrow="Why it matters">
-            <div className="rounded-lg border border-border/70 bg-gradient-to-br from-card to-primary/[0.03] p-4">
-              <div className="flex items-baseline gap-3">
-                <div className="font-heading text-[26px] font-semibold text-success tabular-nums leading-none">
-                  {val.text}
+                  {isRunning && (
+                    <span className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-primary/25 bg-primary/5 text-[12px] text-primary">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-60 animate-ping" />
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+                      </span>
+                      {livingStatusPhrase(d.domain, tick)}
+                    </span>
+                  )}
                 </div>
-                <div className="text-[11.5px] text-muted-foreground">{d.valueCaption}</div>
-              </div>
-              <div className="mt-2 text-[12.5px] text-muted-foreground flex items-center gap-1.5">
-                <TrendingUp className="h-3 w-3 text-success" /> Business impact if executed as recommended
-              </div>
-            </div>
-            <p className="mt-3 text-[13px] leading-relaxed text-foreground/80">
-              {d.valueBasis || "This affects near-term revenue and needs a decision within the next 48 hours."}
-            </p>
-          </Block>
+                <p className="mt-3 text-[15px] leading-relaxed text-foreground/90">
+                  {d.insightDetail || d.insight}
+                </p>
+              </Block>
 
-          {/* Evidence */}
-          {d.valueInputs && d.valueInputs.length > 0 && (
-            <Block eyebrow="Evidence">
-              <ul className="space-y-1.5">
-                {d.valueInputs.map((line, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[13px] text-foreground/85">
-                    <SourceGlyph source={d.source} refLabel={d.sourceRef.label} size={12} />
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-            </Block>
-          )}
-
-          {/* Strategy — always visible */}
-          <Block eyebrow="Choose your strategy">
-            <div className="rounded-xl border border-primary/25 bg-gradient-to-br from-primary/[0.06] via-transparent to-transparent p-3 shadow-[0_1px_0_hsl(var(--border)/0.5),0_20px_50px_-30px_hsl(var(--primary)/0.35)]">
-              <StrategyPicker
-                strategies={strategies}
-                selectedId={selectedStrategyId}
-                onSelect={setSelectedStrategyId}
-              />
-            </div>
-          </Block>
-
-          {/* Collapsed extras */}
-          <Accordion type="multiple" className="border-t border-border/60 pt-2">
-            {relationships.length > 0 && (
-              <AccordionItem value="related" className="border-b-0">
-                <AccordionTrigger className="text-[10.5px] uppercase tracking-widest font-semibold text-muted-foreground hover:no-underline py-3">
-                  Related signals · {relationships.length}
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {relationships.map((r) => {
-                      const other = relatedById.get(r.otherId);
-                      if (!other) return null;
-                      return (
-                        <RelatedDecisionChip
-                          key={r.otherId + r.type}
-                          decision={other}
-                          type={r.type}
-                          onOpen={(id) => onOpenDecision?.(id)}
-                        />
-                      );
-                    })}
+              {/* Why it matters */}
+              <Block eyebrow="Why it matters">
+                <div className="rounded-lg border border-border/70 bg-gradient-to-br from-card to-primary/[0.03] p-4">
+                  <div className="font-heading text-[28px] font-semibold text-success tabular-nums leading-none">
+                    {val.text}
                   </div>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-            <AccordionItem value="plan" className="border-b-0">
-              <AccordionTrigger className="text-[10.5px] uppercase tracking-widest font-semibold text-muted-foreground hover:no-underline py-3">
-                Execution plan
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="pt-1">
-                  {selectedStrategy && <ExecutionPlan strategy={selectedStrategy} />}
                 </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+                <p className="mt-3 text-[14.5px] leading-relaxed text-foreground/85">
+                  {d.valueBasis || "This affects near-term revenue and needs a decision within the next 48 hours."}
+                </p>
+              </Block>
+
+              {/* Evidence */}
+              {d.valueInputs && d.valueInputs.length > 0 && (
+                <Block eyebrow="Evidence">
+                  <ul className="space-y-1.5">
+                    {d.valueInputs.map((line, i) => (
+                      <li key={i} className="flex items-start gap-2 text-[13.5px] text-foreground/85">
+                        <SourceGlyph source={d.source} refLabel={d.sourceRef.label} size={12} />
+                        <span>{line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Block>
+              )}
+
+              {/* Strategy — hidden after execute */}
+              <Block eyebrow="Choose your strategy">
+                <div className="rounded-xl border border-primary/25 bg-gradient-to-br from-primary/[0.06] via-transparent to-transparent p-3 shadow-[0_1px_0_hsl(var(--border)/0.5),0_20px_50px_-30px_hsl(var(--primary)/0.35)]">
+                  <StrategyPicker
+                    strategies={strategies}
+                    selectedId={selectedStrategyId}
+                    onSelect={setSelectedStrategyId}
+                  />
+                </div>
+              </Block>
+
+              {/* Collapsed extras */}
+              <Accordion type="multiple" className="border-t border-border/60 pt-2">
+                {relationships.length > 0 && (
+                  <AccordionItem value="related" className="border-b-0">
+                    <AccordionTrigger className="text-[10.5px] uppercase tracking-widest font-semibold text-muted-foreground hover:no-underline py-3">
+                      Related signals · {relationships.length}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {relationships.map((r) => {
+                          const other = relatedById.get(r.otherId);
+                          if (!other) return null;
+                          return (
+                            <RelatedDecisionChip
+                              key={r.otherId + r.type}
+                              decision={other}
+                              type={r.type}
+                              onOpen={(id) => onOpenDecision?.(id)}
+                            />
+                          );
+                        })}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+                <AccordionItem value="plan" className="border-b-0">
+                  <AccordionTrigger className="text-[10.5px] uppercase tracking-widest font-semibold text-muted-foreground hover:no-underline py-3">
+                    Execution plan
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="pt-1">
+                      {selectedStrategy && <ExecutionPlan strategy={selectedStrategy} />}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </>
+          )}
         </div>
       </ScrollArea>
 
-      {/* Footer */}
-      <footer className="border-t border-border p-3 flex flex-wrap items-center gap-2 bg-gradient-to-t from-muted/20 to-transparent shrink-0 min-h-[68px]">
-        {isTerminal ? (
-          <span className="text-[12.5px] text-muted-foreground px-1">This decision is closed.</span>
-        ) : executed ? (
-          // ——— Post-execute: Undo + verification message, occupies the primary action spot ———
-          <div className="w-full flex items-center gap-3 rounded-lg border border-success/30 bg-success/[0.06] px-3 py-2">
-            <div
-              className="relative shrink-0 h-9 w-9 rounded-full flex items-center justify-center"
-              style={{
-                background: `conic-gradient(hsl(var(--success)) ${progressPct}%, hsl(var(--muted)) 0)`,
-              }}
-              title={`Auto-closing in ${countdown}s`}
-            >
-              <div className="absolute inset-[3px] rounded-full bg-card flex items-center justify-center">
-                <span className="text-[12px] font-semibold tabular-nums text-foreground">{countdown}</span>
+      {/* Footer — hidden after execute (in-body confirmation handles CTAs) */}
+      {!executed && (
+        <footer className="border-t border-border p-3 flex flex-wrap items-center gap-2 bg-gradient-to-t from-muted/20 to-transparent shrink-0 min-h-[68px]">
+          {isTerminal ? (
+            <span className="text-[12.5px] text-muted-foreground px-1">This decision is closed.</span>
+          ) : (
+            <>
+              <div className="relative max-w-[60%]">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -inset-1 rounded-lg ring-2 ring-primary/40 animate-pulse"
+                />
+                <Button
+                  size="sm"
+                  onClick={onExecute}
+                  className="relative h-9 pl-3 pr-2 text-[13px] gap-1.5 font-medium w-full"
+                >
+                  <Check className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">
+                    Execute{selectedStrategy ? `: ${selectedStrategy.title}` : " selected strategy"}
+                  </span>
+                  <span className="ml-1 inline-flex items-center gap-0.5 h-5 px-1.5 rounded border border-primary-foreground/30 bg-primary-foreground/10 text-[10px] font-mono shrink-0">
+                    <CornerDownLeft className="h-2.5 w-2.5" /> Enter
+                  </span>
+                </Button>
               </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 text-[13px] font-medium text-foreground">
-                <Check className="h-3.5 w-3.5 text-success" />
-                <span className="truncate">Executed: {executed.strategyTitle}</span>
-              </div>
-              <div className="text-[12px] text-muted-foreground truncate">
-                {executed.verifyMsg}
-              </div>
-            </div>
-            {executed.canUndo ? (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={onUndo}
-                className="h-9 gap-1.5 text-[13px] shrink-0"
-              >
-                <Undo2 className="h-3.5 w-3.5" /> Undo
+              <Button size="sm" variant="ghost" onClick={() => setDiscuss(true)} className="h-9 text-[12.5px] gap-1.5 text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5" /> Modify
               </Button>
-            ) : (
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={onClose}
-                className="h-9 gap-1.5 text-[13px] shrink-0 text-muted-foreground"
-              >
-                Close
-              </Button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="relative max-w-[60%]">
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -inset-1 rounded-lg ring-2 ring-primary/40 animate-pulse"
-              />
-              <Button
-                size="sm"
-                onClick={onExecute}
-                className="relative h-9 pl-3 pr-2 text-[13px] gap-1.5 font-medium w-full"
-              >
-                <Check className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">
-                  Execute{selectedStrategy ? `: ${selectedStrategy.title}` : " selected strategy"}
-                </span>
-                <span className="ml-1 inline-flex items-center gap-0.5 h-5 px-1.5 rounded border border-primary-foreground/30 bg-primary-foreground/10 text-[10px] font-mono shrink-0">
-                  <CornerDownLeft className="h-2.5 w-2.5" /> Enter
-                </span>
-              </Button>
-            </div>
-            <Button size="sm" variant="ghost" onClick={() => setDiscuss(true)} className="h-9 text-[12.5px] gap-1.5 text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5" /> Modify
-            </Button>
-            <AssignMenu
-              onAssign={(_key, label) => {
-                if (label === "Aan") delegateToAan(d.id);
-                else toast.success(`Assigned to ${label}.`);
-              }}
-            />
-            <Button size="sm" variant="ghost" onClick={() => reject(d.id)} className="h-9 text-[12.5px] gap-1.5 text-muted-foreground">
-              <Ban className="h-3.5 w-3.5" /> Reject
-            </Button>
-            <div className="ml-auto flex items-center gap-1">
-              <Button size="sm" variant="ghost" onClick={() => snooze(d.id, "tomorrow")} className="h-8 text-[12px] gap-1.5 text-muted-foreground">
-                <Clock className="h-3.5 w-3.5" /> Snooze
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  navigator.clipboard?.writeText(window.location.href + "#" + d.id);
-                  toast.success("Link copied.");
+              <AssignMenu
+                onAssign={(_key, label) => {
+                  if (label === "Aan") delegateToAan(d.id);
+                  else toast.success(`Assigned to ${label}.`);
                 }}
-                className="h-8 text-[12px] gap-1.5 text-muted-foreground"
-              >
-                <Share2 className="h-3.5 w-3.5" /> Share
+              />
+              <Button size="sm" variant="ghost" onClick={() => reject(d.id)} className="h-9 text-[12.5px] gap-1.5 text-muted-foreground">
+                <Ban className="h-3.5 w-3.5" /> Dismiss
               </Button>
-            </div>
-          </>
-        )}
-      </footer>
+              <div className="ml-auto flex items-center gap-1">
+                <Button size="sm" variant="ghost" onClick={() => snooze(d.id, "tomorrow")} className="h-8 text-[12px] gap-1.5 text-muted-foreground">
+                  <Clock className="h-3.5 w-3.5" /> Snooze
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    navigator.clipboard?.writeText(window.location.href + "#" + d.id);
+                    toast.success("Link copied.");
+                  }}
+                  className="h-8 text-[12px] gap-1.5 text-muted-foreground"
+                >
+                  <Share2 className="h-3.5 w-3.5" /> Share
+                </Button>
+              </div>
+            </>
+          )}
+        </footer>
+      )}
 
       <DiscussDrawer decision={d} open={discuss} onOpenChange={setDiscuss} />
     </div>

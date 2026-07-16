@@ -12,7 +12,7 @@ import { ActionsProvider, useActionsStore } from "@/state/actionsStore";
 import { SelectionProvider, useSelection } from "@/state/selectionStore";
 import { EmptyState } from "@/components/actions/EmptyState";
 import { EMPTY_FILTER, type FilterState } from "@/components/actions/FilterSheet";
-import { UndoToast } from "@/components/actions/UndoToast";
+
 import { AlertsToolbar } from "@/components/actions/AlertsToolbar";
 import { BulkBar } from "@/components/actions/BulkBar";
 import { GreetingHeader } from "@/components/actions/GreetingHeader";
@@ -113,13 +113,18 @@ function AlertsInner() {
       .sort((a, b) => importanceScore(b) - importanceScore(a));
   }, [pool, filter, query]);
 
-  const categoryGroups = useMemo(() => categorize(tab, filtered), [tab, filtered]);
+  const allCategoryGroups = useMemo(() => categorize(tab, filtered), [tab, filtered]);
+  const categoryGroups = useMemo(() => {
+    if (!activeRailKey || activeRailKey === "__all__") return allCategoryGroups;
+    const only = allCategoryGroups.find((c) => c.key === activeRailKey);
+    return only ? [only] : allCategoryGroups;
+  }, [allCategoryGroups, activeRailKey]);
   const meetingGroups = useMemo(() => groupByMeeting(filtered), [filtered]);
   const isMeetingsTab = tab === "meetings";
 
   const railItems = useMemo(
-    () => categoryGroups.map((c) => ({ key: c.key, label: c.label, count: c.items.length })),
-    [categoryGroups],
+    () => allCategoryGroups.map((c) => ({ key: c.key, label: c.label, count: c.items.length })),
+    [allCategoryGroups],
   );
 
   // Auto-select the single alert when running in restricted mode so the user
@@ -131,11 +136,7 @@ function AlertsInner() {
   }, [liveMode]);
 
   const handleRailSelect = useCallback((key: string) => {
-    setActiveRailKey(key);
-    requestAnimationFrame(() => {
-      const el = sectionRefs.current.get(key);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    setActiveRailKey((prev) => (prev === key ? null : key));
   }, []);
 
   const selectedDecision = useMemo(
@@ -306,7 +307,7 @@ function AlertsInner() {
         </div>
       )}
 
-      <UndoToast />
+      
     </AppLayout>
   );
 }
