@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 export default function AanTriggersPage() {
   const { fireScenario, liveMode, setLiveMode } = useAanEvents();
   const { setDataPanel } = useActivePanel();
+  const { mode: panelMode, setMode: setPanelMode } = useAanPanel();
+
 
   const fire = (id: string) => {
     fireScenario(id);
