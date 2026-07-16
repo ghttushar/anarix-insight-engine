@@ -1,10 +1,13 @@
 {
-  "name": "root-proxy",
+  "name": "anarix",
   "private": true,
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
-    "postinstall": "cd frontend && bun install",
-    "dev": "cd frontend && bun run dev",
-    "build": "cd frontend && bun run build",
-    "build:dev": "cd frontend && bun run build:dev"
+    "dev": "bun --cwd frontend run dev",
+    "build": "bun --cwd frontend run build",
+    "build:dev": "bun --cwd frontend run build:dev",
+    "typecheck": "bun --cwd frontend x tsc -b"
   }
 }

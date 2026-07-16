@@ -1,4 +1,4 @@
 [run]
-dev = "cd frontend && bun run dev"
-build = "cd frontend && bun run build"
-"build:dev" = "cd frontend && bun run build:dev"
+dev = "bun run dev"
+build = "bun run build"
+"build:dev" = "bun run build:dev"
