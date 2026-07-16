@@ -117,7 +117,13 @@ function Block({ eyebrow, children }: { eyebrow: string; children: React.ReactNo
 export function ReviewWorkspace({ decision: d, onClose, onOpenDecision }: Props) {
   const { decisions, approve, reject, delegateToAan, snooze, rollback } = useActionsStore();
   const { openCopilot, addMessage } = useAan();
+  const { mode: panelMode } = useAanPanel();
   const [discuss, setDiscuss] = useState(false);
+  const [inlineDraft, setInlineDraft] = useState<
+    | { kind: "email"; strategyTitle: string; draft: EmailDraft }
+    | { kind: "chat"; strategyTitle: string; title: string; approveLabel: string; approveSuccess: string; draft: string }
+    | null
+  >(null);
   const tick = useLivingTick();
   const rootRef = useRef<HTMLDivElement>(null);
 
