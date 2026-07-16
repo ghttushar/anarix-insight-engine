@@ -174,7 +174,7 @@ function AlertsInner() {
     <AppLayout>
       <AppTaskbar breadcrumbItems={[{ label: "Signals" }]} />
 
-      <div className={`px-4 pt-4 pb-4 max-w-[1600px] mx-auto w-full ${density === "compact" ? "text-[13px]" : ""}`}>
+      <div className={`px-4 pt-4 pb-4 w-full ${density === "compact" ? "text-[13px]" : ""}`}>
         <GreetingHeader name="Tushar" />
 
         <AlertsToolbar
