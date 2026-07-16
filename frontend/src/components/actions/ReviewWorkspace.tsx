@@ -188,6 +188,37 @@ export function ReviewWorkspace({ decision: d, onClose, onOpenDecision }: Props)
     let verifyMsg = "Change applied. Verifying downstream metrics…";
     let canUndo = true;
 
+    const isInlineDraftAction =
+      shortId === "notify-vm" ||
+      shortId === "draft-ticket" ||
+      (shortId === "recommended" && d.id === "critical-listing-eligibility-b0csh8tcc6");
+
+    if (isInlineDraftAction && panelMode === "main") {
+      // Render Aan's draft inline inside this review card — do not open the side panel.
+      if (shortId === "notify-vm") {
+        setInlineDraft({ kind: "email", strategyTitle: selectedStrategy.title, draft: NOTIFY_VM_EMAIL });
+      } else if (shortId === "draft-ticket") {
+        setInlineDraft({
+          kind: "chat",
+          strategyTitle: selectedStrategy.title,
+          title: "Aan drafted this support ticket",
+          approveLabel: "Approve & file ticket",
+          approveSuccess: "Support ticket filed with Amazon Seller Support.",
+          draft: AAN_SEEDS["draft-ticket"].reply,
+        });
+      } else {
+        setInlineDraft({
+          kind: "chat",
+          strategyTitle: selectedStrategy.title,
+          title: "Aan analyzed the listing",
+          approveLabel: "Approve & publish edit",
+          approveSuccess: "Listing edit published for review.",
+          draft: AAN_SEEDS["recommended"].reply,
+        });
+      }
+      return;
+    }
+
     if (shortId === "notify-vm" || shortId === "draft-ticket") {
       const seed = AAN_SEEDS[shortId];
       openCopilot();
@@ -211,6 +242,18 @@ export function ReviewWorkspace({ decision: d, onClose, onOpenDecision }: Props)
     }
 
     setExecuted({ strategyTitle: selectedStrategy.title, verifyMsg, canUndo });
+    startCountdown();
+  }
+
+  function completeInlineDraft() {
+    if (!inlineDraft) return;
+    const strategyTitle = inlineDraft.strategyTitle;
+    const verifyMsg =
+      inlineDraft.kind === "email"
+        ? "Email sent. Aan is monitoring for a reply."
+        : "Draft approved. Aan is tracking follow-up.";
+    setInlineDraft(null);
+    setExecuted({ strategyTitle, verifyMsg, canUndo: false });
     startCountdown();
   }
 
