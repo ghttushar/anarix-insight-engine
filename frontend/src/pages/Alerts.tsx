@@ -174,7 +174,7 @@ function AlertsInner() {
     <AppLayout>
       <AppTaskbar breadcrumbItems={[{ label: "Signals" }]} />
 
-      <div className={`px-4 pt-4 pb-4 max-w-[1600px] mx-auto w-full ${density === "compact" ? "text-[13px]" : ""}`}>
+      <div className={`px-4 pt-4 pb-4 w-full ${density === "compact" ? "text-[13px]" : ""}`}>
         <GreetingHeader name="Tushar" />
 
         <AlertsToolbar
@@ -193,7 +193,7 @@ function AlertsInner() {
 
         <BulkBar />
 
-        <div className="grid gap-4 grid-cols-1 xl:grid-cols-[180px_minmax(0,1fr)_minmax(0,58fr)] items-start">
+        <div className="grid gap-4 grid-cols-1 xl:grid-cols-[176px_minmax(340px,1fr)_minmax(520px,1.35fr)] items-start">
           {/* Category rail — hidden on meetings tab (grouped by meeting instead) */}
           <div className="hidden xl:block">
             {!isMeetingsTab && (
