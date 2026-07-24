@@ -4,12 +4,73 @@ import { Menu, X, ChevronDown, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 
-const navItems: Array<{
+interface MegaMenuColumn {
+  heading: string;
+  items: { label: string; href: string }[];
+}
+
+interface NavItem {
   label: string;
   href?: string;
   dropdown?: { label: string; href: string }[];
-}> = [
-  { label: "Product", href: "/website/product" },
+  megaMenu?: MegaMenuColumn[];
+}
+
+const productHref = "/website/product";
+
+const navItems: NavItem[] = [
+  {
+    label: "Product",
+    megaMenu: [
+      {
+        heading: "Advertising",
+        items: [
+          { label: "Impact Analysis", href: productHref },
+          { label: "Targeting Actions", href: productHref },
+          { label: "Share of Voice", href: productHref },
+          { label: "Budget Pacing", href: productHref },
+        ],
+      },
+      {
+        heading: "Campaign",
+        items: [
+          { label: "Campaign Manager", href: productHref },
+          { label: "Search Harvesting", href: productHref },
+          { label: "Creative Analyzer", href: productHref },
+          { label: "Anomaly Alerts", href: productHref },
+        ],
+      },
+      {
+        heading: "Rules",
+        items: [
+          { label: "Rule Agents", href: productHref },
+          { label: "Applied Rules", href: productHref },
+        ],
+      },
+      {
+        heading: "Profitability",
+        items: [
+          { label: "Dashboard", href: productHref },
+          { label: "Trends", href: productHref },
+          { label: "P&L", href: productHref },
+          { label: "Geographical Data", href: productHref },
+        ],
+      },
+      {
+        heading: "AI",
+        items: [
+          { label: "AAN", href: productHref },
+          { label: "Signals", href: productHref },
+        ],
+      },
+      {
+        heading: "MCP",
+        items: [
+          { label: "Anarix MCP", href: productHref },
+        ],
+      },
+    ],
+  },
   { label: "Pricing", href: "/website/pricing" },
   {
     label: "Company",
@@ -25,6 +86,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileExpandedSection, setMobileExpandedSection] = useState<string | null>(null);
   const location = useLocation();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
@@ -38,6 +100,7 @@ const Navbar = () => {
   useEffect(() => {
     setMobileOpen(false);
     setOpenDropdown(null);
+    setMobileExpandedSection(null);
   }, [location.pathname]);
 
   return (
@@ -69,7 +132,7 @@ const Navbar = () => {
             <div
               key={item.label}
               className="relative"
-              onMouseEnter={() => item.dropdown && setOpenDropdown(item.label)}
+              onMouseEnter={() => (item.dropdown || item.megaMenu) && setOpenDropdown(item.label)}
               onMouseLeave={() => setOpenDropdown(null)}
             >
               {item.href ? (
@@ -85,7 +148,7 @@ const Navbar = () => {
                   className="relative flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg group"
                 >
                   {item.label}
-                  {item.dropdown && (
+                  {(item.dropdown || item.megaMenu) && (
                     <ChevronDown
                       className="w-3.5 h-3.5 transition-transform duration-200"
                       style={{
@@ -97,7 +160,7 @@ const Navbar = () => {
                 </button>
               )}
 
-              {/* Dropdown */}
+              {/* Simple dropdown */}
               <AnimatePresence>
                 {item.dropdown && openDropdown === item.label && (
                   <motion.div
@@ -116,6 +179,41 @@ const Navbar = () => {
                         {sub.label}
                       </Link>
                     ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Mega-menu dropdown */}
+              <AnimatePresence>
+                {item.megaMenu && openDropdown === item.label && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[680px] py-5 px-6 bg-surface-elevated rounded-xl border border-border shadow-medium z-50"
+                  >
+                    <div className="grid grid-cols-6 gap-6">
+                      {item.megaMenu.map((col) => (
+                        <div key={col.heading}>
+                          <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-3">
+                            {col.heading}
+                          </h4>
+                          <ul className="space-y-1">
+                            {col.items.map((sub) => (
+                              <li key={sub.label}>
+                                <Link
+                                  to={sub.href}
+                                  className="block px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors duration-150"
+                                >
+                                  {sub.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -170,46 +268,100 @@ const Navbar = () => {
                     >
                       {item.label}
                     </Link>
-                  ) : (
-                    <button
-                      className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-foreground rounded-lg hover:bg-accent transition-colors"
-                      onClick={() =>
-                        item.dropdown &&
-                        setOpenDropdown(openDropdown === item.label ? null : item.label)
-                      }
-                    >
-                      {item.label}
-                      {item.dropdown && (
+                  ) : item.megaMenu ? (
+                    <>
+                      <button
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-foreground rounded-lg hover:bg-accent transition-colors"
+                        onClick={() =>
+                          setMobileExpandedSection(
+                            mobileExpandedSection === item.label ? null : item.label
+                          )
+                        }
+                      >
+                        {item.label}
                         <ChevronDown
                           className="w-4 h-4 transition-transform duration-200"
                           style={{
-                            transform: openDropdown === item.label ? "rotate(180deg)" : "rotate(0deg)",
+                            transform: mobileExpandedSection === item.label ? "rotate(180deg)" : "rotate(0deg)",
                           }}
                         />
-                      )}
-                    </button>
-                  )}
-                  <AnimatePresence>
-                    {item.dropdown && openDropdown === item.label && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden pl-4"
-                      >
-                        {item.dropdown.map((sub) => (
-                          <Link
-                            key={sub.label}
-                            to={sub.href}
-                            className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      </button>
+                      <AnimatePresence>
+                        {mobileExpandedSection === item.label && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden pl-4"
                           >
-                            {sub.label}
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                            <div className="py-1 space-y-3">
+                              {item.megaMenu.map((col) => (
+                                <div key={col.heading}>
+                                  <h5 className="text-xs font-semibold text-foreground/60 uppercase tracking-wider px-3 mb-1">
+                                    {col.heading}
+                                  </h5>
+                                  <ul className="space-y-0.5">
+                                    {col.items.map((sub) => (
+                                      <li key={sub.label}>
+                                        <Link
+                                          to={sub.href}
+                                          className="block px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                        >
+                                          {sub.label}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-foreground rounded-lg hover:bg-accent transition-colors"
+                        onClick={() =>
+                          item.dropdown &&
+                          setOpenDropdown(openDropdown === item.label ? null : item.label)
+                        }
+                      >
+                        {item.label}
+                        {item.dropdown && (
+                          <ChevronDown
+                            className="w-4 h-4 transition-transform duration-200"
+                            style={{
+                              transform: openDropdown === item.label ? "rotate(180deg)" : "rotate(0deg)",
+                            }}
+                          />
+                        )}
+                      </button>
+                      <AnimatePresence>
+                        {item.dropdown && openDropdown === item.label && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden pl-4"
+                          >
+                            {item.dropdown.map((sub) => (
+                              <Link
+                                key={sub.label}
+                                to={sub.href}
+                                className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                {sub.label}
+                              </Link>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  )}
                 </div>
               ))}
               <div className="pt-3 border-t border-border space-y-2">

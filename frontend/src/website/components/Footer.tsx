@@ -1,8 +1,17 @@
 import { Link } from "react-router-dom";
 
+const productHref = "/website/product";
+
 const footerLinks: Record<string, { label: string; href: string; external?: boolean }[]> = {
   Product: [
-    { label: "Anarix Insight Engine", href: "/website/product" },
+    { label: "Advertising", href: productHref },
+    { label: "Campaign", href: productHref },
+    { label: "Rules", href: productHref },
+    { label: "Profitability", href: productHref },
+    { label: "AI (AAN & Signals)", href: productHref },
+    { label: "MCP", href: productHref },
+  ],
+  Resources: [
     { label: "Pricing", href: "/website/pricing" },
     { label: "Documentation", href: "/website/documentation" },
   ],
@@ -21,7 +30,7 @@ const Footer = () => {
   return (
     <footer className="px-6 pb-6">
       <div className="max-w-7xl mx-auto bg-card rounded-3xl border border-border shadow-soft p-10 sm:p-14">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
           <div className="col-span-2 md:col-span-1">
             <Link to="/website" className="text-2xl font-display font-semibold text-foreground tracking-tight">
               Anarix<span className="text-primary">.</span>ai
