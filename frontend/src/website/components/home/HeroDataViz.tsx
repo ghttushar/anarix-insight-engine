@@ -54,8 +54,9 @@ const HeroDataViz = () => {
 
     const resize = () => {
       const dpr = window.devicePixelRatio || 1;
+      const section = canvas.closest("section");
       const w = window.innerWidth;
-      const h = window.innerHeight * 0.75;
+      const h = section ? section.offsetHeight : window.innerHeight;
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
@@ -68,6 +69,14 @@ const HeroDataViz = () => {
     };
     resize();
     window.addEventListener("resize", resize);
+
+    // Also observe section size changes (e.g. after font load)
+    const section = canvas.closest("section");
+    let ro: ResizeObserver | null = null;
+    if (section) {
+      ro = new ResizeObserver(() => resize());
+      ro.observe(section);
+    }
 
     const onMouse = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
@@ -176,6 +185,7 @@ const HeroDataViz = () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMouse);
+      ro?.disconnect();
     };
   }, [init, initParticles]);
 
@@ -183,7 +193,7 @@ const HeroDataViz = () => {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 pointer-events-none"
-      style={{ maskImage: "radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 80%)" }}
+      style={{ maskImage: "radial-gradient(ellipse 90% 85% at 50% 45%, black 20%, transparent 85%)" }}
     />
   );
 };

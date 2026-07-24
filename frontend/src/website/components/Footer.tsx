@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 
 const productHref = "/website/product";
+const aanHref = "/website/aan-ai";
+const mcpHref = "/website/mcp";
+const signalsHref = "/website/signals";
 
 const footerLinks: Record<string, { label: string; href: string; external?: boolean }[]> = {
   Product: [
@@ -8,8 +11,9 @@ const footerLinks: Record<string, { label: string; href: string; external?: bool
     { label: "Campaign", href: productHref },
     { label: "Rules", href: productHref },
     { label: "Profitability", href: productHref },
-    { label: "AI (AAN & Signals)", href: productHref },
-    { label: "MCP", href: productHref },
+    { label: "AAN (AI)", href: aanHref },
+    { label: "Signals", href: signalsHref },
+    { label: "MCP", href: mcpHref },
   ],
   Resources: [
     { label: "Pricing", href: "/website/pricing" },

@@ -17,6 +17,9 @@ interface NavItem {
 }
 
 const productHref = "/website/product";
+const aanHref = "/website/aan-ai";
+const mcpHref = "/website/mcp";
+const signalsHref = "/website/signals";
 
 const navItems: NavItem[] = [
   {
@@ -59,14 +62,14 @@ const navItems: NavItem[] = [
       {
         heading: "AI",
         items: [
-          { label: "AAN", href: productHref },
-          { label: "Signals", href: productHref },
+          { label: "AAN", href: aanHref },
+          { label: "Signals", href: signalsHref },
         ],
       },
       {
         heading: "MCP",
         items: [
-          { label: "Anarix MCP", href: productHref },
+          { label: "Anarix MCP", href: mcpHref },
         ],
       },
     ],
@@ -191,21 +194,24 @@ const Navbar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.96 }}
                     transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[680px] py-5 px-6 bg-surface-elevated rounded-xl border border-border shadow-medium z-50"
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 py-6 px-8 bg-surface-elevated rounded-2xl border border-border shadow-strong z-50"
+                    style={{ width: "720px" }}
                   >
-                    <div className="grid grid-cols-6 gap-6">
-                      {item.megaMenu.map((col) => (
+                    <div className="grid grid-cols-3 gap-x-8 gap-y-6">
+                      {item.megaMenu.map((col, idx) => (
                         <div key={col.heading}>
-                          <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider mb-3">
+                          {idx % 3 === 0 && idx > 0 && <div className="col-span-3 h-px bg-border/40 my-1 -mx-8" />}
+                          <h4 className="text-[10px] font-bold text-primary/70 uppercase tracking-[0.16em] mb-2.5">
                             {col.heading}
                           </h4>
-                          <ul className="space-y-1">
+                          <ul className="space-y-0.5">
                             {col.items.map((sub) => (
                               <li key={sub.label}>
                                 <Link
                                   to={sub.href}
-                                  className="block px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors duration-150"
+                                  className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/60 rounded-lg transition-all duration-150"
                                 >
+                                  <span className="w-1 h-1 rounded-full bg-primary/30 shrink-0" />
                                   {sub.label}
                                 </Link>
                               </li>
@@ -213,6 +219,17 @@ const Navbar = () => {
                           </ul>
                         </div>
                       ))}
+                    </div>
+                    <div className="mt-5 pt-4 border-t border-border/40">
+                      <Link
+                        to={productHref}
+                        className="flex items-center gap-2 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+                      >
+                        View all product features
+                        <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4.5 2.5L8 6L4.5 9.5" />
+                        </svg>
+                      </Link>
                     </div>
                   </motion.div>
                 )}

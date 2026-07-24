@@ -139,6 +139,9 @@ import WebsitePrivacyPolicy from "./website/pages/legal/PrivacyPolicy";
 import WebsiteTermsAndConditions from "./website/pages/legal/TermsAndConditions";
 import WebsiteCancelPlan from "./website/pages/CancelPlan";
 import WebsiteDowngradePlan from "./website/pages/DowngradePlan";
+import WebsiteMcp from "./website/pages/McpPage";
+import WebsiteAan from "./website/pages/AanPage";
+import WebsiteSignals from "./website/pages/SignalsPage";
 
 const queryClient = new QueryClient();
 
@@ -315,7 +318,9 @@ function AppRoutes() {
       <Route path="/website" element={<WebsiteLayout />}>
         <Route index element={<WebsiteHome />} />
         <Route path="product" element={<WebsiteProduct />} />
-        <Route path="aan-ai" element={<Navigate to="/website/product" replace />} />
+        <Route path="aan-ai" element={<WebsiteAan />} />
+        <Route path="mcp" element={<WebsiteMcp />} />
+        <Route path="signals" element={<WebsiteSignals />} />
         <Route path="pricing" element={<WebsitePricing />} />
         <Route path="documentation" element={<WebsiteDocumentation />} />
         <Route path="company" element={<Navigate to="/website/company/about" replace />} />
