@@ -24,11 +24,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
-import { ViewBadge } from "@/components/layout/ViewBadge";
 import { AanAutonomyBadge } from "@/components/aan/autonomous/AanAutonomyBadge";
 import { useAanEvents } from "@/components/aan/autonomous/AanEventsContext";
-import { MobileTaskbar } from "@/views/mobile/MobileTaskbar";
-import { useViewport } from "@/contexts/ViewportContext";
 
 interface BreadcrumbItem {
   label: string;
@@ -133,24 +130,10 @@ interface AppTaskbarProps {
 }
 
 export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, showRunButton = false, onRun, children, breadcrumbItems, dateRangeOverride, onDateRangeOverrideChange, hideUtilityCluster = false }: AppTaskbarProps) {
-  const { view } = useViewport();
   const location = useLocation();
   // Hide the app taskbar entirely on the Signals page.
   if (location.pathname.startsWith("/alerts")) {
     return null;
-  }
-  // Mobile delegates to a purpose-built taskbar.
-  if (view === "mobile") {
-    return (
-      <MobileTaskbar
-        breadcrumbItems={breadcrumbItems}
-        showDateRange={showDateRange}
-        showRunButton={showRunButton}
-        onRun={onRun}
-      >
-        {children}
-      </MobileTaskbar>
-    );
   }
   const { adType, setAdType, frequency, setFrequency, dateRange: ctxDateRange, setDateRange: setCtxDateRange } = useFilter();
   const dateRange = dateRangeOverride ?? ctxDateRange;
@@ -263,7 +246,6 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
             <span className="taskbar-last-synced text-[11px] text-muted-foreground whitespace-nowrap">Last synced: {lastSyncTime}</span>
             <div className="h-3.5 w-px bg-border" />
             <AanAutonomyBadge />
-            <ViewBadge />
           </div>
         </div>
       )}

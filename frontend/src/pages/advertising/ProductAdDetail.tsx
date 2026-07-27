@@ -19,7 +19,6 @@ import { useFilter } from "@/contexts/FilterContext";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { toast } from "sonner";
-import { MobileDrillHeader } from "@/views/mobile/MobileDrillHeader";
 const breadcrumbItems = [
   { label: "Advertising", href: "/advertising/campaigns" },
   { label: "Product Ad Detail" },
@@ -56,7 +55,6 @@ export default function ProductAdDetail() {
     <AppLayout>
       <div className="flex flex-1 min-h-0 min-w-0">
         <div className="flex-1 min-w-0 space-y-4">
-          <MobileDrillHeader title={productAdName} subtitle={adGroupName} to={`/advertising/campaigns/${campaignId}/${adGroupId}`} />
           <PageHeader title="Advertising" />
 
 

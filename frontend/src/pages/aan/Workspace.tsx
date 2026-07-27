@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useAan } from "@/components/aan/AanContext";
-import { useViewport } from "@/contexts/ViewportContext";
 import { MiniSidebar } from "@/components/layout/MiniSidebar";
 import { AanWorkspaceSidebar } from "@/components/aan/AanWorkspaceSidebar";
 import { AanConversation } from "@/components/aan/AanConversation";
@@ -8,19 +7,13 @@ import { AanInput } from "@/components/aan/AanInput";
 import { AanArtifactViewer } from "@/components/aan/AanArtifactViewer";
 import { AanPresenceProvider } from "@/components/aan/AanPresenceContext";
 import { AanPresencePortal } from "@/components/aan/AanPresencePortal";
-import { MobileAanLayout } from "@/views/mobile/MobileAanLayout";
 
 export default function AanWorkspacePage() {
   const { viewingArtifact, closeArtifactView, openWorkspace, mode } = useAan();
-  const { view } = useViewport();
 
   useEffect(() => {
     if (mode !== "workspace") openWorkspace();
   }, []);
-
-  if (view === "mobile") {
-    return <MobileAanLayout />;
-  }
 
   const showArtifactPanel = !!viewingArtifact;
   return (

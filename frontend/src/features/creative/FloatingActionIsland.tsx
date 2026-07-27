@@ -15,7 +15,6 @@ import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useBranding } from "@/contexts/BrandingContext";
 import { useAan } from "@/components/aan/AanContext";
 import { KeyboardShortcutsDialog } from "@/components/shortcuts/KeyboardShortcutsDialog";
-import { useViewport } from "@/contexts/ViewportContext";
 import html2canvas from "html2canvas";
 
 interface ActionItem {
@@ -30,8 +29,7 @@ interface ActionItem {
 const hiddenRoutes = ["/login", "/onboarding", "/settings", "/alerts"];
 
 export function FloatingActionIsland() {
-  const { view } = useViewport();
-  const isTabletView = view === "tablet";
+  const isTabletView = false;
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -102,8 +100,7 @@ export function FloatingActionIsland() {
     target.addEventListener("pointercancel", handleUp);
   }, []);
 
-  const isMobileView = view === "mobile";
-  const shouldHide = isMobileView || hiddenRoutes.some((route) => location.pathname.startsWith(route));
+  const shouldHide = hiddenRoutes.some((route) => location.pathname.startsWith(route));
   if (shouldHide) return null;
 
 
