@@ -3,7 +3,7 @@ import { ArrowRight, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AttendeePill } from "./AttendeePill";
 import { ShareMenu } from "./ShareMenu";
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 import { formatValue } from "@/lib/decisions/valueFormat";
 
 interface Props {

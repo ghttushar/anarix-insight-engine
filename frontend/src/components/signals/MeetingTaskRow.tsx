@@ -3,7 +3,7 @@ import { CheckCircle2, ChevronDown, Clock, PenLine, User, X } from "lucide-react
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ValuePill } from "./ValuePill";
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 import type { MeetingTask, MeetingTaskStatus } from "@/data/mockMeetings";
 
 const STATUS_META: Record<MeetingTaskStatus, { label: string; className: string; dot: string }> = {

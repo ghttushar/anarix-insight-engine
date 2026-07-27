@@ -8,7 +8,7 @@ import { AttendeePill } from "./AttendeePill";
 import { MeetingTaskRow } from "./MeetingTaskRow";
 import { ShareMenu } from "./ShareMenu";
 import { ValuePill } from "./ValuePill";
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 
 interface Props {
   bundleId: string | null;

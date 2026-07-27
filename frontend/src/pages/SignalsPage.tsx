@@ -8,22 +8,22 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ActionsProvider, useActionsStore } from "@/state/actionsStore";
-import { SelectionProvider, useSelection } from "@/state/selectionStore";
-import { EmptyState } from "@/components/actions/EmptyState";
-import { EMPTY_FILTER, type FilterState } from "@/components/actions/FilterSheet";
+import { ActionsProvider, useActionsStore } from "@/state/signalsStore";
+import { SelectionProvider, useSelection } from "@/state/signalSelectionStore";
+import { EmptyState } from "@/components/signals/EmptyState";
+import { EMPTY_FILTER, type FilterState } from "@/components/signals/FilterSheet";
 
-import { AlertsToolbar } from "@/components/actions/AlertsToolbar";
-import { BulkBar } from "@/components/actions/BulkBar";
-import { GreetingHeader } from "@/components/actions/GreetingHeader";
-import { DailyBriefing } from "@/components/actions/DailyBriefing";
-import { CategorySection } from "@/components/actions/CategorySection";
-import { CategoryRail } from "@/components/actions/CategoryRail";
-import { DecisionValueCard } from "@/components/actions/DecisionValueCard";
-import { MeetingCard } from "@/components/actions/MeetingCard";
-import { ReviewWorkspace } from "@/components/actions/ReviewWorkspace";
-import { MeetingReviewView } from "@/components/actions/review/MeetingReviewView";
-import { filterByTab, computeTabCounts, type AlertTabKey } from "@/components/actions/tabs";
+import { SignalsToolbar } from "@/components/signals/SignalsToolbar";
+import { BulkBar } from "@/components/signals/BulkBar";
+import { GreetingHeader } from "@/components/signals/GreetingHeader";
+import { DailyBriefing } from "@/components/signals/DailyBriefing";
+import { CategorySection } from "@/components/signals/CategorySection";
+import { CategoryRail } from "@/components/signals/CategoryRail";
+import { DecisionValueCard } from "@/components/signals/DecisionValueCard";
+import { MeetingCard } from "@/components/signals/MeetingCard";
+import { ReviewWorkspace } from "@/components/signals/ReviewWorkspace";
+import { MeetingReviewView } from "@/components/signals/review/MeetingReviewView";
+import { filterByTab, computeTabCounts, type AlertTabKey } from "@/components/signals/tabs";
 import { categorize } from "@/lib/decisions/categories";
 import { importanceScore } from "@/lib/decisions/lifecycle";
 import { useAanEvents } from "@/components/aan/autonomous/AanEventsContext";
@@ -185,7 +185,7 @@ function AlertsInner() {
       <div className="px-4 pt-4 w-full">
         <GreetingHeader name="Tushar" />
 
-        <AlertsToolbar
+        <SignalsToolbar
           tab={tab}
           onTabChange={setTab}
           counts={counts}

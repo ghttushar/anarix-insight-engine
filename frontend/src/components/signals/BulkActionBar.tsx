@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { CheckCircle2, Sparkles, Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSelection } from "@/state/selectionStore";
-import { useActionsStore } from "@/state/actionsStore";
+import { useSelection } from "@/state/signalSelectionStore";
+import { useActionsStore } from "@/state/signalsStore";
 import { valueMagnitude, formatValue } from "@/lib/decisions/valueFormat";
 import { SnoozeMenu } from "./SnoozeMenu";
 

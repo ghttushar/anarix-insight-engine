@@ -14,9 +14,9 @@ import { SourceGlyph } from "./SourceGlyph";
 import { ShareMenu } from "./ShareMenu";
 import { SnoozeMenu } from "./SnoozeMenu";
 import type { Decision } from "@/data/mockDecisions";
-import { useActionsStore, type SnoozeChoice } from "@/state/actionsStore";
+import { useActionsStore, type SnoozeChoice } from "@/state/signalsStore";
 import { formatValue } from "@/lib/decisions/valueFormat";
-import { useSelection } from "@/state/selectionStore";
+import { useSelection } from "@/state/signalSelectionStore";
 import { getSourceMeta } from "@/lib/decisions/sourceRegistry";
 
 interface Props {

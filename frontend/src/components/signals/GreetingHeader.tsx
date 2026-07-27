@@ -1,7 +1,7 @@
 // Greeting header — minimal. The app-level KPI metric row has been removed to
 // reduce cognitive load on the Signals page. Live business KPIs remain
 // available in the daily briefing panel on the right.
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 import { briefingFor } from "@/lib/decisions/briefing";
 
 interface Props {

@@ -7,7 +7,7 @@ import { AanMark } from "@/components/branding/AanMark";
 import { Send } from "lucide-react";
 import { SourceGlyph } from "./SourceGlyph";
 import { ValueBlock } from "./ValueBlock";
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 
 export type PanelMode = "detail" | "ask_aan" | "custom";
 
@@ -32,7 +32,7 @@ interface Props {
  * "Write custom action / Discuss with Aan" on a row/card/task.
  * Pre-seeded with the decision context.
  */
-export function AlertDetailPanel({ state, onOpenChange }: Props) {
+export function SignalDetailPanel({ state, onOpenChange }: Props) {
   const { decisions, delegateToAan } = useActionsStore();
   const d = decisions.find((x) => x.id === state.decisionId);
   const open = state.decisionId !== null;

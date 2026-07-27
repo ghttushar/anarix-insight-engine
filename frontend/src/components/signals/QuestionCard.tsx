@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SourceGlyph } from "./SourceGlyph";
 import { ShareMenu } from "./ShareMenu";
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 import { getSourceMeta } from "@/lib/decisions/sourceRegistry";
 import type { AanQuestion } from "@/data/mockQuestions";
 

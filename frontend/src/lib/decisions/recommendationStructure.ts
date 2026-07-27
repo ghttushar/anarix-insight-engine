@@ -3,7 +3,7 @@
 // Falls back to sensible copy when a field is missing on the mock.
 import type { Decision } from "@/data/mockDecisions";
 import { formatValue } from "./valueFormat";
-import { confidenceFor } from "@/components/actions/chips/ConfidenceChip";
+import { confidenceFor } from "@/components/signals/chips/ConfidenceChip";
 
 export interface RecommendationParts {
   summary: string;

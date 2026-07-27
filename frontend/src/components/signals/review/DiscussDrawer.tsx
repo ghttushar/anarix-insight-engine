@@ -1,4 +1,4 @@
-// Discuss-with-Aan slide-out drawer. Replaces the AlertDetailPanel path.
+// Discuss-with-Aan slide-out drawer. Replaces the SignalDetailPanel path.
 import { useState } from "react";
 import { X, Send, Sparkles } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";

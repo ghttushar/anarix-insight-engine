@@ -6,7 +6,7 @@ import { ShareMenu } from "./ShareMenu";
 import { SnoozeMenu } from "./SnoozeMenu";
 import { SourceGlyph } from "./SourceGlyph";
 import type { Decision } from "@/data/mockDecisions";
-import { useActionsStore, type SnoozeChoice } from "@/state/actionsStore";
+import { useActionsStore, type SnoozeChoice } from "@/state/signalsStore";
 import { getSourceMeta } from "@/lib/decisions/sourceRegistry";
 import { formatValue } from "@/lib/decisions/valueFormat";
 

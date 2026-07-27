@@ -11,8 +11,8 @@ import { ConfidenceChip } from "./chips/ConfidenceChip";
 import { IfIgnoredChip } from "./chips/IfIgnoredChip";
 import { LivingStatusChip } from "./chips/LivingStatusChip";
 import { SourceGlyph } from "./SourceGlyph";
-import { useActionsStore } from "@/state/actionsStore";
-import { useSelection } from "@/state/selectionStore";
+import { useActionsStore } from "@/state/signalsStore";
+import { useSelection } from "@/state/signalSelectionStore";
 import { lifecycleFor } from "@/lib/decisions/lifecycle";
 import type { Decision } from "@/data/mockDecisions";
 

@@ -6,7 +6,7 @@ import { AttendeePill } from "./AttendeePill";
 import { ValueBlock } from "./ValueBlock";
 import { ActionChoiceRow } from "./ActionChoiceRow";
 
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 import type { Decision } from "@/data/mockDecisions";
 
 interface Props {

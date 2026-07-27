@@ -11,7 +11,7 @@ import { formatValue } from "@/lib/decisions/valueFormat";
 import { livingStatusPhrase } from "@/lib/decisions/lifecycle";
 import { useLivingTick } from "@/hooks/useLivingClock";
 import { SourcePill } from "./chips/SourcePill";
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 
 interface Props {
   decision: Decision;

@@ -12,11 +12,11 @@ import { ActionChoiceRow } from "./ActionChoiceRow";
 import { ShareMenu } from "./ShareMenu";
 import { SettledStrip, settledTintClasses } from "./SettledStrip";
 import { InlineMeetingWorkspace } from "./InlineMeetingWorkspace";
-import { ExpandedAlertBody } from "./ExpandedAlertBody";
+import { ExpandedSignalBody } from "./ExpandedSignalBody";
 import { useUndoFor } from "./useUndoFor";
 
-import { useActionsStore } from "@/state/actionsStore";
-import { useSelection } from "@/state/selectionStore";
+import { useActionsStore } from "@/state/signalsStore";
+import { useSelection } from "@/state/signalSelectionStore";
 import type { Decision } from "@/data/mockDecisions";
 
 
@@ -238,7 +238,7 @@ export function StackRow({ decision: d, onOpenDetail, interactive = true }: Prop
               />
             </div>
           ) : (
-            <ExpandedAlertBody
+            <ExpandedSignalBody
               decision={d}
               onApprove={() => approve(d.id)}
               onDiscuss={() => onOpenDetail(d.id, "custom")}

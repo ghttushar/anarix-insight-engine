@@ -3,7 +3,7 @@ import { HelpCircle, Check, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SourceGlyph } from "./SourceGlyph";
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 import type { AanQuestion } from "@/data/mockQuestions";
 
 interface Props {

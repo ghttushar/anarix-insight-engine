@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useSelection } from "@/state/selectionStore";
-import { useActionsStore } from "@/state/actionsStore";
+import { useSelection } from "@/state/signalSelectionStore";
+import { useActionsStore } from "@/state/signalsStore";
 
 /**
  * Wires Decide-surface keyboard shortcuts. Called once from AlertsInner.

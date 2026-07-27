@@ -15,7 +15,7 @@ import { RelatedDecisionChip } from "./review/RelatedDecisionChip";
 import { AssignMenu } from "./review/AssignMenu";
 import { DiscussDrawer } from "./review/DiscussDrawer";
 import { SourceGlyph } from "./SourceGlyph";
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 import { strategiesFor } from "@/lib/decisions/strategies";
 import { relationshipsFor } from "@/lib/decisions/relationships";
 import { sourcePillFor, PILL_TONE_CLASS } from "@/lib/decisions/sourcePill";

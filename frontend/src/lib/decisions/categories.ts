@@ -1,6 +1,6 @@
 // Category buckets per tab. Each tab shows a different category taxonomy.
 import type { Decision } from "@/data/mockDecisions";
-import type { AlertTabKey } from "@/components/actions/tabs";
+import type { AlertTabKey } from "@/components/signals/tabs";
 
 export interface Category {
   key: string;

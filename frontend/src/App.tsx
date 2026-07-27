@@ -23,7 +23,7 @@ import { InsightsProvider } from "@/components/insights";
 import { CreativeFeatures } from "@/features/creative";
 import { toast } from "sonner";
 import NotFound from "./pages/NotFound";
-import AlertsPage from "./pages/Alerts";
+import AlertsPage from "./pages/SignalsPage";
 
 // Auth & Onboarding
 import Login from "./pages/auth/Login";

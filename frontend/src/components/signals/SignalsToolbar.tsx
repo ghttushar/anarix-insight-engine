@@ -16,7 +16,7 @@ interface Props {
   onFilterSheetOpenChange: (o: boolean) => void;
 }
 
-export function AlertsToolbar(p: Props) {
+export function SignalsToolbar(p: Props) {
   return (
     <div className="mb-4 flex flex-wrap items-center gap-2">
       <nav role="tablist" aria-label="Alerts tabs" className="flex items-center gap-1 p-1 rounded-lg bg-muted/40 border border-border/50">

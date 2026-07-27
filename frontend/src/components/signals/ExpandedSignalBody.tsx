@@ -31,7 +31,7 @@ function timeAgo(ts: number): string {
  * Categorized expanded body for non-meeting Decision cards.
  * Sections: Context · Why this number · Evidence.
  */
-export function ExpandedAlertBody({ decision: d }: Props) {
+export function ExpandedSignalBody({ decision: d }: Props) {
   return (
     <div className="px-5 pt-4 pb-4 space-y-5">
       {d.insightDetail && (

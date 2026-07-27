@@ -1,7 +1,7 @@
 // Daily briefing card — shown on the default landing (nothing selected).
 // Copy adapts to time of day and derives numbers from the decision corpus.
 import { Sun, Sunset, Moon, Sunrise, Sparkles, type LucideIcon } from "lucide-react";
-import { useActionsStore } from "@/state/actionsStore";
+import { useActionsStore } from "@/state/signalsStore";
 import { briefingFor, type BriefingSlot } from "@/lib/decisions/briefing";
 
 const ICON: Record<BriefingSlot, LucideIcon> = {
