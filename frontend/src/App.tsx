@@ -25,11 +25,6 @@ import { toast } from "sonner";
 import NotFound from "./pages/NotFound";
 import AlertsPage from "./pages/Alerts";
 
-
-// Living OS — supervisory workspace (isolated, no app chrome)
-import LivingOSWorkspace from "./pages/livingos/Workspace";
-
-
 // Auth & Onboarding
 import Login from "./pages/auth/Login";
 import ConnectAccounts from "./pages/onboarding/ConnectAccounts";
@@ -98,7 +93,6 @@ import PanelIndex, {
   InsightsPanelRoute,
   NotificationsPanelRoute,
 } from "./pages/panels/PanelRoute";
-import TrialStateRoute from "./pages/_dev/TrialStateRoute";
 
 // Settings
 import Preferences from "./pages/settings/Preferences";
@@ -107,13 +101,10 @@ import ConnectAmazon from "./pages/settings/ConnectAmazon";
 import ConnectWalmart from "./pages/settings/ConnectWalmart";
 import SettingsTeam from "./pages/settings/Team";
 import SettingsSystem from "./pages/settings/System";
-import DesignSystem from "./pages/settings/DesignSystem";
-import ComponentLibrary from "./pages/settings/ComponentLibrary";
 import Integrations from "./pages/settings/Integrations";
 import Billing from "./pages/settings/Billing";
 
 // Brand
-import AanMascotShowcase from "./pages/brand/AanMascotShowcase";
 
 // Website
 import WebsiteLayout from "./website/WebsiteLayout";
@@ -179,28 +170,11 @@ function AppRoutes() {
 
       {/* Auth & Onboarding */}
       <Route path="/login" element={<Login />} />
-      <Route path="/onboarding/connect" element={<MobileGate title="Connect on desktop" description="Account connection isn't available on mobile."><ConnectAccounts /></MobileGate>} />
-
-      {/* Viewport variants — Phase 1 scaffold. Tablet/Mobile screens land in later phases. */}
-      <Route path="/desktop" element={<Navigate to="/profitability/dashboard" replace />} />
-      <Route path="/desktop/*" element={<Navigate to="/profitability/dashboard" replace />} />
-      <Route path="/tablet" element={<TabletRedirect />} />
-      <Route path="/tablet/*" element={<TabletRedirect />} />
-      <Route path="/mobile" element={<MobileRedirect />} />
-      <Route path="/mobile/*" element={<MobileRedirect />} />
-
-      {/* Living OS — supervisory workspace. Fully isolated: no app chrome. */}
-      <Route path="/livingos" element={<LivingOSWorkspace />} />
-      <Route path="/livingos/*" element={<LivingOSWorkspace />} />
-
-
-
-      {/* Hidden dev utility: pin a trial state and render any nav-bar page underneath */}
-      <Route path="/_state/:state/*" element={<TrialStateRoute />} />
+      <Route path="/onboarding/connect" element={<ConnectAccounts />} />
 
       {/* Sandbox */}
-      <Route path="/workspace" element={<MobileGate title="Dashboard builder is desktop-only"><WorkspaceDashboard /></MobileGate>} />
-      <Route path="/workspace/:dashboardId" element={<MobileGate title="Dashboard builder is desktop-only"><WorkspaceDashboard /></MobileGate>} />
+      <Route path="/workspace" element={<WorkspaceDashboard />} />
+      <Route path="/workspace/:dashboardId" element={<WorkspaceDashboard />} />
       <Route path="/workspace/health-score" element={<HealthScore />} />
 
       {/* Profitability */}
@@ -226,9 +200,9 @@ function AppRoutes() {
       <Route path="/advertising/creative-analyzer" element={<CreativeAnalyzer />} />
       <Route path="/advertising/rules/agents" element={<RuleAgents />} />
       <Route path="/advertising/rules/applied" element={<AppliedRules />} />
-      <Route path="/advertising/rules/create" element={<MobileGate title="Rule creation is desktop-only"><RuleCreation /></MobileGate>} />
-      <Route path="/advertising/rules/create/:templateId" element={<MobileGate title="Rule creation is desktop-only"><RuleCreation /></MobileGate>} />
-      <Route path="/advertising/rules/edit/:ruleId" element={<MobileGate title="Rule editing is desktop-only"><RuleCreation /></MobileGate>} />
+      <Route path="/advertising/rules/create" element={<RuleCreation />} />
+      <Route path="/advertising/rules/create/:templateId" element={<RuleCreation />} />
+      <Route path="/advertising/rules/edit/:ruleId" element={<RuleCreation />} />
 
       {/* Catalog */}
       <Route path="/catalog/products" element={<CatalogProducts />} />
@@ -272,9 +246,6 @@ function AppRoutes() {
       <Route path="/alerts" element={<Navigate to="/alerts/stack" replace />} />
       <Route path="/alerts/:viewMode" element={<AlertsPage />} />
 
-
-
-
       {/* Standalone panel routes — for figma export and shareable deep links */}
       <Route path="/panels" element={<PanelIndex />} />
       <Route path="/panels/aan-inbox" element={<AanInboxPanelRoute />} />
@@ -285,25 +256,17 @@ function AppRoutes() {
       <Route path="/panels/insights" element={<InsightsPanelRoute />} />
       <Route path="/panels/notifications" element={<NotificationsPanelRoute />} />
 
-
       {/* Settings */}
       <Route path="/settings/appearance" element={<Preferences />} />
-      <Route path="/profile" element={<MobileProfile />} />
-      <Route path="/settings/accounts" element={<MobileGate title="Manage accounts on desktop"><Accounts /></MobileGate>} />
-      <Route path="/settings/integrations" element={<MobileGate title="Integrations are desktop-only"><Integrations /></MobileGate>} />
-      <Route path="/settings/accounts/connect/amazon" element={<MobileGate title="Connect on desktop"><ConnectAmazon /></MobileGate>} />
-      <Route path="/settings/accounts/connect/walmart" element={<MobileGate title="Connect on desktop"><ConnectWalmart /></MobileGate>} />
-      <Route path="/settings/team" element={<MobileGate title="Team settings are desktop-only"><SettingsTeam /></MobileGate>} />
+      <Route path="/settings/accounts" element={<Accounts />} />
+      <Route path="/settings/integrations" element={<Integrations />} />
+      <Route path="/settings/accounts/connect/amazon" element={<ConnectAmazon />} />
+      <Route path="/settings/accounts/connect/walmart" element={<ConnectWalmart />} />
+      <Route path="/settings/team" element={<SettingsTeam />} />
       <Route path="/settings/system" element={<SettingsSystem />} />
       <Route path="/settings/aan-triggers" element={<AanTriggersPage />} />
-      <Route path="/settings/design-system" element={<DesignSystem />} />
-      <Route path="/settings/design-system/:tab" element={<DesignSystem />} />
-      <Route path="/settings/component-library" element={<ComponentLibrary />} />
-      <Route path="/settings/component-library/:section" element={<ComponentLibrary />} />
-      <Route path="/settings/billing" element={<MobileGate title="Billing is desktop-only"><Billing /></MobileGate>} />
-      <Route path="/settings/billing/:tab" element={<MobileGate title="Billing is desktop-only"><Billing /></MobileGate>} />
-
-      <Route path="/brand/aan" element={<AanMascotShowcase />} />
+      <Route path="/settings/billing" element={<Billing />} />
+      <Route path="/settings/billing/:tab" element={<Billing />} />
 
       {/* Marketing website */}
       <Route path="/website" element={<WebsiteLayout />}>
