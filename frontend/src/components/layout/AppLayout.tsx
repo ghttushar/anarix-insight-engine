@@ -120,9 +120,6 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  if (view === "mobile") {
-    return <MobileShell>{children}</MobileShell>;
-  }
   return (
     <SidebarProvider defaultOpen={true}>
       <LayoutInner>{children}</LayoutInner>

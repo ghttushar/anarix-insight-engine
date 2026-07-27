@@ -21,7 +21,6 @@ import { AanProvider } from "@/components/aan";
 import { AanPanelProvider } from "@/contexts/AanPanelContext";
 import { InsightsProvider } from "@/components/insights";
 import { CreativeFeatures } from "@/features/creative";
-import { GestureFeedback } from "@/components/gestures/GestureFeedback";
 import { toast } from "sonner";
 import NotFound from "./pages/NotFound";
 import AlertsPage from "./pages/Alerts";
@@ -334,10 +333,8 @@ function AppRoutes() {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ViewportProvider>
     <ThemeProvider>
       <ColorSchemeProvider>
-      <DensityProvider>
         <CurrencyProvider>
         <AccountProvider>
           <IntegrationsProvider>
@@ -357,17 +354,11 @@ const App = () => (
                           <Toaster />
                           <Sonner position="bottom-left" />
                           <BrowserRouter>
-                            <TutorialProvider>
-                              <GestureProvider>
                                 <CreativeFeatures>
                                   <WelcomeToasts />
                                   <AppRoutes />
                                   
-                                  <GestureFeedback />
-                                  <OnboardingTutorial />
                                 </CreativeFeatures>
-                              </GestureProvider>
-                            </TutorialProvider>
                           </BrowserRouter>
                         </TooltipProvider>
                         </TrialProvider>
@@ -385,10 +376,8 @@ const App = () => (
           </IntegrationsProvider>
         </AccountProvider>
         </CurrencyProvider>
-      </DensityProvider>
       </ColorSchemeProvider>
     </ThemeProvider>
-    </ViewportProvider>
   </QueryClientProvider>
 );
 
