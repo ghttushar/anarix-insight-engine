@@ -15,10 +15,6 @@ export default function AanWorkspacePage() {
     if (mode !== "workspace") openWorkspace();
   }, []);
 
-  if (view === "mobile") {
-    return <MobileAanLayout />;
-  }
-
   const showArtifactPanel = !!viewingArtifact;
   return (
     <AanPresenceProvider>

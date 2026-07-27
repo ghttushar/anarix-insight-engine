@@ -16,7 +16,6 @@ export default function Login() {
   const navigate = useNavigate();
   const { clearAccounts } = useAccounts();
   const { newBranding } = useBranding();
-  const { state: tutorialState, requestAutoStart } = useTutorial();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
