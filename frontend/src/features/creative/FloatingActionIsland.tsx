@@ -29,7 +29,7 @@ interface ActionItem {
 const hiddenRoutes = ["/login", "/onboarding", "/settings", "/alerts"];
 
 export function FloatingActionIsland() {
-  const isTabletView = view === "tablet";
+  const isTabletView = false;
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -100,8 +100,7 @@ export function FloatingActionIsland() {
     target.addEventListener("pointercancel", handleUp);
   }, []);
 
-  const isMobileView = view === "mobile";
-  const shouldHide = isMobileView || hiddenRoutes.some((route) => location.pathname.startsWith(route));
+  const shouldHide = hiddenRoutes.some((route) => location.pathname.startsWith(route));
   if (shouldHide) return null;
 
 

@@ -144,20 +144,13 @@ export default function ProfitabilityDashboard() {
           />
           <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} breadcrumbItems={breadcrumbItems} />
 
-          {isMobile ? (
-            <MobileProfitabilityHero
-              summaries={profitabilitySummaries}
-              onViewBreakdown={handleOpenBreakdown}
-            />
-          ) : (
-            <ProfitabilityHeroCard
-              summaries={profitabilitySummaries}
-              trendDataByPeriod={trendDataByPeriod}
-              selectedPeriod={selectedPeriod}
-              onPeriodChange={setSelectedPeriod}
-              onViewBreakdown={handleOpenBreakdown}
-            />
-          )}
+          <ProfitabilityHeroCard
+            summaries={profitabilitySummaries}
+            trendDataByPeriod={trendDataByPeriod}
+            selectedPeriod={selectedPeriod}
+            onPeriodChange={setSelectedPeriod}
+            onViewBreakdown={handleOpenBreakdown}
+          />
 
           <div className="space-y-3">
             <DataTableToolbar

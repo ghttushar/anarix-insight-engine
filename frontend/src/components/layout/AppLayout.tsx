@@ -16,7 +16,6 @@ const AskAanTooltip = lazy(() => import("@/components/aan/AskAanTooltip").then(m
 function LayoutInner({ children }: { children: ReactNode }) {
   const { dataPanel, aiPanel, hasAnyPanel, closeDataPanel } = useActivePanel();
   const { open, setOpen } = useSidebar();
-  const { density } = useDensity();
   const { trial } = useTrial();
   const { billingFlowEnabled } = useBillingFlow();
   const showSyncOverlay = billingFlowEnabled && trial === "syncing";
@@ -88,7 +87,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
         <main
           className={cn(
             "flex-1 overflow-auto bg-background min-h-0 min-w-0",
-            density === "compact" ? "p-4" : "p-6"
+            "p-6"
           )}
           onClick={handleMainClick}
         >

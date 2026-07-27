@@ -259,7 +259,6 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
             <span className="taskbar-last-synced text-[11px] text-muted-foreground whitespace-nowrap">Last synced: {lastSyncTime}</span>
             <div className="h-3.5 w-px bg-border" />
             <AanAutonomyBadge />
-            <ViewBadge />
           </div>
         </div>
       )}

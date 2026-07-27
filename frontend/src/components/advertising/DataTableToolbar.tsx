@@ -189,11 +189,11 @@ export function DataTableToolbar({
 
 
   return (
-    <div className={cn("space-y-1.5", isMobile && "mobile-toolbar")} data-table-toolbar>
+    <div className={"space-y-1.5"} data-table-toolbar>
       {/* Main Toolbar Row */}
       <div className={cn(
         "flex items-center justify-between gap-2",
-        isMobile ? "flex-col items-stretch" : "flex-wrap"
+        "flex-wrap"
       )}>
         {/* Left Side */}
         <div className="flex items-center gap-2 min-w-0 flex-1">

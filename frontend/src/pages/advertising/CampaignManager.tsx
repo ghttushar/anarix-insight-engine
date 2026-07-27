@@ -257,7 +257,6 @@ function CampaignManagerInner() {
   const renderTable = () => {
     // Mobile uses the same desktop tables — CSS handles the horizontal
     // scroll + sticky first column. Drill-down detail screens keep their
-    // own stacked layouts via MobileDrillHeader.
     switch (activeTab) {
       case "campaigns": return <CampaignTable campaigns={campaigns} onActiveToggle={handleActiveToggle} onCampaignUpdate={handleCampaignUpdate} showTotalBudget={isWalmart} searchQuery={searchQuery} viewMode={viewMode} onRowClick={(id) => navigate(`/advertising/campaigns/${id}`)} hiddenColumns={hiddenColumns} showDeltas={showDeltas} selectedIds={selectedIds} onSelectionChange={setSelectedIds} />;
       case "ad-groups": return <AdGroupsTable searchQuery={searchQuery} showDeltas={showDeltas} />;
