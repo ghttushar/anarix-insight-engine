@@ -11,9 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { geographicalData } from "@/data/mockProfitability";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useViewport } from "@/contexts/ViewportContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { MobileCard, MobileCardList } from "@/views/mobile/MobileCardList";
 
 const regionLookup: Record<string, typeof geographicalData[0]> = {
   US: geographicalData[0],
@@ -49,9 +47,7 @@ const breadcrumbItems = [
   { label: "Geographical Data" },
 ];
 export default function Geographical() {
-  const { view } = useViewport();
   const { formatCurrency } = useCurrency();
-  const isMobile = view === "mobile";
   const [selectedRegionCode, setSelectedRegionCode] = useState<string>("US");
   const [drillRegionId, setDrillRegionId] = useState<string | null>(null);
   const [viewLevel, setViewLevel] = useState<"state" | "product">("state");

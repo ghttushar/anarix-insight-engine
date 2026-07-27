@@ -3,13 +3,10 @@ import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AanInboxPanel } from "@/components/aan/autonomous/AanInboxPanel";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
-import { useDensity } from "@/contexts/DensityContext";
 import { useTrial } from "@/contexts/TrialContext";
 import { useBillingFlow } from "@/contexts/BillingFlowContext";
 import { DataSyncingState } from "@/components/billing/DataSyncingState";
 import { TrialExpiredState } from "@/components/billing/TrialExpiredState";
-import { useViewport } from "@/contexts/ViewportContext";
-import { MobileShell } from "@/views/mobile/MobileShell";
 import { cn } from "@/lib/utils";
 
 
@@ -124,7 +121,6 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const { view } = useViewport();
   if (view === "mobile") {
     return <MobileShell>{children}</MobileShell>;
   }

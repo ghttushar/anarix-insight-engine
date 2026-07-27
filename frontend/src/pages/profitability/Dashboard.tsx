@@ -18,8 +18,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
-import { useViewport } from "@/contexts/ViewportContext";
-import { MobileProfitabilityHero } from "@/views/mobile/MobileProfitabilityHero";
 
 
 const COLUMN_DEFS = [
@@ -57,8 +55,6 @@ const breadcrumbItems = [
   { label: "Dashboard" },
 ];
 export default function ProfitabilityDashboard() {
-  const { view } = useViewport();
-  const isMobile = view === "mobile";
   const { dataPanel, setDataPanel, closeDataPanel } = useActivePanel();
   const { tab: routeTab } = useParams<{ tab?: string }>();
   const profNav = useNavigate();

@@ -15,7 +15,6 @@ import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { useBranding } from "@/contexts/BrandingContext";
 import { useAan } from "@/components/aan/AanContext";
 import { KeyboardShortcutsDialog } from "@/components/shortcuts/KeyboardShortcutsDialog";
-import { useViewport } from "@/contexts/ViewportContext";
 import html2canvas from "html2canvas";
 
 interface ActionItem {
@@ -30,7 +29,6 @@ interface ActionItem {
 const hiddenRoutes = ["/login", "/onboarding", "/settings", "/alerts"];
 
 export function FloatingActionIsland() {
-  const { view } = useViewport();
   const isTabletView = view === "tablet";
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);

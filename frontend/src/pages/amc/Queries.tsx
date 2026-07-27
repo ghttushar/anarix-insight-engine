@@ -15,8 +15,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
-import { useViewport } from "@/contexts/ViewportContext";
-import { MobileCard, MobileCardList } from "@/views/mobile/MobileCardList";
 
 const statusColors: Record<string, string> = {
   active: "bg-success/10 text-success",
@@ -40,8 +38,6 @@ export default function AMCQueries() {
   const [selectedTime, setSelectedTime] = useState(format(new Date(), "HH:mm"));
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [queryToDelete, setQueryToDelete] = useState<string | null>(null);
-  const { view } = useViewport();
-  const isMobile = view === "mobile";
 
   const filteredQueries = mockQueries.filter((q) =>
     q.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

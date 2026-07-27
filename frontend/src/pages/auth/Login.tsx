@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAccounts } from "@/contexts/AccountContext";
-import { useTutorial } from "@/features/tutorial/TutorialContext";
 
 
 import { AnarixLogo } from "@/components/branding/AnarixLogo";

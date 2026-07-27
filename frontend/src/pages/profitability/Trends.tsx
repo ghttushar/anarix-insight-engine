@@ -18,8 +18,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Info, TrendingUp, ChevronDown, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { useViewport } from "@/contexts/ViewportContext";
-import { MobileCard, MobileCardList } from "@/views/mobile/MobileCardList";
 
 
 
@@ -38,8 +36,6 @@ const frequencyColumns: Record<Frequency, string[]> = {
 
 export default function ProfitabilityTrends() {
   const { formatCurrency } = useCurrency();
-  const { view } = useViewport();
-  const isMobile = view === "mobile";
   const [selectedMetric, setSelectedMetric] = useState("Total Sales");
   const [frequency, setFrequency] = useState<Frequency>("Weekly");
   const [searchValue, setSearchValue] = useState("");

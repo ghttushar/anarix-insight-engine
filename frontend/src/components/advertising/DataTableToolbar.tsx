@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { UploadDialog } from "@/components/advertising/UploadDialog";
 import { cn } from "@/lib/utils";
-import { useViewport } from "@/contexts/ViewportContext";
 
 interface FilterRule {
   id: string;
@@ -188,8 +187,6 @@ export function DataTableToolbar({
     c.label.toLowerCase().includes(columnSearch.toLowerCase())
   );
 
-  const { view } = useViewport();
-  const isMobile = view === "mobile";
 
   return (
     <div className={cn("space-y-1.5", isMobile && "mobile-toolbar")} data-table-toolbar>

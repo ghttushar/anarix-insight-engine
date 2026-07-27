@@ -28,8 +28,6 @@ import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { TagsProvider, useTags } from "@/contexts/TagsContext";
 import { CampaignBulkActionsBar } from "@/components/advertising/CampaignBulkActionsBar";
-import { useViewport } from "@/contexts/ViewportContext";
-import { MobileCard, MobileCardList } from "@/views/mobile/MobileCardList";
 import { useCurrency } from "@/contexts/CurrencyContext";
 type TabValue = "campaigns" | "ad-groups" | "product-ads" | "keywords" | "product-targeting" | "search-terms" | "page-type" | "platform";
 
@@ -197,9 +195,7 @@ function CampaignManagerInner() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const { commitDrafts, discardDrafts } = useTags();
-  const { view } = useViewport();
   const { formatCurrency } = useCurrency();
-  const isMobile = view === "mobile";
 
   const kpiItems = mockKPIData
     .filter((kpi) => selectedKPIs.includes(kpi.label))

@@ -24,11 +24,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import amazonLogo from "@/assets/amazon-logo.png";
 import walmartLogo from "@/assets/walmart-logo.png";
-import { ViewBadge } from "@/components/layout/ViewBadge";
 import { AanAutonomyBadge } from "@/components/aan/autonomous/AanAutonomyBadge";
 import { useAanEvents } from "@/components/aan/autonomous/AanEventsContext";
-import { MobileTaskbar } from "@/views/mobile/MobileTaskbar";
-import { useViewport } from "@/contexts/ViewportContext";
 
 interface BreadcrumbItem {
   label: string;
@@ -133,7 +130,6 @@ interface AppTaskbarProps {
 }
 
 export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, showRunButton = false, onRun, children, breadcrumbItems, dateRangeOverride, onDateRangeOverrideChange, hideUtilityCluster = false }: AppTaskbarProps) {
-  const { view } = useViewport();
   const location = useLocation();
   // Hide the app taskbar entirely on the Signals page.
   if (location.pathname.startsWith("/alerts")) {
