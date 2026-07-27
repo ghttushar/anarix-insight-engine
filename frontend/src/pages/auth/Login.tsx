@@ -34,11 +34,6 @@ export default function Login() {
     // Simulate login delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Queue the tutorial to auto-start when the user lands on an analytics route.
-    if (tutorialState.enabled && !tutorialState.completed) {
-      requestAutoStart();
-    }
-
     // Navigate to onboarding/connect accounts
     navigate("/onboarding/connect");
     setIsLoading(false);
