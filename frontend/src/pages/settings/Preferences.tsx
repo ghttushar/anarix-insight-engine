@@ -17,7 +17,6 @@ import { toast } from "sonner";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { useNavigate } from "react-router-dom";
 import { ShortcutEditor } from "@/features/shortcuts/ShortcutEditor";
-import { GestureMapper } from "@/components/gestures/GestureMapper";
 import { POLICIES, Policy } from "@/data/mockAanPolicies";
 import { CONNECTED_SYSTEMS } from "@/data/mockAanFeed";
 import { useAanEvents } from "@/components/aan/autonomous/AanEventsContext";
@@ -160,9 +159,7 @@ export default function Preferences() {
   const { newBranding, toggleNewBranding } = useBranding();
   const { billingFlowEnabled, toggleBillingFlow } = useBillingFlow();
   const { trial, startSync, forceExpire, reset: resetTrial } = useTrial();
-  const { view, setView, entryPath } = useViewport();
   const { effects, toggle: toggleEffect } = useVisualEffects();
-  const { state: tutorialState, setEnabled: setTutorialEnabled, restart: restartTutorial } = useTutorial();
   const navigate = useNavigate();
   const currencyList = Object.values(CURRENCIES);
   const [customShortcuts, setCustomShortcuts] = useState<Record<string, string[]>>(loadCustomShortcuts);
@@ -246,13 +243,6 @@ export default function Preferences() {
     }
   }, []);
 
-  const handleViewChange = (next: AppView) => {
-    if (next === view) return;
-    setView(next);
-    toast.success(`Switched to ${next.charAt(0).toUpperCase() + next.slice(1)} view`);
-    navigate(entryPath(next));
-  };
-
   const handleCaptured = useCallback((desc: string, keys: string[]) => {
     const next = { ...customShortcuts, [desc]: keys };
     setCustomShortcuts(next);
@@ -271,14 +261,6 @@ export default function Preferences() {
     toast.success(`${category} shortcuts reset to defaults`);
   };
 
-  if (view === "mobile") {
-    return (
-      <AppLayout>
-        <MobilePreferences />
-      </AppLayout>
-    );
-  }
-
   return (
     <AppLayout>
       <div className="mx-auto max-w-3xl space-y-8">
@@ -287,56 +269,6 @@ export default function Preferences() {
           <h1 className="font-heading text-2xl font-semibold text-foreground">Preferences</h1>
           <p className="text-sm text-muted-foreground">Customize how Anarix looks and behaves</p>
         </div>
-
-        <Separator />
-
-        {/* App View */}
-        <section className="space-y-4">
-          <div>
-            <h2 className="font-heading text-lg font-medium text-foreground">App View</h2>
-            <p className="text-sm text-muted-foreground">
-              Choose how Anarix renders. Desktop is the current build. Tablet is touch-optimized
-              (same features and layout, redesigned for finger and stylus input). Mobile is reserved.
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {([
-              { id: "desktop" as AppView, icon: Monitor, label: "Desktop", note: "Current build", enabled: true },
-              { id: "tablet" as AppView, icon: Tablet, label: "Tab", note: "Touch-optimized", enabled: true },
-              { id: "mobile" as AppView, icon: Smartphone, label: "Mobile", note: "Coming later", enabled: true },
-            ]).map(({ id, icon: Icon, label, note }) => {
-              const active = view === id;
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => handleViewChange(id)}
-                  className={cn(
-                    "flex flex-col items-start gap-2 rounded-lg border p-4 text-left transition-colors",
-                    active
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-card hover:bg-muted/40"
-                  )}
-                >
-                  <div className="flex items-center gap-2 w-full">
-                    <Icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground")} />
-                    <span className={cn("text-sm font-medium", active ? "text-primary" : "text-foreground")}>{label}</span>
-                    {active && (
-                      <span className="ml-auto text-[10px] font-medium uppercase tracking-wider text-primary">Active</span>
-                    )}
-                  </div>
-                  <span className="text-xs text-muted-foreground">{note}</span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Your choice persists across sessions. Tablet and Mobile each have a dedicated route
-            prefix (<code className="px-1 py-0.5 rounded bg-muted">/tablet</code>,{" "}
-            <code className="px-1 py-0.5 rounded bg-muted">/mobile</code>) so Figma links resolve to
-            the correct variant.
-          </p>
-        </section>
 
         <Separator />
 
@@ -504,57 +436,6 @@ export default function Preferences() {
           </div>
         </section>
 
-        <Separator />
-
-        {/* Gestures */}
-        <section className="space-y-4" id="gestures">
-          <div className="flex items-center gap-2">
-            <Hand className="h-5 w-5 text-muted-foreground" />
-            <h2 className="font-heading text-lg font-medium text-foreground">Gestures</h2>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Hard swipes navigate back/forward. Two- and three-finger gestures trigger any action you map below.
-            Vertical 2-finger gestures only fire when the page is at the very top or bottom — normal scrolling is untouched.
-          </p>
-          <GestureMapper />
-        </section>
-
-        <Separator />
-
-        {/* Tutorial */}
-        <section className="space-y-4" id="tutorial">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-muted-foreground" />
-            <h2 className="font-heading text-lg font-medium text-foreground">Tutorial</h2>
-          </div>
-          <div className="rounded-lg border border-border bg-card divide-y divide-border">
-            <label className="flex items-center justify-between cursor-pointer p-4">
-              <div>
-                <p className="font-medium text-foreground">Show product tutorial after sign-in</p>
-                <p className="text-xs text-muted-foreground">
-                  A guided tour highlights every primary surface — sidebar, taskbar, KPIs, panels, Aan, and shortcuts.
-                </p>
-              </div>
-              <Switch checked={tutorialState.enabled} onCheckedChange={setTutorialEnabled} />
-            </label>
-            <div className="flex items-center justify-between p-4">
-              <div>
-                <p className="text-sm font-medium text-foreground">Replay tutorial now</p>
-                <p className="text-xs text-muted-foreground">
-                  {tutorialState.completed && tutorialState.lastSeen
-                    ? `Last completed ${new Date(tutorialState.lastSeen).toLocaleDateString()}`
-                    : "Not completed yet"}
-                </p>
-              </div>
-              <Button size="sm" onClick={restartTutorial}>
-                <Play className="h-3.5 w-3.5 mr-1.5" />
-                Start tour
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        <Separator />
 
         {/* Edit Alerts — Aan automation policies, connected systems, and how Aan decides. */}
         <section className="space-y-4" id="edit-alerts">
