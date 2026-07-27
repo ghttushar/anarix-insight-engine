@@ -23,7 +23,7 @@ import { InsightsProvider } from "@/components/insights";
 import { CreativeFeatures } from "@/features/creative";
 import { toast } from "sonner";
 import NotFound from "./pages/NotFound";
-import AlertsPage from "./pages/SignalsPage";
+import SignalsPage from "./pages/SignalsPage";
 
 // Auth & Onboarding
 import Login from "./pages/auth/Login";
@@ -244,7 +244,7 @@ function AppRoutes() {
       <Route path="/signals" element={<Navigate to="/alerts/stack" replace />} />
       <Route path="/signals/*" element={<Navigate to="/alerts/stack" replace />} />
       <Route path="/alerts" element={<Navigate to="/alerts/stack" replace />} />
-      <Route path="/alerts/:viewMode" element={<AlertsPage />} />
+      <Route path="/alerts/:viewMode" element={<SignalsPage />} />
 
       {/* Standalone panel routes — for figma export and shareable deep links */}
       <Route path="/panels" element={<PanelIndex />} />
