@@ -15,8 +15,6 @@ import { SortableTableHead, usePinning, sortData, getSortHandler } from "@/compo
 import { TablePagination } from "@/components/tables/TablePagination";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
 import { CreateReportPanel } from "@/components/panels/CreateReportPanel";
-import { useViewport } from "@/contexts/ViewportContext";
-import { MobileCard, MobileCardList } from "@/views/mobile/MobileCardList";
 
 const statusStyles: Record<string, string> = {
   draft: "bg-muted text-muted-foreground border-muted",
@@ -49,8 +47,6 @@ export default function ClientPortal() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeltas, setShowDeltas] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState("performance");
-  const { view } = useViewport();
-  const isMobile = view === "mobile";
 
 
   const { setDataPanel } = useActivePanel();

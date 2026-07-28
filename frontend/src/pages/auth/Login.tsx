@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAccounts } from "@/contexts/AccountContext";
-import { useTutorial } from "@/features/tutorial/TutorialContext";
 
 
 import { AnarixLogo } from "@/components/branding/AnarixLogo";
@@ -17,7 +16,6 @@ export default function Login() {
   const navigate = useNavigate();
   const { clearAccounts } = useAccounts();
   const { newBranding } = useBranding();
-  const { state: tutorialState, requestAutoStart } = useTutorial();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,11 +33,6 @@ export default function Login() {
 
     // Simulate login delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Queue the tutorial to auto-start when the user lands on an analytics route.
-    if (tutorialState.enabled && !tutorialState.completed) {
-      requestAutoStart();
-    }
 
     // Navigate to onboarding/connect accounts
     navigate("/onboarding/connect");

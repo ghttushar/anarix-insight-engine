@@ -1,10 +1,7 @@
-import { useViewport } from "@/contexts/ViewportContext";
-
 /**
- * Mobile is a strict read-only companion view.
- * Any create/edit/delete/upload/connect control must hide when this returns true.
+ * Read-only mode gate. The production desktop app is fully interactive,
+ * so this always returns false. Kept as a hook so call sites stay stable.
  */
 export function useIsReadOnly(): boolean {
-  const { view } = useViewport();
-  return view === "mobile";
+  return false;
 }
