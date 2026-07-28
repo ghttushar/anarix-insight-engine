@@ -54,6 +54,8 @@ venv/
 
 # Development tools
 chainlit.md
+bun.lock
+bun.lockb
 .chainlit
 .ipynb_checkpoints/
 .ac
