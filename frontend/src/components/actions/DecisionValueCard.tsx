@@ -34,11 +34,7 @@ export function DecisionValueCard({ decision: d, selected, onSelect, grouped, on
     onSelect();
   };
 
-  const valueTone =
-    d.valueKind === "gain" ? "text-success"
-    : d.valueKind === "cost" ? "text-destructive"
-    : d.valueKind === "at_risk" ? "text-warning"
-    : "text-foreground/80";
+  const valueTone = "text-foreground";
 
   return (
     <div

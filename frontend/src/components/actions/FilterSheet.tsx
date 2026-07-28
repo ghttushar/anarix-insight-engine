@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Filter as FilterIcon } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Filter as FilterIcon, X } from "lucide-react";
 import { SOURCE_REGISTRY, type DecisionSource } from "@/lib/decisions/sourceRegistry";
 import type { DecisionDomain } from "@/data/mockDecisions";
 import { cn } from "@/lib/utils";
@@ -11,12 +9,14 @@ export interface FilterState {
   sources: Set<DecisionSource>;
   domains: Set<DecisionDomain>;
   window: "any" | "today" | "yesterday" | "week";
+  categories: Set<string>;
 }
 
 export const EMPTY_FILTER: FilterState = {
   sources: new Set(),
   domains: new Set(),
   window: "any",
+  categories: new Set(),
 };
 
 const DOMAINS: { key: DecisionDomain; label: string }[] = [
@@ -39,19 +39,16 @@ interface Props {
   value: FilterState;
   onChange: (f: FilterState) => void;
   activeCount: number;
-  /** Optional controlled-open override, so a banner elsewhere can force the sheet open. */
+  /** Expanded inline filter — no Sheet/sidebar. */
   externalOpen?: boolean;
   onExternalOpenChange?: (o: boolean) => void;
+  /** Category filter options from the alert categories. */
+  categoryOptions?: { key: string; label: string; count: number }[];
 }
 
-export function FilterSheet({ value, onChange, activeCount, externalOpen, onExternalOpenChange }: Props) {
+export function FilterSheet({ value, onChange, activeCount, categoryOptions }: Props) {
   const [draft, setDraft] = useState<FilterState>(value);
-  const [internalOpen, setInternalOpen] = useState(false);
-  const open = externalOpen !== undefined ? externalOpen : internalOpen;
-  const setOpen = (o: boolean) => {
-    if (externalOpen !== undefined) onExternalOpenChange?.(o);
-    else setInternalOpen(o);
-  };
+  const [expanded, setExpanded] = useState(true);
 
   const toggle = <T,>(set: Set<T>, k: T): Set<T> => {
     const n = new Set(set);
@@ -59,13 +56,10 @@ export function FilterSheet({ value, onChange, activeCount, externalOpen, onExte
     return n;
   };
 
-  const apply = () => { onChange(draft); setOpen(false); };
-  const reset = () => { const e = { ...EMPTY_FILTER, sources: new Set<DecisionSource>(), domains: new Set<DecisionDomain>() }; setDraft(e); onChange(e); setOpen(false); };
-
-  return (
-    <Sheet open={open} onOpenChange={(o) => { setOpen(o); if (o) setDraft(value); }}>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 text-[12px] gap-1.5">
+  if (!expanded) {
+    return (
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" className="h-8 text-[12px] gap-1.5" onClick={() => setExpanded(true)}>
           <FilterIcon className="h-3.5 w-3.5" />
           Filter
           {activeCount > 0 && (
@@ -74,85 +68,123 @@ export function FilterSheet({ value, onChange, activeCount, externalOpen, onExte
             </span>
           )}
         </Button>
-      </SheetTrigger>
-      <SheetContent side="right" className="w-[360px] flex flex-col">
-        <SheetHeader>
-          <SheetTitle>Narrow the list</SheetTitle>
-        </SheetHeader>
+      </div>
+    );
+  }
 
-        <div className="flex-1 overflow-auto py-4 space-y-5">
-          <section>
-            <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-2">Source</div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {Object.values(SOURCE_REGISTRY).map((s) => {
-                const on = draft.sources.has(s.key);
-                const Icon = s.icon;
-                return (
-                  <button
-                    key={s.key}
-                    onClick={() => setDraft((d) => ({ ...d, sources: toggle(d.sources, s.key) }))}
-                    className={cn(
-                      "flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-[12px] text-left",
-                      on ? "border-primary/40 bg-primary/5 text-primary" : "border-border hover:bg-muted"
-                    )}
-                  >
-                    <Icon className={cn("h-3.5 w-3.5", s.colorClass)} />
-                    {s.label}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+  const reset = () => {
+    const e = { ...EMPTY_FILTER, sources: new Set<DecisionSource>(), domains: new Set<DecisionDomain>(), categories: new Set<string>() };
+    setDraft(e);
+    onChange(e);
+  };
 
-          <section>
-            <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-2">Area</div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {DOMAINS.map((d) => {
-                const on = draft.domains.has(d.key);
-                return (
-                  <button
-                    key={d.key}
-                    onClick={() => setDraft((s) => ({ ...s, domains: toggle(s.domains, d.key) }))}
-                    className={cn(
-                      "px-2.5 py-1.5 rounded-md border text-[12px] text-left",
-                      on ? "border-primary/40 bg-primary/5 text-primary" : "border-border hover:bg-muted"
-                    )}
-                  >
-                    {d.label}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+  const apply = () => { onChange(draft); };
 
-          <section>
-            <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-2">Time window</div>
-            <div className="flex flex-wrap gap-1.5">
-              {WINDOWS.map((w) => (
+  return (
+    <div className="rounded-lg border border-border/60 bg-card p-3 space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground">Filters</span>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={reset} className="text-[11.5px] h-6 px-2">Reset</Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setExpanded(false)}>
+            <X className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Categories */}
+      {categoryOptions && categoryOptions.length > 0 && (
+        <section>
+          <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-2">Category</div>
+          <div className="flex flex-wrap gap-1.5">
+            {categoryOptions.map((cat) => {
+              const on = draft.categories.has(cat.key);
+              return (
                 <button
-                  key={w.key}
-                  onClick={() => setDraft((d) => ({ ...d, window: w.key }))}
+                  key={cat.key}
+                  onClick={() => setDraft((d) => ({ ...d, categories: toggle(d.categories, cat.key) }))}
                   className={cn(
-                    "px-2.5 py-1 rounded-md border text-[12px]",
-                    draft.window === w.key ? "border-primary/40 bg-primary/5 text-primary" : "border-border hover:bg-muted"
+                    "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-[12px]",
+                    on ? "border-primary/40 bg-primary/5 text-primary font-medium" : "border-border hover:bg-muted text-muted-foreground",
                   )}
                 >
-                  {w.label}
+                  {cat.label}
+                  <span className="text-[10px] tabular-nums opacity-70">({cat.count})</span>
                 </button>
-              ))}
-            </div>
-          </section>
-        </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
-        <SheetFooter className="flex-row justify-between gap-2 pt-3 border-t">
-          <Button variant="ghost" size="sm" onClick={reset} className="text-[11.5px]">Reset</Button>
-          <Button size="sm" onClick={apply} className="text-[11.5px]">Apply</Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+      {/* Source */}
+      <section>
+        <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-2">Source</div>
+        <div className="flex flex-wrap gap-1.5">
+          {Object.values(SOURCE_REGISTRY).map((s) => {
+            const on = draft.sources.has(s.key);
+            const Icon = s.icon;
+            return (
+              <button
+                key={s.key}
+                onClick={() => setDraft((d) => ({ ...d, sources: toggle(d.sources, s.key) }))}
+                className={cn(
+                  "flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-[12px]",
+                  on ? "border-primary/40 bg-primary/5 text-primary" : "border-border hover:bg-muted text-muted-foreground",
+                )}
+              >
+                <Icon className={cn("h-3.5 w-3.5", s.colorClass)} />
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Area */}
+      <section>
+        <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-2">Area</div>
+        <div className="flex flex-wrap gap-1.5">
+          {DOMAINS.map((d) => {
+            const on = draft.domains.has(d.key);
+            return (
+              <button
+                key={d.key}
+                onClick={() => setDraft((s) => ({ ...s, domains: toggle(s.domains, d.key) }))}
+                className={cn(
+                  "px-2.5 py-1.5 rounded-md border text-[12px]",
+                  on ? "border-primary/40 bg-primary/5 text-primary" : "border-border hover:bg-muted text-muted-foreground",
+                )}
+              >
+                {d.label}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Time window */}
+      <section>
+        <div className="text-[10.5px] uppercase tracking-wider font-semibold text-muted-foreground mb-2">Time window</div>
+        <div className="flex flex-wrap gap-1.5">
+          {WINDOWS.map((w) => (
+            <button
+              key={w.key}
+              onClick={() => setDraft((d) => ({ ...d, window: w.key }))}
+              className={cn(
+                "px-2.5 py-1 rounded-md border text-[12px]",
+                draft.window === w.key ? "border-primary/40 bg-primary/5 text-primary font-medium" : "border-border hover:bg-muted text-muted-foreground",
+              )}
+            >
+              {w.label}
+            </button>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
 
 export function countActiveFilters(f: FilterState): number {
-  return f.sources.size + f.domains.size + (f.window !== "any" ? 1 : 0);
+  return f.sources.size + f.domains.size + f.categories.size + (f.window !== "any" ? 1 : 0);
 }

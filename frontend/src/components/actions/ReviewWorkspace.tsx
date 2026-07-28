@@ -307,24 +307,40 @@ export function ReviewWorkspace({ decision: d, onClose, onOpenDecision }: Props)
       )}>
         <div className={cn(
           "pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b to-transparent",
-          executed ? "from-success/[0.10]" : "from-primary/[0.04]",
+          executed ? "from-success/[0.10]" : d.detailContent ? "from-destructive/[0.08]" : "from-primary/[0.04]",
         )} />
         <div className="relative flex items-start gap-3">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className={cn(
-                "inline-flex items-center gap-1.5 h-6 px-2 rounded-full border text-[11px] font-medium",
-                PILL_TONE_CLASS[pill.tone],
-              )}>
-                <pill.Icon size={12} /> {pill.label}
-              </span>
-              <span className="text-[11px] text-muted-foreground uppercase tracking-widest">
-                {d.domain}
-              </span>
-            </div>
-            <h2 className="mt-2 font-heading text-[18px] font-semibold text-foreground leading-snug tracking-tight">
-              {d.insight}
-            </h2>
+            {d.detailContent ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg leading-none">🔴</span>
+                  <span className="text-[13px] font-semibold text-foreground">{d.detailContent.title}</span>
+                </div>
+                <div className="mt-1.5 text-[13px] text-muted-foreground">
+                  ASIN <span className="font-mono font-medium text-foreground">{d.detailContent.asin}</span>
+                  <span className="mx-1.5 text-border">·</span>
+                  <span className="text-foreground/80">{d.detailContent.productName}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={cn(
+                    "inline-flex items-center gap-1.5 h-6 px-2 rounded-full border text-[11px] font-medium",
+                    PILL_TONE_CLASS[pill.tone],
+                  )}>
+                    <pill.Icon size={12} /> {pill.label}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground uppercase tracking-widest">
+                    {d.domain}
+                  </span>
+                </div>
+                <h2 className="mt-2 font-heading text-[18px] font-semibold text-foreground leading-snug tracking-tight">
+                  {d.insight}
+                </h2>
+              </>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -369,6 +385,30 @@ export function ReviewWorkspace({ decision: d, onClose, onOpenDecision }: Props)
                 </Button>
               </div>
             </div>
+          ) : d.detailContent ? (
+            <>
+              {/* Detail content sections */}
+              <div className="space-y-5">
+                {d.detailContent.sections.map((s, i) => (
+                  <section key={i}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[10.5px] uppercase tracking-widest font-semibold text-muted-foreground">
+                        {s.heading}
+                      </span>
+                      {i < d.detailContent.sections.length - 1 && (
+                        <span className="flex-1 border-t border-border/40" />
+                      )}
+                    </div>
+                    <div className="text-[14px] leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                      {s.body}
+                    </div>
+                    {i < d.detailContent.sections.length - 1 && (
+                      <div className="mt-4 border-t border-dashed border-border/30" />
+                    )}
+                  </section>
+                ))}
+              </div>
+            </>
           ) : (
             <>
               {/* Current state */}

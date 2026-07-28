@@ -66,6 +66,13 @@ export interface Decision {
   evidence?: DecisionEvidence;
   steps: DecisionStep[];
   deepLink?: { label: string; href: string };
+  /** Rich content sections for the expanded review workspace. */
+  detailContent?: {
+    title: string;
+    asin: string;
+    productName: string;
+    sections: { heading: string; body: string }[];
+  };
 }
 
 const HOUR = 60 * 60 * 1000;

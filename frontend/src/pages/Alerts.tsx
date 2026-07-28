@@ -18,7 +18,6 @@ import { BulkBar } from "@/components/actions/BulkBar";
 import { GreetingHeader } from "@/components/actions/GreetingHeader";
 import { DailyBriefing } from "@/components/actions/DailyBriefing";
 import { CategorySection } from "@/components/actions/CategorySection";
-import { CategoryRail } from "@/components/actions/CategoryRail";
 import { DecisionValueCard } from "@/components/actions/DecisionValueCard";
 import { MeetingCard } from "@/components/actions/MeetingCard";
 import { ReviewWorkspace } from "@/components/actions/ReviewWorkspace";
@@ -84,13 +83,11 @@ function AlertsInner() {
   const [tab, setTab] = usePersistedState<AlertTabKey>("alerts:tab", "all");
   const [query, setQuery] = usePersistedState<string>("alerts:query", "");
   const [filter, setFilter] = useState<FilterState>(EMPTY_FILTER);
-  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
 
   const sectionRefs = useRef<Map<string, HTMLElement>>(new Map());
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [activeRailKey, setActiveRailKey] = useState<string | null>(null);
 
   const counts = useMemo(() => computeTabCounts(activeDecisions), [activeDecisions]);
   const pool = useMemo(() => filterByTab(activeDecisions, tab), [activeDecisions, tab]);
@@ -115,14 +112,13 @@ function AlertsInner() {
 
   const allCategoryGroups = useMemo(() => categorize(tab, filtered), [tab, filtered]);
   const categoryGroups = useMemo(() => {
-    if (!activeRailKey || activeRailKey === "__all__") return allCategoryGroups;
-    const only = allCategoryGroups.find((c) => c.key === activeRailKey);
-    return only ? [only] : allCategoryGroups;
-  }, [allCategoryGroups, activeRailKey]);
+    if (!filter.categories || filter.categories.size === 0) return allCategoryGroups;
+    return allCategoryGroups.filter((c) => filter.categories.has(c.key));
+  }, [allCategoryGroups, filter.categories]);
   const meetingGroups = useMemo(() => groupByMeeting(filtered), [filtered]);
   const isMeetingsTab = tab === "meetings";
 
-  const railItems = useMemo(
+  const categoryOptions = useMemo(
     () => allCategoryGroups.map((c) => ({ key: c.key, label: c.label, count: c.items.length })),
     [allCategoryGroups],
   );
@@ -134,10 +130,6 @@ function AlertsInner() {
     if (liveMode && selectedId === CRITICAL_ONLY_DECISION.id) setSelectedId(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveMode]);
-
-  const handleRailSelect = useCallback((key: string) => {
-    setActiveRailKey((prev) => (prev === key ? null : key));
-  }, []);
 
   const selectedDecision = useMemo(
     () => activeDecisions.find((d) => d.id === selectedId) ?? null,
@@ -193,24 +185,14 @@ function AlertsInner() {
           onQueryChange={setQuery}
           filter={filter}
           onFilterChange={setFilter}
-          filterSheetOpen={filterSheetOpen}
-          onFilterSheetOpenChange={setFilterSheetOpen}
+          filterSheetOpen={false}
+          onFilterSheetOpenChange={() => {}}
+          categoryOptions={categoryOptions}
         />
 
         <BulkBar />
 
-        <div className="grid gap-4 grid-cols-1 xl:grid-cols-[176px_minmax(340px,1fr)_minmax(520px,1.35fr)] items-start">
-          {/* Category rail */}
-          <div className="hidden xl:block">
-            {!isMeetingsTab && (
-              <CategoryRail
-                items={railItems}
-                activeKey={activeRailKey}
-                onSelect={handleRailSelect}
-              />
-            )}
-          </div>
-
+        <div className="grid gap-4 grid-cols-1 xl:grid-cols-[minmax(340px,1fr)_minmax(520px,1.35fr)] items-start">
           {/* Center: queue */}
           <ScrollArea className="h-[calc(100vh-140px)] pr-2" ref={scrollAreaRef as never}>
             {isEmpty ? (
