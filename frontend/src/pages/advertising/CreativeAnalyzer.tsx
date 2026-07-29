@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sparkles, Upload, Download, Image, Video } from "lucide-react";
-import { getCreativeAssets, getCreativeInsights } from "@/services/advertising.service";
+import { mockCreativeAssets, mockCreativeInsights } from "@/data/mockCreativeAnalyzer";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -21,14 +20,6 @@ const breadcrumbItems = [
 ];
 export default function CreativeAnalyzer() {
   const { formatCurrency } = useCurrency();
-  const [creativeAssets, setCreativeAssets] = useState<any[]>([]);
-  const [creativeInsights, setCreativeInsights] = useState<any[]>([]);
-
-  useEffect(() => {
-    getCreativeAssets().then(setCreativeAssets).catch(() => setCreativeAssets([]));
-    getCreativeInsights().then(setCreativeInsights).catch(() => setCreativeInsights([]));
-  }, []);
-
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -50,7 +41,7 @@ export default function CreativeAnalyzer() {
             <Sparkles className="h-4 w-4 text-primary" />Aan Creative Insights
           </h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            {creativeInsights.map((insight: any) => (
+            {mockCreativeInsights.map((insight) => (
               <div key={insight.id} className="rounded-lg border border-border bg-primary/5 p-3">
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm text-foreground">{insight.insight}</p>
@@ -69,19 +60,19 @@ export default function CreativeAnalyzer() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Total Creatives</p>
-            <p className="text-xl font-semibold text-foreground">{creativeAssets.length}</p>
+            <p className="text-xl font-semibold text-foreground">{mockCreativeAssets.length}</p>
           </CardContent></Card>
           <Card><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Avg CTR</p>
-            <p className="text-xl font-semibold text-foreground">{creativeAssets.length > 0 ? (creativeAssets.reduce((s: number, c: any) => s + c.ctr, 0) / creativeAssets.length).toFixed(1) : "0.0"}%</p>
+            <p className="text-xl font-semibold text-foreground">{(mockCreativeAssets.reduce((s, c) => s + c.ctr, 0) / mockCreativeAssets.length).toFixed(1)}%</p>
           </CardContent></Card>
           <Card><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Avg CVR</p>
-            <p className="text-xl font-semibold text-foreground">{creativeAssets.length > 0 ? (creativeAssets.reduce((s: number, c: any) => s + c.cvr, 0) / creativeAssets.length).toFixed(1) : "0.0"}%</p>
+            <p className="text-xl font-semibold text-foreground">{(mockCreativeAssets.reduce((s, c) => s + c.cvr, 0) / mockCreativeAssets.length).toFixed(1)}%</p>
           </CardContent></Card>
           <Card><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Avg ROAS</p>
-            <p className="text-xl font-semibold text-foreground">{creativeAssets.length > 0 ? (creativeAssets.reduce((s: number, c: any) => s + c.roas, 0) / creativeAssets.length).toFixed(2) : "0.00"}x</p>
+            <p className="text-xl font-semibold text-foreground">{(mockCreativeAssets.reduce((s, c) => s + c.roas, 0) / mockCreativeAssets.length).toFixed(2)}x</p>
           </CardContent></Card>
         </div>
 
@@ -103,7 +94,7 @@ export default function CreativeAnalyzer() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {creativeAssets.map((asset: any) => (
+              {mockCreativeAssets.map((asset) => (
                 <TableRow key={asset.id}>
                   <TableCell className="font-medium">{asset.name}</TableCell>
                   <TableCell className="text-center">

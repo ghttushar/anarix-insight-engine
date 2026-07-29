@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, X } from "lucide-react";
-import { getPnLData, getProducts } from "@/services/profitability.service";
+import { pnlData, profitabilityProducts } from "@/data/mockProfitability";
 import { PnLRow, ProfitabilityProduct } from "@/types/profitability";
 import { toast } from "sonner";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
@@ -92,50 +92,15 @@ export default function ProfitLoss() {
   const [productPickerOpen, setProductPickerOpen] = useState(false);
   const [productSearch, setProductSearch] = useState("");
 
-  // Data state
-  const [pnlData, setPnlData] = useState<PnLRow[]>([]);
-  const [products, setProducts] = useState<ProfitabilityProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      const [p, prod] = await Promise.all([getPnLData(), getProducts()]);
-      if (cancelled) return;
-      setPnlData(p);
-      setProducts(prod);
-      setLoading(false);
-    }
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
   const periods = frequencyPeriods[pnlFrequency];
   const projectedPnlData = useMemo(
     () => pnlData.map((row) => projectRow(row, pnlFrequency)),
-    [pnlFrequency, pnlData]
+    [pnlFrequency]
   );
 
-  const applyFilters = (items: ProfitabilityProduct[]) => {
-    if (!activeFilters || activeFilters.length === 0) return items;
-    return items.filter((p) =>
-      activeFilters.every((f) => {
-        const fieldVal = String((p as any)[f.field] ?? "");
-        const query = f.value.toLowerCase();
-        switch (f.operator) {
-          case "contains": return fieldVal.toLowerCase().includes(query);
-          case "equals": return fieldVal.toLowerCase() === query;
-          case "gt": return Number(fieldVal) > Number(f.query);
-          case "lt": return Number(fieldVal) < Number(f.query);
-          default: return true;
-        }
-      })
-    );
-  };
-
   const filteredProducts = useMemo(
-    () => {
-      let items = products.filter((p) => {
+    () =>
+      profitabilityProducts.filter((p) => {
         if (selectedProductIds.length > 0 && !selectedProductIds.includes(p.id)) return false;
         if (!searchValue) return true;
         const q = searchValue.toLowerCase();
@@ -144,18 +109,16 @@ export default function ProfitLoss() {
           p.itemId.toLowerCase().includes(q) ||
           p.sku.toLowerCase().includes(q)
         );
-      });
-      return applyFilters(items);
-    },
-    [searchValue, selectedProductIds, products, activeFilters]
+      }),
+    [searchValue, selectedProductIds]
   );
 
   const pickerProducts = useMemo(
     () =>
-      products.filter((p) =>
+      profitabilityProducts.filter((p) =>
         productSearch ? p.name.toLowerCase().includes(productSearch.toLowerCase()) : true
       ),
-    [productSearch, products]
+    [productSearch]
   );
 
   const toggleProduct = (id: string) =>
@@ -257,7 +220,7 @@ export default function ProfitLoss() {
             <div className="flex flex-wrap items-center gap-1.5 px-1">
               <span className="text-xs text-muted-foreground">Selected:</span>
               {selectedProductIds.map((id) => {
-                const p = products.find((x) => x.id === id);
+                const p = profitabilityProducts.find((x) => x.id === id);
                 if (!p) return null;
                 return (
                   <Badge key={id} variant="secondary" className="gap-1 pr-1 text-[11px]">

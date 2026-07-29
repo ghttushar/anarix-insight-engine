@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Table, TableBody, TableCell, TableHeader, TableRow,
 } from "@/components/ui/table";
+import { profitabilityProducts } from "@/data/mockProfitability";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { TablePagination } from "@/components/tables/TablePagination";
@@ -15,6 +16,12 @@ interface RegionalProductTableProps {
 
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
 
+const regionAssignments = [
+  { region: "United States", flag: "🇺🇸", products: profitabilityProducts.slice(0, 3) },
+  { region: "Canada", flag: "🇨🇦", products: profitabilityProducts.slice(3, 4) },
+  { region: "Mexico", flag: "🇲🇽", products: profitabilityProducts.slice(4, 5) },
+];
+
 const PINNABLE = ["units", "gmv", "authSales", "adSpend", "netProfit", "margin"];
 const FIXED_OFFSET = 300;
 
@@ -23,17 +30,6 @@ export function RegionalProductTable({ searchValue = "", sortField: externalSort
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
-  const [profitabilityProducts, setProfitabilityProducts] = useState<any[]>([]);
-
-  useEffect(() => {
-    setProfitabilityProducts([]);
-  }, []);
-
-  const regionAssignments = [
-    { region: "United States", flag: "🇺🇸", products: profitabilityProducts.slice(0, 3) },
-    { region: "Canada", flag: "🇨🇦", products: profitabilityProducts.slice(3, 4) },
-    { region: "Mexico", flag: "🇲🇽", products: profitabilityProducts.slice(4, 5) },
-  ];
 
   const allProducts = regionAssignments.flatMap((ra) =>
     ra.products.map((p) => ({ ...p, regionName: ra.region, regionFlag: ra.flag }))

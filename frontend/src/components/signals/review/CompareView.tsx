@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Check } from "lucide-react";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 import { cn } from "@/lib/utils";
 import { recommendationFor } from "@/lib/decisions/recommendationStructure";
 import { RecommendationBlock } from "./RecommendationBlock";

@@ -7,15 +7,14 @@ import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModa
 import { ProductDetailPanel } from "@/components/profitability/ProductDetailPanel";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { TablePagination } from "@/components/tables/TablePagination";
-import { getScatterData, getProducts } from "@/services/profitability.service";
-import { ProfitabilityProduct, ScatterDataPoint } from "@/types/profitability";
+import { scatterData, profitabilityProducts, profitabilityMetrics } from "@/data/mockProfitability";
+import { ProfitabilityProduct } from "@/types/profitability";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { SortableTableHead, usePinning, sortData, getSortHandler } from "@/components/tables/SortableTableHead";
 import { Info, TrendingUp, ChevronDown, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -35,8 +34,6 @@ const frequencyColumns: Record<Frequency, string[]> = {
   Monthly: ["Jan", "Feb", "Mar", "Apr"],
 };
 
-const profitabilityMetrics = ["Total Sales", "Net Profit", "GMV", "Ad Spend", "Units", "Orders", "ROAS", "ACoS"];
-
 export default function ProfitabilityTrends() {
   const { formatCurrency } = useCurrency();
   const [selectedMetric, setSelectedMetric] = useState("Total Sales");
@@ -52,26 +49,8 @@ export default function ProfitabilityTrends() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
 
-  const [products, setProducts] = useState<ProfitabilityProduct[]>([]);
-  const [scatterDataState, setScatterData] = useState<ScatterDataPoint[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      const [p, s] = await Promise.all([getProducts(), getScatterData()]);
-      if (cancelled) return;
-      setProducts(p);
-      setScatterData(s);
-      setLoading(false);
-    }
-    load();
-    return () => { cancelled = true; };
-  }, []);
-
 
   const columns = frequencyColumns[frequency];
-  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(columns, 0, 100);
 
   // Build a numeric key for any column label, falling back to weekly data deterministically.
   const valueForColumn = (p: ProfitabilityProduct, col: string, idx: number) => {
@@ -85,7 +64,7 @@ export default function ProfitabilityTrends() {
 
   const filteredProducts = useMemo(
     () =>
-      products.filter((p) => {
+      profitabilityProducts.filter((p) => {
         if (selectedIds.length > 0 && !selectedIds.includes(p.id)) return false;
         if (!searchValue) return true;
         const q = searchValue.toLowerCase();
@@ -95,15 +74,12 @@ export default function ProfitabilityTrends() {
           p.sku.toLowerCase().includes(q)
         );
       }),
-    [searchValue, selectedIds, products]
+    [searchValue, selectedIds]
   );
 
   const paginatedProducts = useMemo(
-    () => {
-      const sorted = sortData(filteredProducts, sortField === "total" ? null : sortField, sortField === "total" ? "asc" : sortDirection);
-      return sorted.slice((page - 1) * pageSize, page * pageSize);
-    },
-    [filteredProducts, page, pageSize, sortField, sortDirection]
+    () => filteredProducts.slice((page - 1) * pageSize, page * pageSize),
+    [filteredProducts, page, pageSize]
   );
 
   useEffect(() => { setPage(1); }, [searchValue, selectedIds, frequency]);
@@ -111,10 +87,10 @@ export default function ProfitabilityTrends() {
 
   const pickerProducts = useMemo(
     () =>
-      products.filter((p) =>
+      profitabilityProducts.filter((p) =>
         productSearch ? p.name.toLowerCase().includes(productSearch.toLowerCase()) : true
       ),
-    [productSearch, products]
+    [productSearch]
   );
 
   const toggleProduct = (id: string) =>
@@ -218,7 +194,7 @@ export default function ProfitabilityTrends() {
           <div className="flex flex-wrap items-center gap-1.5 px-1">
             <span className="text-xs text-muted-foreground">Selected:</span>
             {selectedIds.map((id) => {
-              const p = products.find((x) => x.id === id);
+              const p = profitabilityProducts.find((x) => x.id === id);
               if (!p) return null;
               return (
                 <Badge key={id} variant="secondary" className="gap-1 pr-1 text-[11px]">
@@ -239,19 +215,15 @@ export default function ProfitabilityTrends() {
           </div>
         )}
 
-        {loading ? (
-          <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">Loading...</div>
-        ) : (
         <ScatterPlotChart
-          data={scatterDataState}
+          data={scatterData}
           selectedIds={selectedIds}
           onPointToggle={(id) => toggleProduct(id)}
           onPointDetail={(id) => {
-            const p = products.find((x) => x.id === id);
+            const p = profitabilityProducts.find((x) => x.id === id);
             if (p) setDetailProduct(p);
           }}
         />
-        )}
 
 
         <div className="space-y-3">
@@ -281,13 +253,11 @@ export default function ProfitabilityTrends() {
                   <TableRow className="bg-muted">
                     <TableHead className="sticky left-0 z-20 bg-muted min-w-[320px]">Product Details</TableHead>
                     {columns.map((c) => (
-                      <SortableTableHead key={c} field={c} sortField={sortField} sortDirection={sortDirection} onSort={(f) => { setSortField(f); setSortDirection((prev) => sortField === f ? (prev === "asc" ? "desc" : "asc") : "asc"); }} pinnedColumns={pinnedColumns} onPinToggle={handlePinToggle} align="right" className={cn("min-w-[100px] whitespace-nowrap", pc(c, true))} style={ps(c)}>
+                      <TableHead key={c} className="text-right min-w-[100px] whitespace-nowrap">
                         {c}
-                      </SortableTableHead>
+                      </TableHead>
                     ))}
-                    <SortableTableHead field="total" sortField={sortField} sortDirection={sortDirection} onSort={(f) => { setSortField(f); setSortDirection((prev) => sortField === f ? (prev === "asc" ? "desc" : "asc") : "asc"); }} pinnedColumns={pinnedColumns} onPinToggle={handlePinToggle} align="right" className="min-w-[120px] font-semibold whitespace-nowrap">
-                      Total
-                    </SortableTableHead>
+                    <TableHead className="text-right min-w-[120px] font-semibold whitespace-nowrap">Total</TableHead>
                     <TableHead className="text-center min-w-[90px]">More Info</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -326,11 +296,11 @@ export default function ProfitabilityTrends() {
                           </div>
                         </TableCell>
                         {columns.map((c, idx) => (
-                          <TableCell key={c} className={cn("text-right whitespace-nowrap", pc(c))} style={ps(c)}>
+                          <TableCell key={c} className="text-right whitespace-nowrap">
                             {formatCurrency(valueForColumn(product, c, idx))}
                           </TableCell>
                         ))}
-                        <TableCell className={cn("text-right font-medium whitespace-nowrap", pc("total"))} style={ps("total")}>
+                        <TableCell className="text-right font-medium whitespace-nowrap">
                           {formatCurrency(total)}
                         </TableCell>
                         <TableCell className="text-center">
@@ -349,13 +319,13 @@ export default function ProfitabilityTrends() {
                   <TableRow className="bg-muted font-medium">
                     <TableCell className="sticky left-0 z-10 bg-muted">Total</TableCell>
                     {columns.map((c, idx) => (
-                      <TableCell key={c} className={cn("text-right whitespace-nowrap", pc(c))} style={ps(c)}>
+                      <TableCell key={c} className="text-right whitespace-nowrap">
                         {formatCurrency(
                           filteredProducts.reduce((sum, p) => sum + valueForColumn(p, c, idx), 0)
                         )}
                       </TableCell>
                     ))}
-                    <TableCell className={cn("text-right whitespace-nowrap", pc("total"))} style={ps("total")}>
+                    <TableCell className="text-right whitespace-nowrap">
                       {formatCurrency(
                         filteredProducts.reduce(
                           (sum, p) => sum + columns.reduce((s, c, idx) => s + valueForColumn(p, c, idx), 0),

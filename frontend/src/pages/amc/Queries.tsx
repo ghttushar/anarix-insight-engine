@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { getQueries } from "@/services/amc.service";
+import { mockQueries } from "@/data/mockAMC";
 import { Plus, Play, MoreHorizontal, Calendar, Clock } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -38,13 +38,8 @@ export default function AMCQueries() {
   const [selectedTime, setSelectedTime] = useState(format(new Date(), "HH:mm"));
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [queryToDelete, setQueryToDelete] = useState<string | null>(null);
-  const [queries, setQueries] = useState<any[]>([]);
 
-  useEffect(() => {
-    getQueries().then(setQueries).catch(() => setQueries([]));
-  }, []);
-
-  const filteredQueries = queries.filter((q: any) =>
+  const filteredQueries = mockQueries.filter((q) =>
     q.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     q.createdBy.toLowerCase().includes(searchQuery.toLowerCase())
   );

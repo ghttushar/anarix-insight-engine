@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 import { RELATIONSHIP_LABEL, type RelationshipType } from "@/lib/decisions/relationships";
 
 interface Props {

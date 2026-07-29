@@ -1,78 +1,14 @@
 // Extended types for the complete Advertising section
-// CampaignStatus and CampaignType live in campaign.ts (canonical source)
-import type { CampaignStatus, CampaignType } from "./campaign";
 
-export interface HarvestCandidate {
-  id: string;
-  searchTerm: string;
-  campaignId: string;
-  campaignName: string;
-  adGroupId: string;
-  adGroupName: string;
-  impressions: number;
-  clicks: number;
-  orders: number;
-  sales: number;
-  spend: number;
-  roas: number;
-  matchType: string;
-  recommendedAction: "add" | "pause" | "none";
-}
+export type CampaignStatus = 
+  | "live" 
+  | "paused" 
+  | "archived" 
+  | "scheduled" 
+  | "out_of_budget" 
+  | "completed";
 
-export interface PacingCampaign {
-  id: string;
-  name: string;
-  dailyBudget: number;
-  dailySpend: number;
-  monthlyBudget: number;
-  monthlySpend: number;
-  status: "on_track" | "at_risk" | "over_spend";
-  pace: number;
-  remainingDays: number;
-  recommendedDailyBudget: number;
-  dailyCap: number;
-}
-
-export interface AnomalyAlert {
-  id: string;
-  type: "spike" | "drop" | "new_trend";
-  severity: "low" | "medium" | "high" | "critical";
-  metric: string;
-  title: string;
-  description: string;
-  entityId: string;
-  entityType: string;
-  timestamp: string;
-  value: number;
-  expectedValue: number;
-  deviation: number;
-}
-
-export interface ClientReport {
-  id: string;
-  title: string;
-  client: string;
-  dateRange: string;
-  status: "draft" | "published" | "archived";
-  lastModified: string;
-  thumbnail?: string;
-}
-
-export interface CreativeAsset {
-  id: string;
-  name: string;
-  type: string;
-  thumbnail?: string;
-}
-
-export interface CreativeInsight {
-  id: string;
-  assetId: string;
-  metric: string;
-  value: number;
-  benchmark: number;
-}
-
+export type CampaignType = "auto" | "manual";
 export type MatchType = "broad" | "exact" | "phrase";
 export type SearchTermType = "branded" | "competitor" | "generic";
 

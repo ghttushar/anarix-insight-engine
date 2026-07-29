@@ -6,7 +6,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 import { formatValue } from "@/lib/decisions/valueFormat";
 import { livingStatusPhrase } from "@/lib/decisions/lifecycle";
 import { useLivingTick } from "@/hooks/useLivingClock";

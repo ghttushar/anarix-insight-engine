@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, ChevronLeft, ChevronRight, ArrowRight, FileText } from "lucide-react";
-import { getTemplates, getAppliedRules } from "@/services/rules.service";
+import { ruleTemplates, suggestionChips, appliedRules, type RuleTemplate } from "@/data/mockRules";
 import { cn } from "@/lib/utils";
+const draftCount = appliedRules.filter((r) => r.status === "draft").length;
 
 
 const breadcrumbItems = [
@@ -20,19 +21,9 @@ export default function RuleAgents() {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [ruleTemplates, setRuleTemplates] = useState<any[]>([]);
-  const [suggestionChips, setSuggestionChips] = useState<string[]>([]);
-  const [appliedRules, setAppliedRules] = useState<any[]>([]);
-  const draftCount = appliedRules.filter((r: any) => r.status === "draft").length;
 
-  useEffect(() => {
-    getTemplates().then(setRuleTemplates).catch(() => setRuleTemplates([]));
-    getAppliedRules().then(setAppliedRules).catch(() => setAppliedRules([]));
-    setSuggestionChips([]);
-  }, []);
-
-  const campaignRules = ruleTemplates.filter((t: any) => t.category === "campaign");
-  const targetingRules = ruleTemplates.filter((t: any) => t.category === "targeting");
+  const campaignRules = ruleTemplates.filter((t) => t.category === "campaign");
+  const targetingRules = ruleTemplates.filter((t) => t.category === "targeting");
 
   const scroll = (dir: "left" | "right") => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -200 : 200, behavior: "smooth" });
@@ -92,7 +83,7 @@ export default function RuleAgents() {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <div ref={scrollRef} className="flex gap-2 overflow-x-auto scrollbar-hide">
-              {suggestionChips.map((chip: string, i: number) => (
+            {suggestionChips.map((chip, i) => (
               <Badge
                 key={i}
                 variant="outline"
@@ -132,7 +123,7 @@ export default function RuleAgents() {
   );
 }
 
-function TemplateCard({ template, onClick }: { template: any; onClick: () => void }) {
+function TemplateCard({ template, onClick }: { template: RuleTemplate; onClick: () => void }) {
   return (
     <Card
       className={cn(

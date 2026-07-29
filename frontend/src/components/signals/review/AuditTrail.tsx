@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 
 interface Event {
   ts: number;

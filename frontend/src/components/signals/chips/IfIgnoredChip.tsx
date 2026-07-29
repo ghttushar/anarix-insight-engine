@@ -1,6 +1,6 @@
 import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 
 /** "If ignored" — coarse projection: ~70% of value over 3 days for cost/gain items. */
 function ifIgnoredCents(d: Decision): number {

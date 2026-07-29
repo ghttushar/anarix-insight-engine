@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Search, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getBrands, getSOVTrendData, getSOVMetrics } from "@/services/bi.service";
+import { brands, sovTrendData, sovMetrics } from "@/data/mockBrandSOV";
 import { toast } from "sonner";
 const breadcrumbItems = [
   { label: "Business Intelligence", href: "/bi/brand-sov" },
@@ -23,15 +23,6 @@ export default function BrandSOV() {
   const [frequency, setFrequency] = useState("hourly");
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeltas, setShowDeltas] = useState(false);
-  const [brands, setBrands] = useState<any[]>([]);
-  const [sovTrendData, setSovTrendData] = useState<any[]>([]);
-  const [sovMetrics, setSovMetrics] = useState<any>(null);
-
-  useEffect(() => {
-    getBrands().then(setBrands).catch(() => setBrands([]));
-    getSOVTrendData().then(setSovTrendData).catch(() => setSovTrendData([]));
-    getSOVMetrics().then(setSovMetrics).catch(() => setSovMetrics(null));
-  }, []);
 
   return (
     <AppLayout>

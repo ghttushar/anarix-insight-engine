@@ -12,8 +12,9 @@
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import type { Decision, DigestItem, DecisionStatus } from "@/types/signals";
-import type { MeetingBundle, MeetingTask, MeetingTaskStatus, AanQuestion, QuestionStatus } from "@/types/meetings";
+import { MOCK_DECISIONS, MOCK_DIGEST_ITEMS, type Decision, type DigestItem, type DecisionStatus } from "@/data/mockDecisions";
+import { MOCK_MEETING_BUNDLES, MOCK_MEETING_TASKS, type MeetingBundle, type MeetingTask, type MeetingTaskStatus } from "@/data/mockMeetings";
+import { MOCK_QUESTIONS, type AanQuestion, type QuestionStatus } from "@/data/mockQuestions";
 import { valueMagnitude } from "@/lib/decisions/valueFormat";
 import { publishUndoable } from "@/components/signals/UndoToast";
 
@@ -68,12 +69,12 @@ interface ActionsStore {
 const Ctx = createContext<ActionsStore | undefined>(undefined);
 
 export function ActionsProvider({ children }: { children: ReactNode }) {
-  const [decisions, setDecisions] = useState<Decision[]>([]);
-  const [digestItems] = useState<DigestItem[]>([]);
+  const [decisions, setDecisions] = useState<Decision[]>(MOCK_DECISIONS);
+  const [digestItems] = useState<DigestItem[]>(MOCK_DIGEST_ITEMS);
   const [digestThresholdCents, setDigestThresholdCents] = useState<number>(DEFAULT_DIGEST_THRESHOLD_CENTS);
-  const [meetings] = useState<MeetingBundle[]>([]);
-  const [meetingTasks, setMeetingTasks] = useState<MeetingTask[]>([]);
-  const [questions, setQuestions] = useState<AanQuestion[]>([]);
+  const [meetings] = useState<MeetingBundle[]>(MOCK_MEETING_BUNDLES);
+  const [meetingTasks, setMeetingTasks] = useState<MeetingTask[]>(MOCK_MEETING_TASKS);
+  const [questions, setQuestions] = useState<AanQuestion[]>(MOCK_QUESTIONS);
 
   // Undo bookkeeping — remembers previous status so we can roll back within 30s.
   const undoTimersRef = useRef<Map<string, { timer: ReturnType<typeof setTimeout>; prev: DecisionStatus }>>(new Map());

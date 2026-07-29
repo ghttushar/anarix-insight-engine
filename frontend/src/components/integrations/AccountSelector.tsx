@@ -2,11 +2,13 @@ import { useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, Store } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAccounts, ConnectedAccount, AccountRegion, AMAZON_REGIONS } from "@/contexts/AccountContext";
+import { useAccounts, ConnectedAccount } from "@/contexts/AccountContext";
 
 const MARKETPLACES: { key: ConnectedAccount["marketplace"]; label: string }[] = [
   { key: "amazon", label: "Amazon" },
   { key: "walmart", label: "Walmart" },
+  { key: "shopify", label: "Shopify" },
+  { key: "tiktok", label: "TikTok" },
 ];
 
 interface Props {
@@ -14,48 +16,21 @@ interface Props {
   onChange: (ids: string[]) => void;
 }
 
-interface SelectableItem {
-  id: string;
-  marketplace: string;
-  merchantName: string;
-  subtitle: string;
-}
-
 export function AccountSelector({ selected, onChange }: Props) {
-  const { accounts, accountGroups, accountRegions } = useAccounts();
+  const { accounts } = useAccounts();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     amazon: true,
     walmart: true,
+    shopify: true,
+    tiktok: true,
   });
 
   const grouped = useMemo(() => {
-    const map: Record<string, SelectableItem[]> = {};
+    const map: Record<string, ConnectedAccount[]> = {};
     for (const m of MARKETPLACES) map[m.key] = [];
-
-    // Non-Amazon flat accounts
-    for (const a of accounts) {
-      (map[a.marketplace] ||= []).push({
-        id: a.id,
-        marketplace: a.marketplace,
-        merchantName: a.merchantName,
-        subtitle: `${a.region} · ${a.accountType} · ${a.merchantId}`,
-      });
-    }
-
-    // Amazon regions
-    for (const region of accountRegions) {
-      const group = accountGroups.find((g) => g.id === region.groupId);
-      const regionLabel = AMAZON_REGIONS.find((r) => r.value === region.region);
-      (map["amazon"] ||= []).push({
-        id: region.id,
-        marketplace: "amazon",
-        merchantName: group ? `${group.name} — ${regionLabel?.label || region.region}` : region.merchantName,
-        subtitle: `${region.region} · ${group?.accountType || "seller"} · ${region.merchantId}`,
-      });
-    }
-
+    for (const a of accounts) (map[a.marketplace] ||= []).push(a);
     return map;
-  }, [accounts, accountGroups, accountRegions]);
+  }, [accounts]);
 
   const toggleId = (id: string) =>
     onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
@@ -115,7 +90,9 @@ export function AccountSelector({ selected, onChange }: Props) {
                         <Checkbox checked={isOn} onCheckedChange={() => toggleId(a.id)} />
                         <div className="min-w-0 flex-1">
                           <p className="text-sm text-foreground truncate">{a.merchantName}</p>
-                          <p className="text-xs text-muted-foreground">{a.subtitle}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {a.region} · {a.accountType} · {a.merchantId}
+                          </p>
                         </div>
                       </label>
                     </li>

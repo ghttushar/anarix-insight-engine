@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 import { deriveAlternateActions } from "@/lib/decisions/deriveAlternateActions";
 import { useUndoFor } from "./useUndoFor";
 import { CountdownRing } from "./CountdownRing";

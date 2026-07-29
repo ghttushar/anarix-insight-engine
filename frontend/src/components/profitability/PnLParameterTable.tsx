@@ -9,13 +9,6 @@ import { PnLRow } from "@/types/profitability";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { SortableTableHead, usePinning, sortData, getSortHandler } from "@/components/tables/SortableTableHead";
-
-const UNIT_PARAM_IDS = new Set(["units", "refundUnits", "cancelledUnits", "orders", "impressions", "clicks", "adUnits"]);
-
-function isUnitParam(parameter: string): boolean {
-  return UNIT_PARAM_IDS.has(parameter.toLowerCase());
-}
 
 interface PnLParameterTableProps {
   data: PnLRow[];
@@ -25,14 +18,6 @@ interface PnLParameterTableProps {
 
 export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParameterTableProps) {
   const { formatCurrency } = useCurrency();
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const allColumns = ["parameter", ...weeks, "total"];
-  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(allColumns, 200, 120);
-
-  const sortedData = sortData(data, sortField, sortDirection);
-  const handleSort = getSortHandler(sortField, setSortField, sortDirection, setSortDirection);
-
   const formatValue = (value: number | null, isCurrency: boolean = true): string => {
     if (value === null) return "-";
     if (isCurrency) return formatCurrency(value);
@@ -86,7 +71,7 @@ export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParame
             row.isParent && "font-medium bg-muted/50"
           )}
         >
-          <TableCell className={cn("sticky left-0 z-10 group-hover:bg-muted/30 transition-colors", row.isParent ? "bg-muted/50" : "bg-card", pc("parameter"))} style={ps("parameter")}>
+          <TableCell className={cn("sticky left-0 z-10 group-hover:bg-muted/30 transition-colors", row.isParent ? "bg-muted/50" : "bg-card")}>
             <div
               className="flex items-center gap-2"
               style={{ paddingLeft: `${row.indent * 20}px` }}
@@ -109,7 +94,7 @@ export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParame
             </div>
           </TableCell>
           {weeks.map((week) => (
-            <TableCell key={week} className={cn("text-right text-sm", pc(week))} style={ps(week)}>
+            <TableCell key={week} className="text-right text-sm">
               <div className="flex items-center justify-end gap-1">
                 <span>{formatValue(row.weeklyValues[week], isCurrency)}</span>
                 {showDeltas && row.weeklyValues[week] !== null && (
@@ -118,7 +103,7 @@ export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParame
               </div>
             </TableCell>
           ))}
-          <TableCell className={cn("text-right font-medium text-sm", pc("total"))} style={ps("total")}>
+          <TableCell className="text-right font-medium text-sm">
             <div className="flex items-center justify-end gap-1">
               <span>{formatValue(row.total, isCurrency)}</span>
               {showDeltas && row.total !== null && (
@@ -130,7 +115,7 @@ export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParame
         {hasChildren &&
           isExpanded &&
           row.children!.map((child) =>
-            renderRow(child, !isUnitParam(child.parameter))
+            renderRow(child, !child.parameter.toLowerCase().includes("unit"))
           )}
       </>
     );
@@ -142,22 +127,12 @@ export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParame
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <SortableTableHead
-                field="parameter"
-                sortField={sortField}
-                sortDirection={sortDirection}
-                onSort={handleSort}
-                pinnedColumns={pinnedColumns}
-                onPinToggle={handlePinToggle}
-                isFixed
-                className={cn("sticky top-0 left-0 z-20 bg-muted/50 min-w-[200px]", pc("parameter", true))}
-                style={ps("parameter")}
-              >
+              <TableHead className="sticky top-0 left-0 z-20 bg-muted/50 min-w-[200px]">
                 <div className="flex items-center gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
-                        onClick={(e) => { e.stopPropagation(); allExpanded ? collapseAll() : expandAll(); }}
+                        onClick={allExpanded ? collapseAll : expandAll}
                         className="p-0.5 hover:bg-muted rounded cursor-pointer"
                       >
                         <ChevronsUpDown className="h-3.5 w-3.5" />
@@ -167,41 +142,18 @@ export function PnLParameterTable({ data, weeks, showDeltas = false }: PnLParame
                   </Tooltip>
                   <span>Parameter / Date</span>
                 </div>
-              </SortableTableHead>
+              </TableHead>
               {weeks.map((week) => (
-                <SortableTableHead
-                  key={week}
-                  field={week}
-                  sortField={sortField}
-                  sortDirection={sortDirection}
-                  onSort={handleSort}
-                  pinnedColumns={pinnedColumns}
-                  onPinToggle={handlePinToggle}
-                  align="right"
-                  className={cn("sticky top-0 z-10 bg-muted/50 text-xs", pc(week, true))}
-                  style={ps(week)}
-                >
+                <TableHead key={week} className="sticky top-0 z-10 bg-muted/50 text-right min-w-[100px] text-xs">
                   {week}
-                </SortableTableHead>
+                </TableHead>
               ))}
-              <SortableTableHead
-                field="total"
-                sortField={sortField}
-                sortDirection={sortDirection}
-                onSort={handleSort}
-                pinnedColumns={pinnedColumns}
-                onPinToggle={handlePinToggle}
-                align="right"
-                className={cn("sticky top-0 z-10 bg-muted/50 font-semibold text-xs", pc("total", true))}
-                style={ps("total")}
-              >
-                Total
-              </SortableTableHead>
+              <TableHead className="sticky top-0 z-10 bg-muted/50 text-right min-w-[120px] font-semibold text-xs">Total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedData.map((row) =>
-              renderRow(row, !isUnitParam(row.parameter))
+            {data.map((row) =>
+              renderRow(row, !row.parameter.toLowerCase().includes("unit"))
             )}
           </TableBody>
         </Table>

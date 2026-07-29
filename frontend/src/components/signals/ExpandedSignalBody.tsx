@@ -1,7 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SourceGlyph } from "./SourceGlyph";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 
 interface Props {
   decision: Decision;

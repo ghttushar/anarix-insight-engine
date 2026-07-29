@@ -1,7 +1,7 @@
 // Multi-strategy recommendations derived from an existing Decision.
 // Every card has one Recommended strategy + a small set of Alternatives.
-import type { Decision } from "@/types/signals";
-const CRITICAL_ONLY_ID = "critical-only";
+import type { Decision } from "@/data/mockDecisions";
+import { CRITICAL_ONLY_ID } from "@/data/criticalOnlyDecision";
 
 export type Reversibility = "reversible" | "partial" | "one_way";
 export type RiskLevel = "low" | "medium" | "high";

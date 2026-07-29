@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { getCampaigns } from "@/services/campaigns.service";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -8,6 +7,8 @@ import {
 } from "@/components/ui/table";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
+import { mockSearchTerms, searchTermsTotals } from "@/data/mockSearchTerms";
+import { mockCampaigns } from "@/data/mockCampaigns";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "./TablePagination";
 import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
@@ -33,20 +34,11 @@ export function SearchTermsTable({ searchQuery = "", showDeltas = false }: Searc
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
-  const [searchTerms, setSearchTerms] = useState<any[]>([]);
-  const [searchTermsTotals, setSearchTermsTotals] = useState<any>({});
-  const [campaigns, setCampaigns] = useState<any[]>([]);
 
-  useEffect(() => {
-    getCampaigns().then(setCampaigns).catch(() => setCampaigns([]));
-    setSearchTerms([]);
-    setSearchTermsTotals({});
-  }, []);
-
-  const filteredTerms = searchTerms.filter((term: any) =>
-    term.searchTerm?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    term.productName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    term.keyword?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredTerms = mockSearchTerms.filter((term) =>
+    term.searchTerm.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    term.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    term.keyword.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSort = (field: string) => {
@@ -125,7 +117,7 @@ export function SearchTermsTable({ searchQuery = "", showDeltas = false }: Searc
                 <TableCell style={ps("adGroupName")} className={cn("text-foreground", pc("adGroupName"))}>{term.adGroupName}</TableCell>
                 <TableCell style={ps("campaignName")} className={cn(pc("campaignName"))}>
                   {(() => {
-                    const ct = campaigns.find((c: any) => c.name === term.campaignName)?.type;
+                    const ct = mockCampaigns.find((c) => c.name === term.campaignName)?.type;
                     return (
                       <div className="flex items-center gap-2">
                         {ct && (

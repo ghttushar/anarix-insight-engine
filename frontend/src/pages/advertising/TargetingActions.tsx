@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, Archive, DollarSign, MoreHorizontal } from "lucide-react";
-import { getTargetingActions, getTargetingCampaigns, getTargetingAdGroups } from "@/services/advertising.service";
+import { mockTargetingActions, mockTargetCampaigns, mockTargetAdGroups } from "@/data/mockTargetingActions";
 import { MatchTypePicker } from "@/components/advertising/MatchTypePicker";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -72,21 +72,12 @@ export default function TargetingActions() {
   const [showDeltas, setShowDeltas] = useState(false);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [targetingActions, setTargetingActions] = useState<any[]>([]);
-  const [targetCampaigns, setTargetCampaigns] = useState<any[]>([]);
-  const [targetAdGroups, setTargetAdGroups] = useState<any[]>([]);
-  const [matchTypeState, setMatchTypeState] = useState<Record<string, any>>({});
-  const [archivedIds, setArchivedIds] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    getTargetingActions().then((data: any[]) => {
-      setTargetingActions(data);
-      setMatchTypeState(Object.fromEntries(data.map((a: any) => [a.id, a.matchTypes])));
-      setArchivedIds(new Set(data.filter((a: any) => a.archived).map((a: any) => a.id)));
-    }).catch(() => setTargetingActions([]));
-    getTargetingCampaigns().then(setTargetCampaigns).catch(() => setTargetCampaigns([]));
-    getTargetingAdGroups().then(setTargetAdGroups).catch(() => setTargetAdGroups([]));
-  }, []);
+  const [matchTypeState, setMatchTypeState] = useState<Record<string, any>>(() =>
+    Object.fromEntries(mockTargetingActions.map((a) => [a.id, a.matchTypes]))
+  );
+  const [archivedIds, setArchivedIds] = useState<Set<string>>(
+    () => new Set(mockTargetingActions.filter((a) => a.archived).map((a) => a.id))
+  );
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
 
   // Switch tab when marketplace switches
@@ -95,7 +86,7 @@ export default function TargetingActions() {
     setSelectedRowIds(new Set());
   }, [defaultTab]);
 
-  const filteredActions = targetingActions.filter((action: any) => {
+  const filteredActions = mockTargetingActions.filter((action) => {
     const matchesSearch =
       action.searchTerm.toLowerCase().includes(searchQuery.toLowerCase()) ||
       action.normalizedTerm.toLowerCase().includes(searchQuery.toLowerCase());
@@ -311,13 +302,13 @@ export default function TargetingActions() {
                       <TableCell>
                         <Select defaultValue={action.targetCampaignId || ""}>
                           <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select..." /></SelectTrigger>
-                          <SelectContent>{targetCampaigns.map((c: any) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}</SelectContent>
+                          <SelectContent>{mockTargetCampaigns.map((c) => (<SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>))}</SelectContent>
                         </Select>
                       </TableCell>
                       <TableCell>
                         <Select defaultValue={action.targetAdGroupId || ""}>
                           <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select..." /></SelectTrigger>
-                          <SelectContent>{targetAdGroups.map((ag: any) => (<SelectItem key={ag.id} value={ag.id}>{ag.name}</SelectItem>))}</SelectContent>
+                          <SelectContent>{mockTargetAdGroups.map((ag) => (<SelectItem key={ag.id} value={ag.id}>{ag.name}</SelectItem>))}</SelectContent>
                         </Select>
                       </TableCell>
                       <TableCell className="px-2 align-top py-2">

@@ -17,32 +17,9 @@ import { toast } from "sonner";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { useNavigate } from "react-router-dom";
 import { ShortcutEditor } from "@/features/shortcuts/ShortcutEditor";
+import { POLICIES, Policy } from "@/data/mockAanPolicies";
+import { CONNECTED_SYSTEMS } from "@/data/mockAanFeed";
 import { useAanEvents } from "@/components/aan/autonomous/AanEventsContext";
-
-interface Policy {
-  id: string;
-  name: string;
-  description: string;
-  enabled: boolean;
-  timesTriggered: number;
-  lastTriggered?: string;
-}
-
-const POLICIES: Policy[] = [
-  { id: "auto-pause", name: "Auto-pause low performers", description: "Pause campaigns/ads below performance thresholds", enabled: true, timesTriggered: 142, lastTriggered: "2026-03-08" },
-  { id: "budget-increase", name: "Budget increase for winners", description: "Auto-increase budget for top-performing campaigns", enabled: true, timesTriggered: 89, lastTriggered: "2026-03-07" },
-  { id: "keyword-harvest", name: "Keyword harvesting", description: "Auto-harvest converting search terms", enabled: false, timesTriggered: 34, lastTriggered: "2026-02-28" },
-  { id: "placement-bid", name: "Placement bid adjustment", description: "Adjust bid modifiers by placement", enabled: true, timesTriggered: 67, lastTriggered: "2026-03-06" },
-  { id: "dayparting", name: "Day parting schedule", description: "Apply time-based schedule rules", enabled: true, timesTriggered: 210, lastTriggered: "2026-03-08" },
-];
-
-const CONNECTED_SYSTEMS = [
-  { id: "amazon-ads", name: "Amazon Ads", status: "active", pulse: true },
-  { id: "walmart-ads", name: "Walmart Ads", status: "active", pulse: true },
-  { id: "amazon-catalog", name: "Amazon Catalog", status: "active", pulse: true },
-  { id: "walmart-catalog", name: "Walmart Catalog", status: "active", pulse: true },
-  { id: "google-analytics", name: "Google Analytics", status: "inactive", pulse: false },
-];
 
 const CUSTOM_SHORTCUTS_KEY = "anarix-custom-shortcuts";
 

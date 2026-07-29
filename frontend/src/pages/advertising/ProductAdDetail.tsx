@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -8,7 +8,9 @@ import { InlineKPIStrip } from "@/components/advertising/InlineKPIStrip";
 import { PerformanceChart } from "@/components/charts/PerformanceChart";
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
 import { AddProductAdsPanel } from "@/components/advertising/AddProductAdsPanel";
-import { getCampaigns, getAdGroups, getProductAds, getChartData, getKPIData } from "@/services/campaigns.service";
+import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
+import { mockAdGroups } from "@/data/mockAdGroups";
+import { mockProductAds } from "@/data/mockProductAds";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/status/StatusBadge";
@@ -31,29 +33,17 @@ export default function ProductAdDetail() {
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
-  const [campaigns, setCampaigns] = useState<any[]>([]);
-  const [adGroups, setAdGroups] = useState<any[]>([]);
-  const [productAds, setProductAds] = useState<any[]>([]);
-  const [chartData, setChartData] = useState<any[]>([]);
-  const [kpiData, setKpiData] = useState<any[]>([]);
 
-  useEffect(() => {
-    getCampaigns().then(setCampaigns).catch(() => setCampaigns([]));
-    getAdGroups().then(setAdGroups).catch(() => setAdGroups([]));
-    getProductAds().then(setProductAds).catch(() => setProductAds([]));
-    getChartData().then(setChartData).catch(() => setChartData([]));
-    getKPIData().then(setKpiData).catch(() => setKpiData([]));
-  }, []);
 
-  const campaign = campaigns.find((c: any) => c.id === campaignId);
-  const adGroup = adGroups.find((ag: any) => ag.id === adGroupId);
-  const productAd = productAds.find((pa: any) => pa.id === productAdId);
+  const campaign = mockCampaigns.find((c) => c.id === campaignId);
+  const adGroup = mockAdGroups.find((ag) => ag.id === adGroupId);
+  const productAd = mockProductAds.find((pa) => pa.id === productAdId);
   const campaignName = campaign?.name || `Campaign ${campaignId}`;
   const adGroupName = adGroup?.name || `Ad Group ${adGroupId}`;
   const productAdName = productAd?.productName || `Product Ad ${productAdId}`;
   const adTypeLabel = adType === "All" ? "SP" : adType;
 
-  const kpiItems = kpiData.slice(0, 5).map((kpi: any, index: number) => ({
+  const kpiItems = mockKPIData.slice(0, 5).map((kpi, index) => ({
     label: kpi.label,
     value: kpi.value,
     previousValue: kpi.previousValue,
@@ -106,7 +96,7 @@ export default function ProductAdDetail() {
           <div className="space-y-3">
             <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
             <InlineKPIStrip items={kpiItems} />
-            <PerformanceChart data={chartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+            <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
           </div>
 
           <DataTableToolbar

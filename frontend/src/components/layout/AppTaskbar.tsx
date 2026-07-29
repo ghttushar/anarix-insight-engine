@@ -80,13 +80,33 @@ const DATE_PRESET_GROUPS: { label: string; presets: DatePreset[] }[] = [
 const MARKETPLACE_LOGOS: Record<string, string | null> = {
   amazon: amazonLogo,
   walmart: walmartLogo,
+  shopify: null,
+  tiktok: null,
 };
 
 const MARKETPLACE_COLORS: Record<string, string> = {
   amazon: "#FF9900",
   walmart: "#0071CE",
+  shopify: "#96BF48",
+  tiktok: "#000000",
 };
 
+function ShopifyIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M15.34 3.03c-.07 0-.13.04-.15.1-.02.05-.46 1.06-.46 1.06s-.93-.19-.93-.19c-.05-.38-.26-.68-.56-.87a3.07 3.07 0 0 0-.47-.24c-.14-.46-.38-.86-.7-1.09-.55-.4-1.22-.4-1.78-.02-.18.12-.34.29-.47.49-.28-.07-.52-.04-.71.09a.96.96 0 0 0-.36.55c-.14.54.09 1.22.53 1.95-.42.13-.71.32-.73.34l.05.2c.03 0 .79-.42 1.71-.42h.11c.56.02 1.01.2 1.34.53.25.25.42.58.5.96l.02.1 4.16 1.01a.17.17 0 0 0 .2-.12L17.09 4a.17.17 0 0 0-.11-.2l-1.64-.77zM9.73 4.13c.09-.19.23-.35.39-.46.39-.27.87-.27 1.28.04.19.14.36.37.48.68-.35-.04-.72 0-1.08.12-.35-.47-.53-.94-.43-1.32a.56.56 0 0 1 .22-.34c.09-.06.19-.07.32-.04-.06.1-.12.21-.18.32zm1.47 1.1c-.35-.32-.78-.5-1.3-.52h-.1c-.46 0-.85.1-1.17.22.05.08.1.17.16.25.27.4.6.73.96.97.47-.23.99-.37 1.53-.37-.02-.18-.05-.37-.08-.55z" />
+      <path d="M20.42 6.64l-4.8-1.17-.42 1.63-1.34-.32c-.1-.4-.3-.74-.58-1.01-.4-.38-.93-.59-1.56-.61h-.12c-.76 0-1.39.27-1.87.53l-.29.17 1.04 12.29 6.6 1.85 4.4-1.6-1.06-11.76zm-5.6 2.37l-.66 2.02s-.72-.39-1.6-.32c-1.29.09-1.3.89-1.29 1.1.07 1.14 3.07 1.39 3.24 4.07.13 2.1-1.12 3.54-2.92 3.66-2.17.14-3.36-1.14-3.36-1.14l.46-1.96s1.2.92 2.16.85c.63-.04.85-.55.83-.91-.09-1.49-2.53-1.4-2.69-3.85-.13-2.07 1.23-4.16 4.22-4.35 1.15-.07 1.74.22 1.74.22l-.13.61z" />
+    </svg>
+  );
+}
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.8.1V9.01a6.27 6.27 0 0 0-1-.08 6.27 6.27 0 0 0-6.27 6.27A6.27 6.27 0 0 0 9.29 21.5a6.27 6.27 0 0 0 6.27-6.27V8.98a8.22 8.22 0 0 0 4.03 1.05V6.69z" />
+    </svg>
+  );
+}
 
 function StatusDot({ status, className }: { status: "connected" | "syncing" | "error"; className?: string }) {
   const colors = { connected: "bg-emerald-500", syncing: "bg-amber-500", error: "bg-red-500" };
@@ -111,20 +131,26 @@ interface AppTaskbarProps {
 
 export function AppTaskbar({ showAdType = false, showFrequency = false, showDateRange = false, showRunButton = false, onRun, children, breadcrumbItems, dateRangeOverride, onDateRangeOverrideChange, hideUtilityCluster = false }: AppTaskbarProps) {
   const location = useLocation();
+  // Hide the app taskbar entirely on the Signals page.
+  if (location.pathname.startsWith("/alerts")) {
+    return null;
+  }
   const { adType, setAdType, frequency, setFrequency, dateRange: ctxDateRange, setDateRange: setCtxDateRange } = useFilter();
   const dateRange = dateRangeOverride ?? ctxDateRange;
   const setDateRange = onDateRangeOverrideChange ?? setCtxDateRange;
   const { effects } = useVisualEffects();
   const { setDataPanel, hasAnyPanel } = useActivePanel();
   const { marketplace } = useMarketplace();
-  const { currentAccount, currentRegion, currentAccountGroup } = useAccounts();
+  const { currentAccount } = useAccounts();
   const { openPanel: openAan } = useAan();
   const { openPanel: openInsights } = useInsights();
   const { pendingCount: aanPendingCount, criticalCount: aanCriticalCount } = useAanEvents();
   const navigate = useNavigate();
   const islandOff = !effects.floatingIsland;
 
+
   const [draftRange, setDraftRange] = useState<{ from: Date; to: Date }>(dateRange);
+
   const [datePopoverOpen, setDatePopoverOpen] = useState(false);
 
   useEffect(() => {
@@ -132,11 +158,6 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
       setDraftRange(dateRange);
     }
   }, [datePopoverOpen]);
-
-  // Hide the app taskbar entirely on the Signals page.
-  if (location.pathname.startsWith("/alerts")) {
-    return null;
-  }
 
   const handleApplyDateRange = () => {
     setDateRange(draftRange);
@@ -154,24 +175,21 @@ export function AppTaskbar({ showAdType = false, showFrequency = false, showDate
 
   const marketplaceLogo = MARKETPLACE_LOGOS[marketplace];
   const marketplaceColor = MARKETPLACE_COLORS[marketplace];
-  const isAmazonRegion = marketplace === "amazon" && currentRegion && currentAccountGroup;
-  const accountName = isAmazonRegion
-    ? `${currentAccountGroup!.name} — ${currentRegion!.region}`
-    : currentAccount?.merchantName || "No Account";
-  const accountStatus = isAmazonRegion
-    ? currentRegion!.status
-    : currentAccount?.status || "connected";
-  const lastSyncTime = isAmazonRegion
-    ? (currentRegion!.lastSync
-        ? format(new Date(currentRegion!.lastSync), "MMM d, h:mm a")
-        : format(new Date(), "MMM d, h:mm a"))
-    : currentAccount?.lastSync
-      ? format(new Date(currentAccount.lastSync), "MMM d, h:mm a")
-      : format(new Date(), "MMM d, h:mm a");
+  const accountName = currentAccount?.merchantName || "No Account";
+  const accountStatus = currentAccount?.status || "connected";
+  const lastSyncTime = currentAccount?.lastSync
+    ? format(new Date(currentAccount.lastSync), "MMM d, h:mm a")
+    : format(new Date(), "MMM d, h:mm a");
 
   const renderMarketplaceLogo = () => {
     if (marketplaceLogo) {
       return <img src={marketplaceLogo} alt={marketplace} className="h-4 w-auto object-contain" />;
+    }
+    if (marketplace === "shopify") {
+      return <ShopifyIcon className="h-4 w-4" />;
+    }
+    if (marketplace === "tiktok") {
+      return <TikTokIcon className="h-4 w-4" />;
     }
     return null;
   };

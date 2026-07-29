@@ -1,6 +1,6 @@
 // Time-of-day AI briefing. Returns a title, dateline and bullet list —
 // derived from the current decision corpus so it feels alive.
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 
 export type BriefingSlot = "morning" | "afternoon" | "evening" | "end_of_day";
 

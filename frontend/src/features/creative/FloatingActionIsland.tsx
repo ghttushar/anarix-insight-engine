@@ -45,7 +45,6 @@ export function FloatingActionIsland() {
   const { pendingCount: aanPendingCount, criticalCount: aanCriticalCount } = useAanEvents();
   const { newBranding } = useBranding();
   const { resolvedTheme, setTheme } = useTheme();
-  const { setDataPanel } = useActivePanel();
   const isDark = resolvedTheme === "dark";
   
   const isWebsite = location.pathname.startsWith("/website");
@@ -70,7 +69,7 @@ export function FloatingActionIsland() {
     const rect = (e.currentTarget.closest("[data-island]") as HTMLElement)?.getBoundingClientRect();
     if (!rect) return;
     const target = e.currentTarget;
-    try { target.setPointerCapture(e.pointerId); } catch { void 0; }
+    try { target.setPointerCapture(e.pointerId); } catch { /* ignore */ }
     setIsDragging(true);
     dragRef.current = {
       startX: e.clientX,
@@ -89,7 +88,7 @@ export function FloatingActionIsland() {
     };
     const handleUp = (ev: PointerEvent) => {
       if (!dragRef.current || ev.pointerId !== dragRef.current.pointerId) return;
-      try { dragRef.current.el.releasePointerCapture(dragRef.current.pointerId); } catch { void 0; }
+      try { dragRef.current.el.releasePointerCapture(dragRef.current.pointerId); } catch { /* ignore */ }
       setIsDragging(false);
       dragRef.current = null;
       target.removeEventListener("pointermove", handleMove);
@@ -128,6 +127,8 @@ export function FloatingActionIsland() {
       return next;
     });
   };
+
+  const { setDataPanel } = useActivePanel();
 
   const themeAction: ActionItem = {
     icon: isDark ? Sun : Moon,

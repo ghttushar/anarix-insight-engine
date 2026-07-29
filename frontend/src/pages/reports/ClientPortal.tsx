@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Send, FileText, Calendar, Download, Eye } from "lucide-react";
-import { getClientReports } from "@/services/client-reports.service";
+import { mockClientReports } from "@/data/mockClientReports";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { SortableTableHead, usePinning, sortData, getSortHandler } from "@/components/tables/SortableTableHead";
@@ -43,14 +43,10 @@ const breadcrumbItems = [
 ];
 
 export default function ClientPortal() {
-  const [reports, setReports] = useState<any[]>([]);
+  const [reports, setReports] = useState(mockClientReports);
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeltas, setShowDeltas] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState("performance");
-
-  useEffect(() => {
-    getClientReports().then(setReports).catch(() => setReports([]));
-  }, []);
 
 
   const { setDataPanel } = useActivePanel();

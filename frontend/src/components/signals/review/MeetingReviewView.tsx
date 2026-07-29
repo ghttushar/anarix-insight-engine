@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatValue } from "@/lib/decisions/valueFormat";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 import { SourcePill } from "../chips/SourcePill";
 
 interface Props {

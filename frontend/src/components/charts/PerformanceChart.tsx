@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LineChart, Line, BarChart, Bar, AreaChart, Area,
@@ -10,7 +10,7 @@ import { ChartContainer, ChartType, ChartMetric } from "./ChartContainer";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { getCampaigns } from "@/services/campaigns.service";
+import { mockCampaigns } from "@/data/mockCampaigns";
 import { ExternalLink } from "lucide-react";
 
 interface PerformanceChartProps {
@@ -52,17 +52,12 @@ function formatTooltipValue(value: number, format: string): string {
 export function PerformanceChart({ data, title = "Performance Overview", showImpact = false, onShowImpactChange, selectedMetrics: selectedMetricsProp, onSelectedMetricsChange }: PerformanceChartProps) {
   const navigate = useNavigate();
   const [internalSelected, setInternalSelected] = useState<MetricKey[]>(DEFAULT_SELECTED_METRICS);
-  const [campaigns, setCampaigns] = useState<any[]>([]);
   const selectedMetrics = selectedMetricsProp ?? internalSelected;
   const setSelectedMetrics = (next: MetricKey[]) => {
     if (onSelectedMetricsChange) onSelectedMetricsChange(next);
     else setInternalSelected(next);
   };
   const [chartType, setChartType] = useState<ChartType>("line");
-
-  useEffect(() => {
-    getCampaigns().then(setCampaigns).catch(() => setCampaigns([]));
-  }, []);
 
   const chartData = showImpact
     ? data.map((point) => {
@@ -101,7 +96,7 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
 
   // Build top-3 / bottom-2 contributors for the Show Impact tooltip
   const contributors = (() => {
-    const sorted = [...campaigns].sort((a: any, b: any) => b.spend - a.spend);
+    const sorted = [...mockCampaigns].sort((a, b) => b.spend - a.spend);
     const top3 = sorted.slice(0, 3);
     const bottom2 = sorted.slice(-2).reverse();
     return { top3, bottom2 };
@@ -237,14 +232,6 @@ export function PerformanceChart({ data, title = "Performance Overview", showImp
       )}
     </ResponsiveContainer>
   );
-
-  if (!data || data.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
-        No data available for the selected period.
-      </div>
-    );
-  }
 
   return (
     <ChartContainer

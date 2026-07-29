@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -12,8 +12,7 @@ import { ImpactDateRangePair } from "@/components/advertising/ImpactDateRangePai
 import { ImpactMetricMultiSelect } from "@/components/advertising/ImpactMetricMultiSelect";
 import { ImpactLineChart } from "@/components/charts/ImpactLineChart";
 import { DateRange, ImpactMetricKey, addDays } from "@/lib/utils/impactSeries";
-import { getImpactCampaigns, getImpactAdGroups, getImpactProducts } from "@/services/advertising.service";
-import type { ImpactComparison } from "@/types/advertising";
+import { mockImpactAdGroups, mockImpactCampaigns, mockImpactProducts } from "@/data/mockImpactData";
 
 const SORTABLE_FIELDS = [
   { id: "name", label: "Name" },
@@ -34,19 +33,9 @@ function defaultRanges(): { previous: DateRange; impact: DateRange } {
 
 export default function ImpactAdGroupDetail() {
   const { campaignId = "", adGroupId = "" } = useParams();
-  const [campaigns, setCampaigns] = useState<ImpactComparison[]>([]);
-  const [adGroups, setAdGroups] = useState<ImpactComparison[]>([]);
-  const [products, setProducts] = useState<ImpactComparison[]>([]);
-
-  useEffect(() => {
-    Promise.all([getImpactCampaigns(), getImpactAdGroups(), getImpactProducts()]).then(([c, a, p]) => {
-      setCampaigns(c); setAdGroups(a); setProducts(p);
-    }).catch(() => { setCampaigns([]); setAdGroups([]); setProducts([]); });
-  }, []);
-
-  const campaign = campaigns.find((c) => c.id === campaignId);
-  const adGroup = adGroups.find((a) => a.id === adGroupId);
-  const data = useMemo(() => products.filter((p) => p.adGroupId === adGroupId), [products, adGroupId]);
+  const campaign = mockImpactCampaigns.find((c) => c.id === campaignId);
+  const adGroup = mockImpactAdGroups.find((a) => a.id === adGroupId);
+  const data = useMemo(() => mockImpactProducts.filter((p) => p.adGroupId === adGroupId), [adGroupId]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMetrics, setSelectedMetrics] = useState<ImpactMetricKey[]>(["adSpend", "adSales"]);

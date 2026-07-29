@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 import { formatValue } from "@/lib/decisions/valueFormat";
 
 export function ImpactChip({ decision }: { decision: Decision }) {

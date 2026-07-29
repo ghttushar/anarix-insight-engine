@@ -24,7 +24,7 @@ const sections: { icon: any; title: string; articles: Article[] }[] = [
           { h: "1. Create your workspace" },
           { p: "Sign up with your work email. Pick a workspace name (typically your brand or agency name). Invite teammates from Settings → Team." },
           { h: "2. Connect a marketplace" },
-          { p: "Open Settings → Integrations and pick Amazon or Walmart. OAuth flows take ~2 minutes per channel. Historical data syncs in the background - usually within an hour for the past 90 days." },
+          { p: "Open Settings → Integrations and pick Amazon, Walmart, Shopify, or TikTok Shop. OAuth flows take ~2 minutes per channel. Historical data syncs in the background - usually within an hour for the past 90 days." },
           { h: "3. Set spend guardrails" },
           { p: "Settings → Preferences → Guardrails. Default daily and monthly spend caps per campaign. These are enforced by the rule engine before any automation can apply." },
           { h: "4. Meet Aan" },
@@ -36,7 +36,7 @@ const sections: { icon: any; title: string; articles: Article[] }[] = [
         title: "Core concepts",
         body: [
           { h: "Marketplace" },
-          { p: "A connected ad account on Amazon or Walmart. Switch between marketplaces using the Marketplace Selector at the top of every page." },
+          { p: "A connected ad account on Amazon, Walmart, Shopify, TikTok, Meta, or Google. Switch between marketplaces using the Marketplace Selector at the top of every page." },
           { h: "Workspace" },
           { p: "Your team's container. Holds connected accounts, rules, reports, dashboards, and Aan history. Roles are managed separately from profile data for security." },
           { h: "Rule" },
@@ -81,7 +81,18 @@ const sections: { icon: any; title: string; articles: Article[] }[] = [
           ] },
         ],
       },
-
+      {
+        id: "connect-shopify",
+        title: "Connect Shopify",
+        body: [
+          { p: "Shopify connection brings in orders, products, and customer data so Anarix can compute true contribution margin and run cross-channel attribution." },
+          { list: [
+            "Settings → Integrations → Shopify → Install App.",
+            "Approve scopes: read_orders, read_products, read_customers.",
+            "Map your Shopify products to your marketplace SKUs (Anarix auto-matches by SKU code; manual override available).",
+          ] },
+        ],
+      },
     ],
   },
   {
@@ -95,7 +106,7 @@ const sections: { icon: any; title: string; articles: Article[] }[] = [
           { p: "Unified P&L shows true contribution margin across channels at the SKU, brand, or account level." },
           { h: "Cost lines included" },
           { list: [
-            "Cost of goods sold (COGS) - uploaded or pulled from your store.",
+            "Cost of goods sold (COGS) - uploaded or pulled from Shopify.",
             "Marketplace fees - referral, FBA, storage, returns.",
             "Ad spend - Sponsored Products/Brands/Display, plus off-platform.",
             "Shipping & fulfillment - actual cost from settlement reports.",
@@ -222,7 +233,7 @@ const sections: { icon: any; title: string; articles: Article[] }[] = [
           { h: "May 2026" },
           { list: [
             "Aan agents - autonomous workflows for budget pacing and anomaly response.",
-
+            "TikTok Shop ads integration (beta).",
             "Improved scatter chart margins on Profitability dashboard.",
           ] },
           { h: "April 2026" },

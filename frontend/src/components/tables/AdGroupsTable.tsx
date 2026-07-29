@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -8,7 +8,7 @@ import {
 import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
-import { getAdGroups } from "@/services/campaigns.service";
+import { mockAdGroups, adGroupsTotals } from "@/data/mockAdGroups";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "./TablePagination";
 import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
@@ -16,7 +16,7 @@ import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
 interface AdGroupsTableProps {
   searchQuery?: string;
   showDeltas?: boolean;
-  onRowClick?: (adGroup: any) => void;
+  onRowClick?: (adGroup: typeof import("@/data/mockAdGroups").mockAdGroups[0]) => void;
 }
 
 const PINNABLE = ["campaignName", "minBid", "maxBid", "targetRoas", "impressions", "clicks", "ctr", "adUnits", "cvr", "cpc", "adSpend", "adSales", "roas", "acos"];
@@ -28,18 +28,10 @@ export function AdGroupsTable({ searchQuery = "", showDeltas = false, onRowClick
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
-  const [adGroups, setAdGroups] = useState<any[]>([]);
-  const [adGroupsTotals, setAdGroupsTotals] = useState<any>({});
 
-  useEffect(() => {
-    getAdGroups().then((data: any[]) => {
-      setAdGroups(data);
-    }).catch(() => setAdGroups([]));
-  }, []);
-
-  const filteredGroups = adGroups.filter((group: any) =>
-    group.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    group.campaignName?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredGroups = mockAdGroups.filter((group) =>
+    group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    group.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSort = (field: string) => {

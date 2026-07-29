@@ -6,7 +6,7 @@ import { SourceGlyph } from "./SourceGlyph";
 import { ShareMenu } from "./ShareMenu";
 import { useActionsStore } from "@/state/signalsStore";
 import { getSourceMeta } from "@/lib/decisions/sourceRegistry";
-import type { AanQuestion } from "@/types/meetings";
+import type { AanQuestion } from "@/data/mockQuestions";
 
 interface Props {
   question: AanQuestion;

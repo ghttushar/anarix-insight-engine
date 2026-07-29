@@ -20,7 +20,7 @@ function loadEffects(): Record<VisualEffectKey, boolean> {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) return { ...defaults, ...JSON.parse(stored) };
-  } catch { void 0; }
+  } catch {}
   return { ...defaults };
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sparkles, Plus, X, Search, Download } from "lucide-react";
-import { getSearchHarvesting } from "@/services/advertising.service";
+import { mockHarvestCandidates, type HarvestCandidate } from "@/data/mockSearchHarvesting";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -25,12 +25,8 @@ const breadcrumbItems = [
 ];
 export default function SearchHarvesting() {
   const { formatCurrency } = useCurrency();
-  const [candidates, setCandidates] = useState<any[]>([]);
+  const [candidates, setCandidates] = useState(mockHarvestCandidates);
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    getSearchHarvesting().then(setCandidates).catch(() => setCandidates([]));
-  }, []);
 
   const pending = candidates.filter((c) => c.status === "pending" && c.searchTerm.toLowerCase().includes(searchQuery.toLowerCase()));
 

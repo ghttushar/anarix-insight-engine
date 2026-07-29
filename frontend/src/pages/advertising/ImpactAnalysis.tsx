@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -14,11 +14,12 @@ import { ImpactMetricMultiSelect } from "@/components/advertising/ImpactMetricMu
 import { ImpactLineChart } from "@/components/charts/ImpactLineChart";
 import { DateRange, ImpactMetricKey, addDays } from "@/lib/utils/impactSeries";
 import {
-  getImpactCampaigns,
-  getImpactAdGroups,
-  getImpactProducts,
-} from "@/services/advertising.service";
-import type { ImpactComparison } from "@/types/advertising";
+  mockImpactCampaigns,
+  mockImpactAdGroups,
+  mockImpactProducts,
+  mockImpactKeywords,
+  mockImpactSearchTerms,
+} from "@/data/mockImpactData";
 
 type ImpactTab = "campaigns" | "ad-groups" | "products" | "keywords" | "search-terms";
 
@@ -64,21 +65,17 @@ export default function ImpactAnalysis() {
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [activeFilters, setActiveFilters] = useState<{ id: string; field: string; operator: string; value: string }[]>([]);
-  const [impactData, setImpactData] = useState<Record<string, ImpactComparison[]>>({});
 
-  useEffect(() => {
-    Promise.all([
-      getImpactCampaigns(),
-      getImpactAdGroups(),
-      getImpactProducts(),
-    ]).then(([campaigns, adGroups, products]) => {
-      setImpactData({ campaigns, "ad-groups": adGroups, products, keywords: [], "search-terms": [] });
-    }).catch(() => {
-      setImpactData({ campaigns: [], "ad-groups": [], products: [], keywords: [], "search-terms": [] });
-    });
-  }, []);
-
-  const data = useMemo(() => impactData[activeTab] ?? [], [activeTab, impactData]);
+  const data = useMemo(() => {
+    switch (activeTab) {
+      case "campaigns": return mockImpactCampaigns;
+      case "ad-groups": return mockImpactAdGroups;
+      case "products": return mockImpactProducts;
+      case "keywords": return mockImpactKeywords;
+      case "search-terms": return mockImpactSearchTerms;
+      default: return mockImpactCampaigns;
+    }
+  }, [activeTab]);
 
   const selectedItems = data;
 

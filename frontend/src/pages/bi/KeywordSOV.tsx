@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { getKeywordSOVData, getSOVTrendData } from "@/services/bi.service";
+import { keywordSOVData, sovTrendData } from "@/data/mockBrandSOV";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -21,15 +21,8 @@ export default function KeywordSOV() {
   const [showDeltas, setShowDeltas] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
-  const [keywordSOVData, setKeywordSOVData] = useState<any[]>([]);
-  const [sovTrendData, setSovTrendData] = useState<any[]>([]);
 
-  useEffect(() => {
-    getKeywordSOVData().then(setKeywordSOVData).catch(() => setKeywordSOVData([]));
-    getSOVTrendData().then(setSovTrendData).catch(() => setSovTrendData([]));
-  }, []);
-
-  const filteredKeywords = keywordSOVData.filter((k: any) =>
+  const filteredKeywords = keywordSOVData.filter((k) =>
     k.keyword.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

@@ -41,7 +41,7 @@ function loadDashboards(): SandboxDashboard[] {
       const parsed = JSON.parse(stored);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
-  } catch { void 0; }
+  } catch {}
   return [{ id: "default", name: "My Sandbox", widgets: defaultWidgets }];
 }
 

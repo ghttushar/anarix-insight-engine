@@ -1,6 +1,6 @@
 // New Alerts tabs — All / From Meetings / FYI / Done.
 // "Watching" is removed as a user-facing concept.
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 
 export type AlertTabKey = "all" | "meetings" | "fyi" | "done";
 

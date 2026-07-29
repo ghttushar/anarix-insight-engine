@@ -19,7 +19,7 @@ const DowngradePlanInner = () => {
 
   const handleDowngrade = (planName: string) => {
     setTrial("paid");
-    try { sessionStorage.removeItem("anarix-cancel-from-app"); } catch { void 0; }
+    try { sessionStorage.removeItem("anarix-cancel-from-app"); } catch {}
     toast.success(`Downgraded to ${planName}`);
     navigate("/profitability/dashboard");
   };

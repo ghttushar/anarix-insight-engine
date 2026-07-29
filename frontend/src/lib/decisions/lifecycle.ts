@@ -1,7 +1,7 @@
 // Decision lifecycle model — derived from status + timestamps.
 // Cards auto-move between queue sections as their lifecycle changes.
 
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 
 export type Lifecycle =
   | "needs_me"

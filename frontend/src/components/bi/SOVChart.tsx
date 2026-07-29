@@ -83,14 +83,6 @@ export function SOVChart({ data, title = "Share of Voice Trend", subtitle }: SOV
     </ResponsiveContainer>
   );
 
-  if (!data || data.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
-        No share-of-voice data available for the selected period.
-      </div>
-    );
-  }
-
   return (
     <ChartContainer
       title={title}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
@@ -7,7 +7,7 @@ import { AddKeywordModal } from "@/components/bi/AddKeywordModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus } from "lucide-react";
-import { getTrackedKeywords } from "@/services/bi.service";
+import { trackedKeywords as initialKeywords } from "@/data/mockBrandSOV";
 import { TrackedKeyword } from "@/types/bi";
 import { toast } from "sonner";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -20,15 +20,11 @@ const breadcrumbItems = [
   { label: "Keyword Tracker" },
 ];
 export default function KeywordTracker() {
-  const [keywords, setKeywords] = useState<TrackedKeyword[]>([]);
+  const [keywords, setKeywords] = useState<TrackedKeyword[]>(initialKeywords);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("active");
   const [showDeltas, setShowDeltas] = useState(false);
-
-  useEffect(() => {
-    getTrackedKeywords().then(setKeywords).catch(() => setKeywords([]));
-  }, []);
 
   const activeKeywords = keywords.filter((k) => k.status === "active");
   const inactiveKeywords = keywords.filter((k) => k.status === "inactive");

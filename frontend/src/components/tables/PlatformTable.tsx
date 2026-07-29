@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Input } from "@/components/ui/input";
 import {
@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/table";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
+import { mockPlatforms, platformsTotals } from "@/data/mockPageTypePlatform";
 import { TablePagination } from "./TablePagination";
 import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
 import { cn } from "@/lib/utils";
@@ -23,18 +24,14 @@ export function PlatformTable({ searchQuery = "", showDeltas = false }: Platform
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, 0);
-  const [platforms, setPlatforms] = useState<any[]>([]);
-  const [platformsTotals, setPlatformsTotals] = useState<any>({});
-  const [bidModifiers, setBidModifiers] = useState<Record<string, number>>({});
+  const [bidModifiers, setBidModifiers] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {};
+    mockPlatforms.forEach((p) => { initial[p.id] = p.bidModifier; });
+    return initial;
+  });
 
-  useEffect(() => {
-    setPlatforms([]);
-    setPlatformsTotals({});
-    setBidModifiers({});
-  }, []);
-
-  const filteredPlatforms = platforms.filter((p: any) =>
-    p.platform?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredPlatforms = mockPlatforms.filter((p) =>
+    p.platform.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSort = (field: string) => {

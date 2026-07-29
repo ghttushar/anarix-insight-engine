@@ -20,7 +20,7 @@ export function ShareMenu({ itemLabel, compact = true }: Props) {
       await navigator.clipboard.writeText(`${window.location.href} · ${itemLabel}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 1200);
-    } catch { void 0; }
+    } catch {}
   };
 
   return (

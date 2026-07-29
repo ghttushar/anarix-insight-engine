@@ -31,7 +31,7 @@ export function TrialProvider({ children }: { children: ReactNode }) {
 
   const persist = (v: TrialState) => {
     setState(v);
-    try { localStorage.setItem(STORAGE_KEY, v); } catch { void 0; }
+    try { localStorage.setItem(STORAGE_KEY, v); } catch {}
   };
 
   const setTrial = useCallback((s: TrialState) => persist(s), []);

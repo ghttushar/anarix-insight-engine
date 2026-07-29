@@ -1,4 +1,4 @@
-import { useState, CSSProperties } from "react";
+import { useState } from "react";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -10,7 +10,7 @@ import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, AlertCircle } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, CalendarIcon, AlertCircle } from "lucide-react";
 import { CampaignTablePagination } from "./CampaignTablePagination";
 import { CampaignTableTotalRow } from "./CampaignTableTotalRow";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CampaignTagBar } from "@/components/advertising/CampaignTagBar";
 import { format, parse } from "date-fns";
-import { SortableTableHead, usePinning, sortData, getSortHandler } from "@/components/tables/SortableTableHead";
 
 interface CampaignTableProps {
   campaigns: Campaign[];
@@ -98,23 +97,6 @@ function DatePickerCell({
   );
 }
 
-const COLUMN_NAMES: [string, string, number?][] = [
-  ["status", "Status", 112],
-  ["name", "Campaign Name", 220],
-  ["startDate", "Start Date"],
-  ["endDate", "End Date"],
-  ["biddingStrategy", "Bidding Strategy"],
-  ["dailyBudget", "Budget", 110],
-  ["totalBudget", "Total Budget", 110],
-  ["spend", "Spend", 110],
-  ["sales", "Sales", 110],
-  ["roas", "ROAS", 90],
-  ["impressions", "Impressions", 110],
-  ["clicks", "Clicks", 100],
-  ["ctr", "CTR", 90],
-  ["acos", "ACOS", 90],
-];
-
 export function CampaignTable({
   campaigns,
   onActiveToggle,
@@ -133,29 +115,40 @@ export function CampaignTable({
   const filteredCampaigns = campaigns.filter((c) =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const isEdit = viewMode === "edit";
 
-  const handleSort = getSortHandler(sortField, setSortField, sortDirection, setSortDirection);
-  const sortedCampaigns = sortData(filteredCampaigns, sortField, sortDirection);
+  const handleSort = (field: SortField) => {
+    if (sortField === field) setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    else { setSortField(field); setSortDirection("asc"); }
+  };
+
+  const sortedCampaigns = [...filteredCampaigns].sort((a, b) => {
+    if (!sortField) return 0;
+    const aVal = a[sortField]; const bVal = b[sortField];
+    if (typeof aVal === "string" && typeof bVal === "string") return sortDirection === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    if (typeof aVal === "number" && typeof bVal === "number") return sortDirection === "asc" ? aVal - bVal : bVal - aVal;
+    return 0;
+  });
+
+  const totalPages = Math.ceil(sortedCampaigns.length / pageSize);
   const paginatedCampaigns = sortedCampaigns.slice((page - 1) * pageSize, page * pageSize);
 
-  const allocColumns = COLUMN_NAMES.filter(([id]) => show(id)).map(([id]) => id);
-  const columnWidths: Record<string, number> = { status: 112, name: 220, dailyBudget: 110, totalBudget: 110, spend: 110, sales: 110, roas: 90, impressions: 110, clicks: 100, ctr: 90, acos: 90 };
-  const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(allocColumns, 0, 150);
-  const pcCell = (col: string) => (pinnedColumns.has(col) ? pc(col) : "");
-  const psCell = (col: string): CSSProperties | undefined => pinnedColumns.has(col) ? ps(col) : undefined;
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return <ArrowUpDown className="h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover/sort:opacity-40" />;
+    return sortDirection === "asc" ? <ArrowUp className="h-3 w-3 text-primary" /> : <ArrowDown className="h-3 w-3 text-primary" />;
+  };
 
   return (
     <div className="rounded-lg border border-border bg-card">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted">
+              <TableRow className="bg-muted">
               {isEdit && onSelectionChange && (
                 <TableHead className="w-10">
                   <Checkbox
@@ -169,25 +162,22 @@ export function CampaignTable({
                 </TableHead>
               )}
               {isEdit && show("active") && <TableHead className="w-16">Active</TableHead>}
-              {show("status") && (
-                <SortableTableHead field="status" sortField={sortField} sortDirection={sortDirection} onSort={handleSort} pinnedColumns={pinnedColumns} onPinToggle={handlePinToggle} isFixed className={cn("sticky left-0 z-20 bg-muted w-[112px]", pc("status", true))} style={ps("status")}>
-                  Status
-                </SortableTableHead>
-              )}
-              {show("name") && (
-                <SortableTableHead field="name" sortField={sortField} sortDirection={sortDirection} onSort={handleSort} pinnedColumns={pinnedColumns} onPinToggle={handlePinToggle} isFixed className={cn("min-w-[220px] sticky z-20 bg-muted", pc("name", true))} style={ps("name")}>
-                  Campaign Name
-                </SortableTableHead>
-              )}
-              {COLUMN_NAMES.slice(2).map(([id, label]) => {
-                if (id === "totalBudget" && !showTotalBudget) return null;
-                if (!show(id)) return null;
-                return (
-                  <SortableTableHead key={id} field={id} sortField={sortField} sortDirection={sortDirection} onSort={handleSort} pinnedColumns={pinnedColumns} onPinToggle={handlePinToggle} align="right" className={cn(pc(id, true))} style={ps(id)}>
-                    {label}
-                  </SortableTableHead>
-                );
-              })}
+              {show("status") && <TableHead className="w-28 sticky left-0 z-10 bg-muted">Status</TableHead>}
+              {show("name") && <TableHead className={cn("min-w-[220px] sticky z-10 bg-muted", isEdit ? "left-[64px]" : "left-[112px]")}>
+                Campaign Name
+              </TableHead>}
+              {show("startDate") && <TableHead>Start Date</TableHead>}
+              {show("endDate") && <TableHead>End Date</TableHead>}
+              {show("biddingStrategy") && <TableHead>Bidding Strategy</TableHead>}
+              {show("dailyBudget") && <TableHead className="text-right">Budget</TableHead>}
+              {showTotalBudget && show("totalBudget") && <TableHead className="text-right">Total Budget</TableHead>}
+              {show("spend") && <TableHead className="text-right">Spend</TableHead>}
+              {show("sales") && <TableHead className="text-right">Sales</TableHead>}
+              {show("roas") && <TableHead className="text-right">ROAS</TableHead>}
+              {show("impressions") && <TableHead className="text-right">Impressions</TableHead>}
+              {show("clicks") && <TableHead className="text-right">Clicks</TableHead>}
+              {show("ctr") && <TableHead className="text-right">CTR</TableHead>}
+              {show("acos") && <TableHead className="text-right">ACOS</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -218,8 +208,8 @@ export function CampaignTable({
                         <Switch checked={campaign.isActive} onCheckedChange={(checked) => onActiveToggle?.(campaign.id, checked)} disabled={campaign.status === "archived" || campaign.status === "completed"} />
                       </TableCell>
                     )}
-                    {show("status") && <TableCell className={cn("sticky left-0 z-10", pc("status"))} style={ps("status")}><StatusBadge status={campaign.status} /></TableCell>}
-                    {show("name") && <TableCell className={cn("font-medium sticky z-10", pc("name"))} style={ps("name")}>
+                    {show("status") && <TableCell className="sticky left-0 z-10 bg-background group-hover:bg-muted transition-colors"><StatusBadge status={campaign.status} /></TableCell>}
+                    {show("name") && <TableCell className={cn("font-medium sticky z-10 bg-background group-hover:bg-muted transition-colors", isEdit ? "left-[64px]" : "left-[112px]")}>
                       <div className="space-y-1 min-w-[200px]">
                         {isEdit ? (
                           <Input defaultValue={campaign.name} className="h-8 text-sm" onBlur={(e) => onCampaignUpdate?.(campaign.id, { name: e.target.value })} onClick={(e) => e.stopPropagation()} />
@@ -253,7 +243,7 @@ export function CampaignTable({
                         </div>
                       </div>
                     </TableCell>}
-                    {show("startDate") && <TableCell className={pc("startDate")} style={ps("startDate")}>
+                    {show("startDate") && <TableCell>
                       {isEdit ? (
                         <span onClick={(e) => e.stopPropagation()}>
                           <DatePickerCell
@@ -284,7 +274,7 @@ export function CampaignTable({
                         </span>
                       ) : <span className="text-sm text-foreground whitespace-nowrap">{campaign.biddingStrategy}</span>}
                     </TableCell>}
-                    {show("dailyBudget") && <TableCell className={cn("text-right", pcCell("dailyBudget"))} style={psCell("dailyBudget")}>
+                    {show("dailyBudget") && <TableCell className="text-right">
                       {isEdit ? (
                         <Input type="number" defaultValue={campaign.dailyBudget} className="h-8 text-xs w-[100px] text-right" onBlur={(e) => onCampaignUpdate?.(campaign.id, { dailyBudget: parseFloat(e.target.value) || 0 })} onClick={(e) => e.stopPropagation()} />
                       ) : (
@@ -295,49 +285,49 @@ export function CampaignTable({
                       )}
                     </TableCell>}
                     {showTotalBudget && show("totalBudget") && (
-                      <TableCell className={cn("text-right", pcCell("totalBudget"))} style={psCell("totalBudget")}>
+                      <TableCell className="text-right">
                         <div className="flex flex-col items-end">
                           <span className="text-foreground">{campaign.totalBudget ? formatCurrency(campaign.totalBudget) : "—"}</span>
                         </div>
                       </TableCell>
                     )}
-                    {show("spend") && <TableCell className={cn("text-right", pcCell("spend"))} style={psCell("spend")}>
+                    {show("spend") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatCurrency(campaign.spend)}</span>
                         {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'spend')} />}
                       </div>
                     </TableCell>}
-                    {show("sales") && <TableCell className={cn("text-right", pcCell("sales"))} style={psCell("sales")}>
+                    {show("sales") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatCurrency(campaign.sales)}</span>
                         {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'sales')} />}
                       </div>
                     </TableCell>}
-                    {show("roas") && <TableCell className={cn("text-right", pcCell("roas"))} style={psCell("roas")}>
+                    {show("roas") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{campaign.roas.toFixed(2)}</span>
                         {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'roas')} />}
                       </div>
                     </TableCell>}
-                    {show("impressions") && <TableCell className={cn("text-right", pcCell("impressions"))} style={psCell("impressions")}>
+                    {show("impressions") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatNumber(campaign.impressions)}</span>
                         {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'impressions')} />}
                       </div>
                     </TableCell>}
-                    {show("clicks") && <TableCell className={cn("text-right", pcCell("clicks"))} style={psCell("clicks")}>
+                    {show("clicks") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatNumber(campaign.clicks)}</span>
                         {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'clicks')} />}
                       </div>
                     </TableCell>}
-                    {show("ctr") && <TableCell className={cn("text-right", pcCell("ctr"))} style={psCell("ctr")}>
+                    {show("ctr") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatPercent(campaign.ctr)}</span>
                         {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'ctr')} />}
                       </div>
                     </TableCell>}
-                    {show("acos") && <TableCell className={cn("text-right", pcCell("acos"))} style={psCell("acos")}>
+                    {show("acos") && <TableCell className="text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-foreground">{formatPercent(campaign.acos)}</span>
                         {showDeltas && <DeltaBadge value={getDelta(campaign.id, 'acos')} />}

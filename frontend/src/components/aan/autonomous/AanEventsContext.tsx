@@ -6,8 +6,8 @@
 // Everything is client-only. No Supabase. No real API calls.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, ReactNode } from "react";
-import type { ScenarioTemplate } from "@/types/aan";
-import type { MeetingTaskBundle, MeetingItemStatus } from "@/types/meetings";
+import { SCENARIOS, ScenarioTemplate, getScenario } from "@/data/mockAanScenarios";
+import { MEETING_TASK_BUNDLES, MeetingTaskBundle, MeetingItemStatus } from "@/data/mockMeetingTasks";
 import { toast } from "sonner";
 
 export type Lifecycle =
@@ -108,7 +108,7 @@ const PRESENCE_MESSAGES = [
 
 export function AanEventsProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<AanEvent[]>(() => seedEvents());
-  const [meetingBundles, setMeetingBundles] = useState<MeetingTaskBundle[]>(() => []);
+  const [meetingBundles, setMeetingBundles] = useState<MeetingTaskBundle[]>(() => MEETING_TASK_BUNDLES);
   const [liveMode, setLiveMode] = useState(false);
   const [presenceIndex, setPresenceIndex] = useState(0);
   const liveTickRef = useRef<ReturnType<typeof setInterval> | null>(null);

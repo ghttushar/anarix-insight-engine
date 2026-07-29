@@ -14,7 +14,7 @@ import { SourceGlyph } from "./SourceGlyph";
 import { useActionsStore } from "@/state/signalsStore";
 import { useSelection } from "@/state/signalSelectionStore";
 import { lifecycleFor } from "@/lib/decisions/lifecycle";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 
 interface Props {
   decision: Decision;
@@ -25,7 +25,8 @@ interface Props {
 
 export function DecisionRowLite({ decision: d, selected, onSelect, onReview }: Props) {
   const { approve, reject, delegateToAan } = useActionsStore();
-  const sel = useSelection();
+  let sel: ReturnType<typeof useSelection> | null = null;
+  try { sel = useSelection(); } catch { sel = null; }
   const isFocused = sel?.focusedId === d.id;
   const isChecked = sel?.isSelected(d.id) ?? false;
   const rowRef = useRef<HTMLDivElement>(null);

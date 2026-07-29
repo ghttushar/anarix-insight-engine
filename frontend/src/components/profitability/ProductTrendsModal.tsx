@@ -36,32 +36,19 @@ const METRICS_OPTIONS = [
 
 export function ProductTrendsModal({ product, isOpen, onClose }: ProductTrendsModalProps) {
   const { formatCurrency } = useCurrency();
-  const [frequency, setFrequency] = useState("Weekly");
+  const [frequency, setFrequency] = useState("weekly");
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>(["orderSales", "totalSales"]);
   const [chartType, setChartType] = useState<ChartType>("line");
 
   if (!product) return null;
 
   const weeklyData = product.weeklyData || {};
-  const rawEntries = Object.entries(weeklyData);
-  const chartData = rawEntries.map(([week, value], i) => {
-    const label =
-      frequency === "Daily" ? `Day ${String(i + 1).padStart(2, "0")}` :
-      frequency === "Monthly" ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][i % 12] :
-      week;
-    const factor =
-      frequency === "Daily" ? 1 / 7 :
-      frequency === "Monthly" ? 4.3 :
-      frequency === "Yearly" ? 52 :
-      frequency === "Quarterly" ? 13 :
-      1;
-    return {
-      week: label,
-      orderSales: Math.round((value * factor) * 100) / 100,
-      totalSales: Math.round((value * factor * 1.08) * 100) / 100,
-      commission: Math.round((value * factor * 0.15) * 100) / 100,
-    };
-  });
+  const chartData = Object.entries(weeklyData).map(([week, value]) => ({
+    week,
+    orderSales: value,
+    totalSales: value * 1.08,
+    commission: value * 0.15,
+  }));
 
   const toggleMetric = (key: string) => {
     setSelectedMetrics((prev) =>
@@ -139,7 +126,7 @@ export function ProductTrendsModal({ product, isOpen, onClose }: ProductTrendsMo
               <SelectTrigger className="h-8 w-[120px] text-xs"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {["Daily", "Weekly", "Monthly", "Quarterly", "Yearly"].map((f) => (
-                  <SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>
+                  <SelectItem key={f.toLowerCase()} value={f.toLowerCase()} className="text-xs">{f}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

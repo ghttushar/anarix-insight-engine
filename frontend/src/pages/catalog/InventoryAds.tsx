@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertTriangle, ArrowDown, ArrowUp, Minus, Pause, Play, RefreshCw } from "lucide-react";
-import { getInventoryProducts } from "@/services/inventory.service";
+import { mockInventoryProducts } from "@/data/mockInventoryAds";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -33,14 +32,9 @@ const breadcrumbItems = [
 ];
 export default function InventoryAds() {
   const { formatCurrency } = useCurrency();
-  const [inventoryProducts, setInventoryProducts] = useState<any[]>([]);
-  const criticalCount = inventoryProducts.filter((p: any) => p.stockStatus === "critical").length;
-  const overstockCount = inventoryProducts.filter((p: any) => p.stockStatus === "overstock").length;
-  const totalSavings = inventoryProducts.reduce((s: number, p: any) => s + Math.max(0, p.dailyAdSpend - p.suggestedAdSpend), 0);
-
-  useEffect(() => {
-    getInventoryProducts().then(setInventoryProducts).catch(() => setInventoryProducts([]));
-  }, []);
+  const criticalCount = mockInventoryProducts.filter((p) => p.stockStatus === "critical").length;
+  const overstockCount = mockInventoryProducts.filter((p) => p.stockStatus === "overstock").length;
+  const totalSavings = mockInventoryProducts.reduce((s, p) => s + Math.max(0, p.dailyAdSpend - p.suggestedAdSpend), 0);
 
   return (
     <AppLayout>
@@ -61,7 +55,7 @@ export default function InventoryAds() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Products Tracked</p>
-            <p className="text-xl font-semibold text-foreground">{inventoryProducts.length}</p>
+            <p className="text-xl font-semibold text-foreground">{mockInventoryProducts.length}</p>
           </CardContent></Card>
           <Card className="h-full"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Critical Stock</p>
@@ -78,7 +72,7 @@ export default function InventoryAds() {
         </div>
 
         {/* Alerts */}
-        {inventoryProducts.filter((p: any) => p.stockStatus === "critical").map((p: any) => (
+        {mockInventoryProducts.filter((p) => p.stockStatus === "critical").map((p) => (
           <div key={p.id} className="rounded-lg border-l-4 border-l-destructive border border-border bg-destructive/5 p-3">
             <div className="flex items-start gap-2">
               <AlertTriangle className="h-4 w-4 mt-0.5 text-destructive shrink-0" />
@@ -110,7 +104,7 @@ export default function InventoryAds() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {inventoryProducts.map((p: any) => (
+              {mockInventoryProducts.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell>
                     <div>

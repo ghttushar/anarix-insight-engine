@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
-
+import { mockCompetitorProducts, type CompetitorProduct } from "@/data/mockCompetitorPricing";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
@@ -16,7 +16,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { TablePagination } from "@/components/tables/TablePagination";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 
-function PriceHistoryChart({ selected }: { selected: any }) {
+function PriceHistoryChart({ selected }: { selected: CompetitorProduct }) {
   const { formatCurrency } = useCurrency();
   const [chartType, setChartType] = useState<ChartType>("line");
   const [activeMetrics, setActiveMetrics] = useState<string[]>(["price"]);
@@ -78,20 +78,15 @@ const breadcrumbItems = [
 ];
 export default function CompetitorPricing() {
   const { formatCurrency } = useCurrency();
-  const [competitorProducts, setCompetitorProducts] = useState<any[]>([]);
-  const [selected, setSelected] = useState<any | null>(null);
+  const [selected, setSelected] = useState<CompetitorProduct | null>(mockCompetitorProducts[0]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeltas, setShowDeltas] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
-  useEffect(() => {
-    setCompetitorProducts([]);
-  }, []);
-
-  const filteredProducts = competitorProducts.filter((p: any) =>
-    p.productName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.competitorName?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProducts = mockCompetitorProducts.filter((p) =>
+    p.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.competitorName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const paginatedProducts = filteredProducts.slice((page - 1) * pageSize, page * pageSize);
@@ -111,19 +106,19 @@ export default function CompetitorPricing() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="h-full bg-card"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Tracked Competitors</p>
-            <p className="text-xl font-semibold text-foreground">{new Set(competitorProducts.map((p: any) => p.competitorName)).size}</p>
+            <p className="text-xl font-semibold text-foreground">{new Set(mockCompetitorProducts.map((p) => p.competitorName)).size}</p>
           </CardContent></Card>
           <Card className="h-full bg-card"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Products Tracked</p>
-            <p className="text-xl font-semibold text-foreground">{competitorProducts.length}</p>
+            <p className="text-xl font-semibold text-foreground">{mockCompetitorProducts.length}</p>
           </CardContent></Card>
           <Card className="h-full bg-card"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Price Undercut</p>
-            <p className="text-xl font-semibold text-destructive">{competitorProducts.filter((p: any) => p.currentPrice < p.yourPrice).length}</p>
+            <p className="text-xl font-semibold text-destructive">{mockCompetitorProducts.filter((p) => p.currentPrice < p.yourPrice).length}</p>
           </CardContent></Card>
           <Card className="h-full bg-card"><CardContent className="pt-4 pb-3 px-4">
             <p className="text-xs text-muted-foreground mb-1">Price Advantage</p>
-            <p className="text-xl font-semibold text-success">{competitorProducts.filter((p: any) => p.currentPrice > p.yourPrice).length}</p>
+            <p className="text-xl font-semibold text-success">{mockCompetitorProducts.filter((p) => p.currentPrice > p.yourPrice).length}</p>
           </CardContent></Card>
         </div>
 

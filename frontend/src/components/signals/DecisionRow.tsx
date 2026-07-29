@@ -13,7 +13,7 @@ import { ValuePill } from "./ValuePill";
 import { SourceGlyph } from "./SourceGlyph";
 import { ShareMenu } from "./ShareMenu";
 import { SnoozeMenu } from "./SnoozeMenu";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 import { useActionsStore, type SnoozeChoice } from "@/state/signalsStore";
 import { formatValue } from "@/lib/decisions/valueFormat";
 import { useSelection } from "@/state/signalSelectionStore";
@@ -75,7 +75,8 @@ function useLiveProgress(startedAt: number | undefined, steps: Decision["steps"]
 export function DecisionRow({ decision: d, duplicates = [], interactive = false }: Props) {
   const [open, setOpen] = useState(false);
   const { approve, reject, delegateToAan, snooze } = useActionsStore();
-  const sel = useSelection();
+  let sel: ReturnType<typeof useSelection> | null = null;
+  try { sel = useSelection(); } catch { sel = null; }
   const isSelected = interactive && sel ? sel.isSelected(d.id) : false;
   const isFocused = interactive && sel ? sel.focusedId === d.id : false;
   const rowRef = useRef<HTMLDivElement>(null);

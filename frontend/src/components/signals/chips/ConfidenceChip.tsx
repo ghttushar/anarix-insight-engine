@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { Decision } from "@/types/signals";
+import type { Decision } from "@/data/mockDecisions";
 
 type Conf = "firm" | "soft" | "watching";
 
