@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -7,8 +7,7 @@ import {
 import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
-import { mockProductAds, productAdsTotals } from "@/data/mockProductAds";
-import { mockCampaigns } from "@/data/mockCampaigns";
+import { getProductAds, getCampaigns } from "@/services/campaigns.service";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { AddProductAdsModal } from "@/components/advertising/AddProductAdsModal";
@@ -20,7 +19,7 @@ interface ProductAdsTableProps {
   searchQuery?: string;
   showAddButton?: boolean;
   showDeltas?: boolean;
-  onRowClick?: (productAd: typeof import("@/data/mockProductAds").mockProductAds[0]) => void;
+  onRowClick?: (productAd: any) => void;
 }
 
 const PINNABLE = ["adGroupName", "campaignName", "impressions", "clicks", "ctr", "adUnits", "cvr", "cpc", "adSpend", "adSales", "roas", "acos"];
@@ -35,11 +34,19 @@ export function ProductAdsTable({ searchQuery = "", showAddButton = false, showD
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
+  const [productAds, setProductAds] = useState<any[]>([]);
+  const [productAdsTotals, setProductAdsTotals] = useState<any>({});
+  const [campaigns, setCampaigns] = useState<any[]>([]);
 
-  const filteredAds = mockProductAds.filter((ad) =>
-    ad.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    ad.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    ad.itemId.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    getProductAds().then(setProductAds).catch(() => setProductAds([]));
+    getCampaigns().then(setCampaigns).catch(() => setCampaigns([]));
+  }, []);
+
+  const filteredAds = productAds.filter((ad: any) =>
+    ad.productName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    ad.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    ad.itemId?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSort = (field: string) => {

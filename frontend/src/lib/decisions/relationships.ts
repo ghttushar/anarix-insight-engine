@@ -1,6 +1,6 @@
 // Typed decision relationships. Derived at query time from existing Decision
 // fields — no schema change to mock data.
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 
 export type RelationshipType =
   | "blocks"

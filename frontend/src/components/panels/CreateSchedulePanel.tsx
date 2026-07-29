@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useActivePanel } from "@/contexts/ActivePanelContext";
-import { dayPartingCampaigns } from "@/data/mockDayParting";
+import { getCampaigns } from "@/services/day-parting.service";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -27,7 +27,12 @@ export function CreateSchedulePanel() {
   const { dataPanel, closeDataPanel } = useActivePanel();
   const isOpen = dataPanel === "createSchedule";
 
+  const [dayPartingCampaigns, setDayPartingCampaigns] = useState<any[]>([]);
   const [ruleName, setRuleName] = useState("");
+
+  useEffect(() => {
+    getCampaigns().then(setDayPartingCampaigns).catch(() => setDayPartingCampaigns([]));
+  }, []);
   const [schedStartDate, setSchedStartDate] = useState("");
   const [schedEndDate, setSchedEndDate] = useState("");
   const [noEndDate, setNoEndDate] = useState(false);
@@ -74,7 +79,7 @@ export function CreateSchedulePanel() {
             <Label className="text-xs">Campaigns</Label>
             <div className="flex flex-wrap gap-1">
               {selectedCampaigns.map((id) => {
-                const camp = dayPartingCampaigns.find((c) => c.id === id);
+                const camp = dayPartingCampaigns.find((c: any) => c.id === id);
                 return (
                   <Badge key={id} variant="secondary" className="gap-1 pr-1 text-[10px] h-5">
                     {camp?.name || id}
@@ -84,7 +89,7 @@ export function CreateSchedulePanel() {
               })}
               <Select onValueChange={(v) => { if (!selectedCampaigns.includes(v)) setSelectedCampaigns((prev) => [...prev, v]); }}>
                 <SelectTrigger className="h-5 w-16 text-[9px] border-dashed"><SelectValue placeholder="+ Add" /></SelectTrigger>
-                <SelectContent>{dayPartingCampaigns.map((c) => <SelectItem key={c.id} value={c.id} className="text-xs">{c.name}</SelectItem>)}</SelectContent>
+                <SelectContent>{dayPartingCampaigns.map((c: any) => <SelectItem key={c.id} value={c.id} className="text-xs">{c.name}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>

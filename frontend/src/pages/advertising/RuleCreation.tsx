@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -12,7 +12,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Copy, Trash2, ChevronDown, ChevronRight, Info, Home, ArrowRight, X, Save } from "lucide-react";
-import { ruleTemplates, metricOptions, operatorOptions, actionOptions, lookbackOptions, frequencyOptions, dateRangeOptions, type RuleCriteria, type RuleCondition } from "@/data/mockRules";
+import { getTemplates } from "@/services/rules.service";
+
+interface RuleCondition {
+  id: string;
+  metric: string;
+  operator: string;
+  valueType: "absolute" | "percentage";
+  value: number;
+  maxValue?: number;
+}
+
+interface RuleCriteria {
+  id: string;
+  priority: number;
+  name: string;
+  conditions: RuleCondition[];
+  action: { type: string; value: number };
+}
+
+const metricOptions: { value: string; label: string }[] = [];
+const operatorOptions: { value: string; label: string }[] = [];
+const actionOptions: { value: string; label: string }[] = [];
+const lookbackOptions: { value: string; label: string }[] = [];
+const frequencyOptions: { value: string; label: string }[] = [];
+const dateRangeOptions: { value: string; label: string }[] = [];
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { RuleCampaignSelector } from "@/components/advertising/RuleCampaignSelector";
@@ -43,7 +67,13 @@ const breadcrumbItems = [
 export default function RuleCreation() {
   const navigate = useNavigate();
   const { templateId, ruleId } = useParams();
-  const template = ruleTemplates.find((t) => t.id === templateId);
+  const [ruleTemplates, setRuleTemplates] = useState<any[]>([]);
+
+  useEffect(() => {
+    getTemplates().then(setRuleTemplates).catch(() => setRuleTemplates([]));
+  }, []);
+
+  const template = ruleTemplates.find((t: any) => t.id === templateId);
   const isEdit = !!ruleId;
 
   const [ruleName, setRuleName] = useState(template ? `${template.name}` : "");

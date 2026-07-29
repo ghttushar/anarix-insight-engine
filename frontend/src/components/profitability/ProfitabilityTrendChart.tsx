@@ -36,6 +36,24 @@ export function ProfitabilityTrendChart({ data, periodLabel }: ProfitabilityTren
     setActiveMetric(key);
   };
 
+  // Transform data based on selected frequency
+  const chartData = data.map((d, i) => {
+    const label =
+      frequency === "daily" ? `Day ${String(i + 1).padStart(2, "0")}` :
+      frequency === "monthly" ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][i % 12] :
+      d.week;
+    const factor =
+      frequency === "daily" ? 1 / 7 :
+      frequency === "monthly" ? 4.3 :
+      1;
+    return {
+      ...d,
+      week: label,
+      orders: Math.round(d.orders * factor),
+      units: Math.round(d.units * factor),
+    };
+  });
+
   const metricDropdown = (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -73,7 +91,7 @@ export function ProfitabilityTrendChart({ data, periodLabel }: ProfitabilityTren
   const renderChart = (height: number) => (
     <ResponsiveContainer width="100%" height={height}>
       {chartType === "bar" ? (
-        <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis dataKey="week" tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} />
           <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
@@ -82,7 +100,7 @@ export function ProfitabilityTrendChart({ data, periodLabel }: ProfitabilityTren
           {activeMetric === "units" && <Bar dataKey="units" fill="hsl(var(--chart-2))" radius={[3, 3, 0, 0]} />}
         </BarChart>
       ) : chartType === "area" ? (
-        <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis dataKey="week" tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} />
           <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
@@ -91,7 +109,7 @@ export function ProfitabilityTrendChart({ data, periodLabel }: ProfitabilityTren
           {activeMetric === "units" && <Area type="monotone" dataKey="units" stroke="hsl(var(--chart-2))" fill="hsl(var(--chart-2))" fillOpacity={0.15} strokeWidth={2} />}
         </AreaChart>
       ) : (
-        <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
           <XAxis dataKey="week" tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} />
           <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
@@ -102,6 +120,14 @@ export function ProfitabilityTrendChart({ data, periodLabel }: ProfitabilityTren
       )}
     </ResponsiveContainer>
   );
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
+        No trend data available for the selected period.
+      </div>
+    );
+  }
 
   return (
     <ChartContainer

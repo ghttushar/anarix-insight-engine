@@ -4,7 +4,7 @@ import { Calendar, ArrowRight, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { formatValue } from "@/lib/decisions/valueFormat";
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 
 interface Props {
   bundleId: string;

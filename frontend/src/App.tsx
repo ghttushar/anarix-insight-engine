@@ -78,11 +78,7 @@ import WorkspaceDashboard from "./pages/workspace/Dashboard";
 import HealthScore from "./pages/workspace/HealthScore";
 import ClientPortal from "./pages/reports/ClientPortal";
 
-// Aan
-import AanWorkspacePage from "./pages/aan/Workspace";
-import AanFeedPage from "./pages/aan/Feed";
-import AanPoliciesPage from "./pages/aan/Policies";
-import AanTriggersPage from "./pages/settings/AanTriggers";
+// Aan (deferred — provider kept for existing component consumers)
 import { AanEventsProvider } from "@/components/aan/autonomous/AanEventsContext";
 import PanelIndex, {
   AanInboxPanelRoute,
@@ -231,11 +227,6 @@ function AppRoutes() {
       <Route path="/dayparting/scheduled" element={<Navigate to="/dayparting" replace />} />
       <Route path="/dayparting/scheduled/*" element={<Navigate to="/dayparting" replace />} />
 
-      {/* Aan */}
-      <Route path="/aan" element={<AanWorkspacePage />} />
-      <Route path="/aan/feed" element={<AanFeedPage />} />
-      <Route path="/aan/policies" element={<AanPoliciesPage />} />
-
       {/* Reports */}
       <Route path="/reports/client-portal" element={<ClientPortal />} />
 
@@ -263,7 +254,6 @@ function AppRoutes() {
       <Route path="/settings/accounts/connect/walmart" element={<ConnectWalmart />} />
       <Route path="/settings/team" element={<SettingsTeam />} />
       <Route path="/settings/system" element={<SettingsSystem />} />
-      <Route path="/settings/aan-triggers" element={<AanTriggersPage />} />
       <Route path="/settings/billing" element={<Billing />} />
       <Route path="/settings/billing/:tab" element={<Billing />} />
 

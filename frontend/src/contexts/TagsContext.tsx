@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useMemo, useState, ReactNode } from "react";
-import { seedTags } from "@/data/mockTags";
 
 interface TagsContextValue {
   /** Master tag dictionary (all tags ever created). */
@@ -33,7 +32,7 @@ interface TagsContextValue {
 const TagsContext = createContext<TagsContextValue | null>(null);
 
 export function TagsProvider({ children }: { children: ReactNode }) {
-  const [tags, setTags] = useState<string[]>(seedTags);
+  const [tags, setTags] = useState<string[]>([]);
   const [campaignTags, setCampaignTags] = useState<Record<string, string[]>>({});
   const [draftTags, setDraftTags] = useState<Record<string, string[]>>({});
 

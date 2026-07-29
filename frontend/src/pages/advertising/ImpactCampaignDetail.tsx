@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -12,7 +12,8 @@ import { ImpactDateRangePair } from "@/components/advertising/ImpactDateRangePai
 import { ImpactMetricMultiSelect } from "@/components/advertising/ImpactMetricMultiSelect";
 import { ImpactLineChart } from "@/components/charts/ImpactLineChart";
 import { DateRange, ImpactMetricKey, addDays } from "@/lib/utils/impactSeries";
-import { mockImpactAdGroups, mockImpactCampaigns } from "@/data/mockImpactData";
+import { getImpactCampaigns, getImpactAdGroups } from "@/services/advertising.service";
+import type { ImpactComparison } from "@/types/advertising";
 
 const SORTABLE_FIELDS = [
   { id: "name", label: "Name" },
@@ -34,8 +35,17 @@ function defaultRanges(): { previous: DateRange; impact: DateRange } {
 export default function ImpactCampaignDetail() {
   const navigate = useNavigate();
   const { campaignId = "" } = useParams();
-  const campaign = mockImpactCampaigns.find((c) => c.id === campaignId);
-  const data = useMemo(() => mockImpactAdGroups.filter((ag) => ag.campaignId === campaignId), [campaignId]);
+  const [campaigns, setCampaigns] = useState<ImpactComparison[]>([]);
+  const [adGroups, setAdGroups] = useState<ImpactComparison[]>([]);
+
+  useEffect(() => {
+    Promise.all([getImpactCampaigns(), getImpactAdGroups()]).then(([c, a]) => {
+      setCampaigns(c); setAdGroups(a);
+    }).catch(() => { setCampaigns([]); setAdGroups([]); });
+  }, []);
+
+  const campaign = campaigns.find((c) => c.id === campaignId);
+  const data = useMemo(() => adGroups.filter((ag) => ag.campaignId === campaignId), [adGroups, campaignId]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMetrics, setSelectedMetrics] = useState<ImpactMetricKey[]>(["adSpend", "adSales"]);

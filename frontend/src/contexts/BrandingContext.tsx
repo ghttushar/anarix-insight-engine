@@ -26,13 +26,13 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
 
   const setNewBranding = useCallback((v: boolean) => {
     setNewBrandingState(v);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(v)); } catch {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(v)); } catch { void 0; }
   }, []);
 
   const toggleNewBranding = useCallback(() => {
     setNewBrandingState((prev) => {
       const next = !prev;
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { void 0; }
       return next;
     });
   }, []);

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 import { sourcePillFor, PILL_TONE_CLASS } from "@/lib/decisions/sourcePill";
 
 interface Props {

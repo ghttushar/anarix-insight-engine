@@ -1,5 +1,5 @@
 // Timeline (was: Audit). Vertical event list of what happened.
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 
 interface Event {
   ts: number;

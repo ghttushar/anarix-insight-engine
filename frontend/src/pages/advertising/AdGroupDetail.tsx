@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AddProductAdsPanel } from "@/components/advertising/AddProductAdsPanel";
 import { AdGroupSettingsPanel } from "@/components/advertising/AdGroupSettingsPanel";
@@ -13,8 +13,7 @@ import { AdGroupInfoCard } from "@/components/advertising/AdGroupInfoCard";
 import { ProductAdsTable } from "@/components/tables/ProductAdsTable";
 import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable";
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
-import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
-import { mockAdGroups } from "@/data/mockAdGroups";
+import { getCampaigns, getAdGroups, getChartData, getKPIData } from "@/services/campaigns.service";
 import { Button } from "@/components/ui/button";
 import { Play, Plus } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
@@ -42,14 +41,25 @@ export default function AdGroupDetail() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [adGroups, setAdGroups] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [kpiData, setKpiData] = useState<any[]>([]);
 
-  const campaign = mockCampaigns.find((c) => c.id === campaignId);
-  const adGroup = mockAdGroups.find((ag) => ag.id === adGroupId);
+  useEffect(() => {
+    getCampaigns().then(setCampaigns).catch(() => setCampaigns([]));
+    getAdGroups().then(setAdGroups).catch(() => setAdGroups([]));
+    getChartData().then(setChartData).catch(() => setChartData([]));
+    getKPIData().then(setKpiData).catch(() => setKpiData([]));
+  }, []);
+
+  const campaign = campaigns.find((c: any) => c.id === campaignId);
+  const adGroup = adGroups.find((ag: any) => ag.id === adGroupId);
   const campaignName = campaign?.name || `Campaign ${campaignId}`;
   const adGroupName = adGroup?.name || `Ad Group ${adGroupId}`;
   const adTypeLabel = adType === "All" ? "SP" : adType;
 
-  const kpiItems = mockKPIData.slice(0, 5).map((kpi, index) => ({
+  const kpiItems = kpiData.slice(0, 5).map((kpi: any, index: number) => ({
     label: kpi.label,
     value: kpi.value,
     previousValue: kpi.previousValue,
@@ -88,7 +98,7 @@ export default function AdGroupDetail() {
           <div className="space-y-3">
             <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
             <InlineKPIStrip items={kpiItems} />
-            <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+            <PerformanceChart data={chartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
           </div>
 
           <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />

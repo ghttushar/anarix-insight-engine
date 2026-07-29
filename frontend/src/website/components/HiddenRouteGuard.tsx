@@ -19,6 +19,6 @@ export function HiddenRouteGuard({ children }: { children: ReactNode }) {
     return <Navigate to="/website" replace />;
   }
   // Persist the flag so deeper hidden routes (downgrade-plan) work too.
-  try { sessionStorage.setItem(STORAGE_KEY, "1"); } catch {}
+  try { sessionStorage.setItem(STORAGE_KEY, "1"); } catch { void 0; }
   return <>{children}</>;
 }

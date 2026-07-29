@@ -8,7 +8,7 @@ import { RelatedDecisionChip } from "./RelatedDecisionChip";
 import { strategiesFor, type Strategy } from "@/lib/decisions/strategies";
 import { relationshipsFor } from "@/lib/decisions/relationships";
 import { SourceGlyph } from "../SourceGlyph";
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 
 interface Props {
   decision: Decision;

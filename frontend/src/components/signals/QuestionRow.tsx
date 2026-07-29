@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SourceGlyph } from "./SourceGlyph";
 import { useActionsStore } from "@/state/signalsStore";
-import type { AanQuestion } from "@/data/mockQuestions";
+import type { AanQuestion } from "@/types/meetings";
 
 interface Props {
   question: AanQuestion;

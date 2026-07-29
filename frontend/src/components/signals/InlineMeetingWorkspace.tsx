@@ -7,7 +7,7 @@ import { ValueBlock } from "./ValueBlock";
 import { ActionChoiceRow } from "./ActionChoiceRow";
 
 import { useActionsStore } from "@/state/signalsStore";
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 
 interface Props {
   bundleId: string;

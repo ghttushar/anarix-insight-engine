@@ -117,3 +117,13 @@ export interface ScatterDataPoint {
   adSpend: number;
   quadrant: "winners" | "grow" | "optimize" | "review";
 }
+
+export interface PnLLineItem {
+  label: string;
+  amazon: number;
+  walmart: number;
+  combined: number;
+  isHeader?: boolean;
+  isTotal?: boolean;
+  indent?: number;
+}

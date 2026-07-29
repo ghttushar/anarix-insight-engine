@@ -26,7 +26,7 @@ import { useAan } from "@/components/aan/AanContext";
 import { useAanPanel } from "@/contexts/AanPanelContext";
 import { InlineEmailCompose, type EmailDraft } from "./review/inline/InlineEmailCompose";
 import { InlineDraftChat } from "./review/inline/InlineDraftChat";
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 import { toast } from "sonner";
 
 interface Props {

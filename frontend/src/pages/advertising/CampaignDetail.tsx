@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -13,7 +13,7 @@ import { AdGroupsTable } from "@/components/tables/AdGroupsTable";
 import { ProductAdsTable } from "@/components/tables/ProductAdsTable";
 import { KeywordTargetingTable } from "@/components/tables/KeywordTargetingTable";
 import { SearchTermsTable } from "@/components/tables/SearchTermsTable";
-import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
+import { getCampaigns, getChartData, getKPIData } from "@/services/campaigns.service";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { useFilter } from "@/contexts/FilterContext";
@@ -40,12 +40,21 @@ export default function CampaignDetail() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [kpiData, setKpiData] = useState<any[]>([]);
 
-  const campaign = mockCampaigns.find((c) => c.id === campaignId);
+  useEffect(() => {
+    getCampaigns().then(setCampaigns).catch(() => setCampaigns([]));
+    getChartData().then(setChartData).catch(() => setChartData([]));
+    getKPIData().then(setKpiData).catch(() => setKpiData([]));
+  }, []);
+
+  const campaign = campaigns.find((c: any) => c.id === campaignId);
   const campaignName = campaign?.name || `Campaign ${campaignId}`;
   const adTypeLabel = adType === "All" ? "SP" : adType;
 
-  const kpiItems = mockKPIData.slice(0, 5).map((kpi, index) => ({
+  const kpiItems = kpiData.slice(0, 5).map((kpi: any, index: number) => ({
     label: kpi.label,
     value: kpi.value,
     previousValue: kpi.previousValue,
@@ -84,7 +93,7 @@ export default function CampaignDetail() {
           <div className="space-y-3">
             <h2 className="text-base font-semibold text-foreground">Performance Overview</h2>
             <InlineKPIStrip items={kpiItems} />
-            <PerformanceChart data={mockChartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
+            <PerformanceChart data={chartData} showImpact={showImpact} onShowImpactChange={setShowImpact} />
           </div>
 
           <UnderlineTabs tabs={tabs} value={activeTab} onChange={(v) => setActiveTab(v as TabValue)} />

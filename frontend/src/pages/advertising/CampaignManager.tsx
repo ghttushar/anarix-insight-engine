@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -17,7 +17,7 @@ import { PlatformTable } from "@/components/tables/PlatformTable";
 import { ProductTargetingTable } from "@/components/tables/ProductTargetingTable";
 import { CreateCampaignModal } from "@/components/advertising/CreateCampaignModal";
 import { CreateCampaignPanel } from "@/components/panels/CreateCampaignPanel";
-import { mockCampaigns, mockChartData, mockKPIData } from "@/data/mockCampaigns";
+import { getCampaigns, getChartData, getKPIData } from "@/services/campaigns.service";
 import { useMarketplace } from "@/contexts/MarketplaceContext";
 import { useFilter } from "@/contexts/FilterContext";
 import { Campaign } from "@/types/campaign";
@@ -179,15 +179,26 @@ function CampaignManagerInner() {
   const { isWalmart } = useMarketplace();
   const { adType, setAdType } = useFilter();
   const { setDataPanel } = useActivePanel();
-  const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [kpiData, setKpiData] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<TabValue>("campaigns");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"view" | "edit">("view");
   const [activeFilters, setActiveFilters] = useState<FilterRule[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
-  const [selectedKPIs, setSelectedKPIs] = useState<string[]>(
-    mockKPIData.slice(0, 5).map((k) => k.label)
-  );
+  const [selectedKPIs, setSelectedKPIs] = useState<string[]>([]);
+
+  useEffect(() => {
+    getCampaigns().then(setCampaigns).catch(() => setCampaigns([]));
+    getChartData().then(setChartData).catch(() => setChartData([]));
+    getKPIData().then((data) => {
+      setKpiData(data);
+      if (data.length > 0) {
+        setSelectedKPIs(data.slice(0, 5).map((k: any) => k.label));
+      }
+    }).catch(() => setKpiData([]));
+  }, []);
   const [showImpact, setShowImpact] = useState(false);
   const [showDeltas, setShowDeltas] = useState(false);
   const [sortField, setSortField] = useState<string | null>(null);
@@ -197,9 +208,9 @@ function CampaignManagerInner() {
   const { commitDrafts, discardDrafts } = useTags();
   const { formatCurrency } = useCurrency();
 
-  const kpiItems = mockKPIData
-    .filter((kpi) => selectedKPIs.includes(kpi.label))
-    .map((kpi, index) => ({
+  const kpiItems = kpiData
+    .filter((kpi: any) => selectedKPIs.includes(kpi.label))
+    .map((kpi: any, index: number) => ({
       label: kpi.label,
       value: kpi.value,
       previousValue: kpi.previousValue,
@@ -298,7 +309,7 @@ function CampaignManagerInner() {
 
           <InlineKPIStrip items={kpiItems} availableMetrics={AVAILABLE_METRICS} onMetricChange={handleKPISwap} />
           <PerformanceChart
-            data={mockChartData}
+            data={chartData}
             showImpact={showImpact}
             onShowImpactChange={setShowImpact}
             selectedMetrics={(() => {

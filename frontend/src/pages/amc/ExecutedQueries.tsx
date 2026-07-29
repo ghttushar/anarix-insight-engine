@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { mockExecutedQueries } from "@/data/mockAMC";
+import { getExecutedQueries } from "@/services/amc.service";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -22,8 +22,13 @@ const breadcrumbItems = [
 ];
 export default function AMCExecutedQueries() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [executedQueries, setExecutedQueries] = useState<any[]>([]);
 
-  const filtered = mockExecutedQueries.filter((eq) =>
+  useEffect(() => {
+    getExecutedQueries().then(setExecutedQueries).catch(() => setExecutedQueries([]));
+  }, []);
+
+  const filtered = executedQueries.filter((eq: any) =>
     eq.queryName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

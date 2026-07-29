@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-import { MeetingTaskBundle } from "@/data/mockMeetingTasks";
+import type { MeetingTaskBundle } from "@/types/meetings";
 import { useAanEvents } from "./AanEventsContext";
 import { toast } from "sonner";
 

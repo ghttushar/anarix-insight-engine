@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { getHealthScore } from "@/services/health.service";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CircularProgress } from "@/components/ui/circular-progress";
 import { TrendingUp, TrendingDown, Minus, RefreshCw } from "lucide-react";
-import { mockHealthScore, type HealthDimension } from "@/data/mockHealthScore";
+import type { HealthDimension } from "@/services/health";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -35,8 +37,23 @@ const breadcrumbItems = [
   { label: "Health Score" },
 ];
 export default function HealthScore() {
-  const { compositeScore, previousScore, trend, dimensions } = mockHealthScore;
+  const [compositeScore, setCompositeScore] = useState(0);
+  const [previousScore, setPreviousScore] = useState(0);
+  const [trend, setTrend] = useState("stable");
+  const [dimensions, setDimensions] = useState<HealthDimension[]>([]);
   const delta = compositeScore - previousScore;
+
+  useEffect(() => {
+    getHealthScore().then((data: any) => {
+      setCompositeScore(data.compositeScore ?? data.overall ?? 0);
+      setPreviousScore(data.previousScore ?? 0);
+      setTrend(data.trend ?? "stable");
+      setDimensions(data.dimensions ?? []);
+    }).catch(() => {
+      setCompositeScore(0);
+      setDimensions([]);
+    });
+  }, []);
 
   return (
     <AppLayout>

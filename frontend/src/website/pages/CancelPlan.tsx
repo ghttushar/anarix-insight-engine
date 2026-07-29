@@ -15,7 +15,7 @@ const CancelPlanInner = () => {
 
   const handleConfirmCancel = () => {
     setTrial("expired");
-    try { sessionStorage.removeItem("anarix-cancel-from-app"); } catch {}
+    try { sessionStorage.removeItem("anarix-cancel-from-app"); } catch { void 0; }
     setConfirmOpen(false);
     navigate("/profitability/dashboard");
   };

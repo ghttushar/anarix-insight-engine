@@ -26,8 +26,25 @@ import { filterByTab, computeTabCounts, type AlertTabKey } from "@/components/si
 import { categorize } from "@/lib/decisions/categories";
 import { importanceScore } from "@/lib/decisions/lifecycle";
 import { useAanEvents } from "@/components/aan/autonomous/AanEventsContext";
-import { CRITICAL_ONLY_DECISION } from "@/data/criticalOnlyDecision";
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
+
+const CRITICAL_ONLY_DECISION: Decision = {
+  id: "critical-only",
+  source: "anarix",
+  sourceRef: { label: "Anarix Monitor", ts: Date.now() },
+  valueCents: 0,
+  valueKind: "info",
+  valueCaption: "",
+  valueBasis: "",
+  insight: "Critical alert — ASIN B0CSH8TCC6",
+  actionVerb: "Review",
+  domain: "retail",
+  severity: "critical",
+  status: "open",
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+  steps: [],
+};
 
 function usePersistedState<T>(key: string, initial: T): [T, (v: T) => void] {
   const [v, setV] = useState<T>(() => {

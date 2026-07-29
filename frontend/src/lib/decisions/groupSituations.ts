@@ -2,7 +2,7 @@
 // product, supplier, meeting, domain, marketplace, or rootCause. Duplicates
 // never appear standalone. Groups with 2+ children become a collapsible
 // SituationRow. Groups >7 render a "Show N more" tail.
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 import { valueMagnitude } from "@/lib/decisions/valueFormat";
 
 export interface Situation {

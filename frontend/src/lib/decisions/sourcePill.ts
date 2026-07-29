@@ -3,7 +3,7 @@
 // "Inventory Agent" — instead of always saying "Anarix".
 import { Calendar, MessageSquare, Users, Mail, Sparkles, Bot, Activity } from "lucide-react";
 import { AnarixMark } from "@/components/branding/AnarixMark";
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 import type { DecisionSource } from "@/lib/decisions/sourceRegistry";
 
 export interface SourcePill {

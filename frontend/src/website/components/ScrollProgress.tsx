@@ -16,6 +16,7 @@ const ScrollProgress = () => {
   const { scrollYProgress } = useScroll();
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
+  const dotTop = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
     <motion.div
@@ -36,18 +37,11 @@ const ScrollProgress = () => {
               className="absolute -left-1.5 flex items-center gap-2"
               style={{ top, transform: "translateY(-50%)" }}
             >
-              <motion.span
+              <span
                 className="text-[8px] text-primary/40"
-                style={{
-                  opacity: useTransform(
-                    scrollYProgress,
-                    [Math.max(0, i / sections.length - 0.05), i / sections.length, Math.min(1, i / sections.length + 0.05)],
-                    [0.3, 1, 0.3]
-                  ),
-                }}
               >
                 {s.shape}
-              </motion.span>
+              </span>
             </div>
           );
         })}
@@ -55,7 +49,7 @@ const ScrollProgress = () => {
       <motion.div
         className="absolute -left-4 flex items-center gap-2"
         style={{
-          top: useTransform(scrollYProgress, [0, 1], ["0%", "100%"]),
+          top: dotTop,
           transform: "translateY(-50%)",
         }}
       >

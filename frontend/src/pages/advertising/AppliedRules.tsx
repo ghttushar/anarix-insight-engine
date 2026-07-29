@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Edit, Plus, ChevronLeft, ChevronRight } from "lucide-react";
-import { appliedRules, type AppliedRule } from "@/data/mockRules";
+import { getAppliedRules } from "@/services/rules.service";
 import { cn } from "@/lib/utils";
 const statusStyles: Record<string, string> = {
   active: "bg-success/10 text-success border-success/20",
@@ -17,14 +17,6 @@ const statusStyles: Record<string, string> = {
   draft: "bg-muted text-muted-foreground border-muted",
   ended: "bg-destructive/10 text-destructive border-destructive/20",
 };
-
-const statusTabs = [
-  { value: "all", label: "All Rules", count: appliedRules.length },
-  { value: "active", label: "Active", count: appliedRules.filter((r) => r.status === "active").length },
-  { value: "paused", label: "Paused", count: appliedRules.filter((r) => r.status === "paused").length },
-  { value: "draft", label: "Drafts", count: appliedRules.filter((r) => r.status === "draft").length },
-  { value: "ended", label: "Ended", count: appliedRules.filter((r) => r.status === "ended").length },
-];
 
 type SortKey = "name" | "ruleType" | "entitiesCount" | "frequency" | "lastRun" | "status";
 
@@ -38,11 +30,24 @@ export default function AppliedRules() {
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get("tab") || "all";
 
+  const [appliedRules, setAppliedRules] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState(initialTab);
   const [rowsPerPage, setRowsPerPage] = useState("10");
   const [page, setPage] = useState(0);
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  useEffect(() => {
+    getAppliedRules().then(setAppliedRules).catch(() => setAppliedRules([]));
+  }, []);
+
+  const statusTabs = [
+    { value: "all", label: "All Rules", count: appliedRules.length },
+    { value: "active", label: "Active", count: appliedRules.filter((r: any) => r.status === "active").length },
+    { value: "paused", label: "Paused", count: appliedRules.filter((r: any) => r.status === "paused").length },
+    { value: "draft", label: "Drafts", count: appliedRules.filter((r: any) => r.status === "draft").length },
+    { value: "ended", label: "Ended", count: appliedRules.filter((r: any) => r.status === "ended").length },
+  ];
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -60,9 +65,9 @@ export default function AppliedRules() {
 
   const filteredRules = activeTab === "all"
     ? appliedRules
-    : appliedRules.filter((rule) => rule.status === activeTab);
+    : appliedRules.filter((rule: any) => rule.status === activeTab);
 
-  const sorted = [...filteredRules].sort((a, b) => {
+  const sorted = [...filteredRules].sort((a: any, b: any) => {
     const av = a[sortKey];
     const bv = b[sortKey];
     const cmp = typeof av === "number" ? av - (bv as number) : String(av).localeCompare(String(bv));
@@ -126,7 +131,7 @@ export default function AppliedRules() {
                   </TableCell>
                 </TableRow>
               ) : (
-                pageData.map((rule) => (
+                pageData.map((rule: any) => (
                   <TableRow key={rule.id}>
                     <TableCell>
                       <button

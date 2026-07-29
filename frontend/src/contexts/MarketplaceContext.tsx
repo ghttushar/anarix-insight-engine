@@ -1,14 +1,12 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
-export type Marketplace = "amazon" | "walmart" | "shopify" | "tiktok";
+export type Marketplace = "amazon" | "walmart";
 
 interface MarketplaceContextType {
   marketplace: Marketplace;
   setMarketplace: (marketplace: Marketplace) => void;
   isWalmart: boolean;
   isAmazon: boolean;
-  isShopify: boolean;
-  isTikTok: boolean;
 }
 
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined);
@@ -26,7 +24,7 @@ export function MarketplaceProvider({
 }: MarketplaceProviderProps) {
   const [marketplace, setMarketplaceState] = useState<Marketplace>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && ["amazon", "walmart", "shopify", "tiktok"].includes(stored)) {
+    if (stored && ["amazon", "walmart"].includes(stored)) {
       return stored as Marketplace;
     }
     return defaultMarketplace;
@@ -45,8 +43,6 @@ export function MarketplaceProvider({
     setMarketplace,
     isWalmart: marketplace === "walmart",
     isAmazon: marketplace === "amazon",
-    isShopify: marketplace === "shopify",
-    isTikTok: marketplace === "tiktok",
   };
 
   return (

@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { mockSchedules } from "@/data/mockAMC";
+import { getSchedules } from "@/services/amc.service";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -22,8 +22,13 @@ const breadcrumbItems = [
 ];
 export default function AMCSchedules() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [schedules, setSchedules] = useState<any[]>([]);
 
-  const filtered = mockSchedules.filter((s) =>
+  useEffect(() => {
+    getSchedules().then(setSchedules).catch(() => setSchedules([]));
+  }, []);
+
+  const filtered = schedules.filter((s: any) =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.queryName.toLowerCase().includes(searchQuery.toLowerCase())
   );

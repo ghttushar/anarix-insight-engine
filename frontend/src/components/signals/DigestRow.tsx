@@ -3,7 +3,7 @@ import { ChevronRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SourceGlyph } from "./SourceGlyph";
 import { ValuePill } from "./ValuePill";
-import type { DigestItem } from "@/data/mockDecisions";
+import type { DigestItem } from "@/types/signals";
 
 interface Props {
   items: DigestItem[];

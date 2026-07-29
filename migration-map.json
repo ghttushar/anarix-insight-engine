@@ -179,19 +179,7 @@
     {
       "id": "F9",
       "name": "Aan assistant",
-      "status": "NEW_FEATURE",
-      "routes": [
-        "/aan",
-        "/aan/feed",
-        "/aan/policies"
-      ],
-      "dir": "src/components/aan",
-      "mocks": [
-        "mockAanFeed.ts",
-        "mockAanScenarios.ts",
-        "mockAanPolicies.ts",
-        "mockWorkspaceCorpus.ts"
-      ]
+      "status": "DEFERRED"
     },
     {
       "id": "F10",
@@ -230,7 +218,6 @@
         "/settings/integrations",
         "/settings/team",
         "/settings/system",
-        "/settings/aan-triggers",
         "/settings/billing"
       ],
       "mocks": [
@@ -257,6 +244,10 @@
       ]
     }
   ],
+  "directories": {
+    "src/adapters": "API-to-UI type adapters (8 files)",
+    "src/services": "Swappable domain service layer (8 files)"
+  },
   "routes": [
     {
       "path": "/login",
@@ -541,10 +532,6 @@
     {
       "path": "/settings/system",
       "component": "SettingsSystem"
-    },
-    {
-      "path": "/settings/aan-triggers",
-      "component": "AanTriggersPage"
     },
     {
       "path": "/settings/billing",
@@ -1041,9 +1028,6 @@
   "mockData": [
     "criticalOnlyDecision.ts",
     "mockAMC.ts",
-    "mockAanFeed.ts",
-    "mockAanPolicies.ts",
-    "mockAanScenarios.ts",
     "mockAdGroups.ts",
     "mockAnomalyAlerts.ts",
     "mockBrandSOV.ts",
@@ -1060,21 +1044,18 @@
     "mockInventoryAds.ts",
     "mockInvoices.ts",
     "mockKeywords.ts",
-    "mockMeetingTasks.ts",
     "mockMeetings.ts",
     "mockPageTypePlatform.ts",
     "mockProductAds.ts",
     "mockProductTargeting.ts",
     "mockProfitability.ts",
     "mockQuestions.ts",
-    "mockRuleBuilder.ts",
     "mockRules.ts",
     "mockSearchHarvesting.ts",
     "mockSearchTerms.ts",
     "mockTags.ts",
     "mockTargetingActions.ts",
-    "mockUnifiedPnL.ts",
-    "mockWorkspaceCorpus.ts"
+    "mockUnifiedPnL.ts"
   ],
   "removedDuringPrep": [
     "src/livingos",

@@ -8,7 +8,7 @@ import { RegionalTable } from "@/components/tables/RegionalTable";
 import { RegionalProductTable } from "@/components/tables/RegionalProductTable";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { geographicalData } from "@/data/mockProfitability";
+import { getGeographicalData } from "@/services/profitability.service";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -58,13 +58,38 @@ export default function Geographical() {
   const [catalogue, setCatalogue] = useState("all");
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const selectedRegion = regionLookup[selectedRegionCode] || geographicalData[0];
+
+  // Data state
+  const [geoData, setGeoData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const g = await getGeographicalData();
+      if (cancelled) return;
+      setGeoData(g);
+      setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  const regionLookupLocal: Record<string, any> = useMemo(() => ({
+    US: geoData[0],
+    CA: geoData[0]?.children?.[0] || geoData[0],
+    TX: geoData[0]?.children?.[1] || geoData[0],
+    NY: geoData[0]?.children?.[2] || geoData[0],
+    FL: geoData[0]?.children?.[3] || geoData[0],
+  }), [geoData]);
+
+  const selectedRegion = regionLookupLocal[selectedRegionCode] || geoData[0];
 
   const mobileRegions = useMemo(() => {
-    if (!drillRegionId) return geographicalData;
-    const parent = geographicalData.find((r) => r.id === drillRegionId);
+    if (!drillRegionId) return geoData;
+    const parent = geoData.find((r: any) => r.id === drillRegionId);
     return parent?.children || [];
-  }, [drillRegionId]);
+  }, [drillRegionId, geoData]);
 
 
   const handleColumnToggle = (id: string) => {
@@ -82,6 +107,10 @@ export default function Geographical() {
         />
         <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} breadcrumbItems={breadcrumbItems} />
 
+        {loading ? (
+          <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">Loading...</div>
+        ) : (
+        <>
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 h-full">
             <GeographyMap selectedRegion={selectedRegionCode} onRegionSelect={setSelectedRegionCode} />
@@ -123,12 +152,14 @@ export default function Geographical() {
 
           <div className="rounded-lg border border-border bg-card">
             {viewLevel === "state" ? (
-              <RegionalTable data={geographicalData} searchValue={searchValue} />
+              <RegionalTable data={geoData} searchValue={searchValue} />
             ) : (
               <RegionalProductTable searchValue={searchValue} />
             )}
           </div>
         </div>
+        </>
+        )}
       </div>
 </AppLayout>
 

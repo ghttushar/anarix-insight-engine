@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertTriangle, TrendingUp, TrendingDown, Minus, Download, RefreshCw } from "lucide-react";
-import { mockPacingCampaigns, mockPacingAlerts, type PacingCampaign } from "@/data/mockBudgetPacing";
+import { getPacingCampaigns, getPacingAlerts } from "@/services/advertising.service";
 import { toast } from "sonner";
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartType, ChartMetric } from "@/components/charts/ChartContainer";
@@ -27,7 +27,7 @@ const severityConfig: Record<string, string> = {
   info: "border-l-primary bg-primary/5",
 };
 
-function HourlySpendChart({ selectedCampaign, chartData }: { selectedCampaign: PacingCampaign; chartData: { hour: string; spend: number; target: number }[] }) {
+function HourlySpendChart({ selectedCampaign, chartData }: { selectedCampaign: any; chartData: { hour: string; spend: number; target: number }[] }) {
   const [chartType, setChartType] = useState<ChartType>("area");
   const [activeMetrics, setActiveMetrics] = useState<string[]>(["spend", "target"]);
 
@@ -94,12 +94,22 @@ const breadcrumbItems = [
 ];
 export default function BudgetPacing() {
   const { formatCurrency } = useCurrency();
-  const [selectedCampaign, setSelectedCampaign] = useState<PacingCampaign | null>(mockPacingCampaigns[0]);
+  const [pacingCampaigns, setPacingCampaigns] = useState<any[]>([]);
+  const [pacingAlerts, setPacingAlerts] = useState<any[]>([]);
+  const [selectedCampaign, setSelectedCampaign] = useState<any | null>(null);
 
-  const totalDailyBudget = mockPacingCampaigns.reduce((s, c) => s + c.dailyBudget, 0);
-  const totalSpentToday = mockPacingCampaigns.reduce((s, c) => s + c.spentToday, 0);
-  const totalMonthlyBudget = mockPacingCampaigns.reduce((s, c) => s + c.monthlyBudget, 0);
-  const totalSpentMonth = mockPacingCampaigns.reduce((s, c) => s + c.spentThisMonth, 0);
+  useEffect(() => {
+    getPacingCampaigns().then((data: any[]) => {
+      setPacingCampaigns(data);
+      if (data.length > 0) setSelectedCampaign(data[0]);
+    }).catch(() => setPacingCampaigns([]));
+    getPacingAlerts().then(setPacingAlerts).catch(() => setPacingAlerts([]));
+  }, []);
+
+  const totalDailyBudget = pacingCampaigns.reduce((s: number, c: any) => s + c.dailyBudget, 0);
+  const totalSpentToday = pacingCampaigns.reduce((s: number, c: any) => s + c.spentToday, 0);
+  const totalMonthlyBudget = pacingCampaigns.reduce((s: number, c: any) => s + c.monthlyBudget, 0);
+  const totalSpentMonth = pacingCampaigns.reduce((s: number, c: any) => s + c.spentThisMonth, 0);
 
   const chartData = selectedCampaign
     ? selectedCampaign.hourlySpend.map((spend, hour) => ({
@@ -150,7 +160,7 @@ export default function BudgetPacing() {
           {/* Alerts */}
           <div className="space-y-3">
             <h3 className="font-heading text-sm font-semibold text-foreground">Pacing Alerts</h3>
-            {mockPacingAlerts.map((alert) => (
+            {pacingAlerts.map((alert: any) => (
               <div key={alert.id} className={`rounded-lg border-l-4 p-3 ${severityConfig[alert.severity]}`}>
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
@@ -191,7 +201,7 @@ export default function BudgetPacing() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockPacingCampaigns.map((c) => {
+              {pacingCampaigns.map((c: any) => {
                 const variance = c.projectedMonthlySpend - c.monthlyBudget;
                 return (
                   <TableRow

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,6 @@ import {
 import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
-import { mockKeywords, keywordsTotals } from "@/data/mockKeywords";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "./TablePagination";
 import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
@@ -33,11 +32,18 @@ export function KeywordTargetingTable({ searchQuery = "", showDeltas = false }: 
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
+  const [keywords, setKeywords] = useState<any[]>([]);
+  const [keywordsTotals, setKeywordsTotals] = useState<any>({});
 
-  const filteredKeywords = mockKeywords.filter((kw) =>
-    kw.keyword.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    kw.adGroupName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    kw.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    setKeywords([]);
+    setKeywordsTotals({});
+  }, []);
+
+  const filteredKeywords = keywords.filter((kw: any) =>
+    kw.keyword?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    kw.adGroupName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    kw.campaignName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSort = (field: string) => {

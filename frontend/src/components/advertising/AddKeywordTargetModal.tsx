@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockTargetCampaigns, mockTargetAdGroups } from "@/data/mockTargetingActions";
+import { getTargetingCampaigns, getTargetingAdGroups } from "@/services/advertising.service";
 import { Plus, Trash2 } from "lucide-react";
 
 interface KeywordEntry {
@@ -36,13 +36,20 @@ interface AddKeywordTargetModalProps {
 }
 
 export function AddKeywordTargetModal({ isOpen, onClose, onAdd }: AddKeywordTargetModalProps) {
+  const [mockTargetCampaigns, setMockTargetCampaigns] = useState<any[]>([]);
+  const [mockTargetAdGroups, setMockTargetAdGroups] = useState<any[]>([]);
   const [keywords, setKeywords] = useState<KeywordEntry[]>([
     { id: crypto.randomUUID(), keyword: "", broad: false, exact: true, phrase: false, bid: "" },
   ]);
   const [campaignId, setCampaignId] = useState("");
   const [adGroupId, setAdGroupId] = useState("");
 
-  const filteredAdGroups = mockTargetAdGroups.filter((ag) => ag.campaignId === campaignId);
+  useEffect(() => {
+    getTargetingCampaigns().then(setMockTargetCampaigns).catch(() => setMockTargetCampaigns([]));
+    getTargetingAdGroups().then(setMockTargetAdGroups).catch(() => setMockTargetAdGroups([]));
+  }, []);
+
+  const filteredAdGroups = mockTargetAdGroups.filter((ag: any) => ag.campaignId === campaignId);
 
   const addRow = () => {
     setKeywords([...keywords, { id: crypto.randomUUID(), keyword: "", broad: false, exact: true, phrase: false, bid: "" }]);
@@ -84,7 +91,7 @@ export function AddKeywordTargetModal({ isOpen, onClose, onAdd }: AddKeywordTarg
               <Select value={campaignId} onValueChange={(v) => { setCampaignId(v); setAdGroupId(""); }}>
                 <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select campaign" /></SelectTrigger>
                 <SelectContent>
-                  {mockTargetCampaigns.map((c) => (
+                  {mockTargetCampaigns.map((c: any) => (
                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                   ))}
                 </SelectContent>
@@ -95,7 +102,7 @@ export function AddKeywordTargetModal({ isOpen, onClose, onAdd }: AddKeywordTarg
               <Select value={adGroupId} onValueChange={setAdGroupId} disabled={!campaignId}>
                 <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select ad group" /></SelectTrigger>
                 <SelectContent>
-                  {filteredAdGroups.map((ag) => (
+                  {filteredAdGroups.map((ag: any) => (
                     <SelectItem key={ag.id} value={ag.id}>{ag.name}</SelectItem>
                   ))}
                 </SelectContent>

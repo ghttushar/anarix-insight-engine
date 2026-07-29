@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Search, X } from "lucide-react";
 import { StatusBadge } from "@/components/status/StatusBadge";
-import { catalogProducts } from "@/data/mockCatalog";
+import { getProducts } from "@/services/catalog.service";
 
 interface AddProductAdsModalProps {
   open: boolean;
@@ -20,16 +20,21 @@ interface StagedProduct {
 }
 
 export function AddProductAdsModal({ open, onOpenChange }: AddProductAdsModalProps) {
+  const [catalogProducts, setCatalogProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [stagedProducts, setStagedProducts] = useState<StagedProduct[]>([]);
 
-  const filteredProducts = catalogProducts.filter((p) =>
+  useEffect(() => {
+    getProducts().then(setCatalogProducts).catch(() => setCatalogProducts([]));
+  }, []);
+
+  const filteredProducts = catalogProducts.filter((p: any) =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
     p.itemId.toLowerCase().includes(search.toLowerCase())
   );
 
-  const toggleProduct = (product: typeof catalogProducts[0]) => {
+  const toggleProduct = (product: (typeof catalogProducts)[0]) => {
     const newSelected = new Set(selectedIds);
     if (newSelected.has(product.id)) {
       newSelected.delete(product.id);

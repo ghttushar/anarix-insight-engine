@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ValuePill } from "./ValuePill";
 import { useActionsStore } from "@/state/signalsStore";
-import type { MeetingTask, MeetingTaskStatus } from "@/data/mockMeetings";
+import type { MeetingTask, MeetingTaskStatus } from "@/types/meetings";
 
 const STATUS_META: Record<MeetingTaskStatus, { label: string; className: string; dot: string }> = {
   open:          { label: "Open",             className: "text-muted-foreground", dot: "bg-muted-foreground/40" },

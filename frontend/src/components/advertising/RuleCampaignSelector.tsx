@@ -1,11 +1,11 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, Filter, Plus, Trash2, ArrowLeft, ArrowRight, X } from "lucide-react";
-import { mockCampaigns } from "@/data/mockCampaigns";
+import { getCampaigns } from "@/services/campaigns.service";
 import { Campaign } from "@/types/campaign";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +18,7 @@ interface RuleCampaignSelectorProps {
 }
 
 export function RuleCampaignSelector({ onBack, onSaveDraft: _onSaveDraft, onApplyRule, ruleName, isEdit = false }: RuleCampaignSelectorProps) {
+  const [mockCampaigns, setMockCampaigns] = useState<any[]>([]);
   const [leftSearch, setLeftSearch] = useState("");
   const [rightSearch, setRightSearch] = useState("");
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
@@ -25,29 +26,33 @@ export function RuleCampaignSelector({ onBack, onSaveDraft: _onSaveDraft, onAppl
   const [selectedRight, setSelectedRight] = useState<Set<string>>(new Set());
   const [statusFilter, setStatusFilter] = useState<"active" | "all">("active");
 
+  useEffect(() => {
+    getCampaigns().then(setMockCampaigns).catch(() => setMockCampaigns([]));
+  }, []);
+
   const availableCampaigns = useMemo(() => {
     return mockCampaigns.filter(
-      (c) =>
+      (c: any) =>
         !addedIds.has(c.id) &&
         (statusFilter === "all" || c.status === "live") &&
         (c.name.toLowerCase().includes(leftSearch.toLowerCase()) ||
           c.id.toLowerCase().includes(leftSearch.toLowerCase()))
     );
-  }, [leftSearch, addedIds, statusFilter]);
+  }, [leftSearch, addedIds, statusFilter, mockCampaigns]);
 
   const addedCampaigns = useMemo(() => {
     return mockCampaigns.filter(
-      (c) =>
+      (c: any) =>
         addedIds.has(c.id) &&
         (c.name.toLowerCase().includes(rightSearch.toLowerCase()) ||
           c.id.toLowerCase().includes(rightSearch.toLowerCase()))
     );
-  }, [rightSearch, addedIds]);
+  }, [rightSearch, addedIds, mockCampaigns]);
 
   const toggleLeftSelect = (id: string) => {
     setSelectedLeft((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
       return next;
     });
   };
@@ -55,7 +60,7 @@ export function RuleCampaignSelector({ onBack, onSaveDraft: _onSaveDraft, onAppl
   const toggleRightSelect = (id: string) => {
     setSelectedRight((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
       return next;
     });
   };

@@ -1,7 +1,7 @@
 import { Video, Users, ArrowRight, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MeetingTaskBundle } from "@/data/mockMeetingTasks";
+import type { MeetingTaskBundle } from "@/types/meetings";
 import { useAanEvents } from "./AanEventsContext";
 
 interface Props {

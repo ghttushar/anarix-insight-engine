@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 import { livingStatusPhrase } from "@/lib/decisions/lifecycle";
 
 /** Rotating living-verb chip for Aan Working rows. Single shared 6s tick. */

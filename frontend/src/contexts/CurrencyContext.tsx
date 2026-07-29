@@ -45,7 +45,7 @@ function getInitialCurrency(): string {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && CURRENCIES[stored]) return stored;
-  } catch {}
+  } catch { void 0; }
   return "USD";
 }
 
@@ -58,7 +58,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const setDisplayCurrency = useCallback((code: string) => {
     if (CURRENCIES[code]) {
       setDisplayCurrencyState(code);
-      try { localStorage.setItem(STORAGE_KEY, code); } catch {}
+      try { localStorage.setItem(STORAGE_KEY, code); } catch { void 0; }
     }
   }, []);
 

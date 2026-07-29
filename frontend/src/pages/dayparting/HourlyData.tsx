@@ -14,7 +14,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Calendar, Plus, Pause, Play, Trash2 } from "lucide-react";
-import { hourlyData, calculateHourlySummary, dayPartingCampaigns, schedules as initialSchedules, executionHistory } from "@/data/mockDayParting";
+import { getHourlyData, getHourlySummary, getCampaigns, getSchedules, getExecutionHistory } from "@/services/day-parting.service";
 import { MetricType, DayPartingSchedule } from "@/types/dayparting";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -66,11 +66,27 @@ export default function HourlyData() {
     const tab = location.pathname === "/dayparting/history" ? "history" : "dayparting";
     setActiveTab(tab);
   }, [location.pathname]);
+  const [hourlyData, setHourlyData] = useState<any[]>([]);
+  const [summary, setSummary] = useState<any>(null);
+  const [dayPartingCampaigns, setDayPartingCampaigns] = useState<any[]>([]);
+  const [schedules, setSchedules] = useState<any[]>([]);
+  const [executionHistory, setExecutionHistory] = useState<any[]>([]);
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>(["camp-1"]);
   const [metric, setMetric] = useState<MetricType>("roas");
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeltas, setShowDeltas] = useState(false);
   const [boxMetrics, setBoxMetrics] = useState<string[]>(["spend", "revenue", "roas", "acos", "orders", "units"]);
+
+  useEffect(() => {
+    getHourlyData().then(setHourlyData).catch(() => setHourlyData([]));
+    getHourlySummary().then(setSummary).catch(() => setSummary(null));
+    getCampaigns().then((data: any[]) => {
+      setDayPartingCampaigns(data);
+      if (data.length > 0) setSelectedCampaigns([data[0].id]);
+    }).catch(() => setDayPartingCampaigns([]));
+    getSchedules().then(setSchedules).catch(() => setSchedules([]));
+    getExecutionHistory().then(setExecutionHistory).catch(() => setExecutionHistory([]));
+  }, []);
 
   // Table sort/pin
   const [sortField, setSortField] = useState<string | null>(null);
@@ -81,7 +97,6 @@ export default function HourlyData() {
   const handleSort = getSortHandler(sortField, setSortField, sortDirection, setSortDirection);
 
   // Schedules state
-  const [schedules, setSchedules] = useState<DayPartingSchedule[]>(initialSchedules);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null);
 
@@ -89,17 +104,17 @@ export default function HourlyData() {
   const [historySearch, setHistorySearch] = useState("");
   const [historyStatusFilter, setHistoryStatusFilter] = useState("all");
 
-  const summary = calculateHourlySummary(hourlyData);
   const formatCurrency = (value: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 
   const getMetricValue = (key: string): number => {
+    const s = summary || {};
     const map: Record<string, number> = {
-      spend: summary.totalSpend, revenue: summary.totalRevenue,
-      roas: summary.avgRoas, acos: summary.avgAcos,
-      orders: summary.totalOrders, units: summary.totalUnits,
+      spend: s.totalSpend || 0, revenue: s.totalRevenue || 0,
+      roas: s.avgRoas || 0, acos: s.avgAcos || 0,
+      orders: s.totalOrders || 0, units: s.totalUnits || 0,
       ...METRIC_VALUES,
     };
-    map.adSales = summary.totalRevenue;
+    map.adSales = s.totalRevenue || 0;
     return map[key] ?? 0;
   };
 
@@ -122,8 +137,8 @@ export default function HourlyData() {
     scheduleId: string | null;
   };
 
-  const unifiedRows: UnifiedRow[] = dayPartingCampaigns.map((campaign) => {
-    const campSchedules = schedules.filter((s) => s.campaignIds.includes(campaign.id));
+  const unifiedRows: UnifiedRow[] = dayPartingCampaigns.map((campaign: any) => {
+    const campSchedules = schedules.filter((s: any) => s.campaignIds.includes(campaign.id));
     const activeSchedule = campSchedules.find((s) => s.status === "active") || campSchedules[0];
     return {
       id: campaign.id,
@@ -169,7 +184,7 @@ export default function HourlyData() {
   };
 
   // History filtering
-  const filteredHistory = executionHistory.filter((h) => {
+  const filteredHistory = executionHistory.filter((h: any) => {
     const matchesSearch =
       h.scheduleName.toLowerCase().includes(historySearch.toLowerCase()) ||
       h.campaignName.toLowerCase().includes(historySearch.toLowerCase());
@@ -179,8 +194,8 @@ export default function HourlyData() {
 
   const statusCounts = {
     all: executionHistory.length,
-    success: executionHistory.filter((h) => h.status === "success").length,
-    failed: executionHistory.filter((h) => h.status === "failed").length,
+    success: executionHistory.filter((h: any) => h.status === "success").length,
+    failed: executionHistory.filter((h: any) => h.status === "failed").length,
   };
 
   const SCHEDULE_STATUS_STYLES: Record<string, string> = {
@@ -217,7 +232,7 @@ export default function HourlyData() {
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Campaign</span>
               <Select value={selectedCampaigns[0]} onValueChange={(v) => setSelectedCampaigns([v])}>
                 <SelectTrigger className="h-8 w-[200px] text-sm border-0 bg-transparent shadow-none px-1.5 cursor-pointer"><SelectValue placeholder="Select campaign" /></SelectTrigger>
-                <SelectContent>{dayPartingCampaigns.map((camp) => (<SelectItem key={camp.id} value={camp.id} className="text-xs">{camp.name}</SelectItem>))}</SelectContent>
+                <SelectContent>{dayPartingCampaigns.map((camp: any) => (<SelectItem key={camp.id} value={camp.id} className="text-xs">{camp.name}</SelectItem>))}</SelectContent>
               </Select>
             </div>
             <div className="flex items-center gap-1.5 rounded-md bg-muted/40 px-2.5 py-1">

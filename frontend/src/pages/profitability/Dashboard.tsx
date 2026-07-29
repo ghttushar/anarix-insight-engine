@@ -12,8 +12,8 @@ import { ProductTrendsModal } from "@/components/profitability/ProductTrendsModa
 import { ProductsOrdersToggle } from "@/components/profitability/ProductsOrdersToggle";
 import { PeriodBreakdownPanel } from "@/components/profitability/PeriodBreakdownPanel";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
-import { profitabilitySummaries, profitabilityProducts, profitabilityOrders, trendDataByPeriod } from "@/data/mockProfitability";
-import { ProfitabilityProduct, ProfitabilitySummary } from "@/types/profitability";
+import { getSummaries, getProducts, getOrders, getTrendDataByPeriod, updateCogs as updateCogsService } from "@/services/profitability.service";
+import { ProfitabilityProduct, ProfitabilityOrder, ProfitabilitySummary, TrendDataPoint } from "@/types/profitability";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -63,6 +63,33 @@ export default function ProfitabilityDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>("today");
   const [tableTab, setTableTab] = useState<"products" | "orders">(initialTab);
 
+  // Data state
+  const [summaries, setSummaries] = useState<ProfitabilitySummary[]>([]);
+  const [products, setProducts] = useState<ProfitabilityProduct[]>([]);
+  const [orders, setOrders] = useState<ProfitabilityOrder[]>([]);
+  const [trendDataByPeriod, setTrendDataByPeriod_] = useState<Record<string, TrendDataPoint[]>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const [s, p, o, t] = await Promise.all([
+        getSummaries(),
+        getProducts(),
+        getOrders(),
+        getTrendDataByPeriod(),
+      ]);
+      if (cancelled) return;
+      setSummaries(s);
+      setProducts(p);
+      setOrders(o);
+      setTrendDataByPeriod_(t);
+      setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
   useEffect(() => {
     if (routeTab && validTabs.includes(routeTab as any)) {
       setTableTab(routeTab as "products" | "orders");
@@ -76,7 +103,6 @@ export default function ProfitabilityDashboard() {
   const [searchValue, setSearchValue] = useState("");
   const [columns, setColumns] = useState(COLUMN_DEFS);
   const [activeFilters, setActiveFilters] = useState<any[]>([]);
-  const [products, setProducts] = useState(profitabilityProducts);
   const [showDeltas, setShowDeltas] = useState(false);
   const [catalogue, setCatalogue] = useState("all");
   
@@ -107,8 +133,9 @@ export default function ProfitabilityDashboard() {
     closeDataPanel();
   };
 
-  const handleCogsSave = (productId: string, newCogs: number) => {
+  const handleCogsSave = async (productId: string, newCogs: number) => {
     setProducts((prev) => prev.map((p) => p.id === productId ? { ...p, cogs: newCogs } : p));
+    await updateCogsService(productId, newCogs);
   };
 
   const handleColumnToggle = (columnId: string) => {
@@ -125,11 +152,30 @@ export default function ProfitabilityDashboard() {
     p.sku.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  const filteredOrders = profitabilityOrders.filter((o) =>
+  const filteredOrders = orders.filter((o) =>
     o.orderId.toLowerCase().includes(searchValue.toLowerCase()) ||
     o.country.toLowerCase().includes(searchValue.toLowerCase()) ||
     o.products.some((p) => p.name.toLowerCase().includes(searchValue.toLowerCase()))
   );
+
+  // Apply DataTableToolbar filter rules to the product list
+  const applyFilters = (items: ProfitabilityProduct[]) => {
+    if (!activeFilters || activeFilters.length === 0) return items;
+    return items.filter((p) =>
+      activeFilters.every((f) => {
+        const fieldVal = String((p as any)[f.field] ?? "");
+        const query = f.value.toLowerCase();
+        switch (f.operator) {
+          case "contains": return fieldVal.toLowerCase().includes(query);
+          case "equals": return fieldVal.toLowerCase() === query;
+          case "gt": return Number(fieldVal) > Number(f.query);
+          case "lt": return Number(fieldVal) < Number(f.query);
+          default: return true;
+        }
+      })
+    );
+  };
+  const filteredProductsWithRules = applyFilters(filteredProducts);
 
   const showProductDetail = dataPanel === "productDetail" && detailProduct;
   const showBreakdown = dataPanel === "periodBreakdown" && breakdownSummary;
@@ -144,13 +190,17 @@ export default function ProfitabilityDashboard() {
           />
           <AppTaskbar showDateRange showRunButton onRun={() => toast.info("Refreshing data...")} breadcrumbItems={breadcrumbItems} />
 
+          {loading ? (
+            <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">Loading...</div>
+          ) : (
           <ProfitabilityHeroCard
-            summaries={profitabilitySummaries}
+            summaries={summaries}
             trendDataByPeriod={trendDataByPeriod}
             selectedPeriod={selectedPeriod}
             onPeriodChange={setSelectedPeriod}
             onViewBreakdown={handleOpenBreakdown}
           />
+          )}
 
           <div className="space-y-3">
             <DataTableToolbar
@@ -179,7 +229,7 @@ export default function ProfitabilityDashboard() {
             />
             <div className="rounded-lg border border-border bg-card">
               <ProductsPnLTable
-                products={filteredProducts}
+                products={filteredProductsWithRules}
                 orders={filteredOrders}
                 mode={tableTab}
                 visibleColumns={columns.filter((c) => c.visible).map((c) => c.id)}

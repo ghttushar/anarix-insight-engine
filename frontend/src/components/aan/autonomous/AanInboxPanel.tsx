@@ -38,17 +38,17 @@ export function AanInboxPanel({ standalone = false, focusScenarioId, onlyMorning
   });
   const [showAllApproval, setShowAllApproval] = useState(false);
 
+  const focusedEvent = useMemo(
+    () => (focusScenarioId ? events.find((e) => e.scenarioId === focusScenarioId) ?? null : null),
+    [focusScenarioId, events]
+  );
+
   if (!standalone && dataPanel !== "aan-inbox") return null;
 
   const approval = events.filter((e) => ["awaiting_approval", "detected", "analyzing"].includes(e.lifecycle) && e.scenario.severity !== "fyi");
   const executing = events.filter((e) => e.lifecycle === "executing");
   const fulfilled = events.filter((e) => e.lifecycle === "fulfilled" || e.lifecycle === "rejected");
   const watching = events.filter((e) => ["awaiting_approval", "detected", "analyzing"].includes(e.lifecycle) && e.scenario.severity === "fyi");
-
-  const focusedEvent = useMemo(
-    () => (focusScenarioId ? events.find((e) => e.scenarioId === focusScenarioId) ?? null : null),
-    [focusScenarioId, events]
-  );
 
   const APPROVAL_PREVIEW = 2;
   const approvalVisible = showAllApproval ? approval : approval.slice(0, APPROVAL_PREVIEW);

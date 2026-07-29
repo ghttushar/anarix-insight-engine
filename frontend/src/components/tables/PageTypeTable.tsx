@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Input } from "@/components/ui/input";
 import {
@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/table";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
-import { mockPageTypes, pageTypesTotals } from "@/data/mockPageTypePlatform";
 import { TablePagination } from "./TablePagination";
 import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
 import { cn } from "@/lib/utils";
@@ -24,14 +23,18 @@ export function PageTypeTable({ searchQuery = "", showDeltas = false }: PageType
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, 0);
-  const [bidModifiers, setBidModifiers] = useState<Record<string, number>>(() => {
-    const initial: Record<string, number> = {};
-    mockPageTypes.forEach((pt) => { initial[pt.id] = pt.bidModifier; });
-    return initial;
-  });
+  const [pageTypes, setPageTypes] = useState<any[]>([]);
+  const [pageTypesTotals, setPageTypesTotals] = useState<any>({});
+  const [bidModifiers, setBidModifiers] = useState<Record<string, number>>({});
 
-  const filteredTypes = mockPageTypes.filter((pt) =>
-    pt.pageType.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    setPageTypes([]);
+    setPageTypesTotals({});
+    setBidModifiers({});
+  }, []);
+
+  const filteredPageTypes = pageTypes.filter((pt: any) =>
+    pt.pageType?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSort = (field: string) => {

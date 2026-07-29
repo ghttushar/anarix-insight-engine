@@ -26,13 +26,13 @@ export function BillingFlowProvider({ children }: { children: ReactNode }) {
 
   const setBillingFlow = useCallback((v: boolean) => {
     setState(v);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(v)); } catch {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(v)); } catch { void 0; }
   }, []);
 
   const toggleBillingFlow = useCallback(() => {
     setState((prev) => {
       const next = !prev;
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { void 0; }
       return next;
     });
   }, []);

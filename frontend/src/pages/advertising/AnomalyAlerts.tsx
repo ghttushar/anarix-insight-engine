@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sparkles, Bell, BellOff, TrendingUp, TrendingDown, AlertTriangle, CheckCircle } from "lucide-react";
-import { mockAnomalyAlerts, type AnomalyAlert } from "@/data/mockAnomalyAlerts";
+import { getAnomalyAlerts } from "@/services/advertising.service";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -30,8 +30,12 @@ const breadcrumbItems = [
   { label: "Anomaly Alerts" },
 ];
 export default function AnomalyAlerts() {
-  const [alerts, setAlerts] = useState(mockAnomalyAlerts);
+  const [alerts, setAlerts] = useState<any[]>([]);
   const [showAcknowledged, setShowAcknowledged] = useState(false);
+
+  useEffect(() => {
+    getAnomalyAlerts().then(setAlerts).catch(() => setAlerts([]));
+  }, []);
 
   const filtered = showAcknowledged ? alerts : alerts.filter((a) => !a.acknowledged);
   const unackCount = alerts.filter((a) => !a.acknowledged).length;
@@ -106,7 +110,7 @@ export default function AnomalyAlerts() {
   );
 }
 
-function AlertCard({ alert, onAcknowledge }: { alert: AnomalyAlert; onAcknowledge: (id: string) => void }) {
+function AlertCard({ alert, onAcknowledge }: { alert: any; onAcknowledge: (id: string) => void }) {
   return (
     <div className={cn("rounded-lg border-l-4 border border-border p-4", severityStyles[alert.severity], alert.acknowledged && "opacity-60")}>
       <div className="flex items-start justify-between gap-4">

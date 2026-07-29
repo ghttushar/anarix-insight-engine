@@ -489,9 +489,11 @@ export function ScatterPlotChart({ data, selectedIds, onPointToggle, onPointDeta
         <XAxis dataKey="quadrant" tick={{ fontSize: 12 }} className="text-muted-foreground" />
         <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
         <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: "8px" }} />
-        {quadrantAggregates.map((item, i) => (
-          <Bar key={i} dataKey="totalSales" fill={item.fill} radius={[4, 4, 0, 0]} />
-        ))}
+        <Bar dataKey="totalSales" radius={[4, 4, 0, 0]}>
+          {quadrantAggregates.map((item, i) => (
+            <Cell key={i} fill={item.fill} />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );

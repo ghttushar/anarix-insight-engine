@@ -1,4 +1,4 @@
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 import { recommendationFor } from "@/lib/decisions/recommendationStructure";
 import { RecommendationBlock } from "./RecommendationBlock";
 import { AuditTrail } from "./AuditTrail";

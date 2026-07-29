@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Filter as FilterIcon, X } from "lucide-react";
 import { SOURCE_REGISTRY, type DecisionSource } from "@/lib/decisions/sourceRegistry";
-import type { DecisionDomain } from "@/data/mockDecisions";
+import type { DecisionDomain } from "@/types/signals";
 import { cn } from "@/lib/utils";
 
 export interface FilterState {
@@ -52,7 +52,7 @@ export function FilterSheet({ value, onChange, activeCount, categoryOptions }: P
 
   const toggle = <T,>(set: Set<T>, k: T): Set<T> => {
     const n = new Set(set);
-    n.has(k) ? n.delete(k) : n.add(k);
+    if (n.has(k)) { n.delete(k); } else { n.add(k); }
     return n;
   };
 

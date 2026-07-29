@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,6 @@ import {
 import { StatusBadge } from "@/components/status/StatusBadge";
 import { DeltaBadge } from "@/components/ui/delta-badge";
 import { getDelta } from "@/lib/utils/deltaGenerator";
-import { mockProductTargets, productTargetsTotals } from "@/data/mockProductTargeting";
 import { cn } from "@/lib/utils";
 import { TablePagination } from "./TablePagination";
 import { SortableTableHead, sortData, usePinning } from "./SortableTableHead";
@@ -32,12 +31,19 @@ export function ProductTargetingTable({ searchQuery = "", showDeltas = false }: 
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { pinnedColumns, handlePinToggle, ps, pc } = usePinning(PINNABLE, FIXED_OFFSET);
+  const [productTargets, setProductTargets] = useState<any[]>([]);
+  const [productTargetsTotals, setProductTargetsTotals] = useState<any>({});
 
-  const filteredTargets = mockProductTargets.filter((pt) =>
-    pt.targetLabel.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    pt.targetValue.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    pt.adGroupName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    pt.campaignName.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    setProductTargets([]);
+    setProductTargetsTotals({});
+  }, []);
+
+  const filteredTargets = productTargets.filter((pt: any) =>
+    pt.targetLabel?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    pt.targetValue?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    pt.adGroupName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    pt.campaignName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSort = (field: string) => {

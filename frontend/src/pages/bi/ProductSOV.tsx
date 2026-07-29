@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { SOVChart } from "@/components/bi/SOVChart";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { productSOVData, sovTrendData } from "@/data/mockBrandSOV";
+import { getProductSOVData, getSOVTrendData } from "@/services/bi.service";
 import { toast } from "sonner";
 import { TablePagination } from "@/components/tables/TablePagination";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -19,8 +19,15 @@ export default function ProductSOV() {
   const [showDeltas, setShowDeltas] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [productSOVData, setProductSOVData] = useState<any[]>([]);
+  const [sovTrendData, setSovTrendData] = useState<any[]>([]);
 
-  const filteredProducts = productSOVData.filter((p) =>
+  useEffect(() => {
+    getProductSOVData().then(setProductSOVData).catch(() => setProductSOVData([]));
+    getSOVTrendData().then(setSovTrendData).catch(() => setSovTrendData([]));
+  }, []);
+
+  const filteredProducts = productSOVData.filter((p: any) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.sku.toLowerCase().includes(searchQuery.toLowerCase())
   );

@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Download, Eye, ExternalLink, Pencil, Plus } from "lucide-react";
-import { mockInvoices, Invoice } from "@/data/mockInvoices";
+import type { Invoice } from "@/types/marketplace";
+import { getInvoices } from "@/services/invoicing.service";
 import { AddCardModal } from "@/components/billing/AddCardModal";
 import { useBillingFlow } from "@/contexts/BillingFlowContext";
 import { toast } from "sonner";
@@ -40,6 +41,11 @@ export default function Billing() {
   const initialTab: Tab = (routeTab && (TABS as readonly string[]).includes(routeTab)) ? (routeTab as Tab) : "invoices";
   const [tab, setTab] = useState<Tab>(initialTab);
   const { billingFlowEnabled } = useBillingFlow();
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+
+  useEffect(() => {
+    getInvoices().then(setInvoices).catch(() => setInvoices([]));
+  }, []);
 
   const [card, setCard] = useState({ last4: "4242", brand: "Visa", exp: "12/27", name: "Jane Doe" });
   const [autoRenew, setAutoRenew] = useState(true);
@@ -104,7 +110,7 @@ export default function Billing() {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockInvoices.map((inv) => (
+                  {invoices.map((inv) => (
                     <tr key={inv.id} className="border-b border-border/60 last:border-b-0 hover:bg-muted/20">
                       <td className="py-3 px-4 text-foreground whitespace-nowrap">{new Date(inv.date).toLocaleDateString()}</td>
                       <td className="py-3 px-4 text-foreground font-mono text-xs">{inv.number}</td>

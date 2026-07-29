@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { CatalogProductsTable } from "@/components/catalog/CatalogProductsTable";
-import { catalogProducts } from "@/data/mockCatalog";
+import { getProducts } from "@/services/catalog.service";
 import { toast } from "sonner";
 import { useCurrency } from "@/contexts/CurrencyContext";
 const COLUMN_DEFS = [
@@ -49,8 +49,14 @@ export default function CatalogProducts() {
   const [showDeltas, setShowDeltas] = useState(false);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [catalogProducts, setCatalogProducts] = useState<any[]>([]);
   const { formatCurrency } = useCurrency();
-  const filteredProducts = catalogProducts.filter((p) =>
+
+  useEffect(() => {
+    getProducts().then(setCatalogProducts).catch(() => setCatalogProducts([]));
+  }, []);
+
+  const filteredProducts = catalogProducts.filter((p: any) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.itemId.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.sku.toLowerCase().includes(searchQuery.toLowerCase())

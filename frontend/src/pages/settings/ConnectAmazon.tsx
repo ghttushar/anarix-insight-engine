@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Store, ShoppingCart, Tag, Check } from "lucide-react";
+import { Store, ShoppingCart, Tag, Check, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageBreadcrumb } from "@/components/layout/PageBreadcrumb";
-import { useAccounts } from "@/contexts/AccountContext";
+import { useAccounts, AMAZON_REGIONS } from "@/contexts/AccountContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import logoFull from "@/assets/logo-light-full.svg";
 import logoWhite from "@/assets/logo-dark-full.svg";
+
 const connectionOptions = [
   {
     id: "seller",
@@ -41,18 +43,19 @@ const connectionOptions = [
   },
 ];
 
-
 const breadcrumbItems = [
   { label: "Settings", href: "/settings/accounts" },
   { label: "Connect Amazon" },
 ];
+
 export default function ConnectAmazon() {
   const navigate = useNavigate();
-  const { addAccount, isOnboarding } = useAccounts();
+  const { addAccountGroup, addRegionToGroup, isOnboarding } = useAccounts();
   const { resolvedTheme } = useTheme();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [merchantName, setMerchantName] = useState("");
   const [merchantId, setMerchantId] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("US");
   const [isConnecting, setIsConnecting] = useState(false);
 
   const logoSrc = resolvedTheme === "dark" ? logoWhite : logoFull;
@@ -62,17 +65,21 @@ export default function ConnectAmazon() {
 
     setIsConnecting(true);
 
-    // Simulate connection
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     const option = connectionOptions.find((o) => o.id === selectedOption);
 
-    addAccount({
+    const group = addAccountGroup({
       marketplace: "amazon",
       accountType: option?.accountType || "seller",
-      merchantName,
+      name: merchantName,
+    });
+
+    addRegionToGroup({
+      groupId: group.id,
+      region: selectedRegion,
+      merchantName: `${merchantName} ${selectedRegion}`,
       merchantId,
-      region: "US",
       status: "connected",
       lastSync: new Date().toISOString(),
       bidAutomation: "ai",
@@ -102,16 +109,13 @@ export default function ConnectAmazon() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border px-6 py-4">
         <div className="flex items-center justify-between">
           <img src={logoSrc} alt="Anarix" className="h-8 w-auto" />
         </div>
       </header>
 
-      {/* Main content */}
       <main className="max-w-4xl mx-auto p-6">
-        {/* Breadcrumb */}
         <PageBreadcrumb items={breadcrumbItems} className="mb-6" />
 
         <div className="text-center mb-10">
@@ -126,7 +130,6 @@ export default function ConnectAmazon() {
           </p>
         </div>
 
-        {/* Connection options */}
         <div className="grid gap-4 md:grid-cols-3 mb-8">
           {connectionOptions.map((option) => (
             <button
@@ -158,14 +161,13 @@ export default function ConnectAmazon() {
           ))}
         </div>
 
-        {/* Connection form */}
         {selectedOption && (
           <div className="max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
             <div className="space-y-2">
-              <Label htmlFor="merchantName">Merchant Name</Label>
+              <Label htmlFor="merchantName">Account Name</Label>
               <Input
                 id="merchantName"
-                placeholder="Your store name"
+                placeholder="e.g., Demo Account"
                 value={merchantName}
                 onChange={(e) => setMerchantName(e.target.value)}
               />
@@ -181,6 +183,28 @@ export default function ConnectAmazon() {
               />
               <p className="text-xs text-muted-foreground">
                 Find this in your Amazon Seller Central settings
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="region">Region</Label>
+              <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                <SelectTrigger id="region" className="w-full">
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {AMAZON_REGIONS.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>
+                      {r.label} ({r.value})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Select the Amazon marketplace region for this account
               </p>
             </div>
 

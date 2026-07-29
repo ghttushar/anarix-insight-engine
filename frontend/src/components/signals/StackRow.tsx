@@ -17,7 +17,7 @@ import { useUndoFor } from "./useUndoFor";
 
 import { useActionsStore } from "@/state/signalsStore";
 import { useSelection } from "@/state/signalSelectionStore";
-import type { Decision } from "@/data/mockDecisions";
+import type { Decision } from "@/types/signals";
 
 
 const SEV_RAIL: Record<Decision["severity"], string> = {
@@ -52,8 +52,7 @@ interface Props {
 
 export function StackRow({ decision: d, onOpenDetail, interactive = true }: Props) {
   const { approve, reject, meetings, tasksForBundle } = useActionsStore();
-  let sel: ReturnType<typeof useSelection> | null = null;
-  try { sel = useSelection(); } catch { sel = null; }
+  const sel = useSelection();
   const isSelected = interactive && sel ? sel.isSelected(d.id) : false;
   const isFocused = interactive && sel ? sel.focusedId === d.id : false;
   const rowRef = useRef<HTMLDivElement>(null);

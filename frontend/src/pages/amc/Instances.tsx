@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { DataTableToolbar } from "@/components/advertising/DataTableToolbar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { mockInstances } from "@/data/mockAMC";
+import { getInstances } from "@/services/amc.service";
 import { toast } from "sonner";
 import { AppTaskbar } from "@/components/layout/AppTaskbar";
 
@@ -21,8 +21,13 @@ const breadcrumbItems = [
 ];
 export default function AMCInstances() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [instances, setInstances] = useState<any[]>([]);
 
-  const filtered = mockInstances.filter((i) =>
+  useEffect(() => {
+    getInstances().then(setInstances).catch(() => setInstances([]));
+  }, []);
+
+  const filtered = instances.filter((i: any) =>
     i.advertiserName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     i.instanceId.toLowerCase().includes(searchQuery.toLowerCase())
   );
