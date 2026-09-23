@@ -1,64 +1,99 @@
-## Goal
+# Morning Brief — three variations
 
-Add a user preference in Aan settings that controls where Aan's generated drafts (email to Vendor Manager, Amazon Support ticket, listing modification) appear:
+A new **Brief** area that answers one question: *what happened to my business since I last looked?*
+Not only Signals — it pulls from advertising, profitability, catalog/inventory, rules, keyword
+harvesting, dayparting, MCP agents and teammate activity.
 
-- **Side** (default, current behavior): draft appears in the right-side Aan Copilot side panel.
-- **Main**: draft replaces the strategy area inside the Review Workspace's right column — no side panel opens. User edits and sends/chats directly there.
+## Routes
 
-Scope: Signals page only. No other pages/behaviors touched.
+| Route | Name | Feel |
+|---|---|---|
+| `/brief/narrative` | Narrative Brief | Written, editorial, reads like a morning memo |
+| `/brief/dashboard` | Brief Dashboard | Charts, tiles, tables — numbers first |
+| `/brief/mixed` | Mixed Brief | Narrative spine with charts inline (default) |
 
-## Changes
+`/brief` redirects to `/brief/mixed`. One shared header with a segmented switch between the three,
+plus date-window label, marketplace, and "Open Signals" link. Each page scrolls independently.
 
-### 1. New preference context
-Create `frontend/src/contexts/AanPanelContext.tsx`:
-- `mode: "side" | "main"` (default `"side"`), persisted in `localStorage` (`aan:panel-mode`).
-- Provider wrapped in `App.tsx` alongside existing Aan providers.
-- Hook `useAanPanel()`.
+## Shared data layer (mock, deterministic)
 
-### 2. Settings toggle
-In `frontend/src/pages/settings/AanTriggers.tsx` (Aan settings page), add a new card section "AI Panel":
-- Segmented control with two options: **Side panel** / **Main view**.
-- Short description under each explaining behavior.
-- Wired to `useAanPanel()`.
+New `src/data/mockBrief.ts` + `src/lib/brief/compose.ts` assembling:
 
-### 3. Wire ReviewWorkspace to honor the toggle
-In `frontend/src/components/actions/ReviewWorkspace.tsx`:
-- In `onExecute()` for `notify-vm`, `draft-ticket`, and the recommended `Analyze Listing` strategy (`:recommended` on the CRITICAL_ONLY decision — this is the "Modify" flow):
-  - If `mode === "side"` → keep current behavior (`openCopilot()` + `addMessage()`).
-  - If `mode === "main"` → do NOT open copilot. Set new local state `inlineDraft = { kind: "email" | "chat", seed }` which replaces the strategy picker/execute button with an inline draft card.
+- **Headline numbers** — revenue, ad spend, TACoS, ROAS, orders, net profit, units; each with
+  yesterday + 7-day comparison.
+- **Yesterday's actions and their result** — rule actions applied, bids changed, budgets moved,
+  keywords harvested, dayparting schedule changes, negatives added; each with before/after
+  performance so we can show "what your actions earned".
+- **Automation activity** — rules fired (by rule), MCP agent runs, Aan autonomous actions,
+  pending approvals.
+- **People activity** — changes made by team members (who changed what, when).
+- **Attention items** — top signals needing a decision, inventory/OOS risk, Buy Box losses,
+  budget-capped campaigns, anomalies.
+- **Movers** — best/worst campaigns, SKUs, keywords, placements.
+- **Today ahead** — scheduled rules, dayparting windows, meetings, budget pacing forecast.
 
-### 4. New inline draft components (rendered in the right column of Signals only)
-Create under `frontend/src/components/actions/review/inline/`:
+All three screens read from this single source, so the story stays consistent across variants.
 
-- **`InlineEmailCompose.tsx`** (for `notify-vm`):
-  - Pre-filled fields: To, Cc, Bcc, Subject, Body — all from the existing `AAN_SEEDS["notify-vm"]` (parsed from the drafted markdown; to keep it simple, split the seed into `subject` and `body` constants stored alongside the component).
-  - Editable inputs, "Send" (primary) and "Cancel" (returns to strategy view) buttons.
-  - Send → toast success + reset workspace (same auto-close as current execute path).
+## 1. Narrative Brief (`/brief/narrative`)
 
-- **`InlineDraftChat.tsx`** (for `draft-ticket` and `Analyze Listing`/modify):
-  - Shows the initial Aan draft as an assistant message bubble.
-  - Editable textarea at the bottom for the user to reply / iterate.
-  - Simple local echo assistant response (matches the existing seed pattern — no backend calls; this is a mock/demo app).
-  - "Approve & file" / "Approve & apply" primary button + "Cancel" button.
+Editorial column, generous reading width, minimal chrome. Sections in order:
 
-Styling: reuse existing tokens (`bg-card`, `border-border`, `Button`, `Textarea`, `Input` from `@/components/ui`). No new visuals invented — matches AlertDetailPanel's chat/email patterns.
+1. Greeting + one-paragraph **executive summary** (auto-composed sentences from the data).
+2. **Overnight** — what happened while away, as prose bullets with inline bold numbers.
+3. **What your automations did** — sentence per rule/agent with outcome.
+4. **What the team changed** — who did what.
+5. **What needs you today** — 3–5 items, each a short paragraph with an inline link into the
+   relevant module.
+6. **Wins and drags** — two short written lists.
+7. **Today's outlook** — scheduled work, pacing, meetings.
+8. Sparklines only — no full charts. Numbers live inside the sentences.
 
-### 5. Render inline draft inside ReviewWorkspace body
-In the body ScrollArea of `ReviewWorkspace.tsx`, add a branch:
-- If `inlineDraft` set → render `<InlineEmailCompose />` or `<InlineDraftChat />` in place of the "Choose your strategy" Block (evidence/current-state blocks above remain visible).
-- Cancel clears `inlineDraft`; Send/Approve triggers the same post-execute confirmation card that already exists.
+## 2. Brief Dashboard (`/brief/dashboard`)
 
-## Files touched
+Dense, grid-based, no long prose:
 
-- **New:** `frontend/src/contexts/AanPanelContext.tsx`
-- **New:** `frontend/src/components/actions/review/inline/InlineEmailCompose.tsx`
-- **New:** `frontend/src/components/actions/review/inline/InlineDraftChat.tsx`
-- **Edit:** `frontend/src/App.tsx` — mount `AanPanelProvider`.
-- **Edit:** `frontend/src/pages/settings/AanTriggers.tsx` — add "AI Panel" toggle card.
-- **Edit:** `frontend/src/components/actions/ReviewWorkspace.tsx` — branch on `mode` in `onExecute()`, render inline draft.
+- KPI tile row (7 tiles, delta vs yesterday and vs 7-day average).
+- Revenue vs ad spend combo chart (bars + line, 14 days).
+- TACoS / ROAS dual-line trend.
+- "Impact of yesterday's actions" before/after bar comparison.
+- Automation activity: stacked bar by source (rules, MCP agents, Aan, humans) + a run-log table.
+- Top movers table (campaigns / SKUs / keywords, tabbed).
+- Dayparting heatmap strip (hour × day intensity).
+- Keyword harvesting funnel counters + harvested-terms table.
+- Inventory risk table (days of cover, OOS ETA).
+- Budget pacing progress bars.
+- Signals-by-category donut with counts.
 
-No other files, pages, or flows change. Side-panel behavior is fully preserved when the toggle is "Side".
+## 3. Mixed Brief (`/brief/mixed`)
 
-## Verification
+The default. Narrative spine, charts inline where a number needs proof:
 
-After build: switch toggle to Main → open the critical signal → click each of Notify Vendor Manager / Draft Amazon Support Ticket / Analyze Listing → confirm draft appears inline in the right column and the Aan side panel does NOT open. Switch back to Side → confirm original behavior.
+- Executive summary paragraph + KPI tile row.
+- "Overnight" prose block beside the revenue/spend chart.
+- "Your actions paid off" paragraph + before/after chart.
+- Automation prose summary + compact run table.
+- "Needs you today" cards with sparkline evidence.
+- Movers: short written call-out + compact table.
+- Outlook paragraph + pacing bars.
+
+## Components
+
+New folder `src/components/brief/`, one responsibility per file:
+
+`BriefShell.tsx` (header, variant switch, scroll container), `BriefKpiRow.tsx`, `BriefKpiTile.tsx`,
+`Sparkline.tsx`, `NarrativeBlock.tsx`, `ActionImpactChart.tsx`, `RevenueSpendChart.tsx`,
+`EfficiencyTrendChart.tsx`, `AutomationActivity.tsx`, `AutomationRunTable.tsx`,
+`TeamActivityList.tsx`, `NeedsYouList.tsx`, `MoversTable.tsx`, `DaypartingStrip.tsx`,
+`HarvestingPanel.tsx`, `InventoryRiskTable.tsx`, `BudgetPacingList.tsx`,
+`SignalsMixDonut.tsx`, `OutlookPanel.tsx`.
+
+Pages: `src/pages/brief/NarrativeBrief.tsx`, `DashboardBrief.tsx`, `MixedBrief.tsx`.
+
+## Rules followed
+
+- Design tokens only (Periwinkle system), no hardcoded colours; red/green/yellow reserved for
+  data meaning; charts use Recharts via the existing chart primitives.
+- Neutral, precise copy in numbers sections; light narrative tone allowed in the written brief.
+- Motion limited to fades ≤ 200ms.
+- Everything read-only: no writes, no destructive actions, deep links only.
+- Sidebar gets a "Brief" entry above Signals. Nothing is pushed to the remote repo.
