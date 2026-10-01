@@ -78,7 +78,7 @@ export function FilterSheet({ value, onChange, activeCount, categoryOptions }: P
     onChange(e);
   };
 
-  const apply = () => { onChange(draft); };
+  const update = (fn: (d: FilterState) => FilterState) => { const n = fn(draft); setDraft(n); onChange(n); };
 
   return (
     <div className="rounded-lg border border-border/60 bg-card p-3 space-y-4">
@@ -102,7 +102,7 @@ export function FilterSheet({ value, onChange, activeCount, categoryOptions }: P
               return (
                 <button
                   key={cat.key}
-                  onClick={() => setDraft((d) => ({ ...d, categories: toggle(d.categories, cat.key) }))}
+                  onClick={() => update((d) => ({ ...d, categories: toggle(d.categories, cat.key) }))}
                   className={cn(
                     "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border text-[12px]",
                     on ? "border-primary/40 bg-primary/5 text-primary font-medium" : "border-border hover:bg-muted text-muted-foreground",
@@ -127,7 +127,7 @@ export function FilterSheet({ value, onChange, activeCount, categoryOptions }: P
             return (
               <button
                 key={s.key}
-                onClick={() => setDraft((d) => ({ ...d, sources: toggle(d.sources, s.key) }))}
+                onClick={() => update((d) => ({ ...d, sources: toggle(d.sources, s.key) }))}
                 className={cn(
                   "flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-[12px]",
                   on ? "border-primary/40 bg-primary/5 text-primary" : "border-border hover:bg-muted text-muted-foreground",
@@ -150,7 +150,7 @@ export function FilterSheet({ value, onChange, activeCount, categoryOptions }: P
             return (
               <button
                 key={d.key}
-                onClick={() => setDraft((s) => ({ ...s, domains: toggle(s.domains, d.key) }))}
+                onClick={() => update((s) => ({ ...s, domains: toggle(s.domains, d.key) }))}
                 className={cn(
                   "px-2.5 py-1.5 rounded-md border text-[12px]",
                   on ? "border-primary/40 bg-primary/5 text-primary" : "border-border hover:bg-muted text-muted-foreground",
@@ -170,7 +170,7 @@ export function FilterSheet({ value, onChange, activeCount, categoryOptions }: P
           {WINDOWS.map((w) => (
             <button
               key={w.key}
-              onClick={() => setDraft((d) => ({ ...d, window: w.key }))}
+              onClick={() => update((d) => ({ ...d, window: w.key }))}
               className={cn(
                 "px-2.5 py-1 rounded-md border text-[12px]",
                 draft.window === w.key ? "border-primary/40 bg-primary/5 text-primary font-medium" : "border-border hover:bg-muted text-muted-foreground",
