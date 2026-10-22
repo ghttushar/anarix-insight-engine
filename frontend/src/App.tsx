@@ -153,6 +153,12 @@ function WelcomeToasts() {
   return null;
 }
 
+function MaintenanceGate() {
+  const { maintenanceMode } = useMaintenance();
+  if (maintenanceMode) return <UnderMaintenance />;
+  return <AppRoutes />;
+}
+
 function AppRoutes() {
   const { hasAccounts, isOnboarding } = useAccounts();
 
@@ -170,6 +176,7 @@ function AppRoutes() {
       />
 
       {/* Auth & Onboarding */}
+      <Route path="/maintenance" element={<UnderMaintenance />} />
       <Route path="/login" element={<Login />} />
       <Route path="/onboarding/connect" element={<ConnectAccounts />} />
 
