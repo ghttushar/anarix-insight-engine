@@ -320,13 +320,14 @@ const App = () => (
                         <BrandingProvider>
                         <BillingFlowProvider>
                         <TrialProvider>
+                        <MaintenanceProvider>
                         <TooltipProvider>
                           <Toaster />
                           <Sonner position="bottom-left" />
                           <BrowserRouter>
                                 <CreativeFeatures>
                                   <WelcomeToasts />
-                                  <AppRoutes />
+                                  <MaintenanceGate />
                                   
                                 </CreativeFeatures>
                           </BrowserRouter>
