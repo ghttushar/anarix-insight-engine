@@ -160,6 +160,7 @@ export default function Preferences() {
   const { newBranding, toggleNewBranding } = useBranding();
   const { billingFlowEnabled, toggleBillingFlow } = useBillingFlow();
   const { trial, startSync, forceExpire, reset: resetTrial } = useTrial();
+  const { maintenanceMode, setMaintenanceMode } = useMaintenance();
   const { effects, toggle: toggleEffect } = useVisualEffects();
   const navigate = useNavigate();
   const currencyList = Object.values(CURRENCIES);
@@ -409,6 +410,24 @@ export default function Preferences() {
                     <Button size="sm" variant="outline" onClick={() => forceExpire()}>Force expired</Button>
                     <Button size="sm" variant="ghost" onClick={() => resetTrial()}>Reset</Button>
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 pt-3 border-t border-border">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">Maintenance mode</p>
+                    <p className="text-xs text-muted-foreground">Replaces the entire app with the under-maintenance screen until turned off.</p>
+                  </div>
+                  <Switch checked={maintenanceMode} onCheckedChange={(v) => setMaintenanceMode(v)} />
+                </div>
+
+                <div className="flex items-center justify-between gap-3 pt-3 border-t border-border">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">Under maintenance page</p>
+                    <p className="text-xs text-muted-foreground">Preview the full-screen maintenance page without touching the rest of the app.</p>
+                  </div>
+                  <Button size="sm" variant="outline" className="shrink-0" onClick={() => navigate("/maintenance")}>
+                    Preview maintenance page
+                  </Button>
                 </div>
               </div>
             )}
