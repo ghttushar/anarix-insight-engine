@@ -328,7 +328,6 @@ const App = () => (
                                 <CreativeFeatures>
                                   <WelcomeToasts />
                                   <MaintenanceGate />
-                                  
                                 </CreativeFeatures>
                           </BrowserRouter>
                         </TooltipProvider>
