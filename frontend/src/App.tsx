@@ -16,9 +16,11 @@ import { FeatureToggleProvider } from "@/contexts/FeatureToggleContext";
 import { BrandingProvider } from "@/contexts/BrandingContext";
 import { BillingFlowProvider } from "@/contexts/BillingFlowContext";
 import { TrialProvider } from "@/contexts/TrialContext";
+import { MaintenanceProvider, useMaintenance } from "@/contexts/MaintenanceContext";
 import { ActivePanelProvider } from "@/contexts/ActivePanelContext";
 import { AanProvider } from "@/components/aan";
 import { AanPanelProvider } from "@/contexts/AanPanelContext";
+import UnderMaintenance from "./pages/system/UnderMaintenance";
 import { InsightsProvider } from "@/components/insights";
 import { CreativeFeatures } from "@/features/creative";
 import { toast } from "sonner";
@@ -151,6 +153,12 @@ function WelcomeToasts() {
   return null;
 }
 
+function MaintenanceGate() {
+  const { maintenanceMode } = useMaintenance();
+  if (maintenanceMode) return <UnderMaintenance />;
+  return <AppRoutes />;
+}
+
 function AppRoutes() {
   const { hasAccounts, isOnboarding } = useAccounts();
 
@@ -168,6 +176,7 @@ function AppRoutes() {
       />
 
       {/* Auth & Onboarding */}
+      <Route path="/maintenance" element={<UnderMaintenance />} />
       <Route path="/login" element={<Login />} />
       <Route path="/onboarding/connect" element={<ConnectAccounts />} />
 
@@ -311,18 +320,19 @@ const App = () => (
                         <BrandingProvider>
                         <BillingFlowProvider>
                         <TrialProvider>
+                        <MaintenanceProvider>
                         <TooltipProvider>
                           <Toaster />
                           <Sonner position="bottom-left" />
                           <BrowserRouter>
                                 <CreativeFeatures>
                                   <WelcomeToasts />
-                                  <AppRoutes />
-                                  
+                                  <MaintenanceGate />
                                 </CreativeFeatures>
                           </BrowserRouter>
                         </TooltipProvider>
                         </TrialProvider>
+                        </MaintenanceProvider>
                         </BillingFlowProvider>
                         </BrandingProvider>
                       </FeatureToggleProvider>
