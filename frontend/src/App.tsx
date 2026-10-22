@@ -331,8 +331,8 @@ const App = () => (
                                 </CreativeFeatures>
                           </BrowserRouter>
                         </TooltipProvider>
-                        </TrialProvider>
                         </MaintenanceProvider>
+                        </TrialProvider>
                         </BillingFlowProvider>
                         </BrandingProvider>
                       </FeatureToggleProvider>
