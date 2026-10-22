@@ -10,6 +10,7 @@ import { useFeatureToggle } from "@/contexts/FeatureToggleContext";
 import { useBranding } from "@/contexts/BrandingContext";
 import { useBillingFlow } from "@/contexts/BillingFlowContext";
 import { useTrial } from "@/contexts/TrialContext";
+import { useMaintenance } from "@/contexts/MaintenanceContext";
 import { useVisualEffects } from "@/contexts/VisualEffectsContext";
 import { cn } from "@/lib/utils";
 import { Pencil, RotateCcw, Globe, Monitor, Tablet, Smartphone, Sparkles, Hand, Play, Keyboard, Bell, Shield, Zap, AlertTriangle, ChevronDown, ShoppingCart, AlertOctagon, Wallet, KeyRound, Target, Clock, Rocket, TrendingDown, Star, Calendar, Video, Sun, MessageSquare, Mail, Users, FileText, Plug } from "lucide-react";
